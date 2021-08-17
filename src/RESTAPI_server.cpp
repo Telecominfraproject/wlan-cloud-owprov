@@ -9,7 +9,13 @@
 #include "RESTAPI_handler.h"
 
 #include "RESTAPI_system_command.h"
+
 #include "RESTAPI_entity_handler.h"
+#include "RESTAPI_contact_handler.h"
+#include "RESTAPI_location_handler.h"
+#include "RESTAPI_venue_handler.h"
+#include "RESTAPI_inventory_handler.h"
+#include "RESTAPI_managementPolicy_handler.h"
 
 namespace uCentral {
 
@@ -62,7 +68,12 @@ namespace uCentral {
 
         return  RESTAPI_Router<
                 RESTAPI_system_command,
-                OpenWifi::RESTAPI_entity_handler
+                OpenWifi::RESTAPI_entity_handler,
+                OpenWifi::RESTAPI_contact_handler,
+                OpenWifi::RESTAPI_location_handler,
+                OpenWifi::RESTAPI_venue_handler,
+                OpenWifi::RESTAPI_inventory_handler,
+                OpenWifi::RESTAPI_managementPolicy_handler
                 >(Path,Bindings,Logger_);
     }
 

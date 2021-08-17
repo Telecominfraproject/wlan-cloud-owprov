@@ -3,7 +3,6 @@
 //
 
 #include "storage_venue.h"
-#include "Utils.h"
 #include "uCentralTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
@@ -36,7 +35,7 @@ namespace OpenWifi {
     };
 
     VenueDB::VenueDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-    DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L) {}
+        DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L) {}
 
 }
 
