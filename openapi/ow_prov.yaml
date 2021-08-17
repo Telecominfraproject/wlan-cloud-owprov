@@ -454,14 +454,594 @@ components:
           $ref: '#/components/schemas/TagIntPairList'
 
 paths:
-  /entity:
+  /entity/{uuid}:
     get:
       tags:
         - Entities
-      operationId: getEntities
+      operationId: getEntity
+      summary: Retrieve a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When looking for the root entity, the uuid 0000-0000-0000 must be entered.
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Entity'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Entities
+      operationId: createEntity
+      summary: Create a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When creating the root entity, the uuid 0000-0000-0000 must be entered.
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Entity'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Entities
+      operationId: modifyEntity
+      summary: Modify a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When modifying the root entity, the uuid 0000-0000-0000 must be entered.
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Entity'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Entities
+      operationId: deleteEntity
       summary: Retrieve the list of entities
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: The root entity cannot be deleted.
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /contact/{uuid}:
+    get:
+      tags:
+        - Contacts
+      operationId: getContact
+      summary: Retrieve a specific contact
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Contact'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Contacts
+      operationId: createContact
+      summary: Create a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Contact'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Contacts
+      operationId: modifyContact
+      summary: Modify a specific contact
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Contact'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Contacts
+      operationId: deleteContact
+      summary: Delete a contact
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
 
+  /location/{uuid}:
+    get:
+      tags:
+        - Locations
+      operationId: getLocation
+      summary: Retrieve a specific location
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Location'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Locations
+      operationId: createLocation
+      summary: Create a specific location
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Location'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Locations
+      operationId: modifyLocation
+      summary: Modify a specific location
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Location'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Locations
+      operationId: deleteLocation
+      summary: Delete a location
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /inventory/{serialNumber}:
+    get:
+      tags:
+        - Inventory
+      operationId: getInventory
+      summary: Retrieve a specific inventory tag
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/InventoryTag'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Inventory
+      operationId: createInventory
+      summary: Create a specific Inventory
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryTag'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/InventoryTag'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Inventory
+      operationId: modifyInventory
+      summary: Modify a specific Inventory
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryTag'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/InventoryTag'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Inventory
+      operationId: deleteInventory
+      summary: Delete a specific Inventory
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+
+  /venue/{uuid}:
+    get:
+      tags:
+        - Venues
+      operationId: getVenue
+      summary: Retrieve a specific venue
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Venue'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Venues
+      operationId: createVenue
+      summary: Create a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Venue'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Venues
+      operationId: modifyVenue
+      summary: Modify a specific venue
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new venue
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Venue'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Venues
+      operationId: deleteVenue
+      summary: Delete a venue
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: The root entity cannot be deleted.
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+
+  /managementPolicy/{uuid}:
+    get:
+      tags:
+        - Management Policies
+      operationId: getManagementPolicy
+      summary: Retrieve a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementPolicy'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Management Policies
+      operationId: createManagementPolicy
+      summary: Create a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagementPolicy'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementPolicy'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Management Policies
+      operationId: modifyManagementPolicy
+      summary: Modify a specific entity
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagementPolicy'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementPolicy'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Management Policies
+      operationId: deleteManagementPolicy
+      summary: Retrieve the list of entities
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: The root entity cannot be deleted.
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
 
 
@@ -534,6 +1114,4 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
-
 
