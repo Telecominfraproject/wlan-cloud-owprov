@@ -5,9 +5,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-Environment="$OWPROV_ROOT=/home/admin/dev/ow-prov"
-ExecStart=/home/admin/dev/ow-prov/cmake-build/owprov
-WorkingDirectory=/home/admin/dev/ow-prov
+Environment="OWPROV_ROOT=/home/admin/dev/wlan-cloud-prov"
+ExecStart=/home/admin/dev/wlan-cloud-prov/cmake-build/owprov
+WorkingDirectory=/home/admin/dev/wlan-cloud-prov
 # ExecReload=/bin/kill -s HUP $MAINPID
 User=admin
 # TimeoutSec=0
