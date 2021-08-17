@@ -23,7 +23,8 @@ namespace OpenWifi {
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"subEntity",ORM::FieldType::FT_TEXT},
         ORM::Field{"subVenue",ORM::FieldType::FT_TEXT},
-        ORM::Field{"deviceType",ORM::FieldType::FT_TEXT}
+        ORM::Field{"deviceType",ORM::FieldType::FT_TEXT},
+        ORM::Field{"qrcode",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -55,6 +56,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.subEntity = In.get<9>();
     Out.subVenue = In.get<10>();
     Out.deviceType = In.get<11>();
+    Out.qrCode = In.get<11>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -70,4 +72,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<9>(In.subEntity);
     Out.set<10>(In.subVenue);
     Out.set<11>(In.deviceType);
+    Out.set<11>(In.qrCode);
 }
