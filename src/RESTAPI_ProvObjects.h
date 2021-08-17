@@ -232,6 +232,7 @@ namespace OpenWifi::ProvObjects {
         std::string     subEntity;
         std::string     subVenue;
         std::string     subscriber;
+        std::string     deviceType;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

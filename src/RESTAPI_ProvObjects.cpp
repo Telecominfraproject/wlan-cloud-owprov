@@ -264,6 +264,7 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json(Obj, "subEntity", subEntity);
         uCentral::RESTAPI_utils::field_to_json(Obj, "subVenue", subVenue);
         uCentral::RESTAPI_utils::field_to_json(Obj, "subscriber", subscriber);
+        uCentral::RESTAPI_utils::field_to_json(Obj, "deviceType", deviceType);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -275,6 +276,7 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"subEntity",subEntity);
             uCentral::RESTAPI_utils::field_from_json( Obj,"subVenue",subVenue);
             uCentral::RESTAPI_utils::field_from_json( Obj,"subscriber",subscriber);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"deviceType",deviceType);
             return true;
         } catch(...) {
 
