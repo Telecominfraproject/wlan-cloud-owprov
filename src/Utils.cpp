@@ -496,7 +496,7 @@ namespace uCentral::Utils {
 	}
 
 	static bool cidr6_match(const in6_addr &address, const in6_addr &network, uint8_t bits) {
-#ifdef LINUX
+#ifdef __linux__
 		const uint32_t *a = address.s6_addr32;
 		const uint32_t *n = network.s6_addr32;
 #else
