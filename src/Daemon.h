@@ -31,7 +31,7 @@
 
 namespace uCentral {
 
-	static const char * vDAEMON_PROPERTIES_FILENAME = "ow_prov.properties";
+	static const char * vDAEMON_PROPERTIES_FILENAME = "owprov.properties";
 	static const char * vDAEMON_ROOT_ENV_VAR = "OWPROV_ROOT";
 	static const char * vDAEMON_CONFIG_ENV_VAR = "OWPROV_CONFIG";
 	static const char * vDAEMON_APP_NAME = uSERVICE_PROVISIONING.c_str();
