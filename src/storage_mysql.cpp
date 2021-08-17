@@ -17,8 +17,6 @@ namespace uCentral {
 
 	int Storage::Setup_MySQL() {
 
-		dbType_ = mysql ;
-
 		Logger_.notice("MySQL Storage enabled.");
 		auto NumSessions = Daemon()->ConfigGetInt("storage.type.mysql.maxsessions", 64);
 		auto IdleTime = Daemon()->ConfigGetInt("storage.type.mysql.idletime", 60);

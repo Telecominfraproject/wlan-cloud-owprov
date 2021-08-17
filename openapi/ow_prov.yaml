@@ -1,0 +1,539 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi Provisioning Model
+  description: Definitions and APIs to manages an OpenWiFi network.
+  version: 2.1.0
+  license:
+    name: BSD3
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Unauthorized:
+      description: The requested does not have sufficient rights to perform the operation.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Success:
+      description: The requested operation was performed.
+      content:
+        application/json:
+          schema:
+            properties:
+              Operation:
+                type: string
+              Details:
+                type: string
+              Code:
+                type: integer
+
+  schemas:
+
+    ObjectInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoteInfo'
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64
+
+    # uuids: mpe:<uuid>
+    ManagementPolicyEntry:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: string
+        resources:
+          description: this is a list of UUID and UUID Patterns to control by this policy
+          type: array
+          items:
+            type: string
+        access:
+          type: array
+          items:
+            type: string
+            enum:
+              - NOACCESS
+              - READ
+              - MODIFY
+              - DELETE
+              - LIST
+              - CREATE
+              - FULL
+        policy:
+          description: A JSON document describing the policy
+          type: string
+
+    # uuids: mpp:<uuid>
+    ManagementPolicy:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagementPolicyEntry'
+
+    # uuids: ent:<uuid>
+    Entity:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        parent:
+          description: If empty, then this is the root entity, otherwise this points to a parent entity
+          type: string
+          format: uuid
+        children:
+          type: array
+          items:
+            type: string
+            format: uuid
+        managers:
+          description: The list of UUID of the management groups allowed to manage this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        contacts:
+          description: The list of UUID of the contacts for the entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        locations:
+          description: The list of UUID of the locations associated with thit entiry
+          type: array
+          items:
+            type: string
+            format: uuid
+        managementPolicy:
+          type: string
+          format: uuid
+
+    DiGraphEntry:
+      type: object
+      properties:
+        parent:
+          type: string
+          format: uuid
+        child:
+          type: string
+          format: uuid
+
+    DiGraph:
+      type: array
+      items:
+        $ref: '#/components/schemas/DiGraphEntry'
+
+    # uuids: ven:<uuid>
+    Venue:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        owner:
+          type: string
+          format: uuid
+        parent:
+          type: string
+          format: uuid
+        children:
+          type: array
+          items:
+            type: string
+            format: uuid
+        managers:
+          type: array
+          items:
+            type: string
+            format: uuid
+        managementPolicy:
+          type: string
+          format: uuid
+        devices:
+          type: array
+          items:
+            type: string
+            format: uuid
+        topology:
+          $ref: '#/components/schemas/DiGraph'
+        design:
+          type: string
+
+    # uuids: mgg:<uuid>
+    ManagementGroup:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        managementPolicy:
+          $ref: '#/components/schemas/ManagementPolicy'
+        managers:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    # uuids: loc:<uuid>
+    Location:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        type:
+          type: string
+          enum:
+            - SERVICE
+            - EQUIPMENT
+            - AUTO
+            - MANUAL
+            - SPECIAL
+            - UNKNOWN
+            - CORPORATE
+        buildingName:
+          type: string
+        addressLines:
+          type: array
+          items:
+            type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal:
+          type: string
+        country:
+          type: string
+        telephones:
+          type: array
+          items:
+            type: string
+        contact:
+          type: string
+          format: uuid
+
+    # uuids: con:<uuid>
+    Contact:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        type:
+          type: string
+          enum:
+            - SUBSCRIBER
+            - USER
+            - INSTALLER
+            - CSR
+            - MANAGER
+            - BUSINESSOWNER
+            - TECHNICIAN
+            - CORPORATE
+        title:
+          type: string
+        salutation:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        initials:
+          type: string
+        visual:
+          type: string
+        mobiles:
+          type: array
+          items:
+            type: string
+        phones:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+          format: uuid
+        primaryEmail:
+          type: string
+        secondaryEmail:
+          type: string
+        accessPIN:
+          type: string
+
+    # uuids: svc:<uuid>
+    ServiceConfiguration:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        managementPolicy:
+          $ref: '#/components/schemas/ManagementPolicy'
+
+    # uuids: cfg:<uuid>
+    DeviceConfiguration:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        managementPolicy:
+          $ref: '#/components/schemas/ManagementPolicy'
+        deviceTypes:
+          type: array
+          items:
+            type: string
+        configuration:
+          type: string
+
+    InventoryTag:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        serialNumber:
+          type: string
+        venue:
+          type: string
+          format: uuid
+        entity:
+          type: string
+          format: uuid
+        subEntity:
+          type: string
+          format: uuid
+        subVenue:
+          type: string
+          format: uuid
+
+    #########################################################################################
+    ##
+    ## These are endpoints that all services in the OPenWiFI stack must provide
+    ##
+    #########################################################################################
+    AnyPayload:
+      type: object
+      properties:
+        Document:
+          type: string
+
+    StringList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: string
+
+    TagValuePair:
+      type: object
+      properties:
+        tag:
+          type: string
+        value:
+          type: string
+
+    TagValuePairList:
+      type: object
+      properties:
+        tagList:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagValuePair'
+
+    TagIntPair:
+      type: object
+      properties:
+        tag:
+          type: string
+        value:
+          type: integer
+          format: int64
+
+    TagIntPairList:
+      type: object
+      properties:
+        tagList:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagIntPair'
+
+    SystemCommandDetails:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - setloglevels
+            - getloglevels
+            - getSubSystemNames
+            - getLogLevelNames
+            - stats
+        parameters:
+          oneOf:
+            - $ref: '#/components/schemas/StringList'
+            - $ref: '#/components/schemas/TagValuePairList'
+
+    SystemCommandResults:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/StringList'
+        - $ref: '#/components/schemas/TagValuePairList'
+
+    NoteInfo:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        createdBy:
+          type: string
+        note:
+          type: string
+
+    Dashboard:
+      type: object
+      properties:
+        snapshot:
+          type: integer
+          format: int64
+        tenants:
+          $ref: '#/components/schemas/TagIntPairList'
+
+paths:
+  /entity:
+    get:
+      tags:
+        - Entities
+      operationId: getEntities
+      summary: Retrieve the list of entities
+
+
+
+
+
+  #########################################################################################
+  ##
+  ## These are endpoints that all services in the OpenWiFi stack must provide
+  ##
+  #########################################################################################
+  /dashboard:
+    get:
+      tags:
+        - Dashboards
+      summary: Get the last version of the dashboard
+      operationId: getDeviceDashboard
+      responses:
+        200:
+          $ref: '#/components/schemas/Dashboard'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /system:
+    post:
+      tags:
+        - System Commands
+      summary: Perform some systeme wide commands
+      operationId: systemCommand
+      requestBody:
+        description: Command details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemCommandDetails'
+      responses:
+        200:
+          description: Successfull command execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemCommandResults'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags:
+        - System Commands
+      summary: Retrieve different values from the running service.
+      operationId: getSystemCommand
+      parameters:
+        - in: query
+          description: Get a value
+          name: command
+          schema:
+            type: string
+            enum:
+              - version
+              - times
+          required: true
+
+      responses:
+        200:
+          description: Successfull command execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagValuePair'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+
+

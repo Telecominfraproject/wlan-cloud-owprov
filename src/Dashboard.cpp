@@ -5,7 +5,7 @@
 #include "Dashboard.h"
 #include "StorageService.h"
 
-namespace uCentral {
+namespace OpenWifi {
 	void TopoDashboard::Create() {
 		uint64_t Now = std::time(nullptr);
 		if(LastRun_==0 || (Now-LastRun_)>120) {

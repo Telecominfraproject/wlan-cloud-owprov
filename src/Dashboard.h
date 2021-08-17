@@ -6,16 +6,16 @@
 #define UCENTRALGW_DASHBOARD_H
 
 #include "uCentralTypes.h"
-#include "RESTAPI_TopoObjects.h"
+#include "RESTAPI_ProvObjects.h"
 
-namespace uCentral {
+namespace OpenWifi {
 	class TopoDashboard {
 	  public:
 			void Create();
-			const TopoObjects::Report & Report() const { return DB_;}
+			const ProvObjects::Report & Report() const { return DB_;}
 			inline void Reset() { LastRun_=0; DB_.reset(); }
 	  private:
-            TopoObjects::Report  	DB_;
+	        ProvObjects::Report  	DB_;
 			uint64_t 				LastRun_=0;
 	};
 }

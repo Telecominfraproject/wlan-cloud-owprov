@@ -13,31 +13,23 @@
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SQLite/Connector.h"
 
-#ifndef SMALL_BUILD
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/MySQL/Connector.h"
-#endif
-
-#include "RESTAPI_TopoObjects.h"
 #include "SubSystemServer.h"
+
+#include "orm.h"
+
+#include "storage_entity.h"
+#include "storage_policies.h"
+#include "storage_venue.h"
+#include "storage_location.h"
+#include "storage_contact.h"
+#include "storage_inventory.h"
 
 namespace uCentral {
 
     class Storage : public SubSystemServer {
-
     public:
-		enum StorageType {
-			sqlite,
-			pgsql,
-			mysql
-		};
-
-		enum CommandExecutionType {
-			COMMAND_PENDING,
-			COMMAND_EXECUTED,
-			COMMAND_COMPLETED
-		};
-
         static Storage *instance() {
             if (instance_ == nullptr) {
                 instance_ = new Storage;
@@ -45,28 +37,37 @@ namespace uCentral {
             return instance_;
         }
 
-
-		int Create_Tables();
-
 		int 	Start() override;
 		void 	Stop() override;
-		int 	Setup_SQLite();
+
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
 
-#ifndef SMALL_BUILD
+		int 	Setup_SQLite();
 		int 	Setup_MySQL();
 		int 	Setup_PostgreSQL();
-#endif
+
+		OpenWifi::EntityDB & EntityDB() { return *EntityDB_; };
+		OpenWifi::PolicyDB & PolicyDB() { return *PolicyDB_; };
+		OpenWifi::VenueDB & VenueDB() { return *VenueDB_; };
+		OpenWifi::LocationDB & LocationDB() { return *LocationDB_; };
+		OpenWifi::ContactDB & ContactDB() { return *ContactDB_;};
+		OpenWifi::InventoryDB & InventoryDB() { return *InventoryDB_; };
+
 
 	  private:
 		static Storage      								*instance_;
 		std::unique_ptr<Poco::Data::SessionPool>        	Pool_= nullptr;
-		StorageType 										dbType_ = sqlite;
 		std::unique_ptr<Poco::Data::SQLite::Connector>  	SQLiteConn_= nullptr;
-#ifndef SMALL_BUILD
 		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_= nullptr;
 		std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_= nullptr;
-#endif
+
+		ORM::DBType                                         DBType_ = ORM::DBType::sqlite;
+		std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
+		std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;
+		std::unique_ptr<OpenWifi::VenueDB>                  VenueDB_;
+		std::unique_ptr<OpenWifi::LocationDB>               LocationDB_;
+		std::unique_ptr<OpenWifi::ContactDB>                ContactDB_;
+		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 
 		Storage() noexcept;
    };

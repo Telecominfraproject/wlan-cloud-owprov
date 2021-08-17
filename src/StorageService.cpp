@@ -6,9 +6,10 @@
 //	Arilia Wireless Inc.
 //
 
+#include "Poco/Util/Application.h"
+
 #include "StorageService.h"
 #include "Daemon.h"
-#include "Poco/Util/Application.h"
 #include "Utils.h"
 
 namespace uCentral {
@@ -20,28 +21,6 @@ namespace uCentral {
     {
     }
 
-	std::string Storage::ConvertParams(const std::string & S) const {
-		std::string R;
-
-		R.reserve(S.size()*2+1);
-
-		if(dbType_==pgsql) {
-			auto Idx=1;
-			for(auto const & i:S)
-			{
-				if(i=='?') {
-					R += '$';
-					R.append(std::to_string(Idx++));
-				} else {
-					R += i;
-				}
-			}
-		} else {
-			R = S;
-		}
-		return R;
-	}
-
     int Storage::Start() {
 		SubMutexGuard		Guard(Mutex_);
 
@@ -50,14 +29,32 @@ namespace uCentral {
         std::string DBType = Daemon()->ConfigGetString("storage.type");
 
         if (DBType == "sqlite") {
+            DBType_ = ORM::DBType::sqlite;
             Setup_SQLite();
         } else if (DBType == "postgresql") {
+            DBType_ = ORM::DBType::postgresql;
             Setup_PostgreSQL();
         } else if (DBType == "mysql") {
+            DBType_ = ORM::DBType::mysql;
             Setup_MySQL();
         }
 
-		Create_Tables();
+        EntityDB_ = std::make_unique<OpenWifi::EntityDB>(DBType_,*Pool_, Logger_);
+        PolicyDB_ = std::make_unique<OpenWifi::PolicyDB>(DBType_, *Pool_, Logger_);
+        VenueDB_ = std::make_unique<OpenWifi::VenueDB>(DBType_, *Pool_, Logger_);
+        LocationDB_ = std::make_unique<OpenWifi::LocationDB>(DBType_, *Pool_, Logger_);
+        ContactDB_ = std::make_unique<OpenWifi::ContactDB>(DBType_, *Pool_, Logger_);
+        InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(DBType_, *Pool_, Logger_);
+
+        EntityDB_->Create();
+        PolicyDB_->Create();
+        VenueDB_->Create();
+        LocationDB_->Create();
+        ContactDB_->Create();
+        InventoryDB_->Create();
+
+        OpenWifi::ProvObjects::Entity   R;
+        EntityDB_->GetRecord("id","xxx",R);
 
 		return 0;
     }
@@ -65,5 +62,7 @@ namespace uCentral {
     void Storage::Stop() {
         Logger_.notice("Stopping.");
     }
+
 }
+
 // namespace

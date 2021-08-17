@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export UCENTRALPROV_CONFIG=`pwd`
-export UCENTRALPROV_ROOT=`pwd`
+export OWPROV_CONFIG=`pwd`
+export OWPROV_ROOT=`pwd`

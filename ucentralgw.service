@@ -1,0 +1,22 @@
+[Unit]
+Description=OpenWiFi Provisioning Service
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment="$OWPROV_ROOT=/home/admin/dev/ow-prov"
+ExecStart=/home/admin/dev/ow-prov/cmake-build/owprov
+WorkingDirectory=/home/admin/dev/ow-prov
+# ExecReload=/bin/kill -s HUP $MAINPID
+User=admin
+# TimeoutSec=0
+RestartSec=2
+Restart=always
+StartLimitBurst=3
+# KillMode=process
+LimitNOFILE=500000
+LimitNPROC=500000
+
+[Install]
+WantedBy=multi-user.target

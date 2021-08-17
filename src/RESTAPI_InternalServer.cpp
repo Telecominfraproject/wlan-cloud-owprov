@@ -14,7 +14,7 @@ namespace uCentral {
 
     class RESTAPI_InternalServer *RESTAPI_InternalServer::instance_ = nullptr;
 
-    RESTAPI_InternalServer::RESTAPI_InternalServer() noexcept: SubSystemServer("RESTAPIInternalServer", "REST-ISRV", "ucentral.internal.restapi")
+    RESTAPI_InternalServer::RESTAPI_InternalServer() noexcept: SubSystemServer("RESTAPIInternalServer", "REST-ISRV", "owprov.internal.restapi")
     {
     }
 

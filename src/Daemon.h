@@ -31,10 +31,10 @@
 
 namespace uCentral {
 
-	static const char * vDAEMON_PROPERTIES_FILENAME = "ucentraltopo.properties";
-	static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALTOPO_ROOT";
-	static const char * vDAEMON_CONFIG_ENV_VAR = "UCENTRALTOPO_CONFIG";
-	static const char * vDAEMON_APP_NAME = uSERVICE_TOPOLOGY.c_str();
+	static const char * vDAEMON_PROPERTIES_FILENAME = "ow_prov.properties";
+	static const char * vDAEMON_ROOT_ENV_VAR = "OWPROV_ROOT";
+	static const char * vDAEMON_CONFIG_ENV_VAR = "OWPROV_CONFIG";
+	static const char * vDAEMON_APP_NAME = uSERVICE_PROVISIONING.c_str();
 	static const uint64_t vDAEMON_BUS_TIMER = 10000;
 
     class Daemon : public MicroService {
@@ -49,10 +49,10 @@ namespace uCentral {
 
 			void initialize(Poco::Util::Application &self);
 			static Daemon *instance();
-			inline TopoDashboard & GetDashboard() { return DB_; }
+			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
 	  	private:
 			static Daemon 				*instance_;
-			TopoDashboard				DB_;
+			OpenWifi::TopoDashboard		DB_;
 
     };
 

@@ -15,6 +15,8 @@
 #include <utility>
 #include <queue>
 
+#include "Poco/StringTokenizer.h"
+
 namespace uCentral::Types {
     typedef std::pair<std::string,std::string>              StringPair;
 	typedef std::vector<StringPair>	                        StringPairVec;
@@ -28,12 +30,38 @@ namespace uCentral::Types {
 	typedef std::map<std::string, TopicNotifyFunctionList>  NotifyTable;
     typedef std::map<std::string,uint64_t>                  CountedMap;
 
+    typedef std::string         UUID_t;
+    typedef std::vector<UUID_t> UUIDvec_t;
+
     inline void UpdateCountedMap(CountedMap &M, const std::string &S ) {
         auto it = M.find(S);
         if(it==M.end())
             M[S]=1;
         else
             it->second += 1;
+    }
+
+    inline std::string to_string( const StringVec &V) {
+        std::string Result;
+
+        bool first=true;
+        for(const auto &i:V) {
+            if(first) {
+                Result += i;
+                first = false;
+            } else {
+                Result += ",";
+                Result += i;
+            }
+        }
+        return Result;
+    }
+
+    inline void from_string(const std::string &S, StringVec &V) {
+        Poco::StringTokenizer   Tokens(S,",",Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+
+        for(auto const &i:Tokens)
+            V.emplace_back(i);
     }
 };
 

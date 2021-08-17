@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ucentraltopo VERSION 0.1.0)
+project(owprov VERSION 2.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -48,7 +48,7 @@ endif()
 
 include_directories(/usr/local/include  /usr/local/opt/openssl/include src include/kafka /usr/local/opt/mysql-client/include)
 
-add_executable( ucentraltopo
+add_executable(owprov
         build
         src/Daemon.cpp src/Daemon.h
         src/Dashboard.h src/Dashboard.cpp
@@ -56,7 +56,6 @@ add_executable( ucentraltopo
         src/Utils.h src/Utils.cpp
         src/RESTAPI_utils.cpp src/RESTAPI_utils.h
         src/RESTAPI_SecurityObjects.h src/RESTAPI_SecurityObjects.h
-        src/RESTAPI_TopoObjects.cpp src/RESTAPI_TopoObjects.h
         src/ALBHealthCheckServer.h
         src/AuthClient.cpp src/AuthClient.h
         src/KafkaManager.cpp src/KafkaManager.h
@@ -69,12 +68,18 @@ add_executable( ucentraltopo
         src/RESTAPI_InternalServer.h src/RESTAPI_InternalServer.cpp
         src/StorageService.cpp src/StorageService.h
         src/SubSystemServer.cpp src/SubSystemServer.h
+        src/RESTAPI_ProvObjects.cpp src/RESTAPI_ProvObjects.h
         src/storage_pgql.cpp src/storage_mysql.cpp src/storage_sqlite.cpp
-        src/storage_tables.cpp
+        src/storage_entity.cpp src/storage_entity.h
+        src/storage_policies.cpp src/storage_policies.h
         src/uCentralTypes.h
-        )
+        src/storage_venue.cpp src/storage_venue.h
+        src/storage_location.cpp src/storage_location.h
+        src/storage_contact.cpp src/storage_contact.h
+        src/RESTAPI_entity_handler.cpp src/RESTAPI_entity_handler.h
+        src/storage_inventory.cpp src/storage_inventory.h)
 
-target_link_libraries(ucentraltopo PUBLIC
+target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}
         ${Boost_LIBRARIES}
         ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES}

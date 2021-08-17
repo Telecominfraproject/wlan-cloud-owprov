@@ -17,8 +17,6 @@ namespace uCentral {
 	int Storage::Setup_PostgreSQL() {
 		Logger_.notice("PostgreSQL Storage enabled.");
 
-		dbType_ = pgsql ;
-
 		auto NumSessions = Daemon()->ConfigGetInt("storage.type.postgresql.maxsessions", 64);
 		auto IdleTime = Daemon()->ConfigGetInt("storage.type.postgresql.idletime", 60);
 		auto Host = Daemon()->ConfigGetString("storage.type.postgresql.host");

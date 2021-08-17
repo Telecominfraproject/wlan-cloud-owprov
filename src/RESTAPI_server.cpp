@@ -9,13 +9,14 @@
 #include "RESTAPI_handler.h"
 
 #include "RESTAPI_system_command.h"
+#include "RESTAPI_entity_handler.h"
 
 namespace uCentral {
 
     class RESTAPI_server *RESTAPI_server::instance_ = nullptr;
 
     RESTAPI_server::RESTAPI_server() noexcept:
-            SubSystemServer("RESTAPIServer", "RESTAPIServer", "ucentralfws.restapi")
+    SubSystemServer("RESTAPIServer", "RESTAPIServer", "owprov.restapi")
     {
     }
 
@@ -60,7 +61,8 @@ namespace uCentral {
         // std::cout << "Path: " << Request.getURI() << std::endl;
 
         return  RESTAPI_Router<
-                RESTAPI_system_command
+                RESTAPI_system_command,
+                OpenWifi::RESTAPI_entity_handler
                 >(Path,Bindings,Logger_);
     }
 
