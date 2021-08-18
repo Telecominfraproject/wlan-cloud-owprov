@@ -35,7 +35,19 @@ namespace OpenWifi {
                                 };
 
     EntityDB::EntityDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-        DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L) {}
+        DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L) {
+
+        CheckForRoot();
+        std::cout << "RootExists:" << RootExists_ << std::endl;
+    }
+
+    inline bool EntityDB::CheckForRoot() {
+        ProvObjects::Entity E;
+        if(GetRecord("id",RootUUID(),E))
+            RootExists_=true;
+
+        return RootExists_;
+    }
 
 }
 

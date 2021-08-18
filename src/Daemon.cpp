@@ -30,7 +30,7 @@ namespace uCentral {
 								   vDAEMON_APP_NAME,
 								   vDAEMON_BUS_TIMER,
 								   Types::SubSystemVec{
-									   Storage(),
+									   OpenWifi::Storage(),
 									   AuthClient(),
 									   RESTAPI_server(),
 									   RESTAPI_InternalServer()

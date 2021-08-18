@@ -1,0 +1,139 @@
+#!/bin/bash
+
+#
+#	License type: BSD 3-Clause License
+#	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+#
+#	Created by Stephane Bourque on 2021-03-04.
+#	Arilia Wireless Inc.
+#
+
+if [[ "$(which jq)" == "" ]]
+then
+  echo "You need the package jq installed to use this script."
+  exit 1
+fi
+
+if [[ "$(which curl)" == "" ]]
+then
+  echo "You need the package curl installed to use this script."
+  exit 1
+fi
+
+if [[ "${UCENTRALSEC}" == "" ]]
+then
+  echo "You must set the variable UCENTRALSEC in order to use this script. Something like"
+  echo "UCENTRALSEC=security.isp.com:16001"
+  exit 1
+fi
+
+if [[ "${FLAGS}" == "" ]]
+then
+	FLAGS="-s"
+fi
+
+token=""
+result_file=result.json
+username="tip@ucentral.com"
+password="openwifi"
+browser_list=(firefox sensible-browser xdg-open w3m links links2 lynx youtube-dl)
+browser=""
+
+login() {
+  payload="{ \"userId\" : \"$username\" , \"password\" : \"$password\" }"
+  token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${UCENTRALSEC}/api/v1/oauth2" | jq -r '.access_token')
+
+  if [[ "${token}" == "" ]]
+  then
+  	echo "Could not login. Please verify the host and username/password."
+    exit 13
+  fi
+  echo "${token}" > token.json
+  setfms
+}
+
+findbrowser() {
+	if [[ "${browser}" != "" ]]
+	then
+		echo
+	elif [[ "$(uname)" == "Darwin" ]]
+	then
+		browser=open
+	else
+		BROWSER_LIST=(firefox sensible-browser xdg-open w3m links links2 lynx youtube-dl)
+		for br_name in "${browser_list[@]}"
+		do
+			if [[ $(which ${br_name}) != "" ]]
+			then
+				browser=${br_name}
+				break
+			fi
+		done
+	fi
+}
+
+setfms() {
+	curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/systemEndpoints" \
+        -H "accept: application/json" \
+        -H "Authorization: Bearer ${token}"  > ${result_file}
+#	jq < ${result_file}
+
+	for index in {0..10}
+	do
+		endpointlocation=".endpoints[${index}].uri"
+	endpointlocationtype=".endpoints[${index}].type"
+	rawurl="$(cat ${result_file} | jq -r ${endpointlocation})"
+	svctype="$(cat ${result_file} | jq -r ${endpointlocationtype})"
+	proto="$(echo $rawurl | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+	url="$(echo ${rawurl/$proto/})"
+	user="$(echo $url | grep @ | cut -d@ -f1)"
+	hostport="$(echo ${url/$user@/} | cut -d/ -f1)"
+	host="$(echo $hostport | sed -e 's,:.*,,g')"
+	port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+	path="$(echo $url | grep / | cut -d/ -f2-)"
+	if [[ ${url} != "null" ]]
+		then
+		if [[ ${svctype} == "owprov" ]]
+			then
+			OWPROV="${url}"
+			break
+		fi
+	fi
+	done
+	echo "Using ${OWPROV}..."
+}
+
+logout() {
+  curl  ${FLAGS} -X DELETE -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        "https://${UCENTRALSEC}/api/v1/oauth2/${token}"
+  rm -rf token.json
+}
+
+getroot() {
+    curl    ${FLAGS} \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -H "accept: application/json" \
+            "https://${OWPROV}/api/v1/entity/0000-0000-0000"  > ${result_file}
+    jq < ${result_file}
+}
+
+setroot() {
+    payload="{ \"name\" : \"Arilia Root\", \"description\" ; \"This is the top level entry in the hierarchy.\" }";
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/0000-0000-0000" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
+shopt -s nocasematch
+case "$1" in
+    "login") login; help  ; logout ;;
+    "getroot") login; getroot; logout;;
+    "setroot") login; setroot; logout;;
+    *) help ;;
+esac
+

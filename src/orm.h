@@ -1,6 +1,7 @@
 
 #ifndef __OPENWIFI_ORM_H__
 #define __OPENWIFI_ORM_H__
+
 #include <string>
 #include <memory>
 #include <iostream>
@@ -307,15 +308,14 @@ namespace ORM {
                 Poco::Data::Statement   Insert(Session);
 
                 RecordTuple RT;
-                ConvertParams(R, RT);
-
+                Convert(R, RT);
                 std::string St = "insert into  " + DBName + " ( " + SelectFields_ + " ) values " + SelectList_;
                 Insert  << ConvertParams(St) ,
-                    Poco::Data::Keywords::use(RT),
+                    Poco::Data::Keywords::use(RT);
                 Insert.execute();
                 return true;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -324,18 +324,20 @@ namespace ORM {
             try {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
-                RecordTuple RT;
+                RecordTuple             RT;
 
                 std::string St = "select " + SelectFields_ + " from " + DBName + " where " + FieldName + "=?" ;
+
                 Select  << ConvertParams(St) ,
                     Poco::Data::Keywords::into(RT),
                     Poco::Data::Keywords::use(Value);
-                Select.execute();
-
-                Convert(RT,R);
-                return true;
+                if(Select.execute()==1) {
+                    Convert(RT,R);
+                    return true;
+                }
+                return false;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -355,12 +357,14 @@ namespace ORM {
                     Poco::Data::Keywords::into(RT),
                     Poco::Data::Keywords::use(V0),
                     Poco::Data::Keywords::use(V1);
-                Select.execute();
 
-                Convert(RT,R);
+                if(Select.execute()==1) {
+                    Convert(RT,R);
+                    return true;
+                }
                 return true;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -376,16 +380,18 @@ namespace ORM {
 
                 Select  << ConvertParams(St) ,
                     Poco::Data::Keywords::into(RL);
-                Select.execute();
 
-                for(const auto &i:RL) {
-                    RecordType  R;
-                    Convert(i, R);
-                    Records.template emplace_back(R);
+                if(Select.execute()>0) {
+                    for(const auto &i:RL) {
+                        RecordType  R;
+                        Convert(i, R);
+                        Records.template emplace_back(R);
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -406,7 +412,7 @@ namespace ORM {
                 Update.execute();
                 return true;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -422,7 +428,7 @@ namespace ORM {
                 Delete.execute();
                 return true;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -438,7 +444,7 @@ namespace ORM {
                 Delete.execute();
                 return true;
             } catch (const Poco::Exception &E) {
-                // Logger_.log(E);
+                Logger_.log(E);
             }
             return false;
         }
@@ -468,47 +474,5 @@ namespace ORM {
         Poco::Logger                &Logger_;
     };
 }
-
-/*
-int main(int, char**)
-{
-    auto SQLiteConn_ = std::make_unique<Poco::Data::SQLite::Connector>();
-    SQLiteConn_->registerConnector();
-    auto Pool_ = std::make_unique<Poco::Data::SessionPool>(SQLiteConn_->name(), "test.db", 4, 64, 60);
-
-    ORM::FieldVec    DB1Fields{     ORM::Field{"id",40, true},
-                                    ORM::Field{"name", ORM::FT_INT} };
-    ORM::IndexVec    Indexes{
-        { std::string("name_index"), ORM::IndexEntryVec{ {std::string("name"), ORM::Indextype::ASC} } } };
-
-    ORM::DB<DB1_record, Rec1>   DB1(ORM::sqlite ,
-                                    "tab1",
-                                    ORM::FieldVec{
-                                                    ORM::Field{"id",40, true},
-                                                    ORM::Field{"name", ORM::FT_INT} },
-                                    ORM::IndexVec{{ std::string("name_index"), ORM::IndexEntryVec{ {std::string("name"), ORM::Indextype::ASC} } }},
-                                    *Pool_);
-
-    std::cout << DB1.CreateFields() << std::endl;
-    std::cout << DB1.SelectFields() << std::endl;
-    std::cout << DB1.SelectList() << std::endl;
-    std::cout << DB1.UpdateFields() << std::endl;
-
-    std::cout << DB1.Create() << std::endl;
-
-    User    U1{ 25, "steph"};
-
-    auto SS = &User::Name;
-
-    std::cout << (typeid( User::Name ) == typeid( std::string )) << std::endl;
-    std::cout << "Name: " << U1.*SS << std::endl;
-
-    auto RR = ORM::Escape("I'm a \"cool\" dude");
-    std::cout << "RR: " << RR << std::endl;
-
-    return 0;
-}
-
- */
 
 #endif

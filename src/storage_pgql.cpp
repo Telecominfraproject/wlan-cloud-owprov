@@ -9,7 +9,7 @@
 #include "Daemon.h"
 #include "StorageService.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
 #ifdef SMALL_BUILD
 	int Service::Setup_PostgreSQL() { uCentral::instance()->exit(Poco::Util::Application::EXIT_CONFIG);}
@@ -17,14 +17,14 @@ namespace uCentral {
 	int Storage::Setup_PostgreSQL() {
 		Logger_.notice("PostgreSQL Storage enabled.");
 
-		auto NumSessions = Daemon()->ConfigGetInt("storage.type.postgresql.maxsessions", 64);
-		auto IdleTime = Daemon()->ConfigGetInt("storage.type.postgresql.idletime", 60);
-		auto Host = Daemon()->ConfigGetString("storage.type.postgresql.host");
-		auto Username = Daemon()->ConfigGetString("storage.type.postgresql.username");
-		auto Password = Daemon()->ConfigGetString("storage.type.postgresql.password");
-		auto Database = Daemon()->ConfigGetString("storage.type.postgresql.database");
-		auto Port = Daemon()->ConfigGetString("storage.type.postgresql.port");
-		auto ConnectionTimeout = Daemon()->ConfigGetString("storage.type.postgresql.connectiontimeout");
+		auto NumSessions = uCentral::Daemon()->ConfigGetInt("storage.type.postgresql.maxsessions", 64);
+		auto IdleTime = uCentral::Daemon()->ConfigGetInt("storage.type.postgresql.idletime", 60);
+		auto Host = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.host");
+		auto Username = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.username");
+		auto Password = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.password");
+		auto Database = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.database");
+		auto Port = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.port");
+		auto ConnectionTimeout = uCentral::Daemon()->ConfigGetString("storage.type.postgresql.connectiontimeout");
 
 		std::string ConnectionStr =
 			"host=" + Host +

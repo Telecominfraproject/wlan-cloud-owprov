@@ -9,7 +9,7 @@
 #include "Daemon.h"
 #include "StorageService.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
 #ifdef	SMALL_BUILD
 	int Service::Setup_MySQL() { uCentral::instance()->exit(Poco::Util::Application::EXIT_CONFIG);}
@@ -18,13 +18,13 @@ namespace uCentral {
 	int Storage::Setup_MySQL() {
 
 		Logger_.notice("MySQL Storage enabled.");
-		auto NumSessions = Daemon()->ConfigGetInt("storage.type.mysql.maxsessions", 64);
-		auto IdleTime = Daemon()->ConfigGetInt("storage.type.mysql.idletime", 60);
-		auto Host = Daemon()->ConfigGetString("storage.type.mysql.host");
-		auto Username = Daemon()->ConfigGetString("storage.type.mysql.username");
-		auto Password = Daemon()->ConfigGetString("storage.type.mysql.password");
-		auto Database = Daemon()->ConfigGetString("storage.type.mysql.database");
-		auto Port = Daemon()->ConfigGetString("storage.type.mysql.port");
+		auto NumSessions = uCentral::Daemon()->ConfigGetInt("storage.type.mysql.maxsessions", 64);
+		auto IdleTime = uCentral::Daemon()->ConfigGetInt("storage.type.mysql.idletime", 60);
+		auto Host = uCentral::Daemon()->ConfigGetString("storage.type.mysql.host");
+		auto Username = uCentral::Daemon()->ConfigGetString("storage.type.mysql.username");
+		auto Password = uCentral::Daemon()->ConfigGetString("storage.type.mysql.password");
+		auto Database = uCentral::Daemon()->ConfigGetString("storage.type.mysql.database");
+		auto Port = uCentral::Daemon()->ConfigGetString("storage.type.mysql.port");
 
 		std::string ConnectionStr =
 			"host=" + Host +

@@ -10,20 +10,6 @@
 
 namespace OpenWifi {
 
-    /*
-        ORM::Field{"id",64, true},
-        ORM::Field{"name",ORM::FieldType::FT_TEXT},
-        ORM::Field{"description",ORM::FieldType::FT_TEXT},
-        ORM::Field{"notes",ORM::FieldType::FT_TEXT},
-        ORM::Field{"created",ORM::FieldType::FT_BIGINT},
-        ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
-        ORM::Field{"parent",ORM::FieldType::FT_TEXT},
-        ORM::Field{"children",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managers",ORM::FieldType::FT_TEXT},
-        ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
-        ORM::Field{"locations",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT}
-     */
     typedef Poco::Tuple<
                 std::string,
                 std::string,
@@ -43,7 +29,11 @@ namespace OpenWifi {
     class EntityDB : public ORM::DB<EntityDBRecordType, ProvObjects::Entity> {
     public:
         EntityDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        inline bool RootExists() const { return RootExists_; };
+        static inline const std::string RootUUID() { return "0000-0000-0000"; }
+        bool CheckForRoot();
     private:
+        bool RootExists_=false;
     };
 }
 

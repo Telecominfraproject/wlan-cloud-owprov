@@ -26,9 +26,9 @@
 #include "storage_contact.h"
 #include "storage_inventory.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
-    class Storage : public SubSystemServer {
+    class Storage : public uCentral::SubSystemServer {
     public:
         static Storage *instance() {
             if (instance_ == nullptr) {

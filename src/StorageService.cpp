@@ -12,7 +12,7 @@
 #include "Daemon.h"
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
 	class Storage *Storage::instance_ = nullptr;
 
@@ -26,7 +26,7 @@ namespace uCentral {
 
 		Logger_.setLevel(Poco::Message::PRIO_NOTICE);
         Logger_.notice("Starting.");
-        std::string DBType = Daemon()->ConfigGetString("storage.type");
+        std::string DBType = uCentral::Daemon()->ConfigGetString("storage.type");
 
         if (DBType == "sqlite") {
             DBType_ = ORM::DBType::sqlite;
