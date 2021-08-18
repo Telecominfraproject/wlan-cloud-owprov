@@ -45,6 +45,18 @@ namespace OpenWifi{
                 ReturnObject(Request, Answer, Response);
                 return;
             } else {
+                std::vector<ProvObjects::Entity> Entities;
+                Storage()->EntityDB().GetRecords(QB_.Offset,QB_.Limit,Entities);
+                Poco::JSON::Array   Arr;
+                for(const auto &i:Entities) {
+                    Poco::JSON::Object  O;
+                    i.to_json(O);
+                    Arr.add(O);
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("entities",Arr);
+                ReturnObject(Request, Answer, Response);
+                return;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);

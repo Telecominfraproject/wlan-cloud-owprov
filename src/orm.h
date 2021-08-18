@@ -382,7 +382,7 @@ namespace ORM {
                     Poco::Data::Keywords::into(RL);
 
                 if(Select.execute()>0) {
-                    for(const auto &i:RL) {
+                    for(auto &i:RL) {
                         RecordType  R;
                         Convert(i, R);
                         Records.template emplace_back(R);
@@ -465,29 +465,17 @@ namespace ORM {
             try {
                 RecordType R;
                 if(GetRecord(FieldName, ParentUUID, R)) {
-                    if((R.*T).empty()) {
-                        //  if we are supposed to delete and the vector is empty, nothing to do
-                        if(!Add)
-                            return false;
-                        // we are affing to an empty vector
-                        (R.*T).push_back(ChildUUID);
+                    auto it = std::lower_bound((R.*T).begin(),(R.*T).end(),ChildUUID);
+                    if(Add) {
+                        if(it!=(R.*T).end() && *it == ChildUUID)
+                            return true;
+                        (R.*T).insert(it, ChildUUID);
                     } else {
-                        auto it = std::find((R.*T).begin(),(R.*T).end(),ChildUUID);
-                        // if we found the UUID we are trying to add/delete
-                        if(it!=(R.*T).end() && *it == ChildUUID) {
-                            // UUID is already there, so no need t oadd
-                            if(Add)
-                                return false;
-                            // Just delete the entry
+                        if(it!=(R.*T).end() && *it == ChildUUID)
                             (R.*T).erase(it);
-                        } else {
-                            // we did not find the child, but we found where it should go
-                            if(!Add)
-                                return false;
-                            (R.*T).insert(it,ChildUUID);
-                        }
+                        else
+                            return true;
                     }
-                    // we are only updating the record if we actually needed to change anything.
                     UpdateRecord(FieldName, ParentUUID, R);
                     return true;
                 }
