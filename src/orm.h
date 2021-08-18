@@ -468,13 +468,13 @@ namespace ORM {
                     auto it = std::lower_bound((R.*T).begin(),(R.*T).end(),ChildUUID);
                     if(Add) {
                         if(it!=(R.*T).end() && *it == ChildUUID)
-                            return true;
+                            return false;
                         (R.*T).insert(it, ChildUUID);
                     } else {
                         if(it!=(R.*T).end() && *it == ChildUUID)
                             (R.*T).erase(it);
                         else
-                            return true;
+                            return false;
                     }
                     UpdateRecord(FieldName, ParentUUID, R);
                     return true;
