@@ -449,6 +449,18 @@ namespace ORM {
             return false;
         }
 
+        template <typename T> bool Exists(std::string &FieldName, T &Value) {
+            try {
+                RecordType  R;
+                if(GetRecord(FieldName,Value,R))
+                    return true;
+                return false;
+            } catch (const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return false;
+        }
+
         template <typename X> bool ManipulateVectorMember( X T, std::string &FieldName, std::string & ParentUUID, std::string & ChildUUID, bool Add) {
             try {
                 RecordType R;

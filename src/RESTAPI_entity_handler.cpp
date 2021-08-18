@@ -113,6 +113,17 @@ namespace OpenWifi{
             E.info.id = (UUID==EntityDB::RootUUID()) ? UUID : uCentral::Daemon()->CreateUUID() ;
             if(UUID==EntityDB::RootUUID())
                 E.parent="";
+            else if(E.parent.empty()) {
+                BadRequest(Request, Response, "Parent UUID must be specified");
+                return;
+            } else {
+                std::string f{"id"};
+                if(!Storage()->EntityDB().Exists(f,E.parent)) {
+                    BadRequest(Request, Response, "Parent UUID must exist");
+                    return;
+                }
+            }
+
             E.venues.clear();
             E.children.clear();
             E.managers.clear();
@@ -122,8 +133,11 @@ namespace OpenWifi{
             if(Storage()->EntityDB().CreateRecord(E)) {
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
+                else {
+                    std::string f{"id"};
+                    Storage()->EntityDB().AddChild(f,E.parent,E.info.id);
+                }
 
-                Storage()->EntityDB().AddChild(std::string("id"),UUID,UUID);
                 OK(Request, Response);
                 return;
             }
