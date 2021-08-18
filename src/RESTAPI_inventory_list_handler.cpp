@@ -3,7 +3,8 @@
 //
 
 #include "RESTAPI_inventory_list_handler.h"
-
+#include "StorageService.h"
+#include "Utils.h"
 
 namespace OpenWifi{
     void RESTAPI_inventory_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -22,5 +23,45 @@ namespace OpenWifi{
     }
 
     void RESTAPI_inventory_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+                                        Poco::Net::HTTPServerResponse &Response) {
+
+        try {
+            if(!QB_.Select.empty()) {
+                auto DevUIIDS = uCentral::Utils::Split(QB_.Select);
+                Poco::JSON::Array   Arr;
+                for(const auto &i:DevUIIDS) {
+                    std::string f{"id"};
+                    ProvObjects::InventoryTag E;
+                    if(Storage()->InventoryDB().GetRecord(f,i,E)) {
+                        Poco::JSON::Object  O;
+                        E.to_json(O);
+                        Arr.add(O);
+                    } else {
+                        BadRequest(Request, Response, "Unknown UUID:" + i);
+                        return;
+                    }
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("inventoryTags",Arr);
+                ReturnObject(Request, Answer, Response);
+                return;
+            } else {
+                std::vector<ProvObjects::InventoryTag> Tags;
+                Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags);
+                Poco::JSON::Array   Arr;
+                for(const auto &i:Tags) {
+                    Poco::JSON::Object  O;
+                    i.to_json(O);
+                    Arr.add(O);
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("inventoryTags",Arr);
+                ReturnObject(Request, Answer, Response);
+                return;
+            }
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest(Request, Response);
+    }
 }
