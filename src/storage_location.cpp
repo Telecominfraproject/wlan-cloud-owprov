@@ -25,8 +25,9 @@ namespace OpenWifi {
         ORM::Field{"state",ORM::FieldType::FT_TEXT},
         ORM::Field{"postal",ORM::FieldType::FT_TEXT},
         ORM::Field{"country",ORM::FieldType::FT_TEXT},
-        ORM::Field{"telephones",ORM::FieldType::FT_TEXT},
-        ORM::Field{"contact",ORM::FieldType::FT_TEXT}
+        ORM::Field{"phones",ORM::FieldType::FT_TEXT},
+        ORM::Field{"contact",ORM::FieldType::FT_TEXT},
+        ORM::Field{"mobiles",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    LocationDB_Indexes{
@@ -55,8 +56,9 @@ template<> void ORM::DB<    OpenWifi::LocationDBRecordType, OpenWifi::ProvObject
     Out.state = In.get<10>();
     Out.postal = In.get<11>();
     Out.country = In.get<12>();
-    uCentral::Types::from_string(In.get<13>(), Out.telephones);
+    uCentral::Types::from_string(In.get<13>(), Out.phones);
     Out.contact = In.get<14>();
+    uCentral::Types::from_string(In.get<13>(), Out.mobiles);
 }
 
 template<> void ORM::DB<    OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::Location>::Convert(OpenWifi::ProvObjects::Location &In, OpenWifi::LocationDBRecordType &Out) {
@@ -73,6 +75,7 @@ template<> void ORM::DB<    OpenWifi::LocationDBRecordType, OpenWifi::ProvObject
     Out.set<10>(In.state);
     Out.set<11>(In.postal);
     Out.set<12>(In.country);
-    Out.set<13>(uCentral::Types::to_string(In.telephones));
+    Out.set<13>(uCentral::Types::to_string(In.phones));
     Out.set<14>(In.contact);
+    Out.set<13>(uCentral::Types::to_string(In.mobiles));
 }

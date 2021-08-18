@@ -449,6 +449,90 @@ namespace ORM {
             return false;
         }
 
+        template <typename X> bool ManipulateVectorMember( X T, std::string &FieldName, std::string & ParentUUID, std::string & ChildUUID, bool Add) {
+            try {
+                RecordType R;
+                if(GetRecord(FieldName, ParentUUID, R)) {
+                    if((R.*T).empty()) {
+                        //  if we are supposed to delete and the vector is empty, nothing to do
+                        if(!Add)
+                            return false;
+                        // we are affing to an empty vector
+                        (R.*T).push_back(ChildUUID);
+                    } else {
+                        auto it = std::find((R.*T).begin(),(R.*T).end(),ChildUUID);
+                        // if we found the UUID we are trying to add/delete
+                        if(it!=(R.*T).end() && *it == ChildUUID) {
+                            // UUID is already there, so no need t oadd
+                            if(Add)
+                                return false;
+                            // Just delete the entry
+                            (R.*T).erase(it);
+                        } else {
+                            // we did not find the child, but we found where it should go
+                            if(!Add)
+                                return false;
+                            (R.*T).insert(it,ChildUUID);
+                        }
+                    }
+                    // we are only updating the record if we actually needed to change anything.
+                    UpdateRecord(FieldName, ParentUUID, R);
+                    return true;
+                }
+            } catch (const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return false;
+        }
+
+        inline bool AddChild( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::children, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteChild( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::children, FieldName, ParentUUID, ChildUUID, false);
+        }
+
+        inline bool AddManager( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::managers, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteManager( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::managers, FieldName, ParentUUID, ChildUUID, false);
+        }
+
+        inline bool AddLocation( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::locations, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteLocation( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::locations, FieldName, ParentUUID, ChildUUID, false);
+        }
+
+        inline bool AddContact( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::contacts, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteContact( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::contacts, FieldName, ParentUUID, ChildUUID, false);
+        }
+
+        inline bool AddVenue( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::venues, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteVenue( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::venues, FieldName, ParentUUID, ChildUUID, false);
+        }
+
+        inline bool AddDevice( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::devices, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteDevice( std::string FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::devices, FieldName, ParentUUID, ChildUUID, false);
+        }
+
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
             if(From<1) From=1;
             if(Type==ORM::sqlite) {

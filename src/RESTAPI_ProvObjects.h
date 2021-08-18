@@ -139,8 +139,9 @@ namespace OpenWifi::ProvObjects {
         std::string state;
         std::string postal;
         std::string country;
-        uCentral::Types::StringVec telephones;
+        uCentral::Types::StringVec phones;
         uCentral::Types::UUID_t contact;
+        uCentral::Types::StringVec mobiles;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

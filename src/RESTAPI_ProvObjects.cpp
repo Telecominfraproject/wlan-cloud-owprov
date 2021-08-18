@@ -173,7 +173,7 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json( Obj,"state",state);
         uCentral::RESTAPI_utils::field_to_json( Obj,"postal",postal);
         uCentral::RESTAPI_utils::field_to_json( Obj,"country",country);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"telephones",telephones);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"phones",phones);
         uCentral::RESTAPI_utils::field_to_json( Obj,"contact",contact);
     }
 
@@ -189,8 +189,9 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"state",state);
             uCentral::RESTAPI_utils::field_from_json( Obj,"postal",postal);
             uCentral::RESTAPI_utils::field_from_json( Obj,"country",country);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"telephones",telephones);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"phones",phones);
             uCentral::RESTAPI_utils::field_from_json( Obj,"contact",contact);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"mobiles",mobiles);
             return true;
         } catch (...) {
 

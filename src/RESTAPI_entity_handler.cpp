@@ -88,32 +88,22 @@ namespace OpenWifi{
     void RESTAPI_entity_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
                                                   Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::cout << __LINE__ << std::endl;
             std::string UUID = GetBinding("uuid", "");
 
-            std::cout << __LINE__ << std::endl;
             if(UUID.empty()) {
                 BadRequest(Request, Response, "Missing UUID");
-                std::cout << __LINE__ << std::endl;
                 return;
             }
 
-            std::cout << __LINE__ << std::endl;
             if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
                 BadRequest(Request, Response, "Root entity must be created first.");
-                std::cout << __LINE__ << std::endl;
                 return;
             }
 
-            std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser IncomingParser;
-            std::cout << __LINE__ << std::endl;
             Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
-            std::cout << __LINE__ << std::endl;
             ProvObjects::Entity E;
-            std::cout << __LINE__ << std::endl;
             if (!E.from_json(Obj)) {
-                std::cout << __LINE__ << std::endl;
                 BadRequest(Request, Response);
                 return;
             }
@@ -128,25 +118,20 @@ namespace OpenWifi{
             E.managers.clear();
             E.contacts.clear();
             E.locations.clear();
-            std::cout << __LINE__ << std::endl;
-
 
             if(Storage()->EntityDB().CreateRecord(E)) {
-                std::cout << __LINE__ << std::endl;
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
-                std::cout << __LINE__ << std::endl;
+
+                Storage()->EntityDB().AddChild(std::string("id"),UUID,UUID);
                 OK(Request, Response);
                 return;
             }
-            std::cout << __LINE__ << std::endl;
             NotFound(Request,Response);
             return;
         } catch (const Poco::Exception &E) {
-            std::cout << __LINE__ << std::endl;
             Logger_.log(E);
         }
-        std::cout << __LINE__ << std::endl;
         BadRequest(Request, Response);
     }
 

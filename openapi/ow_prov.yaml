@@ -264,7 +264,11 @@ components:
           type: string
         country:
           type: string
-        telephones:
+        phones:
+          type: array
+          items:
+            type: string
+        mobiles:
           type: array
           items:
             type: string
@@ -301,11 +305,11 @@ components:
           type: string
         visual:
           type: string
-        mobiles:
+        phones:
           type: array
           items:
             type: string
-        phones:
+        mobiles:
           type: array
           items:
             type: string

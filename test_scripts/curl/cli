@@ -120,7 +120,7 @@ getroot() {
 }
 
 setroot() {
-    payload="{ \"name\" : \"Arilia Root\", \"description\" ; \"This is the top level entry in the hierarchy.\" }";
+    payload="{ \"name\" : \"Arilia Root\", \"description\" : \"This is the top level entry in the hierarchy.\" }";
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/0000-0000-0000" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
