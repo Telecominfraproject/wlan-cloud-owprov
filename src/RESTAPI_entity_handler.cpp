@@ -73,7 +73,20 @@ namespace OpenWifi{
             }
 
             ProvObjects::Entity E;
-            if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
+
+            std::string f{"id"};
+            if(!Storage()->EntityDB().GetRecord(f,UUID,E)) {
+                NotFound(Request, Response);
+                return;
+            }
+
+            if(!E.children.empty()) {
+                BadRequest(Request, Response, "Entity still has children.");
+                return;
+            }
+
+            if(Storage()->EntityDB().DeleteRecord(f,UUID)) {
+                Storage()->EntityDB().DeleteChild(f,E.parent,UUID);
                 OK(Request, Response);
                 return;
             }

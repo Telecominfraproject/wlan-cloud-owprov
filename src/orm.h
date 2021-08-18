@@ -277,7 +277,7 @@ namespace ORM {
             return false;
         }
 
-        std::string ConvertParams(const std::string & S) const {
+        [[nodiscard]] std::string ConvertParams(const std::string & S) const {
             std::string R;
 
             R.reserve(S.size()*2+1);
@@ -299,8 +299,8 @@ namespace ORM {
             return R;
         }
 
-        virtual void Convert( RecordTuple &in , RecordType &out);
-        virtual void Convert( RecordType &in , RecordTuple &out);
+        void Convert( RecordTuple &in , RecordType &out);
+        void Convert( RecordType &in , RecordTuple &out);
 
         bool CreateRecord( RecordType & R) {
             try {
