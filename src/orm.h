@@ -371,14 +371,16 @@ namespace ORM {
 
         typedef std::vector<RecordTuple> RecordList;
 
-        bool GetRecords( uint64_t Offset, uint64_t HowMany, std::vector<RecordType> & Records, std::string Where = "") {
+        bool GetRecords( uint64_t Offset, uint64_t HowMany, std::vector<RecordType> & Records, const std::string & Where = "") {
             try {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordList RL;
                 std::string St = "select " + SelectFields_ + " from " + DBName + ComputeRange(Offset, HowMany) ;
 
-                Select  << ConvertParams(St) ,
+                std::string St2 = Where.empty() ? ConvertParams(St) : ConvertParams(St) + " where " + Where;
+
+                Select  << St2 ,
                     Poco::Data::Keywords::into(RL);
 
                 if(Select.execute()>0) {
