@@ -92,18 +92,22 @@ namespace OpenWifi{
 
             if(UUID.empty()) {
                 BadRequest(Request, Response, "Missing UUID");
+                std::cout << __LINE__ << std::endl;
                 return;
             }
 
             if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
                 BadRequest(Request, Response, "Root entity must be created first.");
+                std::cout << __LINE__ << std::endl;
                 return;
             }
 
             Poco::JSON::Parser IncomingParser;
             Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Entity E;
+            std::cout << __LINE__ << std::endl;
             if (!E.from_json(Obj)) {
+                std::cout << __LINE__ << std::endl;
                 BadRequest(Request, Response);
                 return;
             }
@@ -118,19 +122,25 @@ namespace OpenWifi{
             E.managers.clear();
             E.contacts.clear();
             E.locations.clear();
+            std::cout << __LINE__ << std::endl;
 
 
             if(Storage()->EntityDB().CreateRecord(E)) {
+                std::cout << __LINE__ << std::endl;
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
+                std::cout << __LINE__ << std::endl;
                 OK(Request, Response);
                 return;
             }
+            std::cout << __LINE__ << std::endl;
             NotFound(Request,Response);
             return;
         } catch (const Poco::Exception &E) {
+            std::cout << __LINE__ << std::endl;
             Logger_.log(E);
         }
+        std::cout << __LINE__ << std::endl;
         BadRequest(Request, Response);
     }
 
