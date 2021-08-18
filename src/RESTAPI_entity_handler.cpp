@@ -8,6 +8,8 @@
 
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
+#include "RESTAPI_SecurityObjects.h"
+#include "RESTAPI_utils.h"
 
 namespace OpenWifi{
 
@@ -120,6 +122,7 @@ namespace OpenWifi{
                 BadRequest(Request, Response);
                 return;
             }
+            E.info.modified = E.info.created = std::time(nullptr);
 
             //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
             //  must be conveyed through PUT.
@@ -163,5 +166,48 @@ namespace OpenWifi{
     }
 
     void RESTAPI_entity_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {}
+                                                 Poco::Net::HTTPServerResponse &Response) {
+        try {
+            std::string UUID = GetBinding("uuid", "");
+
+            if(UUID.empty()) {
+                BadRequest(Request, Response, "Missing UUID");
+                return;
+            }
+
+            ProvObjects::Entity LocalObject;
+            std::string f{"id"};
+            if(!Storage()->EntityDB().GetRecord(f,UUID,LocalObject)) {
+                NotFound(Request, Response);
+                return;
+            }
+
+            Poco::JSON::Parser IncomingParser;
+            auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            if(RawObject->has("notes")) {
+                uCentral::SecurityObjects::NoteInfoVec NIV;
+                NIV = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(RawObject->get("notes").toString());
+                for(auto const &i:NIV) {
+                    uCentral::SecurityObjects::NoteInfo   ii{.created=(uint64_t)std::time(nullptr), .createdBy=UserInfo_.userinfo.email, .note=i.note};
+                    LocalObject.info.notes.push_back(ii);
+                }
+            }
+            if(RawObject->has("name"))
+                LocalObject.info.name = RawObject->get("name").toString();
+            if(RawObject->has("description"))
+                LocalObject.info.description = RawObject->get("description").toString();
+            LocalObject.info.modified = std::time(nullptr);
+
+            if(Storage()->EntityDB().UpdateRecord(f,UUID,LocalObject)) {
+                Poco::JSON::Object  Answer;
+
+                LocalObject.to_json(Answer);
+                ReturnObject(Request, Answer, Response);
+                return;
+            }
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest(Request, Response);
+    }
 }
