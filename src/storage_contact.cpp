@@ -27,10 +27,11 @@ namespace OpenWifi {
         ORM::Field{"visual",ORM::FieldType::FT_TEXT},
         ORM::Field{"mobiles",ORM::FieldType::FT_TEXT},
         ORM::Field{"phones",ORM::FieldType::FT_TEXT},
-        ORM::Field{"location",ORM::FieldType::FT_TEXT},
         ORM::Field{"primaryEmail",ORM::FieldType::FT_TEXT},
         ORM::Field{"secondaryEmail",ORM::FieldType::FT_TEXT},
-        ORM::Field{"accessPIN",ORM::FieldType::FT_TEXT}
+        ORM::Field{"accessPIN",ORM::FieldType::FT_TEXT},
+        ORM::Field{"venues",ORM::FieldType::FT_TEXT},
+        ORM::Field{"entities",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ContactDB_Indexes{
@@ -65,6 +66,8 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.primaryEmail = In.get<15>();
     Out.secondaryEmail = In.get<16>();
     Out.accessPIN = In.get<17>();
+    uCentral::Types::from_string(In.get<18>(), Out.venues);
+    uCentral::Types::from_string(In.get<19>(), Out.entities);
 }
 
 template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
@@ -86,4 +89,6 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.set<15>(In.primaryEmail);
     Out.set<16>(In.secondaryEmail);
     Out.set<17>(In.accessPIN);
+    Out.set<18>(uCentral::Types::to_string(In.venues));
+    Out.set<19>(uCentral::Types::to_string(In.entities));
 }

@@ -283,6 +283,17 @@ components:
         contact:
           type: string
           format: uuid
+        venues:
+          type: array
+          items:
+            type: string
+            format: uuid
+        entities:
+          type: array
+          items:
+            type: string
+            format: uuid
+
 
     # uuids: con:<uuid>
     Contact:
@@ -321,15 +332,22 @@ components:
           type: array
           items:
             type: string
-        location:
-          type: string
-          format: uuid
         primaryEmail:
           type: string
         secondaryEmail:
           type: string
         accessPIN:
           type: string
+        venues:
+          type: array
+          items:
+            type: string
+            format: uuid
+        entities:
+          type: array
+          items:
+            type: string
+            format: uuid
 
     # uuids: svc:<uuid>
     ServiceConfiguration:
@@ -379,6 +397,8 @@ components:
           type: string
           format: uuid
         qrCode:
+          type: string
+        geoCode:
           type: string
 
     InventoryTagList:

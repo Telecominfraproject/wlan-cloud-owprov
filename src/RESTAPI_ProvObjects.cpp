@@ -174,7 +174,10 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json( Obj,"postal",postal);
         uCentral::RESTAPI_utils::field_to_json( Obj,"country",country);
         uCentral::RESTAPI_utils::field_to_json( Obj,"phones",phones);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"contact",contact);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"mobiles",mobiles);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"venues",venues);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"entities",entities);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"geoCode",geoCode);
     }
 
     bool Location::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -190,8 +193,10 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"postal",postal);
             uCentral::RESTAPI_utils::field_from_json( Obj,"country",country);
             uCentral::RESTAPI_utils::field_from_json( Obj,"phones",phones);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"contact",contact);
             uCentral::RESTAPI_utils::field_from_json( Obj,"mobiles",mobiles);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"venues",venues);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"entities",entities);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
             return true;
         } catch (...) {
 
@@ -210,10 +215,11 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json( Obj,"visual",visual);
         uCentral::RESTAPI_utils::field_to_json( Obj,"mobiles",mobiles);
         uCentral::RESTAPI_utils::field_to_json( Obj,"phones",phones);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"location",location);
         uCentral::RESTAPI_utils::field_to_json( Obj,"primaryEmail",primaryEmail);
         uCentral::RESTAPI_utils::field_to_json( Obj,"secondaryEmail",secondaryEmail);
         uCentral::RESTAPI_utils::field_to_json( Obj,"accessPIN",accessPIN);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"venues",venues);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"entities",entities);
     }
 
     bool Contact::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -230,10 +236,11 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"visual",visual);
             uCentral::RESTAPI_utils::field_from_json( Obj,"mobiles",mobiles);
             uCentral::RESTAPI_utils::field_from_json( Obj,"phones",phones);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"location",location);
             uCentral::RESTAPI_utils::field_from_json( Obj,"primaryEmail",primaryEmail);
             uCentral::RESTAPI_utils::field_from_json( Obj,"secondaryEmail",secondaryEmail);
             uCentral::RESTAPI_utils::field_from_json( Obj,"accessPIN",accessPIN);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"venues",venues);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"entities",entities);
             return true;
         } catch (...) {
 
@@ -267,6 +274,7 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json(Obj, "subscriber", subscriber);
         uCentral::RESTAPI_utils::field_to_json(Obj, "deviceType", deviceType);
         uCentral::RESTAPI_utils::field_to_json(Obj, "qrCode", qrCode);
+        uCentral::RESTAPI_utils::field_to_json(Obj, "geoCode", geoCode);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -279,7 +287,8 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"subVenue",subVenue);
             uCentral::RESTAPI_utils::field_from_json( Obj,"subscriber",subscriber);
             uCentral::RESTAPI_utils::field_from_json( Obj,"deviceType",deviceType);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"qrCode",qrCode);
+            uCentral::RESTAPI_utils::field_from_json(Obj, "qrCode", qrCode);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
             return true;
         } catch(...) {
 
