@@ -46,7 +46,7 @@ namespace OpenWifi{
                 return;
             } else {
                 std::vector<ProvObjects::Entity> Entities;
-                Storage()->EntityDB().GetRecords(QB_.Offset,QB_.Limit,Entities);
+                Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:Entities) {
                     Poco::JSON::Object  O;
