@@ -29,9 +29,8 @@ namespace OpenWifi{
                 auto EntityUIDs = uCentral::Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:EntityUIDs) {
-                    std::string f{"id"};
                     ProvObjects::Entity E;
-                    if(Storage()->EntityDB().GetRecord(f,i,E)) {
+                    if(Storage()->EntityDB().GetRecord("id",i,E)) {
                         Poco::JSON::Object  O;
                         E.to_json(O);
                         Arr.add(O);

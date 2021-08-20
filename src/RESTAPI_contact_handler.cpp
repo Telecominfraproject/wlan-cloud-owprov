@@ -87,13 +87,13 @@ namespace OpenWifi{
             }
 
             std::string f{uCentral::RESTAPI::Protocol::ID};
-            if(!Storage()->EntityDB().Exists(f,C.entities[0])) {
+            if(!Storage()->EntityDB().Exists("id",C.entities[0])) {
                 BadRequest(Request, Response, "Unknown entity: " + C.entities[0] );
                 return;
             }
 
             if(Storage()->ContactDB().CreateRecord(C)) {
-                Storage()->EntityDB().AddContact(f,C.entities[0],C.info.id);
+                Storage()->EntityDB().AddContact("id",C.entities[0],C.info.id);
                 Poco::JSON::Object Answer;
                 C.to_json(Answer);
                 ReturnObject(Request, Answer, Response);

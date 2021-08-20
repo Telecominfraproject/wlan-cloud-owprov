@@ -76,8 +76,7 @@ namespace OpenWifi{
 
             ProvObjects::Entity E;
 
-            std::string f{"id"};
-            if(!Storage()->EntityDB().GetRecord(f,UUID,E)) {
+            if(!Storage()->EntityDB().GetRecord("id",UUID,E)) {
                 NotFound(Request, Response);
                 return;
             }
@@ -87,8 +86,8 @@ namespace OpenWifi{
                 return;
             }
 
-            if(Storage()->EntityDB().DeleteRecord(f,UUID)) {
-                Storage()->EntityDB().DeleteChild(f,E.parent,UUID);
+            if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
+                Storage()->EntityDB().DeleteChild("id",E.parent,UUID);
                 OK(Request, Response);
                 return;
             }
@@ -133,8 +132,7 @@ namespace OpenWifi{
                 BadRequest(Request, Response, "Parent UUID must be specified");
                 return;
             } else {
-                std::string f{"id"};
-                if(!Storage()->EntityDB().Exists(f,E.parent)) {
+                if(!Storage()->EntityDB().Exists("id",E.parent)) {
                     BadRequest(Request, Response, "Parent UUID must exist");
                     return;
                 }
@@ -150,8 +148,7 @@ namespace OpenWifi{
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
                 else {
-                    std::string f{"id"};
-                    Storage()->EntityDB().AddChild(f,E.parent,E.info.id);
+                    Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
                 }
 
                 OK(Request, Response);
@@ -165,6 +162,18 @@ namespace OpenWifi{
         BadRequest(Request, Response);
     }
 
+    /*
+     *
+     * Put is a complex operation, it contains commands only.
+     *      addContact=UUID, delContact=UUID,
+     *      addVenue=UUID, delVenue=UUID,
+     *      addEntity=UUID, delEntity=UUID
+     *      addManager=UUID, delManager=UUID
+     *      addPhone=UUID, delPhone=UUID
+     *      addMobile=UUID, delMobile=UUID
+     *      addDevice=UUID, delDevice=UUID
+     */
+
     void RESTAPI_entity_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
                                                  Poco::Net::HTTPServerResponse &Response) {
         try {
@@ -176,8 +185,7 @@ namespace OpenWifi{
             }
 
             ProvObjects::Entity LocalObject;
-            std::string f{"id"};
-            if(!Storage()->EntityDB().GetRecord(f,UUID,LocalObject)) {
+            if(!Storage()->EntityDB().GetRecord("id",UUID,LocalObject)) {
                 NotFound(Request, Response);
                 return;
             }
@@ -192,14 +200,67 @@ namespace OpenWifi{
                     LocalObject.info.notes.push_back(ii);
                 }
             }
+
             if(RawObject->has("name"))
                 LocalObject.info.name = RawObject->get("name").toString();
             if(RawObject->has("description"))
                 LocalObject.info.description = RawObject->get("description").toString();
             LocalObject.info.modified = std::time(nullptr);
 
-            if(Storage()->EntityDB().UpdateRecord(f,UUID,LocalObject)) {
+            std::string Error;
+            for(auto const &i:Request) {
+                if(i.first == "addContact" || i.first == "delContact") {
+                    if(!Storage()->ContactDB().Exists("id",i.second)) {
+                        Error = "Unknown Contact UUID: " + i.second;
+                        break;
+                    }
+                } else if(i.first == "addLocation" || i.first == "delLocation") {
+                    if(!Storage()->LocationDB().Exists("id",i.second)) {
+                        Error = "Unknown Location UUID: " + i.second;
+                        break;
+                    }
+                } else if(i.first == "addVenue" || i.first == "delVenue") {
+                    if(!Storage()->VenueDB().Exists("id",i.second)) {
+                        Error = "Unknown Venue UUID: " + i.second;
+                        break;
+                    }
+                } else if(i.first == "addManager" || i.first == "delManager") {
+                    if(!Storage()->VenueDB().Exists("id",i.second)) {
+                        Error = "Unknown Venue UUID: " + i.second;
+                        break;
+                    }
+                } else {
+                    Error = "Unknown operation: " + i.first;
+                    break;
+                }
+            }
+
+            if(!Error.empty()) {
+                BadRequest(Request, Response, Error);
+                return;
+            }
+
+            if(Storage()->EntityDB().UpdateRecord("id",UUID,LocalObject)) {
                 Poco::JSON::Object  Answer;
+
+                for(const auto &i:Request) {
+                    std::string Child{i.second};
+                    if(i.first == "addContact") {
+                        Storage()->EntityDB().AddContact("id", UUID, Child);
+                        Storage()->ContactDB().AddEntity("id",Child,UUID);
+                    } else if (i.first == "delContact") {
+                        Storage()->EntityDB().DeleteContact("id", UUID, Child);
+                        Storage()->ContactDB().DeleteEntity("id",Child,UUID);
+                    } else if (i.first == "addLocation") {
+                        Storage()->EntityDB().AddLocation("id", UUID, Child);
+                        Storage()->LocationDB().AddEntity("id",Child,UUID);
+                    } else if (i.first == "delLocation") {
+                        Storage()->EntityDB().DeleteLocation("id", UUID, Child);
+                        Storage()->LocationDB().DeleteEntity("id",Child,UUID);
+                    } else if (i.first == "addManager") {
+                    } else if (i.first == "delManager") {
+                    }
+                }
 
                 LocalObject.to_json(Answer);
                 ReturnObject(Request, Answer, Response);

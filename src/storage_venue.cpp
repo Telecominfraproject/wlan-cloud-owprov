@@ -17,7 +17,7 @@ namespace OpenWifi {
         ORM::Field{"notes",ORM::FieldType::FT_TEXT},
         ORM::Field{"created",ORM::FieldType::FT_BIGINT},
         ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
-        ORM::Field{"owner",ORM::FieldType::FT_TEXT},
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"parent",ORM::FieldType::FT_TEXT},
         ORM::Field{"children",ORM::FieldType::FT_TEXT},
         ORM::Field{"managers",ORM::FieldType::FT_TEXT},
@@ -46,7 +46,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.info.notes = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
-    Out.owner = In.get<6>();
+    Out.entity = In.get<6>();
     Out.parent = In.get<7>();
     uCentral::Types::from_string(In.get<8>(), Out.children);
     uCentral::Types::from_string(In.get<9>(), Out.managers);
@@ -62,7 +62,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<3>(uCentral::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
-    Out.set<6>(In.owner);
+    Out.set<6>(In.entity);
     Out.set<7>(In.parent);
     Out.set<8>(uCentral::Types::to_string(In.children));
     Out.set<9>(uCentral::Types::to_string(In.managers));

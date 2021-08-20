@@ -30,9 +30,8 @@ namespace OpenWifi{
                 auto DevUIIDS = uCentral::Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:DevUIIDS) {
-                    std::string f{"id"};
                     ProvObjects::InventoryTag E;
-                    if(Storage()->InventoryDB().GetRecord(f,i,E)) {
+                    if(Storage()->InventoryDB().GetRecord("id",i,E)) {
                         Poco::JSON::Object  O;
                         E.to_json(O);
                         Arr.add(O);

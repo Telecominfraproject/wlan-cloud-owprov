@@ -98,8 +98,7 @@ namespace OpenWifi{
                 return;
             }
 
-            std::string f{uCentral::RESTAPI::Protocol::SERIALNUMBER};
-            if(Storage()->InventoryDB().Exists(f,SerialNumber)) {
+            if(Storage()->InventoryDB().Exists(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
                 BadRequest(Request,Response, "SerialNumber: " + SerialNumber + " already exists.");
                 return;
             }
@@ -118,12 +117,11 @@ namespace OpenWifi{
             }
 
             IT.info.modified = IT.info.created = std::time(nullptr);
-            f = "id";
-            if(!IT.entity.empty() && !Storage()->InventoryDB().Exists(f,IT.entity)) {
+            if(!IT.entity.empty() && !Storage()->InventoryDB().Exists("id",IT.entity)) {
                 BadRequest(Request, Response, "Entity: " + IT.entity + " does not exist.");
                 return;
             }
-            if(!IT.venue.empty() && !Storage()->VenueDB().Exists(f,IT.venue)) {
+            if(!IT.venue.empty() && !Storage()->VenueDB().Exists("id",IT.venue)) {
                 BadRequest(Request, Response, "Venue: " + IT.venue + " does not exist.");
                 return;
             }
@@ -131,9 +129,9 @@ namespace OpenWifi{
             IT.info.id = uCentral::Daemon()->CreateUUID();
 
             if(Storage()->InventoryDB().CreateRecord(IT)) {
-                Storage()->EntityDB().AddChild(f,IT.entity,IT.info.id);
+                Storage()->EntityDB().AddChild("id",IT.entity,IT.info.id);
                 if(!IT.venue.empty())
-                    Storage()->VenueDB().AddChild(f,IT.venue,IT.info.id);
+                    Storage()->VenueDB().AddChild("id",IT.venue,IT.info.id);
                 Poco::JSON::Object Answer;
                 IT.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
@@ -157,8 +155,7 @@ namespace OpenWifi{
             }
 
             ProvObjects::InventoryTag   ExistingObject;
-            std::string SN{uCentral::RESTAPI::Protocol::SERIALNUMBER};
-            if(!Storage()->InventoryDB().GetRecord(SN,SerialNumber,ExistingObject)) {
+            if(!Storage()->InventoryDB().GetRecord(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber,ExistingObject)) {
                 NotFound(Request, Response);
                 return;
             }
@@ -181,29 +178,28 @@ namespace OpenWifi{
             ExistingObject.info.modified = std::time(nullptr);
 
             // if we are changing venues...
-            std::string ID{"id"};
             if(RawObject->has("entity")) {
                 std::string Entity{RawObject->get("entity").toString()};
-                if(!Storage()->EntityDB().Exists(ID,Entity)) {
+                if(!Storage()->EntityDB().Exists("id",Entity)) {
                     BadRequest(Request, Response, "Entity association does not exist.");
                     return;
                 }
                 if(Entity!=ExistingObject.entity) {
-                    Storage()->EntityDB().DeleteChild(ID, ExistingObject.entity, ExistingObject.info.id);
-                    Storage()->EntityDB().AddChild(ID,Entity,ExistingObject.info.id);
+                    Storage()->EntityDB().DeleteChild("id", ExistingObject.entity, ExistingObject.info.id);
+                    Storage()->EntityDB().AddChild("id",Entity,ExistingObject.info.id);
                 }
             }
 
             if(RawObject->has("venue")) {
                 std::string Venue{RawObject->get("venue").toString()};
-                if(!Storage()->VenueDB().Exists(ID,Venue)) {
+                if(!Storage()->VenueDB().Exists("id",Venue)) {
                     BadRequest(Request, Response, "Venue association does not exist.");
                     return;
                 }
                 if(Venue!=ExistingObject.venue) {
                     if(!ExistingObject.venue.empty())
-                        Storage()->VenueDB().DeleteChild(ID, ExistingObject.venue, ExistingObject.info.id);
-                    Storage()->VenueDB().AddChild(ID,Venue,ExistingObject.info.id);
+                        Storage()->VenueDB().DeleteChild("id", ExistingObject.venue, ExistingObject.info.id);
+                    Storage()->VenueDB().AddChild("id",Venue,ExistingObject.info.id);
                 }
             }
 
@@ -212,7 +208,7 @@ namespace OpenWifi{
                 ExistingObject.deviceType = DeviceType;
             }
 
-            if(Storage()->InventoryDB().UpdateRecord(ID, ExistingObject.info.id, ExistingObject)) {
+            if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
                 Poco::JSON::Object  Answer;
                 ExistingObject.to_json(Answer);
                 ReturnObject(Request, Answer, Response);

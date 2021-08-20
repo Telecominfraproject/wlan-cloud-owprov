@@ -66,7 +66,7 @@ namespace OpenWifi::ProvObjects {
 
     struct Venue {
         ObjectInfo  info;
-        uCentral::Types::UUID_t owner;
+        uCentral::Types::UUID_t entity;
         uCentral::Types::UUID_t parent;
         uCentral::Types::UUIDvec_t children;
         uCentral::Types::UUIDvec_t managers;

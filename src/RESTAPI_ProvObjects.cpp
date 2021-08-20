@@ -117,7 +117,7 @@ namespace OpenWifi::ProvObjects {
     void Venue::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
         uCentral::RESTAPI_utils::field_to_json( Obj,"parent",parent);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"owner",owner);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"owner",entity);
         uCentral::RESTAPI_utils::field_to_json( Obj,"children",children);
         uCentral::RESTAPI_utils::field_to_json( Obj,"managers",managers);
         uCentral::RESTAPI_utils::field_to_json( Obj,"devices",devices);
@@ -131,7 +131,7 @@ namespace OpenWifi::ProvObjects {
         try {
             info.from_json(Obj);
             uCentral::RESTAPI_utils::field_from_json( Obj,"parent",parent);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"owner",owner);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"owner",entity);
             uCentral::RESTAPI_utils::field_from_json( Obj,"children",children);
             uCentral::RESTAPI_utils::field_from_json( Obj,"managers",managers);
             uCentral::RESTAPI_utils::field_from_json( Obj,"devices",devices);
