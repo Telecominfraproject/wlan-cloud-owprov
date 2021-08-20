@@ -229,14 +229,14 @@ components:
           type: string
 
     # uuids: mgg:<uuid>
-    ManagementGroup:
+    ManagementRole:
       type: object
       properties:
         allOf:
           $ref: '#/components/schemas/ObjectInfo'
         managementPolicy:
           $ref: '#/components/schemas/ManagementPolicy'
-        managers:
+        users:
           type: array
           items:
             type: string
