@@ -142,12 +142,6 @@ components:
           items:
             type: string
             format: uuid
-        managers:
-          description: The list of UUID of the management groups allowed to manage this entity
-          type: array
-          items:
-            type: string
-            format: uuid
         venues:
           description: The list of UUID of the venues for this entity
           type: array
@@ -206,11 +200,6 @@ components:
           type: string
           format: uuid
         children:
-          type: array
-          items:
-            type: string
-            format: uuid
-        managers:
           type: array
           items:
             type: string

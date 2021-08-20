@@ -15,6 +15,7 @@
 
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/MySQL/Connector.h"
+#include "Poco/URI.h"
 #include "SubSystemServer.h"
 
 #include "orm.h"
@@ -53,6 +54,7 @@ namespace OpenWifi {
 		OpenWifi::ContactDB & ContactDB() { return *ContactDB_;};
 		OpenWifi::InventoryDB & InventoryDB() { return *InventoryDB_; };
 
+		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 
 	  private:
 		static Storage      								*instance_;

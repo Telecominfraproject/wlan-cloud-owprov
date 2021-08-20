@@ -495,14 +495,6 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::children, FieldName, ParentUUID, ChildUUID, false);
         }
 
-        inline bool AddManager( const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
-            return ManipulateVectorMember(&RecordType::managers, FieldName, ParentUUID, ChildUUID, true);
-        }
-
-        inline bool DeleteManager( const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
-            return ManipulateVectorMember(&RecordType::managers, FieldName, ParentUUID, ChildUUID, false);
-        }
-
         inline bool AddLocation( const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
             return ManipulateVectorMember(&RecordType::locations, FieldName, ParentUUID, ChildUUID, true);
         }

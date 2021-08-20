@@ -75,7 +75,6 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json( Obj,"parent",parent);
         uCentral::RESTAPI_utils::field_to_json( Obj,"venues",venues);
         uCentral::RESTAPI_utils::field_to_json( Obj,"children",children);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"managers",managers);
         uCentral::RESTAPI_utils::field_to_json( Obj,"contacts",contacts);
         uCentral::RESTAPI_utils::field_to_json( Obj,"locations",locations);
         uCentral::RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
@@ -87,7 +86,6 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"parent",parent);
             uCentral::RESTAPI_utils::field_from_json( Obj,"venues",venues);
             uCentral::RESTAPI_utils::field_from_json( Obj,"children",children);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"managers",managers);
             uCentral::RESTAPI_utils::field_from_json( Obj,"contacts",contacts);
             uCentral::RESTAPI_utils::field_from_json( Obj,"locations",locations);
             uCentral::RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
@@ -119,7 +117,6 @@ namespace OpenWifi::ProvObjects {
         uCentral::RESTAPI_utils::field_to_json( Obj,"parent",parent);
         uCentral::RESTAPI_utils::field_to_json( Obj,"owner",entity);
         uCentral::RESTAPI_utils::field_to_json( Obj,"children",children);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"managers",managers);
         uCentral::RESTAPI_utils::field_to_json( Obj,"devices",devices);
         uCentral::RESTAPI_utils::field_to_json( Obj,"topology",topology);
         uCentral::RESTAPI_utils::field_to_json( Obj,"parent",parent);
@@ -133,7 +130,6 @@ namespace OpenWifi::ProvObjects {
             uCentral::RESTAPI_utils::field_from_json( Obj,"parent",parent);
             uCentral::RESTAPI_utils::field_from_json( Obj,"owner",entity);
             uCentral::RESTAPI_utils::field_from_json( Obj,"children",children);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"managers",managers);
             uCentral::RESTAPI_utils::field_from_json( Obj,"devices",devices);
             uCentral::RESTAPI_utils::field_from_json( Obj,"topology",topology);
             uCentral::RESTAPI_utils::field_from_json( Obj,"parent",parent);

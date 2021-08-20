@@ -20,7 +20,6 @@ namespace OpenWifi {
         ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
         ORM::Field{"parent",ORM::FieldType::FT_TEXT},
         ORM::Field{"children",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managers",ORM::FieldType::FT_TEXT},
         ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
         ORM::Field{"locations",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
@@ -60,11 +59,10 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.info.modified = In.get<5>();
     Out.parent = In.get<6>();
     uCentral::Types::from_string(In.get<7>(), Out.children);
-    uCentral::Types::from_string(In.get<8>(), Out.managers);
-    uCentral::Types::from_string(In.get<9>(), Out.contacts);
-    uCentral::Types::from_string(In.get<10>(), Out.locations);
-    Out.managementPolicy = In.get<11>();
-    uCentral::Types::from_string(In.get<12>(), Out.venues);
+    uCentral::Types::from_string(In.get<8>(), Out.contacts);
+    uCentral::Types::from_string(In.get<9>(), Out.locations);
+    Out.managementPolicy = In.get<10>();
+    uCentral::Types::from_string(In.get<11>(), Out.venues);
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -76,9 +74,8 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<5>(In.info.modified);
     Out.set<6>(In.parent);
     Out.set<7>(uCentral::Types::to_string(In.children));
-    Out.set<8>(uCentral::Types::to_string(In.managers));
-    Out.set<9>(uCentral::Types::to_string(In.contacts));
-    Out.set<10>(uCentral::Types::to_string(In.locations));
-    Out.set<11>(In.managementPolicy);
-    Out.set<12>(uCentral::Types::to_string(In.venues));
+    Out.set<8>(uCentral::Types::to_string(In.contacts));
+    Out.set<9>(uCentral::Types::to_string(In.locations));
+    Out.set<10>(In.managementPolicy);
+    Out.set<11>(uCentral::Types::to_string(In.venues));
 }

@@ -20,7 +20,6 @@ namespace OpenWifi {
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"parent",ORM::FieldType::FT_TEXT},
         ORM::Field{"children",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managers",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
@@ -49,10 +48,9 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.entity = In.get<6>();
     Out.parent = In.get<7>();
     uCentral::Types::from_string(In.get<8>(), Out.children);
-    uCentral::Types::from_string(In.get<9>(), Out.managers);
-    uCentral::Types::from_string(In.get<10>(), Out.devices);
-    Out.topology = uCentral::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<11>());
-    Out.design = In.get<12>();
+    uCentral::Types::from_string(In.get<9>(), Out.devices);
+    Out.topology = uCentral::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<10>());
+    Out.design = In.get<11>();
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -65,8 +63,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<6>(In.entity);
     Out.set<7>(In.parent);
     Out.set<8>(uCentral::Types::to_string(In.children));
-    Out.set<9>(uCentral::Types::to_string(In.managers));
-    Out.set<10>(uCentral::Types::to_string(In.devices));
-    Out.set<11>(uCentral::RESTAPI_utils::to_string(In.topology));
-    Out.set<12>(In.design);
+    Out.set<9>(uCentral::Types::to_string(In.devices));
+    Out.set<10>(uCentral::RESTAPI_utils::to_string(In.topology));
+    Out.set<11>(In.design);
 }

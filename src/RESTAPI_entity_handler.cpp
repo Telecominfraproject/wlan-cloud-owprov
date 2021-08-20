@@ -140,7 +140,6 @@ namespace OpenWifi{
 
             E.venues.clear();
             E.children.clear();
-            E.managers.clear();
             E.contacts.clear();
             E.locations.clear();
 
@@ -163,14 +162,11 @@ namespace OpenWifi{
     }
 
     /*
-     *
      * Put is a complex operation, it contains commands only.
      *      addContact=UUID, delContact=UUID,
+     *      addLocation=UUID, delLocation=UUID,
      *      addVenue=UUID, delVenue=UUID,
      *      addEntity=UUID, delEntity=UUID
-     *      addManager=UUID, delManager=UUID
-     *      addPhone=UUID, delPhone=UUID
-     *      addMobile=UUID, delMobile=UUID
      *      addDevice=UUID, delDevice=UUID
      */
 
@@ -208,30 +204,7 @@ namespace OpenWifi{
             LocalObject.info.modified = std::time(nullptr);
 
             std::string Error;
-            for(auto const &i:Parameters_) {
-                if(i.first == "addContact" || i.first == "delContact") {
-                    if(!Storage()->ContactDB().Exists("id",i.second)) {
-                        Error = "Unknown Contact UUID: " + i.second;
-                        break;
-                    }
-                } else if(i.first == "addLocation" || i.first == "delLocation") {
-                    if(!Storage()->LocationDB().Exists("id",i.second)) {
-                        Error = "Unknown Location UUID: " + i.second;
-                        break;
-                    }
-                } else if(i.first == "addVenue" || i.first == "delVenue") {
-                    if(!Storage()->VenueDB().Exists("id",i.second)) {
-                        Error = "Unknown Venue UUID: " + i.second;
-                        break;
-                    }
-                } else if(i.first == "addManager" || i.first == "delManager") {
-                } else {
-                    Error = "Unknown operation: " + i.first;
-                    break;
-                }
-            }
-
-            if(!Error.empty()) {
+            if(!Storage()->Validate(Parameters_,Error)) {
                 BadRequest(Request, Response, Error);
                 return;
             }
@@ -251,10 +224,6 @@ namespace OpenWifi{
                     } else if (i.first == "delLocation") {
                         Storage()->EntityDB().DeleteLocation("id", UUID, Child);
                         Storage()->LocationDB().DeleteEntity("id",Child,UUID);
-                    } else if (i.first == "addManager") {
-                        Storage()->EntityDB().AddManager("id",UUID,Child);
-                    } else if (i.first == "delManager") {
-                        Storage()->EntityDB().DeleteManager("id",UUID,Child);
                     }
                 }
                 Poco::JSON::Object  Answer;

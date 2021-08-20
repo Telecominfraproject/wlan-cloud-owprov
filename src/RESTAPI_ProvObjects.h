@@ -45,7 +45,6 @@ namespace OpenWifi::ProvObjects {
         uCentral::Types::UUID_t parent;
         uCentral::Types::UUIDvec_t children;
         uCentral::Types::UUIDvec_t venues;
-        uCentral::Types::UUIDvec_t managers;
         uCentral::Types::UUIDvec_t contacts;
         uCentral::Types::UUIDvec_t locations;
         uCentral::Types::UUID_t managementPolicy;
@@ -69,7 +68,6 @@ namespace OpenWifi::ProvObjects {
         uCentral::Types::UUID_t entity;
         uCentral::Types::UUID_t parent;
         uCentral::Types::UUIDvec_t children;
-        uCentral::Types::UUIDvec_t managers;
         uCentral::Types::UUID_t managementPolicy;
         uCentral::Types::UUIDvec_t devices;
         DiGraph topology;

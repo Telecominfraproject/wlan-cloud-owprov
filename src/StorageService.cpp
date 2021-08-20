@@ -63,6 +63,52 @@ namespace OpenWifi {
         Logger_.notice("Stopping.");
     }
 
+    bool Storage::Validate(const Poco::URI::QueryParameters &P, std::string &Error) {
+	    for(const auto &i:P) {
+	        if(i.first == "addContact" || i.first == "delContact") {
+	            if(!ContactDB_->Exists("id",i.second)) {
+	                Error = "Unknown contact UUID: " + i.second;
+	                break;
+	            }
+	        }
+	        if(i.first == "addLocation" || i.first == "delLocation") {
+	            if(!LocationDB_->Exists("id",i.second)) {
+	                Error = "Unknown Location UUID: " + i.second;
+	                break;
+	            }
+	        }
+	        if(i.first == "addEntity" || i.first == "delEntity") {
+	            if(!EntityDB_->Exists("id",i.second)) {
+	                Error = "Unknown Entity UUID: " + i.second;
+	                break;
+	            }
+	        }
+	        if(i.first == "addVenue" || i.first == "delVenue") {
+	            if(!VenueDB_->Exists("id",i.second)) {
+	                Error = "Unknown Venue UUID: " + i.second;
+	                break;
+	            }
+	        }
+	        if(i.first == "addManager" || i.first == "delManager") {
+	            /*
+	            if(!VenueDB_->Exists("id",i.second)) {
+	                Error = "Unknown Manager UUID: " + i.second;
+	                break;
+	            }*/
+	        }
+	        if(i.first == "addDevice" || i.first == "delDevice") {
+	            if(!InventoryDB_->Exists("id",i.second)) {
+	                Error = "Unknown Inventory UUID: " + i.second;
+	                break;
+	            }
+	        }
+	    }
+
+	    if(Error.empty())
+	        return true;
+	    return false;
+	}
+
 }
 
 // namespace
