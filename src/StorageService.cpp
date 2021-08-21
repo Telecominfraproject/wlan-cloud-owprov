@@ -74,8 +74,10 @@ namespace OpenWifi {
 	            Poco::Thread::trySleep(DeviceTypes_.empty() ? 2000 : 60000);
 	        if(!Running_)
 	            break;
-	        if(UpdateDeviceTypes())
+	        if(UpdateDeviceTypes()) {
 	            FirstRun = false;
+	            Logger_.information("Updated existing DeviceType list from FMS.");
+	        }
 	    }
 	}
 

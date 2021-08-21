@@ -39,7 +39,6 @@ namespace OpenWifi {
         DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L) {
 
         CheckForRoot();
-        std::cout << "RootExists:" << RootExists_ << std::endl;
     }
 
     inline bool EntityDB::CheckForRoot() {
