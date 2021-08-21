@@ -32,17 +32,8 @@ namespace OpenWifi {
 
 	int OpenAPIRequestGet::Do(Poco::JSON::Object::Ptr &ResponseObject) {
 		try {
-		    {
-		        auto Services = Daemon()->GetServices();
-
-		        for(const auto &i:Services)
-		            std::cout << "   Service: " << i.Type << std::endl;
-		    }
-
-		    std::cout << "Looking for : " << Type_ << std::endl;
-
-			auto Services = Daemon()->GetServices(Type_);
-
+		    auto Services = Daemon()->GetServices(Type_);
+		    std::cout << "Looking for : " << Type_ << " " << Services.size() << " returned" << std::endl;
 			for(auto const &Svc:Services) {
 				Poco::URI	URI(Svc.PrivateEndPoint);
 				Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
