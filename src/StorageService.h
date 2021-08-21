@@ -26,6 +26,7 @@
 #include "storage_location.h"
 #include "storage_contact.h"
 #include "storage_inventory.h"
+#include "storage_management_roles.h"
 
 namespace OpenWifi {
 
@@ -53,6 +54,7 @@ namespace OpenWifi {
 		OpenWifi::LocationDB & LocationDB() { return *LocationDB_; };
 		OpenWifi::ContactDB & ContactDB() { return *ContactDB_;};
 		OpenWifi::InventoryDB & InventoryDB() { return *InventoryDB_; };
+		OpenWifi::ManagementRoleDB & RolesDB() { return *RolesDB_; };
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 
@@ -70,6 +72,7 @@ namespace OpenWifi {
 		std::unique_ptr<OpenWifi::LocationDB>               LocationDB_;
 		std::unique_ptr<OpenWifi::ContactDB>                ContactDB_;
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
+		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
 
 		Storage() noexcept;
    };

@@ -235,7 +235,8 @@ components:
         allOf:
           $ref: '#/components/schemas/ObjectInfo'
         managementPolicy:
-          $ref: '#/components/schemas/ManagementPolicy'
+          type: string
+          format: uuid
         users:
           type: array
           items:

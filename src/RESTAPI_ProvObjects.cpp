@@ -142,20 +142,36 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
-    void ManagementGroup::to_json(Poco::JSON::Object &Obj) const {
-        info.to_json(Obj);
-        uCentral::RESTAPI_utils::field_to_json( Obj,"managers",managers);
-        managementPolicy.to_json(Obj);
+    void UserInfoDigest::to_json(Poco::JSON::Object &Obj) const {
+        uCentral::RESTAPI_utils::field_to_json( Obj,"id",id);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"owner",loginId);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"children",userType);
     }
 
-    bool ManagementGroup::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    bool UserInfoDigest::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            uCentral::RESTAPI_utils::field_from_json( Obj,"id",id);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"owner",loginId);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"children",userType);
+            return true;
+        } catch(...) {
+        }
+        return false;
+    }
+
+    void ManagementRole::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
+        uCentral::RESTAPI_utils::field_to_json( Obj,"users",users);
+    }
+
+    bool ManagementRole::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            uCentral::RESTAPI_utils::field_from_json( Obj,"managers",managers);
-            managementPolicy.from_json(Obj);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
+            uCentral::RESTAPI_utils::field_from_json( Obj,"users",users);
             return true;
-        } catch (...) {
-
+        } catch(...) {
         }
         return false;
     }

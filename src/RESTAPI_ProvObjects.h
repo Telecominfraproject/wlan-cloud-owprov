@@ -77,10 +77,19 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    struct ManagementGroup {
-        ObjectInfo  info;
-        ManagementPolicy managementPolicy;
-        uCentral::Types::UUIDvec_t managers;
+    struct UserInfoDigest {
+        std::string     id;
+        std::string     loginId;
+        std::string     userType;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct ManagementRole {
+        ObjectInfo                      info;
+        uCentral::Types::UUID_t         managementPolicy;
+        std::vector<UserInfoDigest>     users;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -121,12 +130,6 @@ namespace OpenWifi::ProvObjects {
             return LT_CORPORATE;
         return LT_UNKNOWN;
     }
-
-    struct LocationTypeS {
-        LocationType    type;
-        void to_json(Poco::JSON::Object &Obj) const;
-        bool from_json(const Poco::JSON::Object::Ptr &Obj);
-    };
 
     struct Location {
         ObjectInfo  info;
