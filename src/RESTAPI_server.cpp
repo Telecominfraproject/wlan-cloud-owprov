@@ -19,7 +19,7 @@
 #include "RESTAPI_inventory_list_handler.h"
 #include "RESTAPI_entity_list_handler.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class RESTAPI_server *RESTAPI_server::instance_ = nullptr;
 
@@ -56,7 +56,7 @@ namespace uCentral {
 
     Poco::Net::HTTPRequestHandler *RequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest & Request) {
 
-        Logger_.debug(Poco::format("REQUEST(%s): %s %s", uCentral::Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
+        Logger_.debug(Poco::format("REQUEST(%s): %s %s", Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
 
         Poco::URI uri(Request.getURI());
         auto *Path = uri.getPath().c_str();

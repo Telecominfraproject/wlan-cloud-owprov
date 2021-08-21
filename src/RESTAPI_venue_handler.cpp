@@ -27,14 +27,22 @@ namespace OpenWifi{
     }
 
     void RESTAPI_venue_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+                                        Poco::Net::HTTPServerResponse &Response) {
+
+    }
 
     void RESTAPI_venue_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                           Poco::Net::HTTPServerResponse &Response) {}
+                                           Poco::Net::HTTPServerResponse &Response) {
+
+    }
 
     void RESTAPI_venue_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+                                        Poco::Net::HTTPServerResponse &Response) {
+
+    }
 
     void RESTAPI_venue_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+                                        Poco::Net::HTTPServerResponse &Response) {
+
+    }
 }

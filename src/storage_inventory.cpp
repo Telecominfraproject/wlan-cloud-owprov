@@ -4,7 +4,7 @@
 
 #include "storage_inventory.h"
 #include "Utils.h"
-#include "uCentralTypes.h"
+#include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 
@@ -47,7 +47,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
-    Out.info.notes = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(In.get<3>());
+    Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
     Out.serialNumber = In.get<6>();
@@ -63,7 +63,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);
-    Out.set<3>(uCentral::RESTAPI_utils::to_string(In.info.notes));
+    Out.set<3>(OpenWifi::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
     Out.set<6>(In.serialNumber);

@@ -72,7 +72,7 @@ add_executable(owprov
         src/storage_pgql.cpp src/storage_mysql.cpp src/storage_sqlite.cpp
         src/storage_entity.cpp src/storage_entity.h
         src/storage_policies.cpp src/storage_policies.h
-        src/uCentralTypes.h
+        src/OpenWifiTypes.h
         src/storage_venue.cpp src/storage_venue.h
         src/storage_location.cpp src/storage_location.h
         src/storage_contact.cpp src/storage_contact.h

@@ -17,7 +17,7 @@
 
 #include "Poco/StringTokenizer.h"
 
-namespace uCentral::Types {
+namespace OpenWifi::Types {
     typedef std::pair<std::string,std::string>              StringPair;
 	typedef std::vector<StringPair>	                        StringPairVec;
     typedef std::queue<StringPair>	                        StringPairQueue;
@@ -33,12 +33,12 @@ namespace uCentral::Types {
     typedef std::string         UUID_t;
     typedef std::vector<UUID_t> UUIDvec_t;
 
-    inline void UpdateCountedMap(CountedMap &M, const std::string &S ) {
+    inline void UpdateCountedMap(CountedMap &M, const std::string &S, uint64_t Increment=1) {
         auto it = M.find(S);
         if(it==M.end())
-            M[S]=1;
+            M[S] = Increment;
         else
-            it->second += 1;
+            it->second += Increment;
     }
 
     inline std::string to_string( const StringVec &V) {

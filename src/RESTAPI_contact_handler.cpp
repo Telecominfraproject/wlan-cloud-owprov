@@ -34,14 +34,14 @@ namespace OpenWifi{
     void RESTAPI_contact_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                        Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string UUID = GetBinding(uCentral::RESTAPI::Protocol::ID,"");
+            std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
                 BadRequest(Request, Response, "Missing UUID.");
                 return;
             }
 
             ProvObjects::Contact   C;
-            if(Storage()->ContactDB().GetRecord(uCentral::RESTAPI::Protocol::ID,UUID,C)) {
+            if(Storage()->ContactDB().GetRecord(RESTAPI::Protocol::ID,UUID,C)) {
                 Poco::JSON::Object  Answer;
                 C.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
@@ -64,7 +64,7 @@ namespace OpenWifi{
     void RESTAPI_contact_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
                                          Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string UUID = GetBinding(uCentral::RESTAPI::Protocol::ID,"");
+            std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
                 BadRequest(Request, Response, "Missing UUID.");
                 return;
@@ -78,7 +78,7 @@ namespace OpenWifi{
                 return;
             }
 
-            C.info.id = uCentral::Daemon()->CreateUUID();
+            C.info.id = Daemon()->CreateUUID();
             C.info.created = C.info.modified = std::time(nullptr);
 
             if(C.entities.empty() || C.entities.size()!=1) {
@@ -86,7 +86,7 @@ namespace OpenWifi{
                 return;
             }
 
-            std::string f{uCentral::RESTAPI::Protocol::ID};
+            std::string f{RESTAPI::Protocol::ID};
             if(!Storage()->EntityDB().Exists("id",C.entities[0])) {
                 BadRequest(Request, Response, "Unknown entity: " + C.entities[0] );
                 return;

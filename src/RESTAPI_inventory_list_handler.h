@@ -11,7 +11,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 
 namespace OpenWifi {
-    class RESTAPI_inventory_list_handler : public uCentral::RESTAPIHandler {
+    class RESTAPI_inventory_list_handler : public RESTAPIHandler {
     public:
         RESTAPI_inventory_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
         : RESTAPIHandler(bindings, L,

@@ -26,7 +26,7 @@ namespace OpenWifi{
                                                Poco::Net::HTTPServerResponse &Response) {
         try {
             if(!QB_.Select.empty()) {
-                auto EntityUIDs = uCentral::Utils::Split(QB_.Select);
+                auto EntityUIDs = Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:EntityUIDs) {
                     ProvObjects::Entity E;

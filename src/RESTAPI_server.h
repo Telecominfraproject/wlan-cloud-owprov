@@ -13,7 +13,7 @@
 
 #include "SubSystemServer.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class RESTAPI_server : public SubSystemServer {
 

@@ -10,7 +10,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 
 namespace OpenWifi {
-    class RESTAPI_managementPolicy_handler : public uCentral::RESTAPIHandler {
+    class RESTAPI_managementPolicy_handler : public RESTAPIHandler {
     public:
         RESTAPI_managementPolicy_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
         : RESTAPIHandler(bindings, L,

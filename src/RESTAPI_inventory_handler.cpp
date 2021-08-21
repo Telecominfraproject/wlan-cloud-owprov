@@ -34,14 +34,14 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string SerialNumber = GetBinding(uCentral::RESTAPI::Protocol::SERIALNUMBER,"");
+            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
             if(SerialNumber.empty()) {
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
 
             ProvObjects::InventoryTag   IT;
-            if(Storage()->InventoryDB().GetRecord(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
+            if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
                 Poco::JSON::Object  Answer;
                 IT.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
@@ -59,28 +59,28 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
                                            Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string SerialNumber = GetBinding(uCentral::RESTAPI::Protocol::SERIALNUMBER,"");
+            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
             if(SerialNumber.empty()) {
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
 
             ProvObjects::InventoryTag   IT;
-            if(!Storage()->InventoryDB().GetRecord(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
+            if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
                 NotFound(Request,Response);
                 return;
             }
 
             if(!IT.entity.empty())
-                Storage()->EntityDB().DeleteChild(uCentral::RESTAPI::Protocol::ID,IT.entity,IT.info.id);
+                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.entity,IT.info.id);
             if(!IT.subEntity.empty())
-                Storage()->EntityDB().DeleteChild(uCentral::RESTAPI::Protocol::ID,IT.subEntity,IT.info.id);
+                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.subEntity,IT.info.id);
             if(!IT.venue.empty())
-                Storage()->EntityDB().DeleteChild(uCentral::RESTAPI::Protocol::ID,IT.venue,IT.info.id);
+                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.venue,IT.info.id);
             if(!IT.subVenue.empty())
-                Storage()->EntityDB().DeleteChild(uCentral::RESTAPI::Protocol::ID,IT.subVenue,IT.info.id);
+                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.subVenue,IT.info.id);
 
-            Storage()->InventoryDB().DeleteRecord(uCentral::RESTAPI::Protocol::ID, IT.info.id);
+            Storage()->InventoryDB().DeleteRecord(RESTAPI::Protocol::ID, IT.info.id);
             OK(Request, Response);
             return;
         }  catch(const Poco::Exception &E) {
@@ -92,13 +92,13 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
                                             Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string SerialNumber = GetBinding(uCentral::RESTAPI::Protocol::SERIALNUMBER,"");
+            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
             if(SerialNumber.empty()) {
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
 
-            if(Storage()->InventoryDB().Exists(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
+            if(Storage()->InventoryDB().Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
                 BadRequest(Request,Response, "SerialNumber: " + SerialNumber + " already exists.");
                 return;
             }
@@ -111,22 +111,19 @@ namespace OpenWifi{
                 return;
             }
 
-            if(IT.entity.empty()) {
-                BadRequest(Request, Response, "Device must be associated with a top entity.");
+            if(IT.entity.empty() || OpenWifi::EntityDB::IsRoot(IT.entity) || !Storage()->InventoryDB().Exists("id",IT.entity)) {
+                BadRequest(Request, Response, "Device must be associated with a non-root and existing entity. UUID="+IT.entity);
                 return;
             }
 
-            IT.info.modified = IT.info.created = std::time(nullptr);
-            if(!IT.entity.empty() && !Storage()->InventoryDB().Exists("id",IT.entity)) {
-                BadRequest(Request, Response, "Entity: " + IT.entity + " does not exist.");
-                return;
-            }
             if(!IT.venue.empty() && !Storage()->VenueDB().Exists("id",IT.venue)) {
                 BadRequest(Request, Response, "Venue: " + IT.venue + " does not exist.");
                 return;
             }
+
+            IT.info.modified = IT.info.created = std::time(nullptr);
             IT.subEntity = IT.subVenue = "";
-            IT.info.id = uCentral::Daemon()->CreateUUID();
+            IT.info.id = Daemon()->CreateUUID();
 
             if(Storage()->InventoryDB().CreateRecord(IT)) {
                 Storage()->EntityDB().AddChild("id",IT.entity,IT.info.id);
@@ -148,14 +145,14 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string SerialNumber = GetBinding(uCentral::RESTAPI::Protocol::SERIALNUMBER,"");
+            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
             if(SerialNumber.empty()) {
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
 
             ProvObjects::InventoryTag   ExistingObject;
-            if(!Storage()->InventoryDB().GetRecord(uCentral::RESTAPI::Protocol::SERIALNUMBER,SerialNumber,ExistingObject)) {
+            if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,ExistingObject)) {
                 NotFound(Request, Response);
                 return;
             }
@@ -163,12 +160,7 @@ namespace OpenWifi{
             Poco::JSON::Parser IncomingParser;
             Poco::JSON::Object::Ptr RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if(RawObject->has("notes")) {
-                uCentral::SecurityObjects::NoteInfoVec NIV;
-                NIV = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(RawObject->get("notes").toString());
-                for(auto const &i:NIV) {
-                    uCentral::SecurityObjects::NoteInfo   ii{.created=(uint64_t)std::time(nullptr), .createdBy=UserInfo_.userinfo.email, .note=i.note};
-                    ExistingObject.info.notes.push_back(ii);
-                }
+                SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
             }
 
             if(RawObject->has("name"))
@@ -190,6 +182,18 @@ namespace OpenWifi{
                 }
             }
 
+            if(RawObject->has("subEntity")) {
+                std::string subEntity{RawObject->get("subEntity").toString()};
+                if(!Storage()->EntityDB().Exists("id",subEntity)) {
+                    BadRequest(Request, Response, "subEntity association does not exist.");
+                    return;
+                }
+                if(subEntity!=ExistingObject.entity) {
+                    Storage()->EntityDB().DeleteChild("id", ExistingObject.subEntity, ExistingObject.info.id);
+                    Storage()->EntityDB().AddChild("id",subEntity,ExistingObject.info.id);
+                }
+            }
+
             if(RawObject->has("venue")) {
                 std::string Venue{RawObject->get("venue").toString()};
                 if(!Storage()->VenueDB().Exists("id",Venue)) {
@@ -200,6 +204,19 @@ namespace OpenWifi{
                     if(!ExistingObject.venue.empty())
                         Storage()->VenueDB().DeleteChild("id", ExistingObject.venue, ExistingObject.info.id);
                     Storage()->VenueDB().AddChild("id",Venue,ExistingObject.info.id);
+                }
+            }
+
+            if(RawObject->has("subVenue")) {
+                std::string subVenue{RawObject->get("subVenue").toString()};
+                if(!Storage()->VenueDB().Exists("id",subVenue)) {
+                    BadRequest(Request, Response, "Venue association does not exist.");
+                    return;
+                }
+                if(subVenue!=ExistingObject.subVenue) {
+                    if(!ExistingObject.subVenue.empty())
+                        Storage()->VenueDB().DeleteChild("id", ExistingObject.subVenue, ExistingObject.info.id);
+                    Storage()->VenueDB().AddChild("id",subVenue,ExistingObject.info.id);
                 }
             }
 

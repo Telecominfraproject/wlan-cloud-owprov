@@ -11,10 +11,10 @@
 namespace OpenWifi::ProvObjects {
 
     struct ObjectInfo {
-        uCentral::Types::UUID_t   id;
+        Types::UUID_t   id;
         std::string     name;
         std::string     description;
-        uCentral::SecurityObjects::NoteInfoVec notes;
+        SecurityObjects::NoteInfoVec notes;
         uint64_t        created;
         uint64_t        modified;
 
@@ -23,9 +23,9 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct ManagementPolicyEntry {
-        uCentral::Types::UUIDvec_t users;
-        uCentral::Types::UUIDvec_t resources;
-        uCentral::Types::StringVec access;
+        Types::UUIDvec_t users;
+        Types::UUIDvec_t resources;
+        Types::StringVec access;
         std::string policy;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -42,20 +42,20 @@ namespace OpenWifi::ProvObjects {
 
     struct Entity {
         ObjectInfo  info;
-        uCentral::Types::UUID_t parent;
-        uCentral::Types::UUIDvec_t children;
-        uCentral::Types::UUIDvec_t venues;
-        uCentral::Types::UUIDvec_t contacts;
-        uCentral::Types::UUIDvec_t locations;
-        uCentral::Types::UUID_t managementPolicy;
+        Types::UUID_t parent;
+        Types::UUIDvec_t children;
+        Types::UUIDvec_t venues;
+        Types::UUIDvec_t contacts;
+        Types::UUIDvec_t locations;
+        Types::UUID_t managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
     struct DiGraphEntry {
-        uCentral::Types::UUID_t parent;
-        uCentral::Types::UUID_t child;
+        Types::UUID_t parent;
+        Types::UUID_t child;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -65,11 +65,11 @@ namespace OpenWifi::ProvObjects {
 
     struct Venue {
         ObjectInfo  info;
-        uCentral::Types::UUID_t entity;
-        uCentral::Types::UUID_t parent;
-        uCentral::Types::UUIDvec_t children;
-        uCentral::Types::UUID_t managementPolicy;
-        uCentral::Types::UUIDvec_t devices;
+        Types::UUID_t entity;
+        Types::UUID_t parent;
+        Types::UUIDvec_t children;
+        Types::UUID_t managementPolicy;
+        Types::UUIDvec_t devices;
         DiGraph topology;
         std::string design;
 
@@ -88,7 +88,7 @@ namespace OpenWifi::ProvObjects {
 
     struct ManagementRole {
         ObjectInfo                      info;
-        uCentral::Types::UUID_t         managementPolicy;
+        Types::UUID_t         managementPolicy;
         std::vector<UserInfoDigest>     users;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -135,15 +135,15 @@ namespace OpenWifi::ProvObjects {
         ObjectInfo  info;
         LocationType type;
         std::string buildingName;
-        uCentral::Types::StringVec addressLines;
+        Types::StringVec addressLines;
         std::string city;
         std::string state;
         std::string postal;
         std::string country;
-        uCentral::Types::StringVec phones;
-        uCentral::Types::StringVec mobiles;
-        uCentral::Types::StringVec venues;
-        uCentral::Types::StringVec entities;
+        Types::StringVec phones;
+        Types::StringVec mobiles;
+        Types::StringVec venues;
+        Types::StringVec entities;
         std::string geoCode;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -199,13 +199,13 @@ namespace OpenWifi::ProvObjects {
         std::string lastname;
         std::string initials;
         std::string visual;
-        uCentral::Types::StringVec mobiles;
-        uCentral::Types::StringVec phones;
+        Types::StringVec mobiles;
+        Types::StringVec phones;
         std::string primaryEmail;
         std::string secondaryEmail;
         std::string accessPIN;
-        uCentral::Types::StringVec venues;
-        uCentral::Types::StringVec entities;
+        Types::StringVec venues;
+        Types::StringVec entities;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -222,7 +222,7 @@ namespace OpenWifi::ProvObjects {
     struct DeviceConfiguration {
         ObjectInfo info;
         ManagementPolicy managementPolicy;
-        uCentral::Types::StringVec deviceTypes;
+        Types::StringVec deviceTypes;
         std::string configuration;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -247,7 +247,7 @@ namespace OpenWifi::ProvObjects {
 
     struct Report {
         uint64_t            snapShot;
-        uCentral::Types::CountedMap   tenants;
+        Types::CountedMap   tenants;
 
         void        reset();
         void to_json(Poco::JSON::Object &Obj) const;

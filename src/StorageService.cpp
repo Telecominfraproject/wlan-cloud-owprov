@@ -7,10 +7,12 @@
 //
 
 #include "Poco/Util/Application.h"
+#include "Poco/Net/HTTPResponse.h"
 
 #include "StorageService.h"
 #include "Daemon.h"
 #include "Utils.h"
+#include "OpenAPIRequest.h"
 
 namespace OpenWifi {
 
@@ -26,7 +28,7 @@ namespace OpenWifi {
 
 		Logger_.setLevel(Poco::Message::PRIO_NOTICE);
         Logger_.notice("Starting.");
-        std::string DBType = uCentral::Daemon()->ConfigGetString("storage.type");
+        std::string DBType = Daemon()->ConfigGetString("storage.type");
 
         if (DBType == "sqlite") {
             DBType_ = ORM::DBType::sqlite;
@@ -58,10 +60,83 @@ namespace OpenWifi {
         OpenWifi::ProvObjects::Entity   R;
         EntityDB_->GetRecord("id","xxx",R);
 
-		return 0;
+        Updater_.start(*this);
+        return 0;
     }
 
+    void Storage::run() {
+	    Running_ = true ;
+	    bool FirstRun=true;
+	    uint64_t Retry = 10000;
+	    while(Running_) {
+	        if(!FirstRun)
+	            Poco::Thread::trySleep(DeviceTypes_.empty() ? 5000 : 60000);
+	        if(!Running_)
+	            break;
+	        if(UpdateDeviceTypes())
+	            FirstRun = false;
+	    }
+	}
+
+
+    /*  Get the device types... /api/v1/firmwares?deviceSet=true
+     {
+          "deviceTypes": [
+            "cig_wf160d",
+            "cig_wf188",
+            "cig_wf194c",
+            "edgecore_eap101",
+            "edgecore_eap102",
+            "edgecore_ecs4100-12ph",
+            "edgecore_ecw5211",
+            "edgecore_ecw5410",
+            "edgecore_oap100",
+            "edgecore_spw2ac1200",
+            "edgecore_ssw2ac2600",
+            "indio_um-305ac",
+            "linksys_e8450-ubi",
+            "linksys_ea8300",
+            "mikrotik_nand",
+            "mikrotik_nand-large",
+            "tplink_cpe210_v3",
+            "tplink_cpe510_v3",
+            "tplink_eap225_outdoor_v1",
+            "tplink_ec420",
+            "tplink_ex227",
+            "tplink_ex228",
+            "tplink_ex447",
+            "wallys_dr40x9"
+          ]
+        }
+     */
+	bool Storage::UpdateDeviceTypes() {
+
+	    Types::StringPairVec QueryData;
+
+	    QueryData.push_back(std::make_pair("deviceSet","true"));
+	    OpenAPIRequestGet	Req(uSERVICE_SECURITY,
+                                 "/api/v1/validateToken",
+                                 QueryData,
+                                 5000);
+
+	    // TODO
+	    Poco::JSON::Object::Ptr Response;
+	    if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
+	        if(Response->has("tokenInfo") && Response->has("userInfo")) {
+	            SecurityObjects::UserInfoAndPolicy	P;
+	            P.from_json(Response);
+	        }
+	        return true;
+	    }
+
+
+	    return false;
+	}
+
     void Storage::Stop() {
+	    Running_=false;
+	    Updater_.wakeUp();
+	    Updater_.join();
         Logger_.notice("Stopping.");
     }
 

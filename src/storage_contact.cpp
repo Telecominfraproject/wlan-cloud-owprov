@@ -4,7 +4,7 @@
 
 #include "storage_contact.h"
 #include "Utils.h"
-#include "uCentralTypes.h"
+#include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 
@@ -50,7 +50,7 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
-    Out.info.notes = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(In.get<3>());
+    Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
 
@@ -61,20 +61,20 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.lastname = In.get<10>();
     Out.initials = In.get<11>();
     Out.visual = In.get<12>();
-    uCentral::Types::from_string(In.get<13>(), Out.mobiles);
-    uCentral::Types::from_string(In.get<14>(), Out.phones);
+    OpenWifi::Types::from_string(In.get<13>(), Out.mobiles);
+    OpenWifi::Types::from_string(In.get<14>(), Out.phones);
     Out.primaryEmail = In.get<15>();
     Out.secondaryEmail = In.get<16>();
     Out.accessPIN = In.get<17>();
-    uCentral::Types::from_string(In.get<18>(), Out.venues);
-    uCentral::Types::from_string(In.get<19>(), Out.entities);
+    OpenWifi::Types::from_string(In.get<18>(), Out.venues);
+    OpenWifi::Types::from_string(In.get<19>(), Out.entities);
 }
 
 template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);
-    Out.set<3>(uCentral::RESTAPI_utils::to_string(In.info.notes));
+    Out.set<3>(OpenWifi::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
     Out.set<6>(to_string(In.type));
@@ -84,11 +84,11 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.set<10>(In.lastname);
     Out.set<11>(In.initials);
     Out.set<12>(In.visual);
-    Out.set<13>(uCentral::Types::to_string(In.mobiles));
-    Out.set<14>(uCentral::Types::to_string(In.phones));
+    Out.set<13>(OpenWifi::Types::to_string(In.mobiles));
+    Out.set<14>(OpenWifi::Types::to_string(In.phones));
     Out.set<15>(In.primaryEmail);
     Out.set<16>(In.secondaryEmail);
     Out.set<17>(In.accessPIN);
-    Out.set<18>(uCentral::Types::to_string(In.venues));
-    Out.set<19>(uCentral::Types::to_string(In.entities));
+    Out.set<18>(OpenWifi::Types::to_string(In.venues));
+    Out.set<19>(OpenWifi::Types::to_string(In.entities));
 }

@@ -27,7 +27,7 @@ namespace OpenWifi{
 
         try {
             if(!QB_.Select.empty()) {
-                auto DevUIIDS = uCentral::Utils::Split(QB_.Select);
+                auto DevUIIDS = Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:DevUIIDS) {
                     ProvObjects::InventoryTag E;

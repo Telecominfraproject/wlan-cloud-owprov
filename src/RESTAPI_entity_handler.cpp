@@ -128,7 +128,7 @@ namespace OpenWifi{
 
             //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
             //  must be conveyed through PUT.
-            E.info.id = (UUID==EntityDB::RootUUID()) ? UUID : uCentral::Daemon()->CreateUUID() ;
+            E.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
             if(UUID==EntityDB::RootUUID())
                 E.parent="";
             else if(E.parent.empty()) {
@@ -196,12 +196,7 @@ namespace OpenWifi{
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if(RawObject->has("notes")) {
-                uCentral::SecurityObjects::NoteInfoVec NIV;
-                NIV = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(RawObject->get("notes").toString());
-                for(auto const &i:NIV) {
-                    uCentral::SecurityObjects::NoteInfo   ii{.created=(uint64_t)std::time(nullptr), .createdBy=UserInfo_.userinfo.email, .note=i.note};
-                    LocalObject.info.notes.push_back(ii);
-                }
+                SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, LocalObject.info.notes);
             }
 
             if(RawObject->has("name"))

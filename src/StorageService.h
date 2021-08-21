@@ -30,7 +30,7 @@
 
 namespace OpenWifi {
 
-    class Storage : public uCentral::SubSystemServer {
+class Storage : public SubSystemServer, Poco::Runnable {
     public:
         static Storage *instance() {
             if (instance_ == nullptr) {
@@ -58,6 +58,10 @@ namespace OpenWifi {
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 
+		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
+
+		void run() override final;
+
 	  private:
 		static Storage      								*instance_;
 		std::unique_ptr<Poco::Data::SessionPool>        	Pool_= nullptr;
@@ -74,6 +78,11 @@ namespace OpenWifi {
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
 
+		Poco::Thread                                        Updater_;
+		std::set<std::string>                               DeviceTypes_;
+		std::atomic_bool                                    Running_=false;
+
+		bool UpdateDeviceTypes();
 		Storage() noexcept;
    };
 

@@ -19,7 +19,7 @@
 #include "RESTAPI_server.h"
 #include "RESTAPI_InternalServer.h"
 
-namespace uCentral {
+namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
 
 	class Daemon *Daemon::instance() {
@@ -46,7 +46,7 @@ namespace uCentral {
 
 int main(int argc, char **argv) {
 	try {
-		auto App = uCentral::Daemon::instance();
+		auto App = OpenWifi::Daemon::instance();
 		auto ExitCode =  App->run(argc, argv);
 		delete App;
 

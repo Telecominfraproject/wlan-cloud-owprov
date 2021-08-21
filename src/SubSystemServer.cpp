@@ -19,7 +19,7 @@
 
 #include "Daemon.h"
 
-namespace uCentral {
+namespace OpenWifi {
 SubSystemServer::SubSystemServer(std::string Name, const std::string &LoggingPrefix,
 								 std::string SubSystemConfigPrefix)
 	: Name_(std::move(Name)), Logger_(Poco::Logger::get(LoggingPrefix)),

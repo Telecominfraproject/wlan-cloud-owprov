@@ -3,7 +3,7 @@
 //
 
 #include "storage_management_roles.h"
-#include "uCentralTypes.h"
+#include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 
@@ -37,20 +37,20 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
-    Out.info.notes = uCentral::RESTAPI_utils::to_object_array<uCentral::SecurityObjects::NoteInfo>(In.get<3>());
+    Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
     Out.managementPolicy = In.get<6>();
-    Out.users = uCentral::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::UserInfoDigest>(In.get<7>());
+    Out.users = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::UserInfoDigest>(In.get<7>());
 }
 
 template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(OpenWifi::ProvObjects::ManagementRole &In, OpenWifi::ManagementRoleDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);
-    Out.set<3>(uCentral::RESTAPI_utils::to_string(In.info.notes));
+    Out.set<3>(OpenWifi::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
     Out.set<6>(In.managementPolicy);
-    Out.set<7>(uCentral::RESTAPI_utils::to_string(In.users));
+    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.users));
 }

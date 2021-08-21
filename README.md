@@ -4,11 +4,33 @@
 It's UUID value is 0000-0000-0000. Its parent entity must be empty.
 
 ## Entity
-You must set the parent of an entity.
+### Creation rules
+- You must set the parent of an entity.
+- The only properties you may set at creation are:
+  - name
+  - description
+  - notes
+  - parent
 
-## Venue
-When creating a venue, the top venue must have its entity property set to the owning entity, and its parent property empty. 
-For all sub venues, their entity must be set to empty and its parent entity must be set to the venue above it.
+### Modification rules
+You may modify the following fields in the POST
+- name
+- description
+- notes
+You must use the query command parameters to modify other properties
+- addContact=UUID
+- delContact=UUID
+- addLocation=UUID
+- delLocation=UUID
+
+## Inventory Tags
+### Creation rules
+- Entity must point to an existing non-root entity
+- If you associate a venue, it must exist
+
+### Modification rules
+
+
 
 ## Management policy
 
