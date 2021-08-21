@@ -112,27 +112,45 @@ namespace OpenWifi {
      */
 	bool Storage::UpdateDeviceTypes() {
 
-	    Types::StringPairVec QueryData;
+	    try {
+	        Types::StringPairVec QueryData;
 
-	    QueryData.push_back(std::make_pair("deviceSet","true"));
-	    OpenAPIRequestGet	Req(uSERVICE_FIRMWARE,
-                                 "/api/v1/firmwares",
-                                 QueryData,
-                                 5000);
+	        std::cout << __LINE__ << std::endl;
 
-	    Poco::JSON::Object::Ptr Response;
-	    if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
-	        if(Response->isArray("deviceTypes")) {
-	            SubMutexGuard G(Mutex_);
-	            DeviceTypes_.clear();
-	            auto Array = Response->getArray("deviceTypes");
-	            for(const auto &i:*Array) {
-	                DeviceTypes_.insert(i.toString());
-	                std::cout << " D-> " << i.toString() << std::endl;
+	        QueryData.push_back(std::make_pair("deviceSet","true"));
+	        std::cout << __LINE__ << std::endl;
+	        OpenAPIRequestGet	Req(uSERVICE_FIRMWARE,
+                                     "/api/v1/firmwares",
+                                     QueryData,
+                                     5000);
+
+	        std::cout << "Looking for types" << std::endl;
+	        Poco::JSON::Object::Ptr Response;
+	        if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
+	            std::cout << __LINE__ << std::endl;
+	            std::cout << "Looking for types" << std::endl;
+	            if(Response->isArray("deviceTypes")) {
+	                std::cout << __LINE__ << std::endl;
+	                std::cout << "Looking for types" << std::endl;
+	                SubMutexGuard G(Mutex_);
+	                DeviceTypes_.clear();
+	                auto Array = Response->getArray("deviceTypes");
+	                std::cout << __LINE__ << std::endl;
+	                std::cout << "Looking for types" << std::endl;
+	                for(const auto &i:*Array) {
+	                    DeviceTypes_.insert(i.toString());
+	                    std::cout << " D-> " << i.toString() << std::endl;
+	                    std::cout << "Looking for types" << std::endl;
+	                }
+	                std::cout << __LINE__ << std::endl;
+	                return true;
 	            }
-	            return true;
 	        }
+	    } catch (const Poco::Exception &E) {
+	        std::cout << __LINE__ << std::endl;
+	        Logger_.log(E);
 	    }
+	    std::cout << __LINE__ << std::endl;
 	    return false;
 	}
 
