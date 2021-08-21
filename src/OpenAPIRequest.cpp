@@ -33,7 +33,7 @@ namespace OpenWifi {
 	int OpenAPIRequestGet::Do(Poco::JSON::Object::Ptr &ResponseObject) {
 		try {
 		    {
-		        auto Services = Daemon()->GetServices(Type_);
+		        auto Services = Daemon()->GetServices();
 
 		        for(const auto &i:Services)
 		            std::cout << "   Service: " << i.Type << std::endl;
