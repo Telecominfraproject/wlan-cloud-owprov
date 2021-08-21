@@ -121,34 +121,23 @@ namespace OpenWifi {
                                      QueryData,
                                      5000);
 
-	        std::cout << "Looking for types" << std::endl;
 	        Poco::JSON::Object::Ptr Response;
 	        auto StatusCode = Req.Do(Response);
 	        if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-	            std::cout << __LINE__ << std::endl;
-	            std::cout << "Looking for devices" << std::endl;
 	            if(Response->isArray("deviceTypes")) {
-	                std::cout << __LINE__ << std::endl;
 	                SubMutexGuard G(Mutex_);
 	                DeviceTypes_.clear();
 	                auto Array = Response->getArray("deviceTypes");
-	                std::cout << __LINE__ << std::endl;
 	                for(const auto &i:*Array) {
 	                    DeviceTypes_.insert(i.toString());
-	                    std::cout << " D-> " << i.toString() << std::endl;
-	                    std::cout << "Looking for types" << std::endl;
 	                }
-	                std::cout << __LINE__ << std::endl;
 	                return true;
 	            }
 	        } else {
-                std::cout << "Code:" << StatusCode << std::endl;
 	        }
 	    } catch (const Poco::Exception &E) {
-	        std::cout << __LINE__ << std::endl;
 	        Logger_.log(E);
 	    }
-	    std::cout << __LINE__ << std::endl;
 	    return false;
 	}
 
