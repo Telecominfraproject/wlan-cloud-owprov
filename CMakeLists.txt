@@ -77,7 +77,7 @@ add_executable(owprov
         src/storage_location.cpp src/storage_location.h
         src/storage_contact.cpp src/storage_contact.h
         src/RESTAPI_entity_handler.cpp src/RESTAPI_entity_handler.h
-        src/storage_inventory.cpp src/storage_inventory.h src/RESTAPI_contact_handler.cpp src/RESTAPI_contact_handler.h src/RESTAPI_location_handler.cpp src/RESTAPI_location_handler.h src/RESTAPI_venue_handler.cpp src/RESTAPI_venue_handler.h src/RESTAPI_inventory_handler.cpp src/RESTAPI_inventory_handler.h src/RESTAPI_managementPolicy_handler.cpp src/RESTAPI_managementPolicy_handler.h src/RESTAPI_inventory_list_handler.cpp src/RESTAPI_inventory_list_handler.h src/dbhelpers.h src/RESTAPI_entity_list_handler.cpp src/RESTAPI_entity_list_handler.h)
+        src/storage_inventory.cpp src/storage_inventory.h src/RESTAPI_contact_handler.cpp src/RESTAPI_contact_handler.h src/RESTAPI_location_handler.cpp src/RESTAPI_location_handler.h src/RESTAPI_venue_handler.cpp src/RESTAPI_venue_handler.h src/RESTAPI_inventory_handler.cpp src/RESTAPI_inventory_handler.h src/RESTAPI_managementPolicy_handler.cpp src/RESTAPI_managementPolicy_handler.h src/RESTAPI_inventory_list_handler.cpp src/RESTAPI_inventory_list_handler.h src/dbhelpers.h src/RESTAPI_entity_list_handler.cpp src/RESTAPI_entity_list_handler.h src/storage_management_groups.cpp src/storage_management_groups.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

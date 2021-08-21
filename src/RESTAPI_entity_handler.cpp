@@ -123,6 +123,9 @@ namespace OpenWifi{
             }
             E.info.modified = E.info.created = std::time(nullptr);
 
+            for(auto &i:E.info.notes)
+                i.createdBy = UserInfo_.userinfo.email;
+
             //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
             //  must be conveyed through PUT.
             E.info.id = (UUID==EntityDB::RootUUID()) ? UUID : uCentral::Daemon()->CreateUUID() ;
@@ -150,7 +153,11 @@ namespace OpenWifi{
                     Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
                 }
 
-                OK(Request, Response);
+                ProvObjects::Entity AddedRecord;
+                Storage()->EntityDB().GetRecord("id",E.info.id,AddedRecord);
+                Poco::JSON::Object  Answer;
+                AddedRecord.to_json(Answer);
+                ReturnObject(Request, Answer, Response);
                 return;
             }
             NotFound(Request,Response);

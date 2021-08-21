@@ -129,11 +129,22 @@ setroot() {
     jq < ${result_file}
 }
 
+addentity() {
+    payload="{ \"name\" : \"$1\", \"description\" : \"sub entity.\", \"parent\" : \"0000-0000-0000\", \"notes\" : [ {\"note\" : \"CLI added\"} ] }";
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
     "getroot") login; getroot; logout;;
     "setroot") login; setroot; logout;;
+    "addentity") login; addentity "$2" ; logout;;
     *) help ;;
 esac
 

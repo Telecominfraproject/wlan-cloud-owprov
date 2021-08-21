@@ -217,6 +217,17 @@ components:
         design:
           type: string
 
+    UserInfoDigest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        loginId:
+          type: string
+        type:
+          type: string
+
     # uuids: mgg:<uuid>
     ManagementRole:
       type: object
@@ -228,8 +239,15 @@ components:
         users:
           type: array
           items:
-            type: string
-            format: uuid
+            $ref: '#/Components/schemas/UserInfoDigest'
+
+    ManagementRoleList:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: '#/Components/schemas/ManagementRole'
 
     # uuids: loc:<uuid>
     Location:
@@ -1212,6 +1230,88 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /managementRole:
+    get:
+      tags:
+        - Management Roles
+      operationId: getManagementRoles
+      summary: Retrieve a list of managementRoles
+      parameters:
+        - in: query
+          name: entity
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of devices comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of roles
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of elements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagementRoleList'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /managementRole/{uuid}:
+    get:
+      tags:
+        - Management Roles
+      operationId: getManagementRole
+      parameters:
+        - in: query
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        200:
+          description: Return a management role
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ManagementRole'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
