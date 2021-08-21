@@ -8,6 +8,7 @@
 
 #include "Poco/Util/Application.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/JSON/Parser.h"
 
 #include "StorageService.h"
 #include "Daemon.h"
@@ -70,7 +71,7 @@ namespace OpenWifi {
 	    uint64_t Retry = 10000;
 	    while(Running_) {
 	        if(!FirstRun)
-	            Poco::Thread::trySleep(DeviceTypes_.empty() ? 5000 : 60000);
+	            Poco::Thread::trySleep(DeviceTypes_.empty() ? 2000 : 60000);
 	        if(!Running_)
 	            break;
 	        if(UpdateDeviceTypes())
@@ -114,22 +115,24 @@ namespace OpenWifi {
 	    Types::StringPairVec QueryData;
 
 	    QueryData.push_back(std::make_pair("deviceSet","true"));
-	    OpenAPIRequestGet	Req(uSERVICE_SECURITY,
-                                 "/api/v1/validateToken",
+	    OpenAPIRequestGet	Req(uSERVICE_FIRMWARE,
+                                 "/api/v1/firmwares",
                                  QueryData,
                                  5000);
 
-	    // TODO
 	    Poco::JSON::Object::Ptr Response;
 	    if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
-	        if(Response->has("tokenInfo") && Response->has("userInfo")) {
-	            SecurityObjects::UserInfoAndPolicy	P;
-	            P.from_json(Response);
+	        if(Response->isArray("deviceTypes")) {
+	            SubMutexGuard G(Mutex_);
+	            DeviceTypes_.clear();
+	            auto Array = Response->getArray("deviceTypes");
+	            for(const auto &i:*Array) {
+	                DeviceTypes_.insert(i.toString());
+	                std::cout << " D-> " << i.toString() << std::endl;
+	            }
+	            return true;
 	        }
-	        return true;
 	    }
-
-
 	    return false;
 	}
 
