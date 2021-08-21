@@ -42,6 +42,8 @@ namespace OpenWifi {
 					URI.addQueryParameter(qp.first, qp.second);
 
 				std::string Path(URI.getPathAndQuery());
+
+				std::cout << "Path: " << Path << std::endl;
 				Session.setTimeout(Poco::Timespan(5, 0));
 
 				Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_GET,

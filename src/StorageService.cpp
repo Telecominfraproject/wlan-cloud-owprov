@@ -119,13 +119,14 @@ namespace OpenWifi {
 
 	        QueryData.push_back(std::make_pair("deviceSet","true"));
 	        std::cout << __LINE__ << std::endl;
-	        OpenAPIRequestGet	Req(uSERVICE_FIRMWARE,
+	        OpenAPIRequestGet	Req(    uSERVICE_FIRMWARE,
                                      "/api/v1/firmwares",
                                      QueryData,
                                      5000);
 
 	        std::cout << "Looking for types" << std::endl;
 	        Poco::JSON::Object::Ptr Response;
+	        auto StatusCode = Req.Do(Response);
 	        if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
 	            std::cout << __LINE__ << std::endl;
 	            std::cout << "Looking for types" << std::endl;
@@ -145,6 +146,8 @@ namespace OpenWifi {
 	                std::cout << __LINE__ << std::endl;
 	                return true;
 	            }
+	        } else {
+
 	        }
 	    } catch (const Poco::Exception &E) {
 	        std::cout << __LINE__ << std::endl;
