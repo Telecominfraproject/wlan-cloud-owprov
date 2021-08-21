@@ -38,6 +38,9 @@ namespace OpenWifi {
 		        for(const auto &i:Services)
 		            std::cout << "   Service: " << i.Type << std::endl;
 		    }
+
+		    std::cout << "Looking for : " << Type_ << std::endl;
+
 			auto Services = Daemon()->GetServices(Type_);
 
 			for(auto const &Svc:Services) {
