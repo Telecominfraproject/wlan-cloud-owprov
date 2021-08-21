@@ -127,7 +127,7 @@ namespace OpenWifi {
 	        std::cout << "Looking for types" << std::endl;
 	        Poco::JSON::Object::Ptr Response;
 	        auto StatusCode = Req.Do(Response);
-	        if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
+	        if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 	            std::cout << __LINE__ << std::endl;
 	            std::cout << "Looking for types" << std::endl;
 	            if(Response->isArray("deviceTypes")) {
@@ -147,7 +147,7 @@ namespace OpenWifi {
 	                return true;
 	            }
 	        } else {
-
+                std::cout << "Code:" << StatusCode << std::endl;
 	        }
 	    } catch (const Poco::Exception &E) {
 	        std::cout << __LINE__ << std::endl;
