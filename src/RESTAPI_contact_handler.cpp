@@ -81,19 +81,9 @@ namespace OpenWifi{
             C.info.id = Daemon()->CreateUUID();
             C.info.created = C.info.modified = std::time(nullptr);
 
-            if(C.entities.empty() || C.entities.size()!=1) {
-                BadRequest(Request, Response, "A contact must have a single entity set.");
-                return;
-            }
-
             std::string f{RESTAPI::Protocol::ID};
-            if(!Storage()->EntityDB().Exists("id",C.entities[0])) {
-                BadRequest(Request, Response, "Unknown entity: " + C.entities[0] );
-                return;
-            }
 
             if(Storage()->ContactDB().CreateRecord(C)) {
-                Storage()->EntityDB().AddContact("id",C.entities[0],C.info.id);
                 Poco::JSON::Object Answer;
                 C.to_json(Answer);
                 ReturnObject(Request, Answer, Response);

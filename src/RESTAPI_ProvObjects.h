@@ -35,6 +35,7 @@ namespace OpenWifi::ProvObjects {
     struct ManagementPolicy {
         ObjectInfo  info;
         std::vector<ManagementPolicyEntry>  entries;
+        Types::StringVec inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -142,9 +143,8 @@ namespace OpenWifi::ProvObjects {
         std::string country;
         Types::StringVec phones;
         Types::StringVec mobiles;
-        Types::StringVec venues;
-        Types::StringVec entities;
         std::string geoCode;
+        Types::StringVec inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -204,8 +204,7 @@ namespace OpenWifi::ProvObjects {
         std::string primaryEmail;
         std::string secondaryEmail;
         std::string accessPIN;
-        Types::StringVec venues;
-        Types::StringVec entities;
+        Types::StringVec inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -234,12 +233,12 @@ namespace OpenWifi::ProvObjects {
         std::string     serialNumber;
         std::string     venue;
         std::string     entity;
-        std::string     subEntity;
-        std::string     subVenue;
         std::string     subscriber;
         std::string     deviceType;
         std::string     qrCode;
         std::string     geoCode;
+        std::string     location;
+        std::string     contact;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

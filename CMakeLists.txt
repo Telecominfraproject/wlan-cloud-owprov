@@ -69,7 +69,6 @@ add_executable(owprov
         src/StorageService.cpp src/StorageService.h
         src/SubSystemServer.cpp src/SubSystemServer.h
         src/RESTAPI_ProvObjects.cpp src/RESTAPI_ProvObjects.h
-        src/storage_pgql.cpp src/storage_mysql.cpp src/storage_sqlite.cpp
         src/storage_entity.cpp src/storage_entity.h
         src/storage_policies.cpp src/storage_policies.h
         src/OpenWifiTypes.h
@@ -84,9 +83,9 @@ add_executable(owprov
         src/RESTAPI_inventory_handler.cpp src/RESTAPI_inventory_handler.h
         src/RESTAPI_managementPolicy_handler.cpp src/RESTAPI_managementPolicy_handler.h
         src/RESTAPI_inventory_list_handler.cpp src/RESTAPI_inventory_list_handler.h
-        src/dbhelpers.h
         src/RESTAPI_entity_list_handler.cpp src/RESTAPI_entity_list_handler.h
-        src/storage_management_roles.cpp src/storage_management_roles.h)
+        src/storage_management_roles.cpp src/storage_management_roles.h
+        src/storage_setup.cpp)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

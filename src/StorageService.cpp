@@ -19,11 +19,6 @@ namespace OpenWifi {
 
 	class Storage *Storage::instance_ = nullptr;
 
-	Storage::Storage() noexcept:
-	  SubSystemServer("Storage", "STORAGE-SVR", "storage")
-    {
-    }
-
     int Storage::Start() {
 		SubMutexGuard		Guard(Mutex_);
 
@@ -152,48 +147,101 @@ namespace OpenWifi {
 
     bool Storage::Validate(const Poco::URI::QueryParameters &P, std::string &Error) {
 	    for(const auto &i:P) {
-	        if(i.first == "addContact" || i.first == "delContact") {
-	            if(!ContactDB_->Exists("id",i.second)) {
-	                Error = "Unknown contact UUID: " + i.second;
-	                break;
-	            }
+	        auto uuid_parts = Utils::Split(i.second,':');
+	        if(uuid_parts.size()==2) {
+	            if(uuid_parts[0] == "con")
+	                if(!ContactDB_->Exists("id",uuid_parts[1])) {
+	                    Error = "Unknown contact UUID: " + i.second;
+	                    break;
+	                }
 	        }
-	        if(i.first == "addLocation" || i.first == "delLocation") {
-	            if(!LocationDB_->Exists("id",i.second)) {
-	                Error = "Unknown Location UUID: " + i.second;
-	                break;
-	            }
+
+	        if(uuid_parts.size()==2) {
+	            if(uuid_parts[0] == "loc")
+	                if(!LocationDB_->Exists("id",uuid_parts[1])) {
+	                    Error = "Unknown location UUID: " + i.second;
+	                    break;
+	                }
 	        }
-	        if(i.first == "addEntity" || i.first == "delEntity") {
-	            if(!EntityDB_->Exists("id",i.second)) {
-	                Error = "Unknown Entity UUID: " + i.second;
-	                break;
-	            }
+
+	        if(uuid_parts.size()==2) {
+	            if(uuid_parts[0] == "ent")
+	                if(!EntityDB_->Exists("id",uuid_parts[1])) {
+	                    Error = "Unknown entity UUID: " + i.second;
+	                    break;
+	                }
 	        }
-	        if(i.first == "addVenue" || i.first == "delVenue") {
-	            if(!VenueDB_->Exists("id",i.second)) {
-	                Error = "Unknown Venue UUID: " + i.second;
-	                break;
-	            }
+
+	        if(uuid_parts.size()==2) {
+	            if(uuid_parts[0] == "ven")
+	                if(!VenueDB_->Exists("id",uuid_parts[1])) {
+	                    Error = "Unknown venue UUID: " + i.second;
+	                    break;
+	                }
 	        }
-	        if(i.first == "addManager" || i.first == "delManager") {
-	            /*
-	            if(!VenueDB_->Exists("id",i.second)) {
-	                Error = "Unknown Manager UUID: " + i.second;
-	                break;
-	            }*/
+
+	        if(uuid_parts.size()==2) {
+	            if(uuid_parts[0] == "dev")
+	                if(!InventoryDB_->Exists("id",uuid_parts[1])) {
+	                    Error = "Unknown device UUID: " + i.second;
+	                    break;
+	                }
 	        }
-	        if(i.first == "addDevice" || i.first == "delDevice") {
-	            if(!InventoryDB_->Exists("id",i.second)) {
-	                Error = "Unknown Inventory UUID: " + i.second;
-	                break;
-	            }
-	        }
+
 	    }
 
 	    if(Error.empty())
 	        return true;
 	    return false;
+
+	}
+
+    bool Storage::Validate(const Types::StringVec &P, std::string &Error) {
+        for(const auto &i:P) {
+            auto uuid_parts = Utils::Split(i,':');
+            if(uuid_parts.size()==2) {
+                if(uuid_parts[0] == "con")
+                    if(!ContactDB_->Exists("id",uuid_parts[1])) {
+                        Error = "Unknown contact UUID: " + i;
+                        break;
+                    }
+            }
+
+            if(uuid_parts.size()==2) {
+                if(uuid_parts[0] == "loc")
+                    if(!LocationDB_->Exists("id",uuid_parts[1])) {
+                        Error = "Unknown location UUID: " + i;
+                        break;
+                    }
+            }
+
+            if(uuid_parts.size()==2) {
+                if(uuid_parts[0] == "ent")
+                    if(!EntityDB_->Exists("id",uuid_parts[1])) {
+                        Error = "Unknown entity UUID: " + i;
+                        break;
+                    }
+            }
+
+            if(uuid_parts.size()==2) {
+                if(uuid_parts[0] == "ven")
+                    if(!VenueDB_->Exists("id",uuid_parts[1])) {
+                        Error = "Unknown venue UUID: " + i;
+                        break;
+                    }
+            }
+
+            if(uuid_parts.size()==2) {
+                if(uuid_parts[0] == "dev")
+                    if(!InventoryDB_->Exists("id",uuid_parts[1])) {
+                        Error = "Unknown device UUID: " + i;
+                        break;
+                    }
+            }
+        }
+        if(Error.empty())
+            return true;
+        return false;
 	}
 
 }

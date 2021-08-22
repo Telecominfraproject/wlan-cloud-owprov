@@ -535,6 +535,14 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::entities, FieldName, ParentUUID, ChildUUID, false);
         }
 
+        inline bool AddInUse(const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, ChildUUID, false);
+        }
+
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
             if(From<1) From=1;
             if(Type==ORM::sqlite) {

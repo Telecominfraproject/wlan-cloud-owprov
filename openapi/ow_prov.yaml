@@ -126,6 +126,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ManagementPolicyEntry'
+        inUse:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
 
     # uuids: ent:<uuid>
     Entity:
@@ -291,17 +297,12 @@ components:
         contact:
           type: string
           format: uuid
-        venues:
+        inUse:
           type: array
           items:
             type: string
             format: uuid
-        entities:
-          type: array
-          items:
-            type: string
-            format: uuid
-
+            example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
 
     # uuids: con:<uuid>
     Contact:
@@ -346,34 +347,29 @@ components:
           type: string
         accessPIN:
           type: string
-        venues:
-          type: array
-          items:
-            type: string
-            format: uuid
-        entities:
+        inUse:
           type: array
           items:
             type: string
             format: uuid
 
-    # uuids: svc:<uuid>
-    ServiceConfiguration:
+    DeviceConfigurationElement:
       type: object
       properties:
-        id:
+        name:
           type: string
-          format: uuid
-        managementPolicy:
-          $ref: '#/components/schemas/ManagementPolicy'
+        description:
+          type: string
+        weight:
+          type: integer
+        configuration:
+          type: string
 
-    # uuids: cfg:<uuid>
     DeviceConfiguration:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
         managementPolicy:
           $ref: '#/components/schemas/ManagementPolicy'
         deviceTypes:
@@ -381,7 +377,14 @@ components:
           items:
             type: string
         configuration:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceConfigurationElement'
+        inUse:
+          type: array
+          items:
+            type: string
+            format: uuid
 
     InventoryTag:
       type: object
@@ -398,16 +401,16 @@ components:
         entity:
           type: string
           format: uuid
-        subEntity:
-          type: string
-          format: uuid
-        subVenue:
-          type: string
-          format: uuid
         qrCode:
           type: string
         geoCode:
           type: string
+        location:
+          type: string
+          format: uuid
+        contact:
+          type: string
+          format: uuid
 
     InventoryTagList:
       type: object

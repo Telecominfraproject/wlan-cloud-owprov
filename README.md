@@ -26,7 +26,20 @@ You must use the query command parameters to modify other properties
 ## Inventory Tags
 ### Creation rules
 - Entity must point to an existing non-root entity
-- If you associate a venue, it must exist
+- If you associate a venue, it must exist.
+- You must use an existing device type. Device type cannot be empty.
+- Name, description, notes are allowed.
+
+### Modification rules
+- You can modify the device type to another valid one.
+
+## Venue
+### Creation rules
+- If you include an entity, the parent must bot be set
+- if you include a parent, the entity must not be set
+- You cannot have children upon creation.
+- You may include an array of devices UUIDs
+- Topology and design cannot be set
 
 ### Modification rules
 

@@ -71,15 +71,6 @@ namespace OpenWifi{
                 return;
             }
 
-            if(!IT.entity.empty())
-                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.entity,IT.info.id);
-            if(!IT.subEntity.empty())
-                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.subEntity,IT.info.id);
-            if(!IT.venue.empty())
-                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.venue,IT.info.id);
-            if(!IT.subVenue.empty())
-                Storage()->EntityDB().DeleteChild(RESTAPI::Protocol::ID,IT.subVenue,IT.info.id);
-
             Storage()->InventoryDB().DeleteRecord(RESTAPI::Protocol::ID, IT.info.id);
             OK(Request, Response);
             return;
@@ -111,7 +102,17 @@ namespace OpenWifi{
                 return;
             }
 
-            if(IT.entity.empty() || OpenWifi::EntityDB::IsRoot(IT.entity) || !Storage()->InventoryDB().Exists("id",IT.entity)) {
+            if(IT.info.name.empty()) {
+                BadRequest(Request, Response, "Name cannot be empty.");
+                return;
+            }
+
+            if(IT.deviceType.empty() || !Storage()->IsAcceptableDeviceType(IT.deviceType)) {
+                BadRequest(Request, Response, "DeviceType: '" + IT.deviceType + "' does not exist.");
+                return;
+            }
+
+            if(IT.entity.empty() || OpenWifi::EntityDB::IsRoot(IT.entity) || !Storage()->EntityDB().Exists("id",IT.entity)) {
                 BadRequest(Request, Response, "Device must be associated with a non-root and existing entity. UUID="+IT.entity);
                 return;
             }
@@ -122,13 +123,9 @@ namespace OpenWifi{
             }
 
             IT.info.modified = IT.info.created = std::time(nullptr);
-            IT.subEntity = IT.subVenue = "";
             IT.info.id = Daemon()->CreateUUID();
 
             if(Storage()->InventoryDB().CreateRecord(IT)) {
-                Storage()->EntityDB().AddChild("id",IT.entity,IT.info.id);
-                if(!IT.venue.empty())
-                    Storage()->VenueDB().AddChild("id",IT.venue,IT.info.id);
                 Poco::JSON::Object Answer;
                 IT.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
@@ -163,11 +160,20 @@ namespace OpenWifi{
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
             }
 
-            if(RawObject->has("name"))
+            if(RawObject->has("name") && !RawObject->get("name").toString().empty())
                 ExistingObject.info.name = RawObject->get("name").toString();
             if(RawObject->has("description"))
                 ExistingObject.info.description = RawObject->get("description").toString();
             ExistingObject.info.modified = std::time(nullptr);
+
+            if(RawObject->has("deviceType")) {
+                std::string DeviceType{RawObject->get("deviceType").toString()};
+                if(!Storage()->IsAcceptableDeviceType(DeviceType)) {
+                    BadRequest(Request, Response, "DeviceType: '" + DeviceType + "' does not exist.");
+                    return;
+                }
+                ExistingObject.deviceType = DeviceType;
+            }
 
             // if we are changing venues...
             if(RawObject->has("entity")) {
@@ -176,22 +182,7 @@ namespace OpenWifi{
                     BadRequest(Request, Response, "Entity association does not exist.");
                     return;
                 }
-                if(Entity!=ExistingObject.entity) {
-                    Storage()->EntityDB().DeleteChild("id", ExistingObject.entity, ExistingObject.info.id);
-                    Storage()->EntityDB().AddChild("id",Entity,ExistingObject.info.id);
-                }
-            }
-
-            if(RawObject->has("subEntity")) {
-                std::string subEntity{RawObject->get("subEntity").toString()};
-                if(!Storage()->EntityDB().Exists("id",subEntity)) {
-                    BadRequest(Request, Response, "subEntity association does not exist.");
-                    return;
-                }
-                if(subEntity!=ExistingObject.entity) {
-                    Storage()->EntityDB().DeleteChild("id", ExistingObject.subEntity, ExistingObject.info.id);
-                    Storage()->EntityDB().AddChild("id",subEntity,ExistingObject.info.id);
-                }
+                ExistingObject.entity = Entity;
             }
 
             if(RawObject->has("venue")) {
@@ -200,29 +191,7 @@ namespace OpenWifi{
                     BadRequest(Request, Response, "Venue association does not exist.");
                     return;
                 }
-                if(Venue!=ExistingObject.venue) {
-                    if(!ExistingObject.venue.empty())
-                        Storage()->VenueDB().DeleteChild("id", ExistingObject.venue, ExistingObject.info.id);
-                    Storage()->VenueDB().AddChild("id",Venue,ExistingObject.info.id);
-                }
-            }
-
-            if(RawObject->has("subVenue")) {
-                std::string subVenue{RawObject->get("subVenue").toString()};
-                if(!Storage()->VenueDB().Exists("id",subVenue)) {
-                    BadRequest(Request, Response, "Venue association does not exist.");
-                    return;
-                }
-                if(subVenue!=ExistingObject.subVenue) {
-                    if(!ExistingObject.subVenue.empty())
-                        Storage()->VenueDB().DeleteChild("id", ExistingObject.subVenue, ExistingObject.info.id);
-                    Storage()->VenueDB().AddChild("id",subVenue,ExistingObject.info.id);
-                }
-            }
-
-            if(RawObject->has("deviceType")) {
-                std::string DeviceType{RawObject->get("deviceType").toString()};
-                ExistingObject.deviceType = DeviceType;
+                ExistingObject.venue = Venue;
             }
 
             if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {

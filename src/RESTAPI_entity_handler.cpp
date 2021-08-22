@@ -214,18 +214,19 @@ namespace OpenWifi{
             if(Storage()->EntityDB().UpdateRecord("id",UUID,LocalObject)) {
                 for(const auto &i:Request) {
                     std::string Child{i.second};
-                    if(i.first == "addContact") {
-                        Storage()->EntityDB().AddContact("id", UUID, Child);
-                        Storage()->ContactDB().AddEntity("id",Child,UUID);
-                    } else if (i.first == "delContact") {
-                        Storage()->EntityDB().DeleteContact("id", UUID, Child);
-                        Storage()->ContactDB().DeleteEntity("id",Child,UUID);
-                    } else if (i.first == "addLocation") {
-                        Storage()->EntityDB().AddLocation("id", UUID, Child);
-                        Storage()->LocationDB().AddEntity("id",Child,UUID);
-                    } else if (i.first == "delLocation") {
-                        Storage()->EntityDB().DeleteLocation("id", UUID, Child);
-                        Storage()->LocationDB().DeleteEntity("id",Child,UUID);
+                    auto UUID_parts = Utils::Split(Child,':');
+                    if(i.first=="add" && UUID_parts[0] == "con") {
+                        Storage()->EntityDB().AddContact("id", UUID, UUID_parts[1]);
+                        Storage()->ContactDB().AddInUse("id",UUID_parts[1],UUID);
+                    } else if (i.first == "del" && UUID_parts[0] == "con") {
+                        Storage()->EntityDB().DeleteContact("id", UUID, UUID_parts[1]);
+                        Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],UUID);
+                    } else if (i.first == "add" && UUID_parts[0] == "loc") {
+                        Storage()->EntityDB().AddLocation("id", UUID, UUID_parts[1]);
+                        Storage()->LocationDB().AddInUse("id",UUID_parts[1],UUID);
+                    } else if (i.first == "del" && UUID_parts[0] == "loc") {
+                        Storage()->EntityDB().DeleteLocation("id", UUID, UUID_parts[1]);
+                        Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],UUID);
                     }
                 }
                 Poco::JSON::Object  Answer;

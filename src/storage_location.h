@@ -26,7 +26,6 @@ namespace OpenWifi {
         std::string,
         std::string,
         std::string,
-        std::string,
         std::string
     > LocationDBRecordType;
 

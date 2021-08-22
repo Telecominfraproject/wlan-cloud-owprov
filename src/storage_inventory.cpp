@@ -21,10 +21,12 @@ namespace OpenWifi {
         ORM::Field{"serialNumber",ORM::FieldType::FT_TEXT},
         ORM::Field{"venue",ORM::FieldType::FT_TEXT},
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
-        ORM::Field{"subEntity",ORM::FieldType::FT_TEXT},
-        ORM::Field{"subVenue",ORM::FieldType::FT_TEXT},
+        ORM::Field{"subscriber",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceType",ORM::FieldType::FT_TEXT},
-        ORM::Field{"qrcode",ORM::FieldType::FT_TEXT}
+        ORM::Field{"qrcode",ORM::FieldType::FT_TEXT},
+        ORM::Field{"geocode",ORM::FieldType::FT_TEXT},
+        ORM::Field{"location",ORM::FieldType::FT_TEXT},
+        ORM::Field{"contact",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -53,10 +55,12 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.serialNumber = In.get<6>();
     Out.venue = In.get<7>();
     Out.entity = In.get<8>();
-    Out.subEntity = In.get<9>();
-    Out.subVenue = In.get<10>();
-    Out.deviceType = In.get<11>();
+    Out.subscriber = In.get<9>();
+    Out.deviceType = In.get<10>();
     Out.qrCode = In.get<11>();
+    Out.geoCode = In.get<12>();
+    Out.location = In.get<13>();
+    Out.contact = In.get<14>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -69,8 +73,10 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<6>(In.serialNumber);
     Out.set<7>(In.venue);
     Out.set<8>(In.entity);
-    Out.set<9>(In.subEntity);
-    Out.set<10>(In.subVenue);
-    Out.set<11>(In.deviceType);
+    Out.set<9>(In.subscriber);
+    Out.set<10>(In.deviceType);
     Out.set<11>(In.qrCode);
+    Out.set<12>(In.geoCode);
+    Out.set<13>(In.location);
+    Out.set<14>(In.contact);
 }

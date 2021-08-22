@@ -44,10 +44,6 @@ class Storage : public SubSystemServer, Poco::Runnable {
 
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
 
-		int 	Setup_SQLite();
-		int 	Setup_MySQL();
-		int 	Setup_PostgreSQL();
-
 		OpenWifi::EntityDB & EntityDB() { return *EntityDB_; };
 		OpenWifi::PolicyDB & PolicyDB() { return *PolicyDB_; };
 		OpenWifi::VenueDB & VenueDB() { return *VenueDB_; };
@@ -57,6 +53,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		OpenWifi::ManagementRoleDB & RolesDB() { return *RolesDB_; };
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
+		bool Validate(const Types::StringVec &P, std::string &Error);
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
 
@@ -83,7 +80,14 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		std::atomic_bool                                    Running_=false;
 
 		bool UpdateDeviceTypes();
-		Storage() noexcept;
+		Storage() noexcept:
+            SubSystemServer("Storage", "STORAGE-SVR", "storage")
+            {
+            }
+
+        int 	Setup_SQLite();
+		int 	Setup_MySQL();
+		int 	Setup_PostgreSQL();
    };
 
    inline Storage * Storage() { return Storage::instance(); }

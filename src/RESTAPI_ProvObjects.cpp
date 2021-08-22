@@ -54,12 +54,14 @@ namespace OpenWifi::ProvObjects {
     void ManagementPolicy::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
         RESTAPI_utils::field_to_json(Obj, "entries", entries);
+        RESTAPI_utils::field_to_json(Obj, "inUse", inUse);
     }
 
     bool ManagementPolicy::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
             RESTAPI_utils::field_from_json(Obj, "entries", entries);
+            RESTAPI_utils::field_from_json(Obj, "inUse", inUse);
             return true;
         } catch(...) {
 
@@ -184,9 +186,8 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"country",country);
         RESTAPI_utils::field_to_json( Obj,"phones",phones);
         RESTAPI_utils::field_to_json( Obj,"mobiles",mobiles);
-        RESTAPI_utils::field_to_json( Obj,"venues",venues);
-        RESTAPI_utils::field_to_json( Obj,"entities",entities);
         RESTAPI_utils::field_to_json( Obj,"geoCode",geoCode);
+        RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
     }
 
     bool Location::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -203,9 +204,8 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"country",country);
             RESTAPI_utils::field_from_json( Obj,"phones",phones);
             RESTAPI_utils::field_from_json( Obj,"mobiles",mobiles);
-            RESTAPI_utils::field_from_json( Obj,"venues",venues);
-            RESTAPI_utils::field_from_json( Obj,"entities",entities);
             RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
+            RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
             return true;
         } catch (...) {
 
@@ -227,8 +227,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"primaryEmail",primaryEmail);
         RESTAPI_utils::field_to_json( Obj,"secondaryEmail",secondaryEmail);
         RESTAPI_utils::field_to_json( Obj,"accessPIN",accessPIN);
-        RESTAPI_utils::field_to_json( Obj,"venues",venues);
-        RESTAPI_utils::field_to_json( Obj,"entities",entities);
+        RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
     }
 
     bool Contact::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -248,8 +247,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"primaryEmail",primaryEmail);
             RESTAPI_utils::field_from_json( Obj,"secondaryEmail",secondaryEmail);
             RESTAPI_utils::field_from_json( Obj,"accessPIN",accessPIN);
-            RESTAPI_utils::field_from_json( Obj,"venues",venues);
-            RESTAPI_utils::field_from_json( Obj,"entities",entities);
+            RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
             return true;
         } catch (...) {
 
@@ -278,12 +276,12 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json(Obj, "serialNumber", serialNumber);
         RESTAPI_utils::field_to_json(Obj, "venue", venue);
         RESTAPI_utils::field_to_json(Obj, "entity", entity);
-        RESTAPI_utils::field_to_json(Obj, "subEntity", subEntity);
-        RESTAPI_utils::field_to_json(Obj, "subVenue", subVenue);
         RESTAPI_utils::field_to_json(Obj, "subscriber", subscriber);
         RESTAPI_utils::field_to_json(Obj, "deviceType", deviceType);
         RESTAPI_utils::field_to_json(Obj, "qrCode", qrCode);
         RESTAPI_utils::field_to_json(Obj, "geoCode", geoCode);
+        RESTAPI_utils::field_to_json(Obj, "location", location);
+        RESTAPI_utils::field_to_json(Obj, "contact", contact);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -292,12 +290,12 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"serialNumber",serialNumber);
             RESTAPI_utils::field_from_json( Obj,"venue",venue);
             RESTAPI_utils::field_from_json( Obj,"entity",entity);
-            RESTAPI_utils::field_from_json( Obj,"subEntity",subEntity);
-            RESTAPI_utils::field_from_json( Obj,"subVenue",subVenue);
             RESTAPI_utils::field_from_json( Obj,"subscriber",subscriber);
             RESTAPI_utils::field_from_json( Obj,"deviceType",deviceType);
             RESTAPI_utils::field_from_json(Obj, "qrCode", qrCode);
             RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
+            RESTAPI_utils::field_from_json( Obj,"location",location);
+            RESTAPI_utils::field_from_json( Obj,"contact",contact);
             return true;
         } catch(...) {
 
