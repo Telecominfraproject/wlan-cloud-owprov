@@ -77,6 +77,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"contacts",contacts);
         RESTAPI_utils::field_to_json( Obj,"locations",locations);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
+        RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -88,6 +89,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"contacts",contacts);
             RESTAPI_utils::field_from_json( Obj,"locations",locations);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
+            RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
             return true;
         } catch(...) {
 
@@ -121,6 +123,8 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"parent",parent);
         RESTAPI_utils::field_to_json( Obj,"design",design);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
+        RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
+
     }
 
     bool Venue::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -134,6 +138,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"parent",parent);
             RESTAPI_utils::field_from_json( Obj,"design",design);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
+            RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
             return true;
         } catch (...) {
 
@@ -282,6 +287,8 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json(Obj, "geoCode", geoCode);
         RESTAPI_utils::field_to_json(Obj, "location", location);
         RESTAPI_utils::field_to_json(Obj, "contact", contact);
+        RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
+
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -296,6 +303,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
             RESTAPI_utils::field_from_json( Obj,"location",location);
             RESTAPI_utils::field_from_json( Obj,"contact",contact);
+            RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
             return true;
         } catch(...) {
 

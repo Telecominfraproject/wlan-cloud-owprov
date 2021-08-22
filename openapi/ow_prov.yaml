@@ -169,6 +169,10 @@ components:
         managementPolicy:
           type: string
           format: uuid
+        deviceConfiguration:
+          type: string
+          format: uuid
+
 
     EntityList:
       type: object
@@ -222,6 +226,9 @@ components:
           $ref: '#/components/schemas/DiGraph'
         design:
           type: string
+        deviceConfiguration:
+          type: string
+          format: uuid
 
     UserInfoDigest:
       type: object
@@ -409,6 +416,9 @@ components:
           type: string
           format: uuid
         contact:
+          type: string
+          format: uuid
+        deviceConfiguration:
           type: string
           format: uuid
 

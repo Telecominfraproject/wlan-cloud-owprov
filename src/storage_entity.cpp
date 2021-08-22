@@ -26,6 +26,7 @@ namespace OpenWifi {
         ORM::Field{"locations",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"venues",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    EntityDB_Indexes{
@@ -64,6 +65,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     OpenWifi::Types::from_string(In.get<9>(), Out.locations);
     Out.managementPolicy = In.get<10>();
     OpenWifi::Types::from_string(In.get<11>(), Out.venues);
+    Out.deviceConfiguration = In.get<12>();
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -79,4 +81,5 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<9>(OpenWifi::Types::to_string(In.locations));
     Out.set<10>(In.managementPolicy);
     Out.set<11>(OpenWifi::Types::to_string(In.venues));
+    Out.set<12>(In.deviceConfiguration);
 }
