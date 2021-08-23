@@ -26,7 +26,7 @@ namespace OpenWifi {
             Internal) {}
             void handleRequest(Poco::Net::HTTPServerRequest &request,
                                Poco::Net::HTTPServerResponse &response) override final;
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory/{uuid}"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory/{serialNumber}"}; };
 
         void DoGet(Poco::Net::HTTPServerRequest &Request,
                    Poco::Net::HTTPServerResponse &Response);
