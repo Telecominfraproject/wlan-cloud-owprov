@@ -313,17 +313,19 @@ namespace OpenWifi::ProvObjects {
 
     void DeviceConfiguration::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        managementPolicy.to_json(Obj);
+        RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
         RESTAPI_utils::field_to_json( Obj,"deviceTypes",deviceTypes);
         RESTAPI_utils::field_to_json( Obj,"configuration",configuration);
+        RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
     }
 
     bool DeviceConfiguration::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            managementPolicy.from_json(Obj);
+            RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             RESTAPI_utils::field_from_json( Obj,"deviceTypes",deviceTypes);
             RESTAPI_utils::field_from_json( Obj,"configuration",configuration);
+            RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
             return true;
         } catch(...) {
 

@@ -93,6 +93,7 @@ namespace OpenWifi::ProvObjects {
         ObjectInfo                      info;
         Types::UUID_t         managementPolicy;
         std::vector<UserInfoDigest>     users;
+        Types::StringVec inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -222,9 +223,10 @@ namespace OpenWifi::ProvObjects {
 
     struct DeviceConfiguration {
         ObjectInfo info;
-        ManagementPolicy managementPolicy;
+        Types::UUID_t managementPolicy;
         Types::StringVec deviceTypes;
         std::string configuration;
+        Types::StringVec inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

@@ -44,6 +44,7 @@ namespace OpenWifi {
         ContactDB_ = std::make_unique<OpenWifi::ContactDB>(DBType_, *Pool_, Logger_);
         InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(DBType_, *Pool_, Logger_);
         RolesDB_ = std::make_unique<OpenWifi::ManagementRoleDB>(DBType_, *Pool_, Logger_);
+        ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(DBType_, *Pool_, Logger_);
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -52,6 +53,7 @@ namespace OpenWifi {
         ContactDB_->Create();
         InventoryDB_->Create();
         RolesDB_->Create();
+        ConfigurationDB_->Create();
 
         OpenWifi::ProvObjects::Entity   R;
         EntityDB_->GetRecord("id","xxx",R);

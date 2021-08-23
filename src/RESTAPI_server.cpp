@@ -18,6 +18,7 @@
 #include "RESTAPI_managementPolicy_handler.h"
 #include "RESTAPI_inventory_list_handler.h"
 #include "RESTAPI_entity_list_handler.h"
+#include "RESTAPI_configurations_handler.h"
 
 namespace OpenWifi {
 
@@ -64,14 +65,15 @@ namespace OpenWifi {
 
         return  RESTAPI_Router<
                 RESTAPI_system_command,
-                OpenWifi::RESTAPI_entity_handler,
-                OpenWifi::RESTAPI_entity_list_handler,
-                OpenWifi::RESTAPI_contact_handler,
-                OpenWifi::RESTAPI_location_handler,
-                OpenWifi::RESTAPI_venue_handler,
-                OpenWifi::RESTAPI_inventory_handler,
-                OpenWifi::RESTAPI_inventory_list_handler,
-                OpenWifi::RESTAPI_managementPolicy_handler
+                RESTAPI_entity_handler,
+                RESTAPI_entity_list_handler,
+                RESTAPI_contact_handler,
+                RESTAPI_location_handler,
+                RESTAPI_venue_handler,
+                RESTAPI_inventory_handler,
+                RESTAPI_inventory_list_handler,
+                RESTAPI_managementPolicy_handler,
+                RESTAPI_configurations_handler
                 >(Path,Bindings,Logger_);
     }
 

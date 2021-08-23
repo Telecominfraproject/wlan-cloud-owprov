@@ -254,6 +254,12 @@ components:
           type: array
           items:
             $ref: '#/Components/schemas/UserInfoDigest'
+        inUse:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
 
     ManagementRoleList:
       type: object
@@ -378,7 +384,8 @@ components:
         allOf:
           $ref: '#/components/schemas/ObjectInfo'
         managementPolicy:
-          $ref: '#/components/schemas/ManagementPolicy'
+          type: string
+          format: uuid
         deviceTypes:
           type: array
           items:

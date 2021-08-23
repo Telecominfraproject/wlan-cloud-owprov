@@ -85,7 +85,7 @@ add_executable(owprov
         src/RESTAPI_inventory_list_handler.cpp src/RESTAPI_inventory_list_handler.h
         src/RESTAPI_entity_list_handler.cpp src/RESTAPI_entity_list_handler.h
         src/storage_management_roles.cpp src/storage_management_roles.h
-        src/storage_setup.cpp)
+        src/storage_setup.cpp src/storage_configurations.cpp src/storage_configurations.h src/RESTAPI_configurations_handler.cpp src/RESTAPI_configurations_handler.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

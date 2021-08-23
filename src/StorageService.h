@@ -27,6 +27,7 @@
 #include "storage_contact.h"
 #include "storage_inventory.h"
 #include "storage_management_roles.h"
+#include "storage_configurations.h"
 
 namespace OpenWifi {
 
@@ -51,6 +52,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		OpenWifi::ContactDB & ContactDB() { return *ContactDB_;};
 		OpenWifi::InventoryDB & InventoryDB() { return *InventoryDB_; };
 		OpenWifi::ManagementRoleDB & RolesDB() { return *RolesDB_; };
+		OpenWifi::ConfigurationDB & ConfigurationDB() { return *ConfigurationDB_; };
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
@@ -74,6 +76,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		std::unique_ptr<OpenWifi::ContactDB>                ContactDB_;
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
+		std::unique_ptr<OpenWifi::ConfigurationDB>          ConfigurationDB_;
 
 		Poco::Thread                                        Updater_;
 		std::set<std::string>                               DeviceTypes_;
