@@ -5,6 +5,7 @@ info:
   version: 2.1.0
   license:
     name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
 
 servers:
   - url: 'https://localhost:16005/api/v1'
@@ -253,7 +254,7 @@ components:
         users:
           type: array
           items:
-            $ref: '#/Components/schemas/UserInfoDigest'
+            $ref: '#/components/schemas/UserInfoDigest'
         inUse:
           type: array
           items:
@@ -267,7 +268,7 @@ components:
         roles:
           type: array
           items:
-            $ref: '#/Components/schemas/ManagementRole'
+            $ref: '#/components/schemas/ManagementRole'
 
     # uuids: loc:<uuid>
     Location:
@@ -1319,20 +1320,19 @@ paths:
         - Management Roles
       operationId: getManagementRole
       parameters:
-        - in: query
+        - in: path
           name: uuid
           required: true
           schema:
             type: string
             format: uuid
-
       responses:
         200:
           description: Return a management role
           content:
             application/json:
               schema:
-                 $ref: '#/components/schemas/ManagementRole'
+                $ref: '#/components/schemas/ManagementRole'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

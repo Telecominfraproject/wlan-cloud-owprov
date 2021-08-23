@@ -1,3 +1,10 @@
+//
+//	License type: BSD 3-Clause License
+//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+//
+//	Created by Stephane Bourque on 2021-03-04.
+//	Arilia Wireless Inc.
+//
 
 #ifndef __OPENWIFI_ORM_H__
 #define __OPENWIFI_ORM_H__
@@ -160,11 +167,13 @@ namespace ORM {
             const FieldVec & Fields,
             const IndexVec & Indexes,
             Poco::Data::SessionPool & Pool,
-                Poco::Logger &L):
+                Poco::Logger &L,
+                const char *Prefix):
                 Type(dbtype),
                 DBName(TableName),
                 Pool_(Pool),
-                Logger_(L)
+                Logger_(L),
+                Prefix_(Prefix)
         {
             bool first = true;
             int  Place=0;
@@ -302,6 +311,8 @@ namespace ORM {
         void Convert( RecordTuple &in , RecordType &out);
         void Convert( RecordType &in , RecordTuple &out);
 
+        inline const std::string & Prefix() { return Prefix_; };
+
         bool CreateRecord( RecordType & R) {
             try {
                 Poco::Data::Session     Session = Pool_.get();
@@ -320,7 +331,7 @@ namespace ORM {
             return false;
         }
 
-        template <typename T> bool GetRecord( const char * FieldName, T Value,  RecordType & R) {
+        template<typename T> bool GetRecord( const char * FieldName, T Value,  RecordType & R) {
             try {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
@@ -451,7 +462,7 @@ namespace ORM {
             return false;
         }
 
-        template <typename T> bool Exists(const char *FieldName, T &Value) {
+        bool Exists(const char *FieldName, std::string & Value) {
             try {
                 RecordType  R;
                 if(GetRecord(FieldName,Value,R))
@@ -566,6 +577,7 @@ namespace ORM {
         std::map<std::string,int>   FieldNames_;
         Poco::Data::SessionPool     &Pool_;
         Poco::Logger                &Logger_;
+        std::string                 Prefix_;
     };
 }
 

@@ -1,6 +1,11 @@
 //
-// Created by stephane bourque on 2021-08-16.
+//	License type: BSD 3-Clause License
+//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
 //
+//	Created by Stephane Bourque on 2021-03-04.
+//	Arilia Wireless Inc.
+//
+
 
 #include "storage_inventory.h"
 #include "Utils.h"
@@ -41,7 +46,7 @@ namespace OpenWifi {
     };
 
     InventoryDB::InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-        DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L) {}
+        DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
 
 }
 

@@ -9,6 +9,8 @@
 #ifndef UCENTRAL_USTORAGESERVICE_H
 #define UCENTRAL_USTORAGESERVICE_H
 
+#include <map>
+
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -43,8 +45,6 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		int 	Start() override;
 		void 	Stop() override;
 
-		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
-
 		OpenWifi::EntityDB & EntityDB() { return *EntityDB_; };
 		OpenWifi::PolicyDB & PolicyDB() { return *PolicyDB_; };
 		OpenWifi::VenueDB & VenueDB() { return *VenueDB_; };
@@ -56,6 +56,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
+		inline bool ValidatePrefix(const std::string &P) const { return ExistFunc_.find(P)!=ExistFunc_.end(); }
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
 
@@ -77,6 +78,9 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
 		std::unique_ptr<OpenWifi::ConfigurationDB>          ConfigurationDB_;
+
+		typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
+		std::map<std::string, exist_func>                   ExistFunc_;
 
 		Poco::Thread                                        Updater_;
 		std::set<std::string>                               DeviceTypes_;

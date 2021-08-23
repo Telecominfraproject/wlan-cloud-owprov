@@ -1,6 +1,11 @@
 //
-// Created by stephane bourque on 2021-05-09.
+//	License type: BSD 3-Clause License
+//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
 //
+//	Created by Stephane Bourque on 2021-03-04.
+//	Arilia Wireless Inc.
+//
+
 
 #ifndef UCENTRALFWS_RESTAPI_SERVER_H
 #define UCENTRALFWS_RESTAPI_SERVER_H

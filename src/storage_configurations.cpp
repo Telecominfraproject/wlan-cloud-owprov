@@ -1,6 +1,11 @@
 //
-// Created by stephane bourque on 2021-08-22.
+//	License type: BSD 3-Clause License
+//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
 //
+//	Created by Stephane Bourque on 2021-03-04.
+//	Arilia Wireless Inc.
+//
+
 
 #include "storage_configurations.h"
 #include "Utils.h"
@@ -32,7 +37,7 @@ namespace OpenWifi {
     };
 
     ConfigurationDB::ConfigurationDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-        DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L) {}
+        DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L, "cfg") {}
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(OpenWifi::ConfigurationDBRecordType &In, OpenWifi::ProvObjects::DeviceConfiguration &Out) {

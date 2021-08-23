@@ -55,25 +55,36 @@ namespace OpenWifi {
         RolesDB_->Create();
         ConfigurationDB_->Create();
 
-        OpenWifi::ProvObjects::Entity   R;
-        EntityDB_->GetRecord("id","xxx",R);
+        ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
+        ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
+        ExistFunc_[VenueDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return VenueDB_->Exists(F,V); };
+        ExistFunc_[ContactDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return ContactDB_->Exists(F,V); };
+        ExistFunc_[InventoryDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return InventoryDB_->Exists(F,V); };
+        ExistFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return ConfigurationDB_->Exists(F,V); };
+        ExistFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return LocationDB_->Exists(F,V); };
+        ExistFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return RolesDB_->Exists(F,V); };
 
+        EntityDB_->CheckForRoot();
         Updater_.start(*this);
+
         return 0;
     }
 
     void Storage::run() {
 	    Running_ = true ;
 	    bool FirstRun=true;
-	    uint64_t Retry = 10000;
+	    long Retry = 2000;
 	    while(Running_) {
 	        if(!FirstRun)
-	            Poco::Thread::trySleep(DeviceTypes_.empty() ? 2000 : 60000);
+	            Poco::Thread::trySleep(Retry);
 	        if(!Running_)
 	            break;
 	        if(UpdateDeviceTypes()) {
 	            FirstRun = false;
 	            Logger_.information("Updated existing DeviceType list from FMS.");
+	            Retry = 60 * 5 * 1000 ; // 5 minutes
+	        } else {
+	            Retry = 2000;
 	        }
 	    }
 	}
@@ -151,45 +162,14 @@ namespace OpenWifi {
 	    for(const auto &i:P) {
 	        auto uuid_parts = Utils::Split(i.second,':');
 	        if(uuid_parts.size()==2) {
-	            if(uuid_parts[0] == "con")
-	                if(!ContactDB_->Exists("id",uuid_parts[1])) {
-	                    Error = "Unknown contact UUID: " + i.second;
+	            auto F = ExistFunc_.find(uuid_parts[0]);
+	            if(F!=ExistFunc_.end()) {
+	                if(!F->second("id", uuid_parts[1])) {
+	                    Error = "Unknown " + F->first + " UUID:" + uuid_parts[1] ;
 	                    break;
 	                }
+	            }
 	        }
-
-	        if(uuid_parts.size()==2) {
-	            if(uuid_parts[0] == "loc")
-	                if(!LocationDB_->Exists("id",uuid_parts[1])) {
-	                    Error = "Unknown location UUID: " + i.second;
-	                    break;
-	                }
-	        }
-
-	        if(uuid_parts.size()==2) {
-	            if(uuid_parts[0] == "ent")
-	                if(!EntityDB_->Exists("id",uuid_parts[1])) {
-	                    Error = "Unknown entity UUID: " + i.second;
-	                    break;
-	                }
-	        }
-
-	        if(uuid_parts.size()==2) {
-	            if(uuid_parts[0] == "ven")
-	                if(!VenueDB_->Exists("id",uuid_parts[1])) {
-	                    Error = "Unknown venue UUID: " + i.second;
-	                    break;
-	                }
-	        }
-
-	        if(uuid_parts.size()==2) {
-	            if(uuid_parts[0] == "dev")
-	                if(!InventoryDB_->Exists("id",uuid_parts[1])) {
-	                    Error = "Unknown device UUID: " + i.second;
-	                    break;
-	                }
-	        }
-
 	    }
 
 	    if(Error.empty())
@@ -202,43 +182,13 @@ namespace OpenWifi {
         for(const auto &i:P) {
             auto uuid_parts = Utils::Split(i,':');
             if(uuid_parts.size()==2) {
-                if(uuid_parts[0] == "con")
-                    if(!ContactDB_->Exists("id",uuid_parts[1])) {
-                        Error = "Unknown contact UUID: " + i;
+                auto F = ExistFunc_.find(uuid_parts[0]);
+                if(F!=ExistFunc_.end()) {
+                    if(!F->second("id", uuid_parts[1])) {
+                        Error = "Unknown " + F->first + " UUID:" + uuid_parts[1] ;
                         break;
                     }
-            }
-
-            if(uuid_parts.size()==2) {
-                if(uuid_parts[0] == "loc")
-                    if(!LocationDB_->Exists("id",uuid_parts[1])) {
-                        Error = "Unknown location UUID: " + i;
-                        break;
-                    }
-            }
-
-            if(uuid_parts.size()==2) {
-                if(uuid_parts[0] == "ent")
-                    if(!EntityDB_->Exists("id",uuid_parts[1])) {
-                        Error = "Unknown entity UUID: " + i;
-                        break;
-                    }
-            }
-
-            if(uuid_parts.size()==2) {
-                if(uuid_parts[0] == "ven")
-                    if(!VenueDB_->Exists("id",uuid_parts[1])) {
-                        Error = "Unknown venue UUID: " + i;
-                        break;
-                    }
-            }
-
-            if(uuid_parts.size()==2) {
-                if(uuid_parts[0] == "dev")
-                    if(!InventoryDB_->Exists("id",uuid_parts[1])) {
-                        Error = "Unknown device UUID: " + i;
-                        break;
-                    }
+                }
             }
         }
         if(Error.empty())

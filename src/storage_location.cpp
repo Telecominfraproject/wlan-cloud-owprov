@@ -1,6 +1,11 @@
 //
-// Created by stephane bourque on 2021-08-16.
+//	License type: BSD 3-Clause License
+//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
 //
+//	Created by Stephane Bourque on 2021-03-04.
+//	Arilia Wireless Inc.
+//
+
 
 #include "storage_location.h"
 #include "Utils.h"
@@ -39,11 +44,11 @@ namespace OpenWifi {
     };
 
     LocationDB::LocationDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-    DB(T, "locations", LocationDB_Fields, LocationDB_Indexes, P, L) {}
+        DB(T, "locations", LocationDB_Fields, LocationDB_Indexes, P, L, "loc") {}
 
 }
 
-template<> void ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::Location>::Convert(OpenWifi::LocationDBRecordType &In, OpenWifi::ProvObjects::Location &Out) {
+template<> void ORM::DB<OpenWifi::LocationDBRecordType , OpenWifi::ProvObjects::Location>::Convert(OpenWifi::LocationDBRecordType &In, OpenWifi::ProvObjects::Location &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -63,7 +68,7 @@ template<> void ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::L
     OpenWifi::Types::from_string(In.get<16>(), Out.inUse);
 }
 
-template<> void ::ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::Location>::Convert(OpenWifi::ProvObjects::Location &In, OpenWifi::LocationDBRecordType &Out) {
+template<> void ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::Location>::Convert(OpenWifi::ProvObjects::Location &In, OpenWifi::LocationDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);
@@ -82,4 +87,3 @@ template<> void ::ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects:
     Out.set<15>(In.geoCode);
     Out.set<16>(OpenWifi::Types::to_string(In.inUse));
 }
-
