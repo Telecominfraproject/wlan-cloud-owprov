@@ -33,9 +33,9 @@ namespace OpenWifi{
         try {
             std::string UUID;
             if(!QB_.Select.empty()) {
-                auto DevUIIDS = Utils::Split(QB_.Select);
+                auto DevUUIDS = Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
-                for(const auto &i:DevUIIDS) {
+                for(const auto &i:DevUUIDS) {
                     ProvObjects::InventoryTag E;
                     if(Storage()->InventoryDB().GetRecord("id",i,E)) {
                         Poco::JSON::Object  O;
@@ -47,7 +47,7 @@ namespace OpenWifi{
                     }
                 }
                 Poco::JSON::Object  Answer;
-                Answer.set("inventoryTags",Arr);
+                Answer.set("tags",Arr);
                 ReturnObject(Request, Answer, Response);
                 return;
             } else if(HasParameter("entity",UUID)) {
@@ -122,7 +122,7 @@ namespace OpenWifi{
                     Arr.add(O);
                 }
                 Poco::JSON::Object  Answer;
-                Answer.set("inventoryTags",Arr);
+                Answer.set("tags",Arr);
                 ReturnObject(Request, Answer, Response);
                 return;
             }
