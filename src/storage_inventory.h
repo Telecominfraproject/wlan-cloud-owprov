@@ -32,6 +32,8 @@ namespace OpenWifi {
         std::string
     > InventoryDBRecordType;
 
+    typedef std::vector<ProvObjects::InventoryTag> InventoryTagVec;
+
     class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
     public:
         InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);

@@ -109,7 +109,7 @@ namespace ORM {
     }
 
     enum CompareOperations {
-        EQUAL,
+        EQUAL = 0 ,
         LESS,
         LESS_OR_EQUAL,
         GREATER,
@@ -117,6 +117,7 @@ namespace ORM {
         NOT_EQUAL
     };
 
+    static std::vector<std::string> OpsToString{ " = " ,  " < " , " <= " , " > " , " >= " , " != "};
     inline std::string to_string(ORM::CompareOperations O) {
         switch(O) {
             case EQUAL: return "=";
@@ -259,6 +260,26 @@ namespace ORM {
                 return R;
         }
 
+        std::string MakeWhere( const std::string &S, CompareOperations Op, const std::string &V) {
+            std::string R;
+
+            assert( FieldNames_.find(S) != FieldNames_.end() );
+
+            R = S + OpsToString[Op] + "\"" + Escape(V) + "\"" ;
+
+            return R;
+        }
+
+        std::string MakeWhere( const std::string &S, CompareOperations & Op, uint64_t &V) {
+            std::string R;
+
+            assert( FieldNames_.find(S) != FieldNames_.end() );
+
+            R = S + OpsToString[Op] + std::to_string(V) ;
+
+            return R;
+        }
+
         inline bool  Create() {
             std::string S;
 
@@ -333,6 +354,9 @@ namespace ORM {
 
         template<typename T> bool GetRecord( const char * FieldName, T Value,  RecordType & R) {
             try {
+
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordTuple             RT;
@@ -356,8 +380,11 @@ namespace ORM {
         typedef std::vector<std::string> StringVec;
 
         template <  typename T,
-                    typename T0, typename T1> bool GR(const StringVec &FieldName, T & R,T0 &V0, T1 &V1) {
+                typename T0, typename T1> bool GR(const char *FieldName, T & R,T0 &V0, T1 &V1) {
             try {
+
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordTuple RT;
@@ -411,6 +438,8 @@ namespace ORM {
 
         template <typename T> bool UpdateRecord( const char *FieldName, T & Value,  RecordType & R) {
             try {
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Update(Session);
 
@@ -432,6 +461,8 @@ namespace ORM {
 
         template <typename T> bool DeleteRecord( const char *FieldName, T Value) {
             try {
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Delete(Session);
 
@@ -464,6 +495,8 @@ namespace ORM {
 
         bool Exists(const char *FieldName, std::string & Value) {
             try {
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 RecordType  R;
                 if(GetRecord(FieldName,Value,R))
                     return true;
@@ -474,8 +507,31 @@ namespace ORM {
             return false;
         }
 
+        uint64_t Count( const std::string & Where="" ) {
+            try {
+                uint64_t Cnt=0;
+
+                Poco::Data::Session     Session = Pool_.get();
+                Poco::Data::Statement   Select(Session);
+
+                std::string st{"SELECT COUNT(*) FROM " + DBName + " " + (Where.empty() ? "" : (" where " + Where)) };
+
+                Select << st ,
+                    Poco::Data::Keywords::into(Cnt);
+                Select.execute();
+
+                return Cnt;
+
+            } catch (const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return 0;
+        }
+
         template <typename X> bool ManipulateVectorMember( X T, const char *FieldName, std::string & ParentUUID, std::string & ChildUUID, bool Add) {
             try {
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
                 RecordType R;
                 if(GetRecord(FieldName, ParentUUID, R)) {
                     auto it = std::lower_bound((R.*T).begin(),(R.*T).end(),ChildUUID);

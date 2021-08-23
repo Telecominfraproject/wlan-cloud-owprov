@@ -17,11 +17,9 @@ You may modify the following fields in the POST
 - name
 - description
 - notes
-You must use the query command parameters to modify other properties
-- addContact=UUID
-- delContact=UUID
-- addLocation=UUID
-- delLocation=UUID
+
+### Delete
+- Children must be empty
 
 ## Inventory Tags
 ### Creation rules

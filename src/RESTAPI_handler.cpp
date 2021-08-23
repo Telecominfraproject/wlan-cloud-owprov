@@ -111,6 +111,26 @@ namespace OpenWifi {
 		return Default;
 	}
 
+	bool RESTAPIHandler::HasParameter(const std::string &Name, std::string &Value) {
+	    for (const auto &i : Parameters_) {
+	        if (i.first == Name) {
+	            Value = i.second;
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
+	bool RESTAPIHandler::HasParameter(const std::string &Name, uint64_t & Value) {
+	    for (const auto &i : Parameters_) {
+	        if (i.first == Name) {
+	            Value = std::stoi(i.second);
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
 	const std::string &RESTAPIHandler::GetBinding(const std::string &Name, const std::string &Default) {
 		auto E = Bindings_.find(Poco::toLower(Name));
 		if (E == Bindings_.end())
