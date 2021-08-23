@@ -32,6 +32,8 @@ namespace OpenWifi{
 
         try {
             std::string UUID;
+            std::string Arg;
+
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
                 Poco::JSON::Array   Arr;
@@ -51,7 +53,6 @@ namespace OpenWifi{
                 ReturnObject(Request, Answer, Response);
                 return;
             } else if(HasParameter("entity",UUID)) {
-                std::string Arg;
                 if(HasParameter("countOnly",Arg) && Arg=="true") {
                     Poco::JSON::Object  Answer;
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,UUID));
@@ -82,7 +83,6 @@ namespace OpenWifi{
                 ReturnObject(Request, Answer, Response);
                 return;
             } else if(HasParameter("venue",UUID)) {
-                std::string Arg;
                 if(HasParameter("countOnly",Arg) && Arg=="true") {
                     Poco::JSON::Object  Answer;
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
@@ -110,6 +110,12 @@ namespace OpenWifi{
                     Answer.set("serialNumbers", Array);
                 else
                     Answer.set("tags", Array);
+                ReturnObject(Request, Answer, Response);
+                return;
+            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
+                Poco::JSON::Object  Answer;
+                auto C = Storage()->InventoryDB().Count();
+                Answer.set("count", C);
                 ReturnObject(Request, Answer, Response);
                 return;
             } else {
