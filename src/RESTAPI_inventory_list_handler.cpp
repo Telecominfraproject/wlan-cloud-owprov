@@ -54,7 +54,7 @@ namespace OpenWifi{
                 std::string Arg;
                 if(HasParameter("countOnly",Arg) && Arg=="true") {
                     Poco::JSON::Object  Answer;
-                    auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entiry",ORM::EQUAL,UUID));
+                    auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,UUID));
                     Answer.set("count", C);
                     ReturnObject(Request, Answer, Response);
                     return;
@@ -82,7 +82,36 @@ namespace OpenWifi{
                 ReturnObject(Request, Answer, Response);
                 return;
             } else if(HasParameter("venue",UUID)) {
-
+                std::string Arg;
+                if(HasParameter("countOnly",Arg) && Arg=="true") {
+                    Poco::JSON::Object  Answer;
+                    auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
+                    Answer.set("count", C);
+                    ReturnObject(Request, Answer, Response);
+                    return;
+                }
+                bool SerialOnly=false;
+                if(HasParameter("serialOnly",Arg) && Arg=="true")
+                    SerialOnly=true;
+                InventoryTagVec Tags;
+                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
+                Poco::JSON::Array   Array;
+                for(const auto &i:Tags) {
+                    if(SerialOnly) {
+                        Array.add(i.serialNumber);
+                    } else {
+                        Poco::JSON::Object  O;
+                        i.to_json(O);
+                        Array.add(O);
+                    }
+                }
+                Poco::JSON::Object  Answer;
+                if(SerialOnly)
+                    Answer.set("serialNumbers", Array);
+                else
+                    Answer.set("tags", Array);
+                ReturnObject(Request, Answer, Response);
+                return;
             } else {
                 std::vector<ProvObjects::InventoryTag> Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags);
