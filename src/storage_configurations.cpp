@@ -25,7 +25,7 @@ namespace OpenWifi {
     };
 
     static  ORM::IndexVec    ConfigurationDB_Indexes{
-        { std::string("contact_name_index"),
+        { std::string("configuration_name_index"),
           ORM::IndexEntryVec{
             {std::string("name"),
              ORM::Indextype::ASC} } }
