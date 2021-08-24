@@ -24,6 +24,7 @@
 #include "RESTAPI_inventory_list_handler.h"
 #include "RESTAPI_entity_list_handler.h"
 #include "RESTAPI_configurations_handler.h"
+#include "RESTAPI_webSocketServer.h"
 
 namespace OpenWifi {
 
@@ -78,7 +79,8 @@ namespace OpenWifi {
                 RESTAPI_inventory_handler,
                 RESTAPI_inventory_list_handler,
                 RESTAPI_managementPolicy_handler,
-                RESTAPI_configurations_handler
+                RESTAPI_configurations_handler,
+                RESTAPI_webSocketServer
                 >(Path,Bindings,Logger_);
     }
 
