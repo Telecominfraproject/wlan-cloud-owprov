@@ -33,6 +33,10 @@ namespace OpenWifi{
         try {
             std::string UUID;
             std::string Arg;
+            bool AddAdditionalInfo=false;
+
+            if(HasParameter("withExtendedInfo",Arg) && Arg=="true")
+                AddAdditionalInfo = true;
 
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
@@ -157,6 +161,22 @@ namespace OpenWifi{
                 for(const auto &i:Tags) {
                     Poco::JSON::Object  O;
                     i.to_json(O);
+                    if(AddAdditionalInfo) {
+                        if(!i.entity.empty()) {
+                            Poco::JSON::Object  EO;
+                            ProvObjects::Entity EI;
+                            Storage()->EntityDB().GetRecord("id",i.entity,EI);
+                            EI.to_json(EO);
+                            O.set("entity_info",EO);
+                        }
+                        if(!i.venue.empty()) {
+                            Poco::JSON::Object VO;
+                            ProvObjects::Venue VI;
+                            Storage()->VenueDB().GetRecord("id",i.venue,VI);
+                            VI.to_json(VO);
+                            O.set("venue_info",VO);
+                        }
+                    }
                     Arr.add(O);
                 }
                 Poco::JSON::Object  Answer;

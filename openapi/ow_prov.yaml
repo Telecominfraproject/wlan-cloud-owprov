@@ -1111,7 +1111,12 @@ paths:
           schema:
             type: boolean
           required: false
-
+        - in: query
+          description: return extended information
+          name: withExtendedInfo
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
           description: Return a list of elements
