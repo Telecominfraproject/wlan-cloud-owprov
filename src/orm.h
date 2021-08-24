@@ -265,7 +265,7 @@ namespace ORM {
 
             assert( FieldNames_.find(S) != FieldNames_.end() );
 
-            R = S + OpsToString[Op] + "\"" + Escape(V) + "\"" ;
+            R = S + OpsToString[Op] + "'" + Escape(V) + "'" ;
 
             return R;
         }
