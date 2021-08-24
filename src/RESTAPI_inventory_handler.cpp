@@ -88,11 +88,19 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
                                             Poco::Net::HTTPServerResponse &Response) {
         try {
+
             std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
             if(SerialNumber.empty()) {
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
+
+            if(!Utils::ValidSerialNumber(SerialNumber)) {
+                BadRequest(Request, Response, "Invalid SerialNumber.");
+                return;
+            }
+
+            Poco::toLowerInPlace(SerialNumber);
 
             if(Storage()->InventoryDB().Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
                 BadRequest(Request,Response, "SerialNumber: " + SerialNumber + " already exists.");
@@ -117,7 +125,7 @@ namespace OpenWifi{
                 return;
             }
 
-            if(IT.entity.empty() || OpenWifi::EntityDB::IsRoot(IT.entity) || !Storage()->EntityDB().Exists("id",IT.entity)) {
+            if(OpenWifi::EntityDB::IsRoot(IT.entity) || (!IT.entity.empty() && !Storage()->EntityDB().Exists("id",IT.entity))) {
                 BadRequest(Request, Response, "Device must be associated with a non-root and existing entity. UUID="+IT.entity);
                 return;
             }
@@ -131,6 +139,8 @@ namespace OpenWifi{
             IT.info.id = Daemon()->CreateUUID();
 
             if(Storage()->InventoryDB().CreateRecord(IT)) {
+                if (!IT.venue.empty())
+                    Storage()->VenueDB().AddDevice("id",IT.venue,IT.info.id);
                 Poco::JSON::Object Answer;
                 IT.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
@@ -165,10 +175,39 @@ namespace OpenWifi{
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
             }
 
-            if(RawObject->has("name") && !RawObject->get("name").toString().empty())
-                ExistingObject.info.name = RawObject->get("name").toString();
-            if(RawObject->has("description"))
-                ExistingObject.info.description = RawObject->get("description").toString();
+            std::string Arg;
+            if(HasParameter("unassign", Arg) && Arg=="true") {
+                ExistingObject.entity.clear();
+                if(!ExistingObject.venue.empty()) {
+                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                    ExistingObject.venue.clear();
+                }
+                if(!ExistingObject.deviceConfiguration.empty()) {
+                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration, Storage()->InventoryDB().Prefix(), ExistingObject.info.id );
+                    ExistingObject.deviceConfiguration.clear();
+                }
+                if(!ExistingObject.location.empty()) {
+                    Storage()->LocationDB().DeleteInUse("id",ExistingObject.location,Storage()->InventoryDB().Prefix(), ExistingObject.info.id);
+                    ExistingObject.location.clear();
+                }
+                if(!ExistingObject.contact.empty()) {
+                    Storage()->ContactDB().DeleteInUse("id",ExistingObject.contact,Storage()->InventoryDB().Prefix(), ExistingObject.info.id);
+                    ExistingObject.contact.clear();
+                }
+                ExistingObject.info.modified = std::time(nullptr);
+                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+
+                ProvObjects::InventoryTag   NewObject;
+                Storage()->InventoryDB().GetRecord("id",ExistingObject.info.id,NewObject);
+                Poco::JSON::Object  Answer;
+
+                NewObject.to_json(Answer);
+                ReturnObject(Request, Answer, Response);
+                return;
+            }
+
+            AssignIfPresent(RawObject, "name", ExistingObject.info.name);
+            AssignIfPresent(RawObject, "description", ExistingObject.info.description);
             ExistingObject.info.modified = std::time(nullptr);
 
             if(RawObject->has("deviceType")) {
@@ -181,25 +220,34 @@ namespace OpenWifi{
             }
 
             // if we are changing venues...
-            if(RawObject->has("entity")) {
-                std::string Entity{RawObject->get("entity").toString()};
-                if(!Storage()->EntityDB().Exists("id",Entity)) {
+            std::string MoveToEntity;
+            if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
+                if(!Storage()->EntityDB().Exists("id",MoveToEntity)) {
                     BadRequest(Request, Response, "Entity association does not exist.");
                     return;
                 }
-                ExistingObject.entity = Entity;
             }
 
-            if(RawObject->has("venue")) {
-                std::string Venue{RawObject->get("venue").toString()};
-                if(!Storage()->VenueDB().Exists("id",Venue)) {
+            std::string MoveToVenue;
+            if(AssignIfPresent(RawObject, "venue", MoveToVenue)) {
+                if(!Storage()->VenueDB().Exists("id",MoveToVenue)) {
                     BadRequest(Request, Response, "Venue association does not exist.");
                     return;
                 }
-                ExistingObject.venue = Venue;
             }
 
             if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
+
+                if(!MoveToEntity.empty())
+                    ExistingObject.entity = MoveToEntity;
+                if(!MoveToVenue.empty()) {
+                    if(!ExistingObject.venue.empty())
+                        Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                    Storage()->VenueDB().AddDevice("id",MoveToVenue,ExistingObject.info.id);
+                    ExistingObject.venue = MoveToVenue;
+                }
+                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+
                 Poco::JSON::Object  Answer;
                 ExistingObject.to_json(Answer);
                 ReturnObject(Request, Answer, Response);

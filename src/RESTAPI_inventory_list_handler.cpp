@@ -112,6 +112,38 @@ namespace OpenWifi{
                     Answer.set("tags", Array);
                 ReturnObject(Request, Answer, Response);
                 return;
+            } else if(HasParameter("unassigned",Arg) && Arg=="true") {
+                if(HasParameter("countOnly",Arg) && Arg=="true") {
+                    Poco::JSON::Object  Answer;
+                    std::string Empty;
+                    auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
+                    Answer.set("count", C);
+                    ReturnObject(Request, Answer, Response);
+                    return;
+                }
+                bool SerialOnly=false;
+                if(HasParameter("serialOnly",Arg) && Arg=="true")
+                    SerialOnly=true;
+                InventoryTagVec Tags;
+                std::string Empty;
+                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
+                Poco::JSON::Array   Array;
+                for(const auto &i:Tags) {
+                    if(SerialOnly) {
+                        Array.add(i.serialNumber);
+                    } else {
+                        Poco::JSON::Object  O;
+                        i.to_json(O);
+                        Array.add(O);
+                    }
+                }
+                Poco::JSON::Object  Answer;
+                if(SerialOnly)
+                    Answer.set("serialNumbers", Array);
+                else
+                    Answer.set("tags", Array);
+                ReturnObject(Request, Answer, Response);
+                return;
             } else if(HasParameter("countOnly",Arg) && Arg=="true") {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->InventoryDB().Count();

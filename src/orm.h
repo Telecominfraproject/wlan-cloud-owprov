@@ -604,12 +604,14 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::entities, FieldName, ParentUUID, ChildUUID, false);
         }
 
-        inline bool AddInUse(const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
-            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, ChildUUID, true);
+        inline bool AddInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, true);
         }
 
-        inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
-            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, ChildUUID, false);
+        inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, false);
         }
 
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {

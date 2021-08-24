@@ -149,6 +149,9 @@ namespace OpenWifi {
 		bool HasParameter(const std::string &QueryParameter, std::string &Value);
 		bool HasParameter(const std::string &QueryParameter, uint64_t & Value);
 
+		bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value);
+		bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, uint64_t &Value);
+
 	  protected:
 		BindingMap 					Bindings_;
 		Poco::URI::QueryParameters 	Parameters_;
