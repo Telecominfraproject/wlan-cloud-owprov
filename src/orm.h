@@ -417,11 +417,11 @@ namespace ORM {
                 std::string St = "select " + SelectFields_ + " from " + DBName +
                         (Where.empty() ? "" : " where " + Where) +
                         ComputeRange(Offset, HowMany) ;
-                std::string St2 = Where.empty() ? ConvertParams(St) : (ConvertParams(St) + " where " + Where) ;
+                //std::string St2 = Where.empty() ? ConvertParams(St) : (ConvertParams(St) + " where " + Where) ;
 
-                std::cout << "GetRecords: " << St2 << std::endl;
+                std::cout << "GetRecords: " << St << std::endl;
 
-                Select  << St2 ,
+                Select  << St ,
                     Poco::Data::Keywords::into(RL);
 
                 if(Select.execute()>0) {
