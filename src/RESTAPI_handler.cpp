@@ -64,9 +64,9 @@ namespace OpenWifi {
 	}
 
 	void RESTAPIHandler::ParseParameters(Poco::Net::HTTPServerRequest &request) {
-
 		Poco::URI uri(request.getURI());
 		Parameters_ = uri.getQueryParameters();
+		InitQueryBlock();
 	}
 
 	static bool is_number(const std::string &s) {
@@ -385,6 +385,9 @@ namespace OpenWifi {
 	}
 
 	bool RESTAPIHandler::InitQueryBlock() {
+	    if(QueryBlockInitialized_)
+	        return true;
+	    QueryBlockInitialized_=true;
 		QB_.SerialNumber = GetParameter(RESTAPI::Protocol::SERIALNUMBER, "");
 		QB_.StartDate = GetParameter(RESTAPI::Protocol::STARTDATE, 0);
 		QB_.EndDate = GetParameter(RESTAPI::Protocol::ENDDATE, 0);
@@ -397,7 +400,8 @@ namespace OpenWifi {
 		QB_.LastOnly = GetBoolParameter(RESTAPI::Protocol::LASTONLY,false);
 		QB_.Newest = GetBoolParameter(RESTAPI::Protocol::NEWEST,false);
 
-		if(QB_.Offset<1) return false;
+		if(QB_.Offset<1)
+		    QB_.Offset=1;
 		return true;
 	}
 

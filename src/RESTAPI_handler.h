@@ -158,6 +158,7 @@ namespace OpenWifi {
 		std::vector<std::string> 	Methods_;
 		QueryBlock					QB_;
 		bool                        Internal_=false;
+		bool                        QueryBlockInitialized_=false;
 	};
 
 	class RESTAPI_UnknownRequestHandler : public RESTAPIHandler {
