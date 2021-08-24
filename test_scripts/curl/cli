@@ -157,6 +157,30 @@ addtag() {
     jq < ${result_file}
 }
 
+gettags() {
+    curl ${FLAGS} "https://${OWPROV}/api/v1/inventory" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
+tagcount() {
+    curl ${FLAGS} "https://${OWPROV}/api/v1/inventory?countOnly=true" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
+entitycount() {
+    curl ${FLAGS} "https://${OWPROV}/api/v1/entity?countOnly=true" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -165,6 +189,9 @@ case "$1" in
     "addentity") login; addentity "$2" ; logout;;
     "addtag") login; addtag $2 $3; logout;;
     "getentities") login; getentities ; logout;;
+    "gettags") login; gettags ; logout;;
+    "tagcount") login; tagcount ; logout;;
+    "entitycount") login; entitycount ; logout;;
     *) help ;;
 esac
 

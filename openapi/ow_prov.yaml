@@ -446,6 +446,13 @@ components:
           items:
             type: string
 
+    CountAnswer:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int64
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -573,6 +580,12 @@ paths:
             type: string
             example: serial1,serial2,serial3
           required: false
+        - in: query
+          description: return the number of devices
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
 
       responses:
         200:
@@ -580,9 +593,10 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EntityList'
+                oneOf:
+                  - $ref: '#/components/schemas/EntityList'
+                  - $ref: '#/components/schemas/CountAnswer'
+
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -959,6 +973,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/SerialNumberList'
                   - $ref: '#/components/schemas/InventoryTagList'
+                  - $ref: '#/components/schemas/CountAnswer'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
