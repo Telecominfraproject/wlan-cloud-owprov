@@ -414,10 +414,12 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordList RL;
-                std::string St = "select " + SelectFields_ + " from " + DBName + ComputeRange(Offset, HowMany) ;
+                std::string St = "select " + SelectFields_ + " from " + DBName +
+                        (Where.empty() ? "" : " where " + Where) +
+                        ComputeRange(Offset, HowMany) ;
                 std::string St2 = Where.empty() ? ConvertParams(St) : (ConvertParams(St) + " where " + Where) ;
 
-                std::cout << "GetRecords: " << St2 << std::endl;
+                // std::cout << "GetRecords: " << St2 << std::endl;
 
                 Select  << St2 ,
                     Poco::Data::Keywords::into(RL);
@@ -484,8 +486,8 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Delete(Session);
 
-                std::string St = "delete from " + DBName + " " + WhereClause;
-                    Delete  << ConvertParams(St);
+                std::string St = "delete from " + DBName + " where " + WhereClause;
+                Delete  << St;
                 Delete.execute();
                 return true;
             } catch (const Poco::Exception &E) {
