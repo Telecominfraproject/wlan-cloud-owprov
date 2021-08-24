@@ -231,6 +231,14 @@ components:
           type: string
           format: uuid
 
+    VenueList:
+      type: object
+      properties:
+        venues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Venue'
+
     UserInfoDigest:
       type: object
       properties:
@@ -318,6 +326,14 @@ components:
             format: uuid
             example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
 
+    LocationList:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+
     # uuids: con:<uuid>
     Contact:
       type: object
@@ -366,6 +382,14 @@ components:
           items:
             type: string
             format: uuid
+
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
 
     DeviceConfigurationElement:
       type: object
@@ -703,6 +727,65 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /contact:
+    get:
+      tags:
+        - Contacts
+      operationId: getContacts
+      summary: Retrieve a list of contacts
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of contacts comma separated
+          name: select
+          schema:
+            type: string
+            example: uuid1,uuid2,uuid3
+          required: false
+        - in: query
+          description: return the number of contacts
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: return only the UUIDs of contacts
+          name: uuidOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of contacts
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ContactList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /contact/{uuid}:
     get:
       tags:
@@ -795,6 +878,65 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /location:
+    get:
+      tags:
+        - Locations
+      operationId: getLocations
+      summary: Retrieve a list of Locations
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of Locations comma separated
+          name: select
+          schema:
+            type: string
+            example: uuid1,uuid2,uuid3
+          required: false
+        - in: query
+          description: return the number of Locations
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: return only the UUIDs of Locations
+          name: uuidOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of Locations
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/LocationList'
+                  - $ref: '#/components/schemas/CountAnswer'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1074,6 +1216,86 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /venue:
+    get:
+      tags:
+        - Venues
+      operationId: getVenues
+      summary: Retrieve a specific Venues tag
+      parameters:
+        - in: query
+          name: entity
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - in: query
+          name: venue
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - in: query
+          name: unassigned
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: deviceType
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of Venues comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: only serial numbers of full device details
+          name: serialOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: return the number of devices
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of Venues
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/VenueList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /venue/{uuid}:
     get:
