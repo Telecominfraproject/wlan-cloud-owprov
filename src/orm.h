@@ -419,7 +419,7 @@ namespace ORM {
                         ComputeRange(Offset, HowMany) ;
                 std::string St2 = Where.empty() ? ConvertParams(St) : (ConvertParams(St) + " where " + Where) ;
 
-                // std::cout << "GetRecords: " << St2 << std::endl;
+                std::cout << "GetRecords: " << St2 << std::endl;
 
                 Select  << St2 ,
                     Poco::Data::Keywords::into(RL);
