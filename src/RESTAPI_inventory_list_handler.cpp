@@ -119,7 +119,7 @@ namespace OpenWifi{
                 ReturnObject(Request, Answer, Response);
                 return;
             } else {
-                std::vector<ProvObjects::InventoryTag> Tags;
+                InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:Tags) {
