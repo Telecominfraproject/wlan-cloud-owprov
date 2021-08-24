@@ -121,6 +121,9 @@ namespace OpenWifi {
 		try {
 			if (O->has("command")) {
 				auto Command = O->get("command").toString();
+				auto It = CommandProcessors_.find(Command);
+				if(It!=CommandProcessors_.end())
+				    It->second(O,Answer,UserInfo_);
 			}
 		} catch (const Poco::Exception &E) {
 			Logger_.log(E);

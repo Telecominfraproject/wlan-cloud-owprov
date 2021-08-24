@@ -5,11 +5,14 @@
 #ifndef UCENTRALGW_RESTAPI_WEBSOCKETSERVER_H
 #define UCENTRALGW_RESTAPI_WEBSOCKETSERVER_H
 
-class RESTAPI_webSocketServer {};
+#include <functional>
 
 #include "RESTAPI_handler.h"
 
 namespace OpenWifi {
+
+    typedef std::function<void(const Poco::JSON::Object::Ptr &, std::string &, const SecurityObjects::UserInfoAndPolicy &)> ws_processor_func;
+
 	class RESTAPI_webSocketServer : public RESTAPIHandler {
 	  public:
 		RESTAPI_webSocketServer(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
@@ -22,8 +25,14 @@ namespace OpenWifi {
 		static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/ws"};}
 		void DoGet(Poco::Net::HTTPServerRequest &Request,
 				   Poco::Net::HTTPServerResponse &Response);
+
+		inline void RegisterProcessor(const std::string &Command, ws_processor_func & f) {
+		    CommandProcessors_[Command] = f;
+		}
+
 	  private:
 		void Process(const Poco::JSON::Object::Ptr &O, std::string &Answer);
+		std::map<std::string,ws_processor_func>     CommandProcessors_;
 	};
 }
 
