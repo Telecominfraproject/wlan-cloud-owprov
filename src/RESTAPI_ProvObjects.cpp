@@ -129,6 +129,8 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"design",design);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
         RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
+        RESTAPI_utils::field_to_json( Obj,"contact",contact);
+        RESTAPI_utils::field_to_json( Obj,"location",location);
 
     }
 
@@ -144,6 +146,8 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"design",design);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
+            RESTAPI_utils::field_from_json( Obj,"contact",contact);
+            RESTAPI_utils::field_from_json( Obj,"location",location);
             return true;
         } catch (...) {
 

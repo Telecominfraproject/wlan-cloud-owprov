@@ -28,7 +28,9 @@ namespace OpenWifi {
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
-        ORM::Field{"design",ORM::FieldType::FT_TEXT}
+        ORM::Field{"design",ORM::FieldType::FT_TEXT},
+        ORM::Field{"contact",ORM::FieldType::FT_TEXT},
+        ORM::Field{"location",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -56,6 +58,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     OpenWifi::Types::from_string(In.get<9>(), Out.devices);
     Out.topology = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<10>());
     Out.design = In.get<11>();
+    Out.contact = In.get<12>();
+    Out.location = In.get<13>();
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -71,4 +75,6 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<9>(OpenWifi::Types::to_string(In.devices));
     Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.topology));
     Out.set<11>(In.design);
+    Out.set<12>(In.contact);
+    Out.set<13>(In.location);
 }

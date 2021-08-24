@@ -71,15 +71,17 @@ namespace OpenWifi::ProvObjects {
     typedef std::vector<DiGraphEntry>   DiGraph;
 
     struct Venue {
-        ObjectInfo  info;
-        Types::UUID_t entity;
-        Types::UUID_t parent;
-        Types::UUIDvec_t children;
-        Types::UUID_t managementPolicy;
-        Types::UUIDvec_t devices;
-        DiGraph topology;
-        std::string design;
-        std::string     deviceConfiguration;
+        ObjectInfo          info;
+        Types::UUID_t       entity;
+        Types::UUID_t       parent;
+        Types::UUIDvec_t    children;
+        Types::UUID_t       managementPolicy;
+        Types::UUIDvec_t    devices;
+        DiGraph             topology;
+        std::string         design;
+        std::string         deviceConfiguration;
+        std::string         contact;
+        std::string         location;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
