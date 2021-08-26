@@ -62,7 +62,33 @@ namespace OpenWifi{
 
     void RESTAPI_contact_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
                                          Poco::Net::HTTPServerResponse &Response) {
+        try {
+            std::string UUID = GetBinding("uuid","");
+            if(UUID.empty()) {
+                BadRequest(Request, Response, "Missing UUID");
+                return;
+            }
 
+            ProvObjects::Contact    ExistingContact;
+            if(!Storage()->ContactDB().GetRecord("id",UUID,ExistingContact)) {
+                NotFound(Request, Response);
+                return;
+            }
+
+            bool Force=false;
+            std::string Arg;
+            if(HasParameter("force",Arg) && Arg=="true")
+                Force=true;
+
+            if(!Force && !ExistingContact.inUse.empty()) {
+                BadRequest(Request, Response, "Some entities still reference this entry. Delete them or use force=true");
+                return;
+            }
+
+        } catch( const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest(Request, Response, "An error occurred and the contact was not added.");
     }
 
     void RESTAPI_contact_handler::DoPost(Poco::Net::HTTPServerRequest &Request,

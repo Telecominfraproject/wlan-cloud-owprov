@@ -880,6 +880,11 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: force
+          schema:
+            type: boolean
+          required: true
 
       responses:
         204:
@@ -1035,6 +1040,11 @@ paths:
           schema:
             type: string
             format: uuid
+          required: true
+        - in: query
+          name: force
+          schema:
+            type: boolean
           required: true
 
       responses:
@@ -1410,7 +1420,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
 
   /managementPolicy/{uuid}:
     get:
