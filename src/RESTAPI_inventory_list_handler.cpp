@@ -27,6 +27,27 @@ namespace OpenWifi{
             BadRequest(Request, Response, "Unknown HTTP Method");
     }
 
+
+    void RESTAPI_inventory_list_handler::SendList(Poco::Net::HTTPServerRequest &Request, const ProvObjects::InventoryTagVec & Tags, bool SerialOnly,
+                  Poco::Net::HTTPServerResponse &Response) {
+        Poco::JSON::Array   Array;
+        for(const auto &i:Tags) {
+            if(SerialOnly) {
+                Array.add(i.serialNumber);
+            } else {
+                Poco::JSON::Object  O;
+                i.to_json(O);
+                Array.add(O);
+            }
+        }
+        Poco::JSON::Object  Answer;
+        if(SerialOnly)
+            Answer.set("serialNumbers", Array);
+        else
+            Answer.set("tags", Array);
+        ReturnObject(Request, Answer, Response);
+    }
+
     void RESTAPI_inventory_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
 
@@ -34,128 +55,69 @@ namespace OpenWifi{
             std::string UUID;
             std::string Arg;
             bool AddAdditionalInfo=false;
-
             if(HasParameter("withExtendedInfo",Arg) && Arg=="true")
                 AddAdditionalInfo = true;
 
+            bool SerialOnly=false;
+            if(HasParameter("serialOnly",Arg) && Arg=="true")
+                SerialOnly=true;
+
+            bool CountOnly=false;
+            if(HasParameter("serialOnly",Arg) && Arg=="true")
+                CountOnly=true;
+
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
-                Poco::JSON::Array   Arr;
+                ProvObjects::InventoryTagVec Tags;
                 for(const auto &i:DevUUIDS) {
                     ProvObjects::InventoryTag E;
                     if(Storage()->InventoryDB().GetRecord("id",i,E)) {
-                        Poco::JSON::Object  O;
-                        E.to_json(O);
-                        Arr.add(O);
+                        Tags.push_back(E);
                     } else {
                         BadRequest(Request, Response, "Unknown UUID:" + i);
                         return;
                     }
                 }
-                Poco::JSON::Object  Answer;
-                Answer.set("tags",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject( Request, "tags", Tags, Response);
                 return;
             } else if(HasParameter("entity",UUID)) {
-                if(HasParameter("countOnly",Arg) && Arg=="true") {
-                    Poco::JSON::Object  Answer;
+                if(CountOnly) {
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,UUID));
-                    Answer.set("count", C);
-                    ReturnObject(Request, Answer, Response);
+                    ReturnCountOnly(Request, C, Response);
                     return;
                 }
-                bool SerialOnly=false;
-                if(HasParameter("serialOnly",Arg) && Arg=="true")
-                    SerialOnly=true;
-                InventoryTagVec Tags;
+                ProvObjects::InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,UUID));
-                Poco::JSON::Array   Array;
-                for(const auto &i:Tags) {
-                    if(SerialOnly) {
-                        Array.add(i.serialNumber);
-                    } else {
-                        Poco::JSON::Object  O;
-                        i.to_json(O);
-                        Array.add(O);
-                    }
-                }
-                Poco::JSON::Object  Answer;
-                if(SerialOnly)
-                    Answer.set("serialNumbers", Array);
-                else
-                    Answer.set("tags", Array);
-                ReturnObject(Request, Answer, Response);
+                SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("venue",UUID)) {
-                if(HasParameter("countOnly",Arg) && Arg=="true") {
-                    Poco::JSON::Object  Answer;
+                if(CountOnly) {
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
-                    Answer.set("count", C);
-                    ReturnObject(Request, Answer, Response);
+                    ReturnCountOnly(Request, C, Response);
                     return;
                 }
-                bool SerialOnly=false;
-                if(HasParameter("serialOnly",Arg) && Arg=="true")
-                    SerialOnly=true;
-                InventoryTagVec Tags;
+                ProvObjects::InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
-                Poco::JSON::Array   Array;
-                for(const auto &i:Tags) {
-                    if(SerialOnly) {
-                        Array.add(i.serialNumber);
-                    } else {
-                        Poco::JSON::Object  O;
-                        i.to_json(O);
-                        Array.add(O);
-                    }
-                }
-                Poco::JSON::Object  Answer;
-                if(SerialOnly)
-                    Answer.set("serialNumbers", Array);
-                else
-                    Answer.set("tags", Array);
-                ReturnObject(Request, Answer, Response);
+                SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("unassigned",Arg) && Arg=="true") {
-                if(HasParameter("countOnly",Arg) && Arg=="true") {
-                    Poco::JSON::Object  Answer;
+                if(CountOnly) {
                     std::string Empty;
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
-                    Answer.set("count", C);
-                    ReturnObject(Request, Answer, Response);
+                    ReturnCountOnly(Request, C, Response);
                     return;
                 }
-                bool SerialOnly=false;
-                if(HasParameter("serialOnly",Arg) && Arg=="true")
-                    SerialOnly=true;
-                InventoryTagVec Tags;
+                ProvObjects::InventoryTagVec Tags;
                 std::string Empty;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
-                Poco::JSON::Array   Array;
-                for(const auto &i:Tags) {
-                    if(SerialOnly) {
-                        Array.add(i.serialNumber);
-                    } else {
-                        Poco::JSON::Object  O;
-                        i.to_json(O);
-                        Array.add(O);
-                    }
-                }
-                Poco::JSON::Object  Answer;
-                if(SerialOnly)
-                    Answer.set("serialNumbers", Array);
-                else
-                    Answer.set("tags", Array);
-                ReturnObject(Request, Answer, Response);
+                SendList(Request, Tags, SerialOnly, Response);
                 return;
-            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
-                Poco::JSON::Object  Answer;
+            } else if(CountOnly) {
                 auto C = Storage()->InventoryDB().Count();
-                Answer.set("count", C);
-                ReturnObject(Request, Answer, Response);
+                ReturnCountOnly(Request, C, Response);
                 return;
             } else {
-                InventoryTagVec Tags;
+                ProvObjects::InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags);
                 Poco::JSON::Array   Arr;
                 for(const auto &i:Tags) {

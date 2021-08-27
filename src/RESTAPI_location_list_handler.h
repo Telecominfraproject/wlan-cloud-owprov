@@ -12,8 +12,6 @@
 
 namespace OpenWifi {
 
-    typedef std::vector<ProvObjects::Location>   LocationVec;
-
     class RESTAPI_location_list_handler : public RESTAPIHandler {
     public:
         RESTAPI_location_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)

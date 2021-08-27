@@ -25,47 +25,33 @@ namespace OpenWifi{
 
     void RESTAPI_contact_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                                Poco::Net::HTTPServerResponse &Response) {
-
         try {
             std::string UUID;
             std::string Arg;
 
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
-                Poco::JSON::Array   Arr;
+                ProvObjects::ContactVec Contacts;
                 for(const auto &i:DevUUIDS) {
                     ProvObjects::Contact E;
                     if(Storage()->ContactDB().GetRecord("id",i,E)) {
-                        Poco::JSON::Object  O;
-                        E.to_json(O);
-                        Arr.add(O);
+                        Contacts.push_back(E);
                     } else {
                         BadRequest(Request, Response, "Unknown UUID:" + i);
                         return;
                     }
                 }
-                Poco::JSON::Object  Answer;
-                Answer.set("contacts",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request, "contacts", Contacts, Response);
                 return;
             } else if(HasParameter("countOnly",Arg) && Arg=="true") {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->ContactDB().Count();
-                Answer.set("count", C);
-                ReturnObject(Request, Answer, Response);
+                ReturnCountOnly(Request,C,Response);
                 return;
             } else {
-                ContactVec Contacts;
+                ProvObjects::ContactVec Contacts;
                 Storage()->ContactDB().GetRecords(QB_.Offset,QB_.Limit,Contacts);
-                Poco::JSON::Array   Arr;
-                for(const auto &i:Contacts) {
-                    Poco::JSON::Object  O;
-                    i.to_json(O);
-                    Arr.add(O);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("contacts",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request, "contacts", Contacts, Response);
                 return;
             }
         } catch(const Poco::Exception &E) {

@@ -45,6 +45,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<ManagementPolicy>      ManagementPolicyVec;
 
     struct Entity {
         ObjectInfo  info;
@@ -59,6 +60,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<Entity>      EntityVec;
 
     struct DiGraphEntry {
         Types::UUID_t parent;
@@ -86,6 +88,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<Venue>      VenueVec;
 
     struct UserInfoDigest {
         std::string     id;
@@ -105,6 +108,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<ManagementRole>      ManagementRoleVec;
 
     enum LocationType {
         LT_SERVICE, LT_EQUIPMENT, LT_AUTO, LT_MANUAL,
@@ -159,6 +163,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<Location>      LocationVec;
 
     enum ContactType {
         CT_SUBSCRIBER, CT_USER, CT_INSTALLER, CT_CSR, CT_MANAGER,
@@ -219,6 +224,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<Contact>      ContactVec;
 
     struct ServiceConfiguration {
         ObjectInfo info;
@@ -255,6 +261,7 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<InventoryTag>      InventoryTagVec;
 
     struct Report {
         uint64_t            snapShot;

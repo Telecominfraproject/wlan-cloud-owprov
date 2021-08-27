@@ -134,6 +134,14 @@ components:
             format: uuid
             example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
 
+    ManagementPolicyList:
+      type: object
+      properties:
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagementPolicy'
+
     # uuids: ent:<uuid>
     Entity:
       type: object
@@ -1416,6 +1424,76 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /managementPolicy:
+    get:
+      tags:
+        - Management Policies
+      operationId: getPolicies
+      summary: Get a list of policies
+      parameters:
+        - in: query
+          name: entity
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - in: query
+          name: venue
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - in: query
+          name: unassigned
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of policies comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of policies
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of Venues
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ManagementPolicyList'
+                  - $ref: '#/components/schemas/CountAnswer'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

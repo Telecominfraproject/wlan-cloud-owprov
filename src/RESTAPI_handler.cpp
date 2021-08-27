@@ -400,6 +400,13 @@ namespace OpenWifi {
 		Poco::JSON::Stringifier::stringify(Object, Answer);
 	}
 
+	void RESTAPIHandler::ReturnCountOnly(Poco::Net::HTTPServerRequest &Request, uint64_t Count,
+                         Poco::Net::HTTPServerResponse &Response) {
+	    Poco::JSON::Object  Answer;
+	    Answer.set("count", Count);
+        ReturnObject(Request,Answer,Response);
+	}
+
 	bool RESTAPIHandler::InitQueryBlock() {
 	    if(QueryBlockInitialized_)
 	        return true;

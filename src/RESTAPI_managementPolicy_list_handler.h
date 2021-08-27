@@ -1,10 +1,9 @@
 //
-// Created by stephane bourque on 2021-08-23.
+// Created by stephane bourque on 2021-08-26.
 //
 
-#ifndef OWPROV_RESTAPI_VENUE_LIST_HANDLER_H
-#define OWPROV_RESTAPI_VENUE_LIST_HANDLER_H
-
+#ifndef OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H
+#define OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H
 
 #include "RESTAPI_handler.h"
 #include "Poco/Net/HTTPServerRequest.h"
@@ -13,9 +12,9 @@
 
 namespace OpenWifi {
 
-    class RESTAPI_venue_list_handler : public RESTAPIHandler {
+    class RESTAPI_managementPolicy_list_handler : public RESTAPIHandler {
     public:
-        RESTAPI_venue_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
+        RESTAPI_managementPolicy_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
         : RESTAPIHandler(bindings, L,
                          std::vector<std::string>{
             Poco::Net::HTTPRequest::HTTP_GET,
@@ -23,12 +22,12 @@ namespace OpenWifi {
             Internal) {}
             void handleRequest(Poco::Net::HTTPServerRequest &request,
                                Poco::Net::HTTPServerResponse &response) override final;
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/venue"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementPolicy"}; };
 
         void DoGet(Poco::Net::HTTPServerRequest &Request,
                    Poco::Net::HTTPServerResponse &Response);
-
     };
 }
 
-#endif //OWPROV_RESTAPI_VENUE_LIST_HANDLER_H
+
+#endif //OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H

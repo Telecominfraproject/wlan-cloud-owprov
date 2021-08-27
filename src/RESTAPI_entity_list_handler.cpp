@@ -10,6 +10,7 @@
 #include "RESTAPI_entity_list_handler.h"
 #include "Utils.h"
 #include "StorageService.h"
+#include "RESTAPI_utils.h"
 
 namespace OpenWifi{
     void RESTAPI_entity_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -33,40 +34,26 @@ namespace OpenWifi{
             std::string Arg;
             if(!QB_.Select.empty()) {
                 auto EntityUIDs = Utils::Split(QB_.Select);
-                Poco::JSON::Array   Arr;
+                ProvObjects::EntityVec Entities;
                 for(const auto &i:EntityUIDs) {
                     ProvObjects::Entity E;
                     if(Storage()->EntityDB().GetRecord("id",i,E)) {
-                        Poco::JSON::Object  O;
-                        E.to_json(O);
-                        Arr.add(O);
+                        Entities.push_back(E);
                     } else {
                         BadRequest(Request, Response, "Unknown UUID:" + i);
                         return;
                     }
                 }
-                Poco::JSON::Object  Answer;
-                Answer.set("entities",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request, "entities", Entities, Response);
                 return;
             } else if(HasParameter("countOnly",Arg) && Arg=="true") {
-                Poco::JSON::Object  Answer;
                 auto C = Storage()->EntityDB().Count();
-                Answer.set("count", C);
-                ReturnObject(Request, Answer, Response);
+                ReturnCountOnly(Request, C, Response);
                 return;
             } else {
-                std::vector<ProvObjects::Entity> Entities;
+                ProvObjects::EntityVec Entities;
                 Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-                Poco::JSON::Array   Arr;
-                for(const auto &i:Entities) {
-                    Poco::JSON::Object  O;
-                    i.to_json(O);
-                    Arr.add(O);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("entities",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request,"entities",Entities,Response);
                 return;
             }
         } catch(const Poco::Exception &E) {

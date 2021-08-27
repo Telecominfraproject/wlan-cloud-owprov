@@ -5,6 +5,7 @@
 #include "RESTAPI_venue_list_handler.h"
 #include "Utils.h"
 #include "StorageService.h"
+#include "RESTAPI_utils.h"
 
 namespace OpenWifi{
     void RESTAPI_venue_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -26,42 +27,51 @@ namespace OpenWifi{
                                             Poco::Net::HTTPServerResponse &Response) {
         try {
             std::string Arg;
+            bool CountOnly=false;
+            if(HasParameter("countOnly",Arg) && Arg=="true")
+                CountOnly=true;
+
             if(!QB_.Select.empty()) {
                 auto UUIDs = Utils::Split(QB_.Select);
-                Poco::JSON::Array   Arr;
+                ProvObjects::VenueVec  Venues;
                 for(const auto &i:UUIDs) {
                     ProvObjects::Venue E;
                     if(Storage()->VenueDB().GetRecord("id",i,E)) {
-                        Poco::JSON::Object  O;
-                        E.to_json(O);
-                        Arr.add(O);
+                        Venues.push_back(E);
                     } else {
                         BadRequest(Request, Response, "Unknown UUID:" + i);
                         return;
                     }
                 }
-                Poco::JSON::Object  Answer;
-                Answer.set("venues",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request, "venues", Venues, Response);
+                return;
+            } else if(HasParameter("entity",Arg)) {
+                ProvObjects::VenueVec Venues;
+                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("entity", ORM::EQUAL, Arg));
+                if(CountOnly) {
+                    ReturnCountOnly(Request,Venues.size(),Response);
+                } else {
+                    ReturnObject(Request, "venues", Venues, Response);
+                }
+                return;
+            } else if(HasParameter("venue",Arg)) {
+                ProvObjects::VenueVec Venues;
+                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("venue", ORM::EQUAL, Arg));
+                if(CountOnly) {
+                    ReturnCountOnly(Request,Venues.size(),Response);
+                } else {
+                    ReturnObject(Request, "venues", Venues, Response);
+                }
                 return;
             } else if(HasParameter("countOnly",Arg) && Arg=="true") {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->VenueDB().Count();
-                Answer.set("count", C);
-                ReturnObject(Request, Answer, Response);
+                ReturnCountOnly(Request, C,Response);
                 return;
             } else {
-                VenueVec Venues;
+                ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
-                Poco::JSON::Array   Arr;
-                for(const auto &i:Venues) {
-                    Poco::JSON::Object  O;
-                    i.to_json(O);
-                    Arr.add(O);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("venues",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Request, "venues", Venues, Response);
                 return;
             }
         } catch(const Poco::Exception &E) {

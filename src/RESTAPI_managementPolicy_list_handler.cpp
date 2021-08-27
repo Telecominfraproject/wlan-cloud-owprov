@@ -1,14 +1,15 @@
 //
-// Created by stephane bourque on 2021-08-23.
+// Created by stephane bourque on 2021-08-26.
 //
 
-#include "RESTAPI_location_list_handler.h"
+#include "RESTAPI_managementPolicy_list_handler.h"
+
 #include "Utils.h"
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 
 namespace OpenWifi{
-    void RESTAPI_location_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
+    void RESTAPI_managementPolicy_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
                                                      Poco::Net::HTTPServerResponse &Response) {
         if (!ContinueProcessing(Request, Response))
             return;
@@ -23,36 +24,35 @@ namespace OpenWifi{
             BadRequest(Request, Response, "Unknown HTTP Method");
     }
 
-    void RESTAPI_location_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
+    void RESTAPI_managementPolicy_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                              Poco::Net::HTTPServerResponse &Response) {
-
         try {
             std::string UUID;
             std::string Arg;
 
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
-                ProvObjects::LocationVec Locations;
+                ProvObjects::ManagementPolicyVec Policies;
                 for(const auto &i:DevUUIDS) {
-                    ProvObjects::Location E;
-                    if(Storage()->LocationDB().GetRecord("id",i,E)) {
-                        Locations.push_back(E);
+                    ProvObjects::ManagementPolicy E;
+                    if(Storage()->PolicyDB().GetRecord("id",i,E)) {
+                        Policies.push_back(E);
                     } else {
                         BadRequest(Request, Response, "Unknown UUID:" + i);
                         return;
                     }
                 }
-                ReturnObject(Request, "locations", Locations, Response);
+                ReturnObject(Request, "managementPolicies", Policies, Response);
                 return;
             } else if(HasParameter("countOnly",Arg) && Arg=="true") {
                 Poco::JSON::Object  Answer;
-                auto C = Storage()->LocationDB().Count();
-                ReturnCountOnly(Request, C, Response);
+                auto C = Storage()->ContactDB().Count();
+                ReturnCountOnly(Request,C,Response);
                 return;
             } else {
-                ProvObjects::LocationVec Locations;
-                Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
-                ReturnObject(Request, "locations", Locations, Response);
+                ProvObjects::ManagementPolicyVec Policies;
+                Storage()->PolicyDB().GetRecords(QB_.Offset,QB_.Limit,Policies);
+                ReturnObject(Request, "managementPolicies", Policies, Response);
                 return;
             }
         } catch(const Poco::Exception &E) {

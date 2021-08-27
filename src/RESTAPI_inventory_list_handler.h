@@ -14,8 +14,10 @@
 #include "RESTAPI_handler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
+
     class RESTAPI_inventory_list_handler : public RESTAPIHandler {
     public:
         RESTAPI_inventory_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
@@ -30,6 +32,9 @@ namespace OpenWifi {
 
         void DoGet(Poco::Net::HTTPServerRequest &Request,
                    Poco::Net::HTTPServerResponse &Response);
+
+        void SendList(Poco::Net::HTTPServerRequest &Request, const ProvObjects::InventoryTagVec & Tags, bool SerialOnly,
+                      Poco::Net::HTTPServerResponse &Response);
     };
 }
 
