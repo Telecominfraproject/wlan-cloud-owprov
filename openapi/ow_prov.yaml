@@ -1648,7 +1648,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ManagementRoleList'
+                oneOf:
+                  - $ref: '#/components/schemas/ManagementRoleList'
+                  - $ref: '#/components/schemas/CountAnswer'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1673,6 +1675,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ManagementRole'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Management Roles
+      operationId: deleteManagementRole
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Management Roles
+      operationId: createManagementRole
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: during creation, must be set to 1. The real uuid will be returned in the created object
+      requestBody:
+        description: Information used to create management role
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagementRole'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementRole'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Management Roles
+      operationId: modifyManagementRole
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Information used to modify management role
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagementRole'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementRole'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
