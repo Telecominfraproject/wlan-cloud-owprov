@@ -135,6 +135,11 @@ namespace OpenWifi{
                 return;
             }
 
+            if(!V.entity.empty() && !Storage()->EntityDB().Exists("id",V.entity)) {
+                BadRequest(Request, Response, "Entity does not exist.");
+                return;
+            }
+
             if(!V.contact.empty() && !Storage()->ContactDB().Exists("id",V.contact)) {
                 BadRequest(Request, Response, "Contact does not exist.");
                 return;

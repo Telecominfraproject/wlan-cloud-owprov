@@ -121,7 +121,7 @@ namespace OpenWifi::ProvObjects {
     void Venue::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
         RESTAPI_utils::field_to_json( Obj,"parent",parent);
-        RESTAPI_utils::field_to_json( Obj,"owner",entity);
+        RESTAPI_utils::field_to_json( Obj,"entity",entity);
         RESTAPI_utils::field_to_json( Obj,"children",children);
         RESTAPI_utils::field_to_json( Obj,"devices",devices);
         RESTAPI_utils::field_to_json( Obj,"topology",topology);
@@ -138,7 +138,7 @@ namespace OpenWifi::ProvObjects {
         try {
             info.from_json(Obj);
             RESTAPI_utils::field_from_json( Obj,"parent",parent);
-            RESTAPI_utils::field_from_json( Obj,"owner",entity);
+            RESTAPI_utils::field_from_json( Obj,"entity",entity);
             RESTAPI_utils::field_from_json( Obj,"children",children);
             RESTAPI_utils::field_from_json( Obj,"devices",devices);
             RESTAPI_utils::field_from_json( Obj,"topology",topology);
