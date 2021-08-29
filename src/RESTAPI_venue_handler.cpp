@@ -90,7 +90,7 @@ namespace OpenWifi{
                 if(!V.parent.empty())
                     Storage()->VenueDB().DeleteChild("id",V.parent,UUID);
                 if(!V.entity.empty())
-                    Storage()->EntityDB().DeleteChild("id",V.entity,UUID);
+                    Storage()->EntityDB().DeleteVenue("id",V.entity,UUID);
                 Storage()->VenueDB().DeleteRecord("id",UUID);
                 OK(Request, Response);
                 return;
