@@ -62,10 +62,6 @@ namespace OpenWifi{
             if(HasParameter("serialOnly",Arg) && Arg=="true")
                 SerialOnly=true;
 
-            bool CountOnly=false;
-            if(HasParameter("countOnly",Arg) && Arg=="true")
-                CountOnly=true;
-
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
                 ProvObjects::InventoryTagVec Tags;
@@ -81,7 +77,7 @@ namespace OpenWifi{
                 ReturnObject( Request, "tags", Tags, Response);
                 return;
             } else if(HasParameter("entity",UUID)) {
-                if(CountOnly) {
+                if(QB_.CountOnly) {
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,UUID));
                     ReturnCountOnly(Request, C, Response);
                     return;
@@ -91,7 +87,7 @@ namespace OpenWifi{
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("venue",UUID)) {
-                if(CountOnly) {
+                if(QB_.CountOnly) {
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("venue",ORM::EQUAL,UUID));
                     ReturnCountOnly(Request, C, Response);
                     return;
@@ -101,7 +97,7 @@ namespace OpenWifi{
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("unassigned",Arg) && Arg=="true") {
-                if(CountOnly) {
+                if(QB_.CountOnly) {
                     std::string Empty;
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
                     ReturnCountOnly(Request, C, Response);
@@ -112,7 +108,7 @@ namespace OpenWifi{
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().MakeWhere("entity",ORM::EQUAL,Empty));
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
-            } else if(CountOnly) {
+            } else if(QB_.CountOnly) {
                 auto C = Storage()->InventoryDB().Count();
                 ReturnCountOnly(Request, C, Response);
                 return;

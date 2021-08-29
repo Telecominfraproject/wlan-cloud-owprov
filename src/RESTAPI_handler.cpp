@@ -422,6 +422,7 @@ namespace OpenWifi {
 		QB_.LogType = GetParameter(RESTAPI::Protocol::LOGTYPE,0);
 		QB_.LastOnly = GetBoolParameter(RESTAPI::Protocol::LASTONLY,false);
 		QB_.Newest = GetBoolParameter(RESTAPI::Protocol::NEWEST,false);
+		QB_.CountOnly = GetBoolParameter(RESTAPI::Protocol::COUNTONLY,false);
 
 		if(QB_.Offset<1)
 		    QB_.Offset=1;

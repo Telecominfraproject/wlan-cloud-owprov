@@ -46,7 +46,7 @@ namespace OpenWifi{
                 }
                 ReturnObject(Request, "entities", Entities, Response);
                 return;
-            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
+            } else if(QB_.CountOnly) {
                 auto C = Storage()->EntityDB().Count();
                 ReturnCountOnly(Request, C, Response);
                 return;

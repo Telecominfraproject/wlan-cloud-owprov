@@ -44,7 +44,7 @@ namespace OpenWifi{
                 }
                 ReturnObject(Request, "locations", Locations, Response);
                 return;
-            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
+            } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->LocationDB().Count();
                 ReturnCountOnly(Request, C, Response);

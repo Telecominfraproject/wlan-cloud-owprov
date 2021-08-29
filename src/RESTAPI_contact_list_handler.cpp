@@ -43,7 +43,7 @@ namespace OpenWifi{
                 }
                 ReturnObject(Request, "contacts", Contacts, Response);
                 return;
-            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
+            } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->ContactDB().Count();
                 ReturnCountOnly(Request,C,Response);

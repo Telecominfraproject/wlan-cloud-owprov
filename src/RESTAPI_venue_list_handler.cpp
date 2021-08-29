@@ -27,9 +27,6 @@ namespace OpenWifi{
                                             Poco::Net::HTTPServerResponse &Response) {
         try {
             std::string Arg;
-            bool CountOnly=false;
-            if(HasParameter("countOnly",Arg) && Arg=="true")
-                CountOnly=true;
 
             if(!QB_.Select.empty()) {
                 auto UUIDs = Utils::Split(QB_.Select);
@@ -48,7 +45,7 @@ namespace OpenWifi{
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("entity", ORM::EQUAL, Arg));
-                if(CountOnly) {
+                if(QB_.CountOnly) {
                     ReturnCountOnly(Request,Venues.size(),Response);
                 } else {
                     ReturnObject(Request, "venues", Venues, Response);
@@ -57,13 +54,13 @@ namespace OpenWifi{
             } else if(HasParameter("venue",Arg)) {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("venue", ORM::EQUAL, Arg));
-                if(CountOnly) {
+                if(QB_.CountOnly) {
                     ReturnCountOnly(Request,Venues.size(),Response);
                 } else {
                     ReturnObject(Request, "venues", Venues, Response);
                 }
                 return;
-            } else if(HasParameter("countOnly",Arg) && Arg=="true") {
+            } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->VenueDB().Count();
                 ReturnCountOnly(Request, C,Response);
