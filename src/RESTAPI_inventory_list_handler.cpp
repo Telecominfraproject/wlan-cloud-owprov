@@ -63,7 +63,7 @@ namespace OpenWifi{
                 SerialOnly=true;
 
             bool CountOnly=false;
-            if(HasParameter("serialOnly",Arg) && Arg=="true")
+            if(HasParameter("countOnly",Arg) && Arg=="true")
                 CountOnly=true;
 
             if(!QB_.Select.empty()) {
