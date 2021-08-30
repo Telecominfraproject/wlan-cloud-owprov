@@ -29,6 +29,16 @@ namespace OpenWifi::RESTAPI_utils {
 		Obj.set(Field,S);
 	}
 
+	inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const std::vector<Types::StringPair> & S) {
+	    Poco::JSON::Array   Array;
+	    for(const auto &i:S) {
+	        Poco::JSON::Object  O;
+	        O.set("tag",i.first);
+	        O.set("value", i.second);
+	    }
+	    Obj.set(Field,Array);
+	}
+
 	inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const char * S) {
 		Obj.set(Field,S);
 	}
@@ -83,6 +93,22 @@ namespace OpenWifi::RESTAPI_utils {
 	inline void field_from_json(Poco::JSON::Object::Ptr Obj, const char *Field, bool &V) {
 		if(Obj->has(Field))
 			V = (Obj->get(Field).toString() == "true");
+	}
+
+	inline void field_from_json(Poco::JSON::Object::Ptr Obj, const char *Field, Types::StringPairVec &Vec) {
+	    if(Obj->isArray(Field)) {
+	        auto O = Obj->getArray(Field);
+	        for(const auto &i:*O) {
+	            std::string S1,S2;
+	            auto Inner = i.extract<Poco::JSON::Object::Ptr>();
+	            if(Inner->has("tag"))
+	                S1 = Inner->get("tag").toString();
+	            if(Inner->has("value"))
+	                S2 = Inner->get("value").toString();
+	            auto P = std::make_pair(S1,S2);
+	            Vec.push_back(P);
+	        }
+	    }
 	}
 
 	inline void field_from_json(Poco::JSON::Object::Ptr Obj, const char *Field, Types::StringVec &V) {
