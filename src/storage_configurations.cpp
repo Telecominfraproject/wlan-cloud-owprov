@@ -26,7 +26,8 @@ namespace OpenWifi {
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceTypes",ORM::FieldType::FT_TEXT},
         ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
-        ORM::Field{"inUse",ORM::FieldType::FT_TEXT}
+        ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
+        ORM::Field{"variables",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ConfigurationDB_Indexes{
@@ -51,6 +52,7 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     OpenWifi::Types::from_string(In.get<7>(), Out.deviceTypes);
     Out.configuration = In.get<8>();
     OpenWifi::Types::from_string(In.get<9>(), Out.inUse);
+    OpenWifi::Types::from_string(In.get<10>(), Out.variables);
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(OpenWifi::ProvObjects::DeviceConfiguration &In, OpenWifi::ConfigurationDBRecordType &Out) {
@@ -64,4 +66,5 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<7>(OpenWifi::Types::to_string(In.deviceTypes));
     Out.set<8>(In.configuration);
     Out.set<9>(OpenWifi::Types::to_string(In.inUse));
+    Out.set<10>(OpenWifi::Types::to_string(In.variables));
 }
