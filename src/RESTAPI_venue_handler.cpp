@@ -130,7 +130,7 @@ namespace OpenWifi{
                 return;
             }
 
-            if(V.entity == Storage()->EntityDB().RootUUID()) {
+            if(V.entity == EntityDB::RootUUID()) {
                 BadRequest(Request, Response, "Entity cannot be root.");
                 return;
             }

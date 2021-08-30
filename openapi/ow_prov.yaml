@@ -433,11 +433,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DeviceConfigurationElement'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagValuePairList'
         inUse:
           type: array
           items:
             type: string
             format: uuid
+
+    DeviceConfigurationList:
+      type: object
+      properties:
+        configurations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceConfiguration'
 
     InventoryTag:
       type: object
@@ -1749,6 +1761,162 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+
+  /configurations:
+    get:
+      tags:
+        - Configurations
+      operationId: getConfigurations
+      summary: Retrieve a list of entities
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of devices comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of devices
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: Return a list of elements
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DeviceConfigurationList'
+                  - $ref: '#/components/schemas/CountAnswer'
+
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /configurations/{uuid}:
+    get:
+      tags:
+        - Configurations
+      operationId: geConfiguration
+      summary: Retrieve a specific Configuration
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When looking for the root entity, the uuid 0000-0000-0000 must be entered.
+          required: true
+
+      responses:
+        200:
+          $ref: '#/components/schemas/DeviceConfiguration'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Configurations
+      operationId: createConfiguration
+      summary: Create a specific configuration
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When creating the root entity, the uuid 0000-0000-0000 must be entered. When creating a non-root entity, uuid must be 1
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceConfiguration'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/DeviceConfiguration'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Configurations
+      operationId: modifyConfiguration
+      summary: Modify a specific configuration
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: When modifying the root entity, the uuid 0000-0000-0000 must be entered.
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceConfiguration'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/DeviceConfiguration'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Configurations
+      operationId: deleteConfiguration
+      summary: Retrieve the list of entities
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example: The root entity cannot be deleted.
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
 
 
 

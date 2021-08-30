@@ -326,6 +326,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"deviceTypes",deviceTypes);
         RESTAPI_utils::field_to_json( Obj,"configuration",configuration);
         RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
+        RESTAPI_utils::field_to_json( Obj,"variables",variables);
     }
 
     bool DeviceConfiguration::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -335,6 +336,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"deviceTypes",deviceTypes);
             RESTAPI_utils::field_from_json( Obj,"configuration",configuration);
             RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
+            RESTAPI_utils::field_from_json( Obj,"variables",variables);
             return true;
         } catch(...) {
 

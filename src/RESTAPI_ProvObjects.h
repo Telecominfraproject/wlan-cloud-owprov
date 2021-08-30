@@ -240,10 +240,12 @@ namespace OpenWifi::ProvObjects {
         Types::StringVec deviceTypes;
         std::string configuration;
         Types::StringVec inUse;
+        Types::StringPairVec variables;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<DeviceConfiguration>      DeviceConfigurationVec;
 
     struct InventoryTag {
         ObjectInfo      info;

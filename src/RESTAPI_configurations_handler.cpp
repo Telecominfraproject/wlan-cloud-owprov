@@ -31,7 +31,8 @@ namespace OpenWifi{
     }
 
     void RESTAPI_configurations_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {}
+                                                 Poco::Net::HTTPServerResponse &Response) {
+    }
 
     void RESTAPI_configurations_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
                                                  Poco::Net::HTTPServerResponse &Response) {}
