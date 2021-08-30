@@ -17,8 +17,8 @@ namespace OpenWifi {
 
 	class OpenAPIRequestGet {
 	  public:
-		explicit OpenAPIRequestGet( const std::string & Type,
-								   	const std::string & EndPoint,
+		explicit OpenAPIRequestGet( std::string Type,
+								   	std::string EndPoint,
 									Types::StringPairVec & QueryData,
 									uint64_t msTimeout);
 		int Do(Poco::JSON::Object::Ptr &ResponseObject);

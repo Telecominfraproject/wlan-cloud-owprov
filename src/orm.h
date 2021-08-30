@@ -51,22 +51,22 @@ namespace ORM {
         bool        Index=false;
 
 
-        Field(std::string & N) {
-            Name = N;
+        explicit Field(std::string N) :
+            Name(std::move(N))
+        {
             Type = FT_TEXT;
         }
 
-        Field(std::string N, int S) {
-            Name = N;
+        Field(std::string N, int S) :
+            Name(std::move(N)), Size(S)
+        {
             Type = FT_TEXT;
-            Size = S;
         }
 
-        Field(std::string N, int S, bool I) {
-            Name = N;
+        Field(std::string N, int S, bool I):
+            Name(std::move(N)), Size(S), Index(I)
+        {
             Type = FT_TEXT;
-            Size = S;
-            Index = I;
         }
     };
     typedef std::vector<Field>  FieldVec;
@@ -153,8 +153,8 @@ namespace ORM {
         std::string     Name;
         ValueType       Value;
         ORM::CompareOperations  Operation;
-        Comparison(const std::string & N, ORM::CompareOperations Op, ValueType & V) :
-            Name(N), Operation(Op), Value(V) {}
+        Comparison(std::string N, ORM::CompareOperations Op, ValueType & V) :
+            Name(std::move(N)), Operation(Op), Value(V) {}
 
         std::string OP() {
             return Name + " " + to_string(Operation) + " " + to_string(Value);
@@ -262,21 +262,16 @@ namespace ORM {
 
         std::string MakeWhere( const std::string &S, CompareOperations Op, const std::string &V) {
             std::string R;
-
             assert( FieldNames_.find(S) != FieldNames_.end() );
-
             R = S + OpsToString[Op] + "'" + Escape(V) + "'" ;
-
             return R;
         }
 
-        std::string MakeWhere( const std::string &S, CompareOperations & Op, uint64_t &V) {
+        [[maybe_unused]] std::string MakeWhere( const std::string &S, CompareOperations & Op, uint64_t V) {
             std::string R;
 
             assert( FieldNames_.find(S) != FieldNames_.end() );
-
             R = S + OpsToString[Op] + std::to_string(V) ;
-
             return R;
         }
 
@@ -604,26 +599,28 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::entities, FieldName, ParentUUID, ChildUUID, false);
         }
 
-        inline bool AddInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, std::string & ChildUUID) {
+        inline bool AddInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
             std::string FakeUUID{ Prefix + ":" + ChildUUID};
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, true);
         }
 
-        inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, std::string & ChildUUID) {
+        inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
             std::string FakeUUID{ Prefix + ":" + ChildUUID};
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, false);
         }
 
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
             if(From<1) From=1;
-            if(Type==ORM::sqlite) {
-                return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) +  " ";
-            } else if(Type==ORM::postgresql) {
-                return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-            } else if(Type==ORM::mysql) {
-                return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+            switch(Type) {
+                case ORM::sqlite:
+                    return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) +  " ";
+                case ORM::postgresql:
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+                case ORM::mysql:
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+                default:
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
             }
-            return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
         }
 
     private:

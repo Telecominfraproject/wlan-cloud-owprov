@@ -432,7 +432,7 @@ namespace OpenWifi {
 			Poco::Thread::trySleep((unsigned long)Daemon()->DaemonBusTimer());
 			if(!Running_)
 				break;
-			auto Msg = Daemon()->MakeSystemEventMessage(KafkaTopics::ServiceEvents::EVENT_KEEP_ALIVE);
+			Msg = Daemon()->MakeSystemEventMessage(KafkaTopics::ServiceEvents::EVENT_KEEP_ALIVE);
 			KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,Daemon()->PrivateEndPoint(),Msg, false);
 		}
 		Msg = Daemon()->MakeSystemEventMessage(KafkaTopics::ServiceEvents::EVENT_LEAVE);

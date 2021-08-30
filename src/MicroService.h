@@ -86,9 +86,6 @@ namespace OpenWifi {
 			DAEMON_APP_NAME(std::move(AppName)),
 			DAEMON_BUS_TIMER(BusTimer),
 			SubSystems_(std::move(Subsystems)) {
-			std::string V{APP_VERSION};
-			std::string B{BUILD_NUMBER};
-			Version_ =  V + "(" + B +  ")";
 		}
 
 		int main(const ArgVec &args) override;
@@ -140,9 +137,9 @@ namespace OpenWifi {
 		[[nodiscard]] MicroServiceMetaVec GetServices();
 		[[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
 
-		void SavePID();
-		inline uint64_t GetPID() { return Poco::Process::id(); };
-		[[nodiscard]] inline const std::string GetPublicAPIEndPoint() const { return MyPublicEndPoint_ + "/api/v1"; };
+		static void SavePID();
+		static inline uint64_t GetPID() { return Poco::Process::id(); };
+		[[nodiscard]] inline const std::string GetPublicAPIEndPoint() { return MyPublicEndPoint_ + "/api/v1"; };
 		[[nodiscard]] inline const std::string & GetUIURI() const { return UIURI_;};
 
 	  private:
@@ -163,7 +160,7 @@ namespace OpenWifi {
 		std::string 				MyPrivateEndPoint_;
 		std::string 				MyPublicEndPoint_;
 		std::string                 UIURI_;
-		std::string 				Version_;
+		std::string 				Version_{std::string(APP_VERSION) + "("+ BUILD_NUMBER + ")"};
 		BusEventManager				BusEventManager_;
 		SubMutex 					InfraMutex_;
 

@@ -64,11 +64,10 @@ class Storage : public SubSystemServer, Poco::Runnable {
 
 	  private:
 		static Storage      								*instance_;
-		std::unique_ptr<Poco::Data::SessionPool>        	Pool_= nullptr;
-		std::unique_ptr<Poco::Data::SQLite::Connector>  	SQLiteConn_= nullptr;
-		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_= nullptr;
-		std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_= nullptr;
-
+		std::unique_ptr<Poco::Data::SessionPool>        	Pool_;
+		std::unique_ptr<Poco::Data::SQLite::Connector>  	SQLiteConn_;
+		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_;
+		std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_;
 		ORM::DBType                                         DBType_ = ORM::DBType::sqlite;
 		std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
 		std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;

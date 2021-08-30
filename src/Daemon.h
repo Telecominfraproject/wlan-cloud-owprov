@@ -39,12 +39,12 @@ namespace OpenWifi {
 
     class Daemon : public MicroService {
 		public:
-			explicit Daemon(std::string PropFile,
-							std::string RootEnv,
-							std::string ConfigEnv,
-							std::string AppName,
+			explicit Daemon(const std::string & PropFile,
+							const std::string & RootEnv,
+							const std::string & ConfigEnv,
+							const std::string & AppName,
 						  	uint64_t 	BusTimer,
-							Types::SubSystemVec SubSystems) :
+							const Types::SubSystemVec & SubSystems) :
 				MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
 			void initialize(Poco::Util::Application &self);
@@ -52,7 +52,7 @@ namespace OpenWifi {
 			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
 	  	private:
 			static Daemon 				*instance_;
-			OpenWifi::TopoDashboard		DB_;
+			OpenWifi::TopoDashboard		DB_{};
 
     };
 

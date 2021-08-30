@@ -31,7 +31,6 @@ namespace OpenWifi{
     void RESTAPI_entity_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                                Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string Arg;
             if(!QB_.Select.empty()) {
                 auto EntityUIDs = Utils::Split(QB_.Select);
                 ProvObjects::EntityVec Entities;

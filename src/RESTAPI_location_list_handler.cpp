@@ -27,9 +27,6 @@ namespace OpenWifi{
                                              Poco::Net::HTTPServerResponse &Response) {
 
         try {
-            std::string UUID;
-            std::string Arg;
-
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
                 ProvObjects::LocationVec Locations;

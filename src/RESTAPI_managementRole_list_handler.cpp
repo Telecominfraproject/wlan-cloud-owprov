@@ -27,9 +27,6 @@ namespace OpenWifi{
     void RESTAPI_managementRole_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                                       Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string UUID;
-            std::string Arg;
-
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
                 ProvObjects::ManagementRoleVec Roles;

@@ -22,12 +22,12 @@
 
 namespace OpenWifi {
 
-	OpenAPIRequestGet::OpenAPIRequestGet( 	const std::string & ServiceType,
-											const std::string & EndPoint,
+	OpenAPIRequestGet::OpenAPIRequestGet( 	std::string ServiceType,
+											std::string EndPoint,
 									 		Types::StringPairVec & QueryData,
 											uint64_t msTimeout):
- 		Type_(ServiceType),
- 		EndPoint_(EndPoint),
+ 		Type_(std::move(ServiceType)),
+ 		EndPoint_(std::move(EndPoint)),
 		QueryData_(QueryData),
 		msTimeout_(msTimeout) {
 

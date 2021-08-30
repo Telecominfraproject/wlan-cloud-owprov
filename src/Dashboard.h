@@ -15,10 +15,10 @@ namespace OpenWifi {
 	class TopoDashboard {
 	  public:
 			void Create();
-			const ProvObjects::Report & Report() const { return DB_;}
+			[[nodiscard]] const ProvObjects::Report & Report() const { return DB_;}
 			inline void Reset() { LastRun_=0; DB_.reset(); }
 	  private:
-	        ProvObjects::Report  	DB_;
+	        ProvObjects::Report  	DB_{};
 			uint64_t 				LastRun_=0;
 	};
 }

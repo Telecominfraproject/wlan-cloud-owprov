@@ -20,8 +20,8 @@ namespace OpenWifi::ProvObjects {
         std::string     name;
         std::string     description;
         SecurityObjects::NoteInfoVec notes;
-        uint64_t        created;
-        uint64_t        modified;
+        uint64_t        created=0;
+        uint64_t        modified=0;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -207,7 +207,7 @@ namespace OpenWifi::ProvObjects {
 
     struct Contact {
         ObjectInfo  info;
-        ContactType type;
+        ContactType type=CT_USER;
         std::string title;
         std::string salutation;
         std::string firstname;
@@ -266,7 +266,7 @@ namespace OpenWifi::ProvObjects {
     typedef std::vector<InventoryTag>      InventoryTagVec;
 
     struct Report {
-        uint64_t            snapShot;
+        uint64_t            snapShot=0;
         Types::CountedMap   tenants;
 
         void        reset();

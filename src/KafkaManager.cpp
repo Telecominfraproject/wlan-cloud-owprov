@@ -174,7 +174,7 @@ namespace OpenWifi {
 		return std::move( SystemInfoWrapper_ + PayLoad + "}");
 	}
 
-	void KafkaManager::PostMessage(std::string topic, std::string key, std::string PayLoad, bool WrapMessage ) {
+	void KafkaManager::PostMessage(const std::string &topic, const std::string & key, const std::string &PayLoad, bool WrapMessage ) {
 		if(KafkaEnabled_) {
 			SubMutexGuard G(Mutex_);
 			KMessage M{
