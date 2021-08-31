@@ -47,7 +47,7 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
     Out.managementPolicy = In.get<6>();
-    Out.users = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::UserInfoDigest>(In.get<7>());
+    OpenWifi::Types::from_string(In.get<7>(), Out.users);
     OpenWifi::Types::from_string(In.get<8>(), Out.inUse);
 }
 
@@ -59,6 +59,6 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
     Out.set<6>(In.managementPolicy);
-    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.users));
+    Out.set<7>(OpenWifi::Types::to_string(In.users));
     Out.set<8>(OpenWifi::Types::to_string(In.inUse));
 }

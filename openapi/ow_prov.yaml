@@ -276,7 +276,8 @@ components:
         users:
           type: array
           items:
-            $ref: '#/components/schemas/UserInfoDigest'
+            type: string
+            format: uuid
         inUse:
           type: array
           items:

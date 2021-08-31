@@ -100,10 +100,10 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct ManagementRole {
-        ObjectInfo                      info;
-        Types::UUID_t         managementPolicy;
-        std::vector<UserInfoDigest>     users;
-        Types::StringVec inUse;
+        ObjectInfo          info;
+        Types::UUID_t       managementPolicy;
+        Types::UUIDvec_t    users;
+        Types::StringVec    inUse;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
