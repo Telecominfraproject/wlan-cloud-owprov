@@ -31,6 +31,7 @@ namespace OpenWifi{
     void RESTAPI_entity_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                                Poco::Net::HTTPServerResponse &Response) {
         try {
+            std::string Arg;
             if(!QB_.Select.empty()) {
                 auto EntityUIDs = Utils::Split(QB_.Select);
                 ProvObjects::EntityVec Entities;
@@ -48,6 +49,11 @@ namespace OpenWifi{
             } else if(QB_.CountOnly) {
                 auto C = Storage()->EntityDB().Count();
                 ReturnCountOnly(Request, C, Response);
+                return;
+            } if (HasParameter("getTree",Arg) && Arg=="true") {
+                Poco::JSON::Object  FullTree;
+                Storage()->EntityDB().BuildTree(FullTree);
+                ReturnObject(Request,FullTree,Response);
                 return;
             } else {
                 ProvObjects::EntityVec Entities;

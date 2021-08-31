@@ -63,6 +63,7 @@ namespace OpenWifi {
         ExistFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return ConfigurationDB_->Exists(F,V); };
         ExistFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return LocationDB_->Exists(F,V); };
         ExistFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return RolesDB_->Exists(F,V); };
+        ExistFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V) ->bool { return SecurityDBProxy()->Exists(F,V); };
 
         EntityDB_->CheckForRoot();
         Updater_.start(*this);
@@ -89,39 +90,7 @@ namespace OpenWifi {
 	    }
 	}
 
-
-    /*  Get the device types... /api/v1/firmwares?deviceSet=true
-     {
-          "deviceTypes": [
-            "cig_wf160d",
-            "cig_wf188",
-            "cig_wf194c",
-            "edgecore_eap101",
-            "edgecore_eap102",
-            "edgecore_ecs4100-12ph",
-            "edgecore_ecw5211",
-            "edgecore_ecw5410",
-            "edgecore_oap100",
-            "edgecore_spw2ac1200",
-            "edgecore_ssw2ac2600",
-            "indio_um-305ac",
-            "linksys_e8450-ubi",
-            "linksys_ea8300",
-            "mikrotik_nand",
-            "mikrotik_nand-large",
-            "tplink_cpe210_v3",
-            "tplink_cpe510_v3",
-            "tplink_eap225_outdoor_v1",
-            "tplink_ec420",
-            "tplink_ex227",
-            "tplink_ex228",
-            "tplink_ex447",
-            "wallys_dr40x9"
-          ]
-        }
-     */
 	bool Storage::UpdateDeviceTypes() {
-
 	    try {
 	        Types::StringPairVec QueryData;
 
@@ -171,11 +140,9 @@ namespace OpenWifi {
 	            }
 	        }
 	    }
-
 	    if(Error.empty())
 	        return true;
 	    return false;
-
 	}
 
     bool Storage::Validate(const Types::StringVec &P, std::string &Error) {

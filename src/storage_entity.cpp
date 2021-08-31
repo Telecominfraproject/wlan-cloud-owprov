@@ -12,6 +12,7 @@
 #include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -55,6 +56,23 @@ namespace OpenWifi {
         return RootExists_;
     }
 
+    void EntityDB::BuildTree(Poco::JSON::Object &Tree, const std::string & Node) {
+        Poco::JSON::Object  O;
+
+        ProvObjects::Entity E;
+        Storage()->EntityDB().GetRecord("id",Node,E);
+        O.set("type","entity");
+        O.set("name",E.info.name);
+        O.set("uuid",E.info.id);
+
+        Poco::JSON::Array   Children;
+        for(const auto &i:E.children) {
+            Poco::JSON::Object  C;
+            BuildTree(C,i);
+            Children.add(C);
+        }
+        O.set("children",Children);
+    }
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::EntityDBRecordType &In, OpenWifi::ProvObjects::Entity &Out) {

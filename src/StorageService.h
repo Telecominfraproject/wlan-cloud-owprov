@@ -30,6 +30,7 @@
 #include "storage_inventory.h"
 #include "storage_management_roles.h"
 #include "storage_configurations.h"
+#include "SecurityDBProxy.h"
 
 namespace OpenWifi {
 
@@ -60,7 +61,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
 
-		void run() override final;
+		void run() final;
 
 	  private:
 		static Storage      								*instance_;
@@ -77,6 +78,8 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
 		std::unique_ptr<OpenWifi::ConfigurationDB>          ConfigurationDB_;
+
+
 
 		typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
 		std::map<std::string, exist_func>                   ExistFunc_;

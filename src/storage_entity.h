@@ -39,6 +39,7 @@ namespace OpenWifi {
         static inline bool IsRoot(const std::string &UUID) { return (UUID == RootUUID_); }
         static inline const std::string RootUUID() { return RootUUID_; }
         bool CheckForRoot();
+        void BuildTree(Poco::JSON::Object &Tree, const std::string & Node = RootUUID_ );
     private:
         bool RootExists_=false;
     };

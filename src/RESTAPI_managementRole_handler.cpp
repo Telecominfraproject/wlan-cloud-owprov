@@ -9,6 +9,7 @@
 #include "StorageService.h"
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
+#include "Poco/StringTokenizer.h"
 
 namespace OpenWifi{
     void RESTAPI_managementRole_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -128,6 +129,57 @@ namespace OpenWifi{
 
     void RESTAPI_managementRole_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
+        try {
+            std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+            if(UUID.empty()) {
+                BadRequest(Request, Response, "Missing UUID.");
+                return;
+            }
 
+            ProvObjects::ManagementRole Existing;
+            if(!Storage()->RolesDB().GetRecord("id",UUID,Existing)) {
+                NotFound(Request,Response);
+                return;
+            }
+
+            Poco::JSON::Parser IncomingParser;
+            Poco::JSON::Object::Ptr RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            if(RawObject->has("notes")) {
+                SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, Existing.info.notes);
+            }
+
+            AssignIfPresent(RawObject, "name", Existing.info.name);
+            AssignIfPresent(RawObject, "description", Existing.info.description);
+
+            std::string NewPolicy;
+            AssignIfPresent(RawObject, "managementPolicy", NewPolicy);
+            if(!NewPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewPolicy)) {
+                BadRequest(Request, Response, "Unknown Policy:" + NewPolicy);
+                return;
+            }
+
+            std::string Error;
+            if(!Storage()->Validate(Parameters_,Error)) {
+                BadRequest(Request, Response, "Unknown users: " + Error);
+                return;
+            }
+
+            for(const auto &i:Parameters_) {
+                if(i.first=="add") {
+                    auto T = Poco::StringTokenizer(i.second,":");
+                    if(T[0]==SecurityDBProxy()->Prefix()) {
+                        for(const auto &i:Existing.users) {
+
+                        }
+                    }
+                } else if(i.second=="del") {
+
+                }
+            }
+
+        }  catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest(Request, Response, "An error occurred and the contact was not added.");
     }
 }
