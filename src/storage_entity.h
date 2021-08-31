@@ -40,6 +40,7 @@ namespace OpenWifi {
         static inline const std::string RootUUID() { return RootUUID_; }
         bool CheckForRoot();
         void BuildTree(Poco::JSON::Object &Tree, const std::string & Node = RootUUID_ );
+        void AddVenues(Poco::JSON::Object &Tree, const std::string & Venue );
     private:
         bool RootExists_=false;
     };
