@@ -151,7 +151,7 @@ namespace OpenWifi{
             AssignIfPresent(RawObject, "name", Existing.info.name);
             AssignIfPresent(RawObject, "description", Existing.info.description);
 
-            std::string NewPolicy;
+            std::string NewPolicy,OldPolicy = Existing.managementPolicy;
             AssignIfPresent(RawObject, "managementPolicy", NewPolicy);
             if(!NewPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewPolicy)) {
                 BadRequest(Request, Response, "Unknown Policy:" + NewPolicy);
@@ -164,19 +164,31 @@ namespace OpenWifi{
                 return;
             }
 
-            for(const auto &i:Parameters_) {
-                if(i.first=="add") {
-                    auto T = Poco::StringTokenizer(i.second,":");
-                    if(T[0]==SecurityDBProxy()->Prefix()) {
-                        for(const auto &i:Existing.users) {
+            if(!NewPolicy.empty())
+                Existing.managementPolicy = NewPolicy;
 
+            if(Storage()->RolesDB().UpdateRecord("id",UUID,Existing)) {
+                if(!OldPolicy.empty())
+                    Storage()->PolicyDB().DeleteInUse("id",OldPolicy,Storage()->RolesDB().Prefix(),UUID);
+                for(const auto &i:Parameters_) {
+                    if(i.first=="add") {
+                        auto T = Poco::StringTokenizer(i.second,":");
+                        if(T[0]==SecurityDBProxy()->Prefix()) {
+                            Storage()->RolesDB().AddUser("id",UUID,T[1]);
+                        }
+                    } else if(i.second=="del") {
+                        auto T = Poco::StringTokenizer(i.second,":");
+                        if(T[0]==SecurityDBProxy()->Prefix()) {
+                            Storage()->RolesDB().DelUser("id",UUID,T[1]);
                         }
                     }
-                } else if(i.second=="del") {
-
                 }
+                Storage()->RolesDB().GetRecord("id", UUID, Existing);
+                Poco::JSON::Object  Answer;
+                Existing.to_json(Answer);
+                ReturnObject(Request, Answer, Response);
+                return;
             }
-
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }

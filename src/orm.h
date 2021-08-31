@@ -599,6 +599,14 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::entities, FieldName, ParentUUID, ChildUUID, false);
         }
 
+        inline bool AddUser( const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::users, FieldName, ParentUUID, ChildUUID, true);
+        }
+
+        inline bool DelUser( const char *FieldName, std::string & ParentUUID, std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::users, FieldName, ParentUUID, ChildUUID, false);
+        }
+
         inline bool AddInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
             std::string FakeUUID{ Prefix + ":" + ChildUUID};
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, true);
