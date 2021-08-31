@@ -66,10 +66,10 @@ namespace OpenWifi {
             BuildTree(Child,i);
             Children.add(Child);
         }
-        O.set("type","entity");
-        O.set("name",E.info.name);
-        O.set("uuid",E.info.id);
-        O.set("children",Children);
+        Tree.set("type","entity");
+        Tree.set("name",E.info.name);
+        Tree.set("uuid",E.info.id);
+        Tree.set("children",Children);
     }
 }
 
