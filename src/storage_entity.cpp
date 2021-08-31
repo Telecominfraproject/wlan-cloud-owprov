@@ -60,17 +60,17 @@ namespace OpenWifi {
         Poco::JSON::Object  O;
 
         ProvObjects::Entity E;
+        std::cout << "Adding node:" << Node << std::endl;
         Storage()->EntityDB().GetRecord("id",Node,E);
+        Poco::JSON::Array   Children;
+        for(const auto &i:E.children) {
+            Poco::JSON::Object  Child;
+            BuildTree(Child,i);
+            Children.add(Child);
+        }
         O.set("type","entity");
         O.set("name",E.info.name);
         O.set("uuid",E.info.id);
-
-        Poco::JSON::Array   Children;
-        for(const auto &i:E.children) {
-            Poco::JSON::Object  C;
-            BuildTree(C,i);
-            Children.add(C);
-        }
         O.set("children",Children);
     }
 }
