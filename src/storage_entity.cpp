@@ -57,8 +57,6 @@ namespace OpenWifi {
     }
 
     void EntityDB::BuildTree(Poco::JSON::Object &Tree, const std::string & Node) {
-        Poco::JSON::Object  O;
-
         ProvObjects::Entity E;
         std::cout << "Adding node:" << Node << std::endl;
         Storage()->EntityDB().GetRecord("id",Node,E);
