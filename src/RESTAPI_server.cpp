@@ -37,7 +37,7 @@ namespace OpenWifi {
     class RESTAPI_server *RESTAPI_server::instance_ = nullptr;
 
     RESTAPI_server::RESTAPI_server() noexcept:
-    SubSystemServer("RESTAPIServer", "RESTAPIServer", "owprov.restapi")
+    SubSystemServer("RESTAPIServer", "RESTAPIServer", "openwifi.restapi")
     {
     }
 

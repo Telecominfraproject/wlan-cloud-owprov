@@ -38,6 +38,7 @@ namespace OpenWifi {
 	static const std::string uSERVICE_FIRMWARE{ "ucentralfms"};
     static const std::string uSERVICE_TOPOLOGY{ "owtopo"};
     static const std::string uSERVICE_PROVISIONING{ "owprov"};
+    static const std::string uSERVICE_OWLS{ "owls"};
 
 	class MyErrorHandler : public Poco::ErrorHandler {
 	  public:
