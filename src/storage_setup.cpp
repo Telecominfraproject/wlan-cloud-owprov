@@ -20,6 +20,9 @@ namespace OpenWifi {
     int Storage::Setup_SQLite() {
         Logger_.notice("SQLite Storage enabled.");
         auto DBName = Daemon()->DataDir() + "/" + Daemon()->ConfigGetString("storage.type.sqlite.db");
+
+        std::cout << "DBNAME: " << DBName << std::endl;
+
         auto NumSessions = Daemon()->ConfigGetInt("storage.type.sqlite.maxsessions", 64);
         auto IdleTime = Daemon()->ConfigGetInt("storage.type.sqlite.idletime", 60);
         SQLiteConn_ = std::make_unique<Poco::Data::SQLite::Connector>();
