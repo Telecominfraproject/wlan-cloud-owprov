@@ -58,7 +58,7 @@ namespace OpenWifi {
 
     void EntityDB::AddVenues(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Venue E;
-        std::cout << "Adding venue:" << Node << std::endl;
+        // std::cout << "Adding venue:" << Node << std::endl;
         Storage()->VenueDB().GetRecord("id",Node,E);
         Poco::JSON::Array   Venues;
         for(const auto &i:E.children) {
@@ -74,7 +74,7 @@ namespace OpenWifi {
 
     void EntityDB::BuildTree(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Entity E;
-        std::cout << "Adding node:" << Node << std::endl;
+        // std::cout << "Adding node:" << Node << std::endl;
         Storage()->EntityDB().GetRecord("id",Node,E);
         Poco::JSON::Array   Children;
         for(const auto &i:E.children) {
