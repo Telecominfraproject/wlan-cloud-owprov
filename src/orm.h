@@ -120,6 +120,7 @@ namespace ORM {
             case LT: return "<";
             case LTE: return "<=";
         }
+        return "=";
     }
 
     template<typename T> struct SqlOp {
