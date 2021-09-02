@@ -198,6 +198,8 @@ namespace OpenWifi{
                 return;
             }
 
+            std::cout << "Updating: " << LocalObject.info.name << std::endl;
+
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if(RawObject->has("notes")) {
