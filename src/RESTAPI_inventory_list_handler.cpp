@@ -78,34 +78,36 @@ namespace OpenWifi{
                 return;
             } else if(HasParameter("entity",UUID)) {
                 if(QB_.CountOnly) {
-                    auto C = Storage()->InventoryDB().Count(ORM::MkSqlOp(ORM::SqlOp{"entity",ORM::EQ,UUID}));
+                    auto C = Storage()->InventoryDB().Count( Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
                     ReturnCountOnly(Request, C, Response);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
-                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, ORM::MkSqlOp(ORM::SqlOp{"entity",ORM::EQ,UUID}));
+                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("venue",UUID)) {
                 if(QB_.CountOnly) {
-                    auto C = Storage()->InventoryDB().Count(ORM::MkSqlOp(ORM::SqlOp{"venue",ORM::EQ,UUID}));
+                    auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
                     ReturnCountOnly(Request, C, Response);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
-                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, ORM::MkSqlOp(ORM::SqlOp{"venue",ORM::EQ,UUID}));
+                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(HasParameter("unassigned",Arg) && Arg=="true") {
                 if(QB_.CountOnly) {
                     std::string Empty;
-                    auto C = Storage()->InventoryDB().Count( ORM::MkSqlOp(ORM::SqlOp{"venue",ORM::EQ,Empty}, ORM::AND, ORM::SqlOp{"entity",ORM::EQ,Empty}) );
+                    auto C = Storage()->InventoryDB().Count( InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
+                                                                              ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ));
                     ReturnCountOnly(Request, C, Response);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
                 std::string Empty;
-                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, ORM::MkSqlOp(ORM::SqlOp{"venue",ORM::EQ,Empty}, ORM::AND, ORM::SqlOp{"entity",ORM::EQ,Empty}) );
+                Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
+                                                                                                  ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ) );
                 SendList(Request, Tags, SerialOnly, Response);
                 return;
             } else if(QB_.CountOnly) {

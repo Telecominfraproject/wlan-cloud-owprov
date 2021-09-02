@@ -108,98 +108,22 @@ namespace ORM {
         return "";
     }
 
-    enum SqlComparison { EQ, NEQ, LT, LTE, GT, GTE };
-    enum SqlBinaryOp { AND, OR };
+    inline std::string Escape(const std::string &S) {
+        std::string R;
 
-    inline std::string to_string(SqlComparison O) {
-        switch(O) {
-            case EQ: return "=";
-            case NEQ: return "!=";
-            case GT: return ">";
-            case GTE: return ">=";
-            case LT: return "<";
-            case LTE: return "<=";
-        }
-        return "=";
+        for(const auto &i:S)
+            if(i=='\'')
+                R += "''";
+            else
+                R += i;
+            return R;
     }
 
-    template<typename T> struct SqlOp {
-        const char * F;
-        SqlComparison   O;
-        const T V;
-        SqlOp(const char *FieldName, SqlComparison Op, const T Value) : F(FieldName), O(Op), V(Value) {
-        };
-    };
+    enum SqlComparison { EQ = 0, NEQ, LT, LTE, GT, GTE };
+    enum SqlBinaryOp { AND = 0 , OR };
 
-    inline std::string MkSqlOp( const SqlOp<std::string> & T) {
-        return std::string{"("} + T.F + to_string(T.O) + "'" + T.V + "')" ;
-    }
-
-    inline std::string MkSqlOp( const SqlOp<const char *> & T) {
-        return std::string{"("} + T.F + to_string(T.O) + "'" + T.V + "')" ;
-    }
-
-    inline std::string MkSqlOp( const SqlOp<uint64_t> & T) {
-        return std::string{"("} + T.F + to_string(T.O) + std::to_string(T.V) + ")" ;
-    }
-
-    inline std::string MkSqlOp( const SqlOp<int> & T) {
-        return std::string{"("} + T.F + to_string(T.O) + std::to_string(T.V) + ")" ;
-    }
-
-    template <typename... Others> std::string MkSqlOp( const SqlOp<std::string> & T, SqlBinaryOp BOP, Others... More) {
-        switch(BOP) {
-            case AND:
-                return  MkSqlOp(T) + " and " + MkSqlOp(More...);
-            case OR:
-                return MkSqlOp(T) + " or " + MkSqlOp(More...);
-        }
-        return "";
-    }
-
-    template <typename... Others> std::string MkSqlOp( const SqlOp<const char *> & T, SqlBinaryOp BOP, Others... More) {
-        switch(BOP) {
-            case AND:
-                return MkSqlOp(T) + " and " + MkSqlOp(More...);
-            case OR:
-                return MkSqlOp(T) + " or " + MkSqlOp(More...);
-        }
-        return "";
-    }
-
-    template <typename... Others> std::string MkSqlOp( const SqlOp<uint64_t> & T, SqlBinaryOp BOP, Others... More) {
-        switch(BOP) {
-            case AND:
-                return MkSqlOp(T) + " and " + MkSqlOp(More...);
-            case OR:
-                return MkSqlOp(T) + " or " + MkSqlOp(More...);
-        }
-        return "";
-    }
-
-    template <typename... Others> std::string MkSqlOp( const SqlOp<int> & T, SqlBinaryOp BOP, Others... More) {
-        switch(BOP) {
-            case AND:
-                return MkSqlOp(T) + " and " + MkSqlOp(More...);
-            case OR:
-                return MkSqlOp(T) + " or " + MkSqlOp(More...);
-        }
-        return "";
-    }
-
-    inline std::string MkSqlOp( const std::string & T) {
-        return T ;
-    }
-
-    template <typename... Others> std::string MkSqlOp( const std::string &P1 , SqlBinaryOp BOP, Others... More) {
-        switch(BOP) {
-            case AND:
-                return std::string{"("} + P1 + ") and " + MkSqlOp(More...);
-            case OR:
-                return std::string{"("} + P1 + ") or " + MkSqlOp(More...);
-        }
-        return "";
-    }
+    static const std::vector<std::string> BOPS{" and ", " or "};
+    static const std::vector<std::string> SQLCOMPS{"=","!=","<","<=",">",">="};
 
     inline std::string to_string(uint64_t V) {
         return std::to_string(V);
@@ -309,35 +233,41 @@ namespace ORM {
         [[nodiscard]] const std::string & SelectList() const { return SelectList_; };
         [[nodiscard]] const std::string & UpdateFields() const { return UpdateFields_; };
 
-        static std::string Escape(const std::string &S) {
-            std::string R;
-
-            for(const auto &i:S)
-                if(i=='\'')
-                    R += "''";
-                else
-                    R += i;
-                return R;
+        inline std::string OP(const char *F, SqlComparison O , int V) {
+            assert( FieldNames_.find(F) != FieldNames_.end() );
+            return std::string{"("} + F + SQLCOMPS[O] + std::to_string(V) + ")" ;
         }
 
-
-
-/*
-        std::string MakeWhere( const std::string &S, CompareOperations Op, const std::string &V) {
-            std::string R;
-            assert( FieldNames_.find(S) != FieldNames_.end() );
-            R = S + OpsToString[Op] + "'" + Escape(V) + "'" ;
-            return R;
+        inline std::string OP(const char *F, SqlComparison O , uint64_t V) {
+            assert( FieldNames_.find(F) != FieldNames_.end() );
+            return std::string{"("} + F + SQLCOMPS[O] + std::to_string(V) + ")" ;
         }
 
-        [[maybe_unused]] std::string MakeWhere( const std::string &S, CompareOperations & Op, uint64_t V) {
-            std::string R;
-
-            assert( FieldNames_.find(S) != FieldNames_.end() );
-            R = S + OpsToString[Op] + std::to_string(V) ;
-            return R;
+        std::string OP(const char *F, SqlComparison O , const std::string & V) {
+            assert( FieldNames_.find(F) != FieldNames_.end() );
+            return std::string{"("} + F + SQLCOMPS[O] + "'" + Escape(V) + "')" ;
         }
-*/
+
+        std::string OP(const char *F, SqlComparison O , const char * V) {
+            assert( FieldNames_.find(F) != FieldNames_.end() );
+            return std::string{"("} + F + SQLCOMPS[O] + "'" + Escape(V) + "')" ;
+        }
+
+        static std::string OP( const std::string &P1, SqlBinaryOp BOP , const std::string &P2) {
+            return std::string("(")+P1 + BOPS[BOP] + P2 +")";
+        }
+
+        std::string OP( bool Paran, const std::string &P1, SqlBinaryOp BOP , const std::string &P2) {
+            return P1 + BOPS[BOP] + P2 +")";
+        }
+
+        template <typename... Others> std::string OP( bool ParanOpen, const std::string &P1, SqlBinaryOp BOP , const std::string &P2, Others... More) {
+            return P1 + BOPS[BOP] + OP(ParanOpen, P2, More...) + ")";
+        }
+
+        template <typename... Others> std::string OP( const std::string &P1, SqlBinaryOp BOP , const std::string &P2, Others... More) {
+            return std::string{"("} + P1 + BOPS[BOP] + OP(true, P2, More...);
+        }
 
         inline bool  Create() {
             std::string S;
