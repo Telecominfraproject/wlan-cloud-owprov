@@ -161,8 +161,8 @@ namespace ORM {
         switch(BOP) {
             case AND:
                 return MkSqlOp(T) + " and " + MkSqlOp(More...);
-                case OR:
-                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+            case OR:
+                return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
         return "";
     }
@@ -171,8 +171,8 @@ namespace ORM {
         switch(BOP) {
             case AND:
                 return MkSqlOp(T) + " and " + MkSqlOp(More...);
-                case OR:
-                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+            case OR:
+                return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
         return "";
     }
@@ -181,8 +181,8 @@ namespace ORM {
         switch(BOP) {
             case AND:
                 return MkSqlOp(T) + " and " + MkSqlOp(More...);
-                case OR:
-                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+            case OR:
+                return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
         return "";
     }
@@ -195,8 +195,8 @@ namespace ORM {
         switch(BOP) {
             case AND:
                 return std::string{"("} + P1 + ") and " + MkSqlOp(More...);
-                case OR:
-                    return std::string{"("} + P1 + ") or " + MkSqlOp(More...);
+            case OR:
+                return std::string{"("} + P1 + ") or " + MkSqlOp(More...);
         }
         return "";
     }
