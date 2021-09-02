@@ -108,24 +108,90 @@ namespace ORM {
         return "";
     }
 
-    enum CompareOperations {
-        EQUAL = 0 ,
-        LESS,
-        LESS_OR_EQUAL,
-        GREATER,
-        GREATER_OR_EQUAL,
-        NOT_EQUAL
+    enum SqlComparison { EQ, NEQ, LT, LTE, GT, GTE };
+    enum SqlBinaryOp { AND, OR };
+
+    inline std::string to_string(SqlComparison O) {
+        switch(O) {
+            case EQ: return "=";
+            case NEQ: return "!=";
+            case GT: return ">";
+            case GTE: return ">=";
+            case LT: return "<";
+            case LTE: return "<=";
+        }
+    }
+
+    template<typename T> struct SqlOp {
+        const char * F;
+        SqlComparison   O;
+        const T V;
+        SqlOp(const char *FieldName, SqlComparison Op, const T Value) : F(FieldName), O(Op), V(Value) {
+        };
     };
 
-    static std::vector<std::string> OpsToString{ " = " ,  " < " , " <= " , " > " , " >= " , " != "};
-    inline std::string to_string(ORM::CompareOperations O) {
-        switch(O) {
-            case EQUAL: return "=";
-            case LESS: return "<";
-            case LESS_OR_EQUAL: return "<=";
-            case GREATER: return ">";
-            case GREATER_OR_EQUAL: return ">=";
-            case NOT_EQUAL: return "!=";
+    inline std::string MkSqlOp( const SqlOp<std::string> & T) {
+        return std::string{"("} + T.F + to_string(T.O) + "'" + T.V + "')" ;
+    }
+
+    inline std::string MkSqlOp( const SqlOp<const char *> & T) {
+        return std::string{"("} + T.F + to_string(T.O) + "'" + T.V + "')" ;
+    }
+
+    inline std::string MkSqlOp( const SqlOp<uint64_t> & T) {
+        return std::string{"("} + T.F + to_string(T.O) + std::to_string(T.V) + ")" ;
+    }
+
+    inline std::string MkSqlOp( const SqlOp<int> & T) {
+        return std::string{"("} + T.F + to_string(T.O) + std::to_string(T.V) + ")" ;
+    }
+
+    template <typename... Others> std::string MkSqlOp( const SqlOp<std::string> & T, SqlBinaryOp BOP, Others... More) {
+        switch(BOP) {
+            case AND:
+                return  MkSqlOp(T) + " and " + MkSqlOp(More...);
+                case OR:
+                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+        }
+    }
+
+    template <typename... Others> std::string MkSqlOp( const SqlOp<const char *> & T, SqlBinaryOp BOP, Others... More) {
+        switch(BOP) {
+            case AND:
+                return MkSqlOp(T) + " and " + MkSqlOp(More...);
+                case OR:
+                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+        }
+    }
+
+    template <typename... Others> std::string MkSqlOp( const SqlOp<uint64_t> & T, SqlBinaryOp BOP, Others... More) {
+        switch(BOP) {
+            case AND:
+                return MkSqlOp(T) + " and " + MkSqlOp(More...);
+                case OR:
+                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+        }
+    }
+
+    template <typename... Others> std::string MkSqlOp( const SqlOp<int> & T, SqlBinaryOp BOP, Others... More) {
+        switch(BOP) {
+            case AND:
+                return MkSqlOp(T) + " and " + MkSqlOp(More...);
+                case OR:
+                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+        }
+    }
+
+    inline std::string MkSqlOp( const std::string & T) {
+        return T ;
+    }
+
+    template <typename... Others> std::string MkSqlOp( const std::string &P1 , SqlBinaryOp BOP, Others... More) {
+        switch(BOP) {
+            case AND:
+                return std::string{"("} + P1 + ") and " + MkSqlOp(More...);
+                case OR:
+                    return std::string{"("} + P1 + ") or " + MkSqlOp(More...);
         }
     }
 
@@ -148,18 +214,6 @@ namespace ORM {
     inline std::string to_string(const char * S) {
         return S;
     }
-
-    template <typename ValueType> struct Comparison {
-        std::string     Name;
-        ValueType       Value;
-        ORM::CompareOperations  Operation;
-        Comparison(std::string N, ORM::CompareOperations Op, ValueType & V) :
-            Name(std::move(N)), Operation(Op), Value(V) {}
-
-        std::string OP() {
-            return Name + " " + to_string(Operation) + " " + to_string(Value);
-        }
-    };
 
     template <typename RecordTuple, typename RecordType> class DB {
     public:
@@ -260,6 +314,9 @@ namespace ORM {
                 return R;
         }
 
+
+
+/*
         std::string MakeWhere( const std::string &S, CompareOperations Op, const std::string &V) {
             std::string R;
             assert( FieldNames_.find(S) != FieldNames_.end() );
@@ -274,6 +331,7 @@ namespace ORM {
             R = S + OpsToString[Op] + std::to_string(V) ;
             return R;
         }
+*/
 
         inline bool  Create() {
             std::string S;

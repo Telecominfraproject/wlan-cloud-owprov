@@ -44,7 +44,7 @@ namespace OpenWifi{
                 return;
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
-                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("entity", ORM::EQUAL, Arg));
+                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,ORM::MkSqlOp( ORM::SqlOp{"entity",ORM::EQ,Arg} ));
                 if(QB_.CountOnly) {
                     ReturnCountOnly(Request,Venues.size(),Response);
                 } else {
@@ -53,7 +53,7 @@ namespace OpenWifi{
                 return;
             } else if(HasParameter("venue",Arg)) {
                 ProvObjects::VenueVec Venues;
-                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().MakeWhere("venue", ORM::EQUAL, Arg));
+                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,ORM::MkSqlOp( ORM::SqlOp{"venue",ORM::EQ,Arg} ));
                 if(QB_.CountOnly) {
                     ReturnCountOnly(Request,Venues.size(),Response);
                 } else {
