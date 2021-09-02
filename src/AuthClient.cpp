@@ -39,6 +39,7 @@ namespace OpenWifi {
 		auto User = UserCache_.find(SessionToken);
 		if(User != UserCache_.end() && !IsTokenExpired(User->second.webtoken)) {
 			UInfo = User->second;
+			std::cout << "User is cached: " << User->second.userinfo.email << std::endl;
 			return true;
 		} else {
 			Types::StringPairVec QueryData;
@@ -50,6 +51,7 @@ namespace OpenWifi {
 			Poco::JSON::Object::Ptr Response;
 			if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
 				if(Response->has("tokenInfo") && Response->has("userInfo")) {
+				    std::cout << "User info included" << std::endl;
 					SecurityObjects::UserInfoAndPolicy	P;
 					P.from_json(Response);
 					UserCache_[SessionToken] = P;
