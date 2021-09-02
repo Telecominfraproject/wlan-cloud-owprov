@@ -54,6 +54,7 @@ namespace OpenWifi {
 				    std::cout << "User info included" << std::endl;
 					SecurityObjects::UserInfoAndPolicy	P;
 					P.from_json(Response);
+					std::cout << "User info included: " << P.userinfo.email << std::endl;
 					UserCache_[SessionToken] = P;
 					UInfo = P;
 				}
