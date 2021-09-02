@@ -201,6 +201,8 @@ namespace OpenWifi{
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if(RawObject->has("notes")) {
+                std::cout << "email" << UserInfo_.userinfo.email << std::endl;
+                std::cout << "id" << UserInfo_.userinfo.Id << std::endl;
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, LocalObject.info.notes);
             }
 
