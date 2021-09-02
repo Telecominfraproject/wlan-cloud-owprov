@@ -151,9 +151,10 @@ namespace ORM {
         switch(BOP) {
             case AND:
                 return  MkSqlOp(T) + " and " + MkSqlOp(More...);
-                case OR:
-                    return MkSqlOp(T) + " or " + MkSqlOp(More...);
+            case OR:
+                return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
+        return "";
     }
 
     template <typename... Others> std::string MkSqlOp( const SqlOp<const char *> & T, SqlBinaryOp BOP, Others... More) {
@@ -163,6 +164,7 @@ namespace ORM {
                 case OR:
                     return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
+        return "";
     }
 
     template <typename... Others> std::string MkSqlOp( const SqlOp<uint64_t> & T, SqlBinaryOp BOP, Others... More) {
@@ -172,6 +174,7 @@ namespace ORM {
                 case OR:
                     return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
+        return "";
     }
 
     template <typename... Others> std::string MkSqlOp( const SqlOp<int> & T, SqlBinaryOp BOP, Others... More) {
@@ -181,6 +184,7 @@ namespace ORM {
                 case OR:
                     return MkSqlOp(T) + " or " + MkSqlOp(More...);
         }
+        return "";
     }
 
     inline std::string MkSqlOp( const std::string & T) {
@@ -194,6 +198,7 @@ namespace ORM {
                 case OR:
                     return std::string{"("} + P1 + ") or " + MkSqlOp(More...);
         }
+        return "";
     }
 
     inline std::string to_string(uint64_t V) {
