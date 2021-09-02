@@ -51,6 +51,8 @@ namespace OpenWifi {
 			Poco::JSON::Object::Ptr Response;
 			if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
 				if(Response->has("tokenInfo") && Response->has("userInfo")) {
+				    std::cout << ">>>" << Response->get("tokenInfo").toString() << std::endl;
+				    std::cout << ">>>" << Response->get("userInfo").toString() << std::endl;
 				    std::cout << "User info included" << std::endl;
 					SecurityObjects::UserInfoAndPolicy	P;
 					P.from_json(Response);
