@@ -43,6 +43,7 @@ namespace OpenWifi {
 			return true;
 		} else {
 			Types::StringPairVec QueryData;
+			std::cout << "Sending session token: " << SessionToken << std::endl;
 			QueryData.push_back(std::make_pair("token",SessionToken));
 			OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
 								  	"/api/v1/validateToken",
