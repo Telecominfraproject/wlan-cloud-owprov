@@ -36,6 +36,8 @@ namespace OpenWifi {
 	bool AuthClient::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo ) {
 		SubMutexGuard G(Mutex_);
 
+		std::cout << __func__ << std::endl;
+
 		auto User = UserCache_.find(SessionToken);
 		if(User != UserCache_.end() && !IsTokenExpired(User->second.webtoken)) {
 			UInfo = User->second;
@@ -70,6 +72,8 @@ namespace OpenWifi {
 
 	bool AuthClient::IsTokenAuthorized(const std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo) {
 		SubMutexGuard G(Mutex_);
+
+		std::cout << __func__ << std::endl;
 
 		auto User = UserCache_.find(SessionToken);
 		if(User != UserCache_.end() && !IsTokenExpired(User->second.webtoken)) {
