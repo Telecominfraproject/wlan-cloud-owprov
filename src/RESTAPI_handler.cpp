@@ -372,6 +372,7 @@ namespace OpenWifi {
 #ifdef    TIP_SECURITY_SERVICE
             if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 #else
+            std::cout << "Session token:" << SessionToken_ << std::endl;
             if (AuthClient()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 #endif
                 return true;
