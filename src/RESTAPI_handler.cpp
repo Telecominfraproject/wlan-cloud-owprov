@@ -363,6 +363,8 @@ namespace OpenWifi {
                 try {
                     Poco::Net::OAuth20Credentials Auth(Request);
 
+                    std::cout << "Scheme: " << Auth.getScheme() << std::endl;
+
                     if (Auth.getScheme() == "Bearer") {
                         SessionToken_ = Auth.getBearerToken();
                     }
