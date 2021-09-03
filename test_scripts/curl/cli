@@ -20,10 +20,10 @@ then
   exit 1
 fi
 
-if [[ "${UCENTRALSEC}" == "" ]]
+if [[ "${OWSEC}" == "" ]]
 then
-  echo "You must set the variable UCENTRALSEC in order to use this script. Something like"
-  echo "UCENTRALSEC=security.isp.com:16001"
+  echo "You must set the variable OWSEC in order to use this script. Something like"
+  echo "OWSEC=security.isp.com:16001"
   exit 1
 fi
 
@@ -41,7 +41,7 @@ browser=""
 
 login() {
   payload="{ \"userId\" : \"$username\" , \"password\" : \"$password\" }"
-  token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${UCENTRALSEC}/api/v1/oauth2" | jq -r '.access_token')
+  token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${OWSEC}/api/v1/oauth2" | jq -r '.access_token')
 
   if [[ "${token}" == "" ]]
   then
@@ -73,7 +73,7 @@ findbrowser() {
 }
 
 setprov() {
-	curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/systemEndpoints" \
+	curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemEndpoints" \
         -H "accept: application/json" \
         -H "Authorization: Bearer ${token}"  > ${result_file}
 #	jq < ${result_file}
@@ -106,7 +106,7 @@ setprov() {
 logout() {
   curl  ${FLAGS} -X DELETE -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${token}" \
-        "https://${UCENTRALSEC}/api/v1/oauth2/${token}"
+        "https://${OWSEC}/api/v1/oauth2/${token}"
   rm -rf token.json
 }
 

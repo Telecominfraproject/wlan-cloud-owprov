@@ -26,8 +26,6 @@ namespace OpenWifi{
         if (!IsAuthorized(Request, Response))
             return;
 
-        std::cout << "Email:" << UserInfo_.userinfo.email << std::endl;
-
         ParseParameters(Request);
         if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
             DoGet(Request, Response);
@@ -200,13 +198,9 @@ namespace OpenWifi{
                 return;
             }
 
-            std::cout << "Updating: " << LocalObject.info.name << std::endl;
-
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if(RawObject->has("notes")) {
-                std::cout << "email" << UserInfo_.userinfo.email << std::endl;
-                std::cout << "id" << UserInfo_.userinfo.Id << std::endl;
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, LocalObject.info.notes);
             }
 

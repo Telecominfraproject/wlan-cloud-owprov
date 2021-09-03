@@ -355,19 +355,12 @@ namespace OpenWifi {
 
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response) {
-	    std::cout << "Session token:" << SessionToken_ << std::endl;
 	    if(Internal_) {
 	        return Daemon()->IsValidAPIKEY(Request);
 	    } else {
             if (SessionToken_.empty()) {
                 try {
                     Poco::Net::OAuth20Credentials Auth(Request);
-
-                    std::cout << "Scheme: " << Auth.getScheme() << std::endl;
-                    for(const auto &i:Request) {
-                        std::cout << "1" << i.first << " = " << i.second << std::endl;
-                    }
-
                     if (Auth.getScheme() == "Bearer") {
                         SessionToken_ = Auth.getBearerToken();
                     }
@@ -378,7 +371,6 @@ namespace OpenWifi {
 #ifdef    TIP_SECURITY_SERVICE
             if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 #else
-            std::cout << "Session token:" << SessionToken_ << std::endl;
             if (AuthClient()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 #endif
                 return true;
@@ -389,17 +381,6 @@ namespace OpenWifi {
         }
 	}
 
-/*
-	bool RESTAPIHandler::ValidateAPIKey(Poco::Net::HTTPServerRequest &Request,
-										Poco::Net::HTTPServerResponse &Response) {
-		auto Key = Request.get("X-API-KEY", "");
-
-		if (Key.empty())
-			return false;
-
-		return true;
-	}
-*/
 	void RESTAPIHandler::ReturnObject(Poco::Net::HTTPServerRequest &Request, Poco::JSON::Object &Object,
 									  Poco::Net::HTTPServerResponse &Response) {
 		PrepareResponse(Request, Response);
