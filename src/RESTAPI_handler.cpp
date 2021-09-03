@@ -355,6 +355,7 @@ namespace OpenWifi {
 
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response) {
+	    std::cout << "Session token:" << SessionToken_ << std::endl;
 	    if(Internal_) {
 	        return Daemon()->IsValidAPIKEY(Request);
 	    } else {
