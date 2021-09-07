@@ -83,6 +83,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"locations",locations);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
         RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
+        RESTAPI_utils::field_to_json( Obj,"devices",devices);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -95,6 +96,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"locations",locations);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
+            RESTAPI_utils::field_from_json( Obj,"devices",devices);
             return true;
         } catch(...) {
 

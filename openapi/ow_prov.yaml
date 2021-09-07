@@ -181,7 +181,11 @@ components:
         deviceConfiguration:
           type: string
           format: uuid
-
+        devices:
+          type: array
+          items:
+            type: string
+            format: uuid
 
     EntityList:
       type: object

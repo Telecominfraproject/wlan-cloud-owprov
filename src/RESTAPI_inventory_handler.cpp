@@ -175,40 +175,24 @@ namespace OpenWifi{
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
             }
 
-            std::string Arg;
-            if(HasParameter("unassign", Arg) && Arg=="true") {
-                ExistingObject.entity.clear();
-                if(!ExistingObject.venue.empty()) {
-                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
-                    ExistingObject.venue.clear();
-                }
-                if(!ExistingObject.deviceConfiguration.empty()) {
-                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration, Storage()->InventoryDB().Prefix(), ExistingObject.info.id );
-                    ExistingObject.deviceConfiguration.clear();
-                }
-                if(!ExistingObject.location.empty()) {
-                    Storage()->LocationDB().DeleteInUse("id",ExistingObject.location,Storage()->InventoryDB().Prefix(), ExistingObject.info.id);
-                    ExistingObject.location.clear();
-                }
-                if(!ExistingObject.contact.empty()) {
-                    Storage()->ContactDB().DeleteInUse("id",ExistingObject.contact,Storage()->InventoryDB().Prefix(), ExistingObject.info.id);
-                    ExistingObject.contact.clear();
-                }
-                ExistingObject.info.modified = std::time(nullptr);
-                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+            std::string NewVenue, NewEntity;
+            AssignIfPresent(RawObject, "venue",NewVenue);
+            AssignIfPresent(RawObject, "entity",NewEntity);
 
-                ProvObjects::InventoryTag   NewObject;
-                Storage()->InventoryDB().GetRecord("id",ExistingObject.info.id,NewObject);
-                Poco::JSON::Object  Answer;
-
-                NewObject.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+            if(!NewEntity.empty() && !NewVenue.empty()) {
+                BadRequest(Request, Response, "You cannot specify both Entity and Venue");
                 return;
             }
 
-            AssignIfPresent(RawObject, "name", ExistingObject.info.name);
-            AssignIfPresent(RawObject, "description", ExistingObject.info.description);
-            ExistingObject.info.modified = std::time(nullptr);
+            if(!NewVenue.empty() && !Storage()->VenueDB().Exists("id",NewVenue)) {
+                BadRequest(Request, Response, "Venue does not exist.");
+                return;
+            }
+
+            if(!NewEntity.empty() && !Storage()->EntityDB().Exists("id",NewEntity)) {
+                BadRequest(Request, Response, "Entity does not exist.");
+                return;
+            }
 
             if(RawObject->has("deviceType")) {
                 std::string DeviceType{RawObject->get("deviceType").toString()};
@@ -219,34 +203,40 @@ namespace OpenWifi{
                 ExistingObject.deviceType = DeviceType;
             }
 
-            // if we are changing venues...
-            std::string MoveToEntity;
-            if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
-                if(!Storage()->EntityDB().Exists("id",MoveToEntity)) {
-                    BadRequest(Request, Response, "Entity association does not exist.");
-                    return;
+            std::string Arg;
+            bool UnAssign=false;
+            if(HasParameter("unassign", Arg) && Arg=="true") {
+                UnAssign=true;
+                if(!NewVenue.empty() && ExistingObject.venue!=NewVenue) {
+                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                }
+
+                if(!NewEntity.empty() && ExistingObject.entity!=NewEntity) {
+                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
                 }
             }
 
-            std::string MoveToVenue;
-            if(AssignIfPresent(RawObject, "venue", MoveToVenue)) {
-                if(!Storage()->VenueDB().Exists("id",MoveToVenue)) {
-                    BadRequest(Request, Response, "Venue association does not exist.");
-                    return;
-                }
-            }
+            AssignIfPresent(RawObject, "name", ExistingObject.info.name);
+            AssignIfPresent(RawObject, "description", ExistingObject.info.description);
+            ExistingObject.info.modified = std::time(nullptr);
 
             if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
+                if(UnAssign) {
+                    if(!NewEntity.empty() && NewEntity!=ExistingObject.entity) {
+                        Storage()->EntityDB().AddDevice("id",NewEntity,ExistingObject.info.id);
+                        ExistingObject.entity = NewEntity;
+                        ExistingObject.venue.clear();
+                    }
 
-                if(!MoveToEntity.empty())
-                    ExistingObject.entity = MoveToEntity;
-                if(!MoveToVenue.empty()) {
-                    if(!ExistingObject.venue.empty())
-                        Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
-                    Storage()->VenueDB().AddDevice("id",MoveToVenue,ExistingObject.info.id);
-                    ExistingObject.venue = MoveToVenue;
+                    if(!NewVenue.empty() && NewVenue!=ExistingObject.venue) {
+                        Storage()->VenueDB().AddDevice("id",NewVenue,ExistingObject.info.id);
+                        ExistingObject.venue = NewVenue;
+                        ExistingObject.entity.clear();
+                    }
+                    Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
                 }
-                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+
+                Storage()->InventoryDB().GetRecord("id", ExistingObject.info.id, ExistingObject);
 
                 Poco::JSON::Object  Answer;
                 ExistingObject.to_json(Answer);

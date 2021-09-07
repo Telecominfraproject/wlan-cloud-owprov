@@ -56,6 +56,7 @@ namespace OpenWifi::ProvObjects {
         Types::UUIDvec_t locations;
         Types::UUID_t managementPolicy;
         std::string     deviceConfiguration;
+        Types::UUIDvec_t    devices;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

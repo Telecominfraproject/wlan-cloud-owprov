@@ -36,16 +36,12 @@ namespace OpenWifi {
 	bool AuthClient::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo ) {
 		SubMutexGuard G(Mutex_);
 
-		std::cout << __func__ << std::endl;
-
 		auto User = UserCache_.find(SessionToken);
 		if(User != UserCache_.end() && !IsTokenExpired(User->second.webtoken)) {
 			UInfo = User->second;
-			std::cout << "User is cached: " << User->second.userinfo.email << std::endl;
 			return true;
 		} else {
 			Types::StringPairVec QueryData;
-			std::cout << "Sending session token: " << SessionToken << std::endl;
 			QueryData.push_back(std::make_pair("token",SessionToken));
 			OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
 								  	"/api/v1/validateToken",
@@ -54,12 +50,8 @@ namespace OpenWifi {
 			Poco::JSON::Object::Ptr Response;
 			if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
 				if(Response->has("tokenInfo") && Response->has("userInfo")) {
-				    std::cout << ">>>" << Response->get("tokenInfo").toString() << std::endl;
-				    std::cout << ">>>" << Response->get("userInfo").toString() << std::endl;
-				    std::cout << "User info included" << std::endl;
 					SecurityObjects::UserInfoAndPolicy	P;
 					P.from_json(Response);
-					std::cout << "User info included: " << P.userinfo.email << std::endl;
 					UserCache_[SessionToken] = P;
 					UInfo = P;
 				}
@@ -72,8 +64,6 @@ namespace OpenWifi {
 
 	bool AuthClient::IsTokenAuthorized(const std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo) {
 		SubMutexGuard G(Mutex_);
-
-		std::cout << __func__ << std::endl;
 
 		auto User = UserCache_.find(SessionToken);
 		if(User != UserCache_.end() && !IsTokenExpired(User->second.webtoken)) {
