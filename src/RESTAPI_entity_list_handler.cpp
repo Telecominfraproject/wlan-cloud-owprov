@@ -66,4 +66,21 @@ namespace OpenWifi{
         }
         BadRequest(Request, Response);
     }
+
+    void RESTAPI_entity_list_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
+                                            Poco::Net::HTTPServerResponse &Response) {
+        try {
+            std::string Arg;
+            if (HasParameter("setTree",Arg) && Arg=="true") {
+                Poco::JSON::Parser IncomingParser;
+                Poco::JSON::Object::Ptr FullTree = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+                Storage()->EntityDB().ImportTree(FullTree);
+                OK(Request, Response);
+                return;
+            }
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest(Request, Response);
+    }
 }

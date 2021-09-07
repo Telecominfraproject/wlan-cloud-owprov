@@ -13,6 +13,7 @@
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 
@@ -94,6 +95,65 @@ namespace OpenWifi {
         Tree.set("uuid",E.info.id);
         Tree.set("children",Children);
         Tree.set("venues", Venues);
+    }
+
+    void EntityDB::ImportVenues(const Poco::JSON::Object::Ptr &O, const std::string &Parent) {
+        std::string             Type, Name, UUID;
+        Poco::JSON::Array::Ptr  Children, Venues;
+
+        Type = O->get("type").toString();
+        Name = O->get("name").toString();
+
+        std::cout << "Name :" << Name << "  Venue Parent UUID: " << Parent << std::endl;
+        Venues = O->getArray("venues");
+        for(const auto &i:*Venues) {
+            const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
+            ProvObjects::Venue  V;
+            V.info.name = Name;
+            V.info.id = Daemon()->CreateUUID();
+            V.parent = Parent;
+            Storage()->VenueDB().CreateRecord(V);
+            ImportVenues( Child, V.info.id );
+        }
+    }
+
+    void EntityDB::ImportTree(const Poco::JSON::Object::Ptr &O, const std::string &Parent) {
+
+        std::string             Type, Name;
+        Poco::JSON::Array::Ptr  Children, Venues;
+
+        Type = O->get("type").toString();
+        Name = O->get("name").toString();
+
+        if(Parent==EntityDB::RootUUID()) {
+            ProvObjects::Entity E;
+            E.info.name = Name;
+            E.info.id = EntityDB::RootUUID();
+            Storage()->EntityDB().CreateRecord(E);
+        }
+
+        Children = O->getArray("children");
+        for(const auto &i:*Children) {
+            const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
+            ProvObjects::Entity E;
+
+            E.info.name = Name;
+            E.info.id = Daemon()->CreateUUID();
+            E.parent = Parent;
+            Storage()->EntityDB().CreateRecord(E);
+            ImportTree( Child, E.info.id );
+        }
+
+        Venues = O->getArray("venues");
+        for(const auto &i:*Venues) {
+            const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
+            ProvObjects::Venue  V;
+            V.info.name = Name;
+            V.info.id = Daemon()->CreateUUID();
+            V.parent = Parent;
+            Storage()->VenueDB().CreateRecord(V);
+            ImportVenues( Child, V.info.id );
+        }
     }
 }
 

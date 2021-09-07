@@ -21,6 +21,7 @@ namespace OpenWifi {
         : RESTAPIHandler(bindings, L,
                          std::vector<std::string>{
             Poco::Net::HTTPRequest::HTTP_GET,
+            Poco::Net::HTTPRequest::HTTP_POST,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Internal) {}
             void handleRequest(Poco::Net::HTTPServerRequest &request,
@@ -28,6 +29,8 @@ namespace OpenWifi {
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/entity"}; };
 
         void DoGet(Poco::Net::HTTPServerRequest &Request,
+                   Poco::Net::HTTPServerResponse &Response);
+        void DoPost(Poco::Net::HTTPServerRequest &Request,
                    Poco::Net::HTTPServerResponse &Response);
     };
 }
