@@ -1,0 +1,44 @@
+{
+                "type" : "entity",
+                "name" : "root",
+                "children" : [{
+                                "type" : "entity",
+                                "name" : "root" ,
+                                "children" : [ {
+                                                    "type" : "entity" ,
+                                                    "name" : "sub-root1" ,
+                                                    "children" : [{
+                                                                        "type" : "entity" ,
+                                                                        "name" : "sub-1.1" ,
+                                                                        "children" : [] ,
+                                                                        "venues" : []
+                                                                    },
+                                                                    {
+                                                                        "type" : "entity" ,
+                                                                        "name" : "sub-1.2" ,
+                                                                        "children" : [] ,
+                                                                        "venues" : []
+                                                                    }
+                                                                ] ,
+                                                    "venues" : []
+                                                },
+                                                {
+                                                    "type" : "entity" ,
+                                                    "name" : "sub-root2" ,
+                                                    "children" : [] ,
+                                                    "venues" : []
+                                                }
+                                                ] ,
+                                "venues" : [ {
+                                                    "type" : "venue" ,
+                                                    "name" : "sub-v1" ,
+                                                    "venues" : []
+                                                },
+                                                {
+                                                    "type" : "venue" ,
+                                                    "name" : "sub-v2" ,
+                                                    "venues" : []
+                                            }]
+                                }],
+                "venues" : []
+    }

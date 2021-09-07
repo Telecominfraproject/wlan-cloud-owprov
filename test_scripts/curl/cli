@@ -155,6 +155,15 @@ tree() {
     jq < ${result_file}
 }
 
+importtree() {
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity?setTree=true" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json " \
+    --data "@$1" > ${result_file}
+    jq < ${result_file}
+}
+
 gettag() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory?entity=$1" \
     -H "Content-Type: application/json" \
