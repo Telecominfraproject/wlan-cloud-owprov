@@ -20,7 +20,16 @@
                                                                         "venues" : []
                                                                     }
                                                                 ] ,
-                                                    "venues" : []
+                                                    "venues" : [{
+                                                                "type" : "venue" ,
+                                                                "name" : "sub-r1-v1" ,
+                                                                "venues" : []
+                                                            },
+                                                            {
+                                                                "type" : "venue" ,
+                                                                "name" : "sub-r1-v2" ,
+                                                                "venues" : []
+                                                        }]
                                                 },
                                                 {
                                                     "type" : "entity" ,
