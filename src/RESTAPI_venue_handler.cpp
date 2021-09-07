@@ -161,22 +161,9 @@ namespace OpenWifi{
             for(auto &i:V.info.notes)
                 i.createdBy = UserInfo_.userinfo.email;
 
-            if(Storage()->VenueDB().CreateRecord(V)) {
-                if(!V.parent.empty())
-                    Storage()->VenueDB().AddChild("id", V.parent, V.info.id);
-                if(!V.entity.empty())
-                    Storage()->EntityDB().AddVenue("id", V.entity, V.info.id);
-                if(!V.location.empty())
-                    Storage()->LocationDB().AddInUse("id",V.location, Storage()->VenueDB().Prefix(), V.info.id);
-                if(!V.contact.empty())
-                    Storage()->ContactDB().AddInUse("id",V.contact, Storage()->VenueDB().Prefix(), V.info.id);
-                if(!V.managementPolicy.empty())
-                    Storage()->PolicyDB().AddInUse("id",V.managementPolicy, Storage()->VenueDB().Prefix(), V.info.id);
-
-                ProvObjects::Venue AddedRecord;
-                Storage()->VenueDB().GetRecord("id",V.info.id,AddedRecord);
+            if(Storage()->VenueDB().CreateShortCut(V)) {
                 Poco::JSON::Object  Answer;
-                AddedRecord.to_json(Answer);
+                V.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }

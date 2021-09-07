@@ -35,6 +35,7 @@ namespace OpenWifi {
     class VenueDB : public ORM::DB<VenueDBRecordType, ProvObjects::Venue> {
     public:
         VenueDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        bool CreateShortCut(ProvObjects::Venue &V);
     private:
     };
 }

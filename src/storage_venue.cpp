@@ -12,6 +12,8 @@
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 
+#include "StorageService.h"
+
 namespace OpenWifi {
 
     static  ORM::FieldVec    VenueDB_Fields{
@@ -42,6 +44,25 @@ namespace OpenWifi {
 
     VenueDB::VenueDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
+
+    bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {
+        if(CreateRecord(V)) {
+            if(!V.parent.empty())
+                Storage()->VenueDB().AddChild("id", V.parent, V.info.id);
+            if(!V.entity.empty())
+                Storage()->EntityDB().AddVenue("id", V.entity, V.info.id);
+            if(!V.location.empty())
+                Storage()->LocationDB().AddInUse("id",V.location, Storage()->VenueDB().Prefix(), V.info.id);
+            if(!V.contact.empty())
+                Storage()->ContactDB().AddInUse("id",V.contact, Storage()->VenueDB().Prefix(), V.info.id);
+            if(!V.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id",V.managementPolicy, Storage()->VenueDB().Prefix(), V.info.id);
+
+            Storage()->VenueDB().GetRecord("id",V.info.id,V);
+            return true;
+        }
+        return false;
+    }
 
 }
 

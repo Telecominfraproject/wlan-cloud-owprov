@@ -1,6 +1,6 @@
 {
                 "type" : "entity",
-                "name" : "root",
+                "name" : "world",
                 "children" : [{
                                 "type" : "entity",
                                 "name" : "root" ,

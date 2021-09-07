@@ -112,7 +112,8 @@ namespace OpenWifi {
             V.info.name = Name;
             V.info.id = Daemon()->CreateUUID();
             V.parent = Parent;
-            Storage()->VenueDB().CreateRecord(V);
+            V.info.created = V.info.modified = std::time(nullptr);
+            Storage()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
     }
@@ -129,7 +130,8 @@ namespace OpenWifi {
             ProvObjects::Entity E;
             E.info.name = Name;
             E.info.id = EntityDB::RootUUID();
-            Storage()->EntityDB().CreateRecord(E);
+            E.info.created = E.info.modified = std::time(nullptr);
+            Storage()->EntityDB().CreateShortCut(E);
         }
 
         Children = O->getArray("children");
@@ -140,7 +142,8 @@ namespace OpenWifi {
             E.info.name = Name;
             E.info.id = Daemon()->CreateUUID();
             E.parent = Parent;
-            Storage()->EntityDB().CreateRecord(E);
+            E.info.created = E.info.modified = std::time(nullptr);
+            Storage()->EntityDB().CreateShortCut(E);
             ImportTree( Child, E.info.id );
         }
 
@@ -151,10 +154,25 @@ namespace OpenWifi {
             V.info.name = Name;
             V.info.id = Daemon()->CreateUUID();
             V.parent = Parent;
-            Storage()->VenueDB().CreateRecord(V);
+            V.info.created = V.info.modified = std::time(nullptr);
+            Storage()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
     }
+
+    bool EntityDB::CreateShortCut( ProvObjects::Entity & E) {
+        if(Storage()->EntityDB().CreateRecord(E)) {
+            if(E.info.id==EntityDB::RootUUID())
+                Storage()->EntityDB().CheckForRoot();
+            else {
+                Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
+            }
+            Storage()->EntityDB().GetRecord("id",E.info.id,E);
+            return true;
+        }
+        return false;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::EntityDBRecordType &In, OpenWifi::ProvObjects::Entity &Out) {

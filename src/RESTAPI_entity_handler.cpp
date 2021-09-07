@@ -151,17 +151,15 @@ namespace OpenWifi{
             E.contacts.clear();
             E.locations.clear();
 
-            if(Storage()->EntityDB().CreateRecord(E)) {
+            if(Storage()->EntityDB().CreateShortCut(E)) {
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
                 else {
                     Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
                 }
 
-                ProvObjects::Entity AddedRecord;
-                Storage()->EntityDB().GetRecord("id",E.info.id,AddedRecord);
                 Poco::JSON::Object  Answer;
-                AddedRecord.to_json(Answer);
+                E.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }
