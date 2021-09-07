@@ -109,7 +109,7 @@ namespace OpenWifi {
         for(const auto &i:*Venues) {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
-            V.info.name = Name;
+            V.info.name = Child->get("name").toString();
             V.info.id = Daemon()->CreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
@@ -139,7 +139,7 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Entity E;
 
-            E.info.name = Name;
+            E.info.name = Child->get("name").toString();
             E.info.id = Daemon()->CreateUUID();
             E.parent = Parent;
             E.info.created = E.info.modified = std::time(nullptr);
@@ -151,7 +151,7 @@ namespace OpenWifi {
         for(const auto &i:*Venues) {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
-            V.info.name = Name;
+            V.info.name = Child->get("name").toString();
             V.info.id = Daemon()->CreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
