@@ -46,7 +46,7 @@ namespace OpenWifi {
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
 
     bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {
-        if(CreateRecord(V)) {
+        if(Storage()->VenueDB().CreateRecord(V)) {
             if(!V.parent.empty())
                 Storage()->VenueDB().AddChild("id", V.parent, V.info.id);
             if(!V.entity.empty())

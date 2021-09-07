@@ -121,7 +121,6 @@ namespace OpenWifi {
     void EntityDB::ImportTree(const Poco::JSON::Object::Ptr &O, const std::string &Parent) {
 
         std::string             Type, Name;
-        Poco::JSON::Array::Ptr  Children, Venues;
 
         Type = O->get("type").toString();
         Name = O->get("name").toString();
@@ -134,7 +133,7 @@ namespace OpenWifi {
             Storage()->EntityDB().CreateShortCut(E);
         }
 
-        Children = O->getArray("children");
+        auto Children = O->getArray("children");
         for(const auto &i:*Children) {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Entity E;
@@ -147,13 +146,13 @@ namespace OpenWifi {
             ImportTree( Child, E.info.id );
         }
 
-        Venues = O->getArray("venues");
+        auto Venues = O->getArray("venues");
         for(const auto &i:*Venues) {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
             V.info.id = Daemon()->CreateUUID();
-            V.parent = Parent;
+            V.entity = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
             Storage()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
