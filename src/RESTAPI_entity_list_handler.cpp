@@ -24,6 +24,8 @@ namespace OpenWifi{
         ParseParameters(Request);
         if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
             DoGet(Request, Response);
+        else if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
+            DoPost(Request, Response);
         else
             BadRequest(Request, Response, "Unknown HTTP Method");
     }
