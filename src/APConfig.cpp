@@ -46,7 +46,11 @@ namespace OpenWifi {
                         std::cout << "Radio B:" << std::endl;
                         ShowJSON(B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
+                        std::cout << "Merging data:" << std::endl;
+                        ShowJSON(B_Radio);
                         merge(A_Radio,B_Radio,RR);
+                        std::cout << "Merged data:" << std::endl;
+                        ShowJSON(RR);
                         Arr.set(index, RR);
                     } else {
                         Arr.set(index,A);
