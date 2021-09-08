@@ -98,7 +98,7 @@ namespace OpenWifi {
                 std::cout << __LINE__ << std::endl;
                 if(A==nullptr || !A->has(K)) {
                     std::cout << __LINE__ << std::endl;
-                    (*C).set(K,i.second);
+                    (*C).set(K, i.second);
                     std::cout << __LINE__ << std::endl;
                 }
             }
@@ -150,7 +150,7 @@ namespace OpenWifi {
             std::cout << __LINE__ << std::endl;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
             std::cout << __LINE__ << std::endl;
-            Poco::JSON::Object::Ptr Result;
+            auto Result = Poco::makeShared<Poco::JSON::Object>();
             std::cout << __LINE__ << std::endl;
             merge(Tmp, O, Result);
             ShowJSON(Result);
