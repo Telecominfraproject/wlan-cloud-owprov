@@ -47,8 +47,10 @@ namespace OpenWifi {
 
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
         if(K=="radios") {
-            Poco::JSON::Array::Ptr  AA=A;
-            Poco::JSON::Array::Ptr  BB=B;
+            auto AA=Poco::makeShared<Poco::JSON::Array>();
+            AA = A;
+            auto BB=Poco::makeShared<Poco::JSON::Array>();
+            BB = B;
             for(const auto &i:*AA) {
                 auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
                 // std::cout << "Radio A:" << std::endl;
