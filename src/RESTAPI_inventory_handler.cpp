@@ -40,41 +40,28 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::cout << __LINE__ << std::endl;
             std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-            std::cout << __LINE__ << std::endl;
             if(SerialNumber.empty()) {
-                std::cout << __LINE__ << std::endl;
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
 
             ProvObjects::InventoryTag   IT;
-            std::cout << __LINE__ << std::endl;
             if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
                 std::string Arg;
-                std::cout << __LINE__ << std::endl;
                 if(HasParameter("config",Arg) && Arg=="true") {
-                    std::cout << __LINE__ << std::endl;
                     APConfig    Device(SerialNumber,IT.deviceType,Logger_);
-                    std::cout << __LINE__ << std::endl;
 
                     Poco::JSON::Object  Answer;
-                    std::string C;
-                    if(Device.Get(C)) {
-                        std::cout << __LINE__ << std::endl;
-                        Answer.set("config", C);
-                        std::cout << __LINE__ << std::endl;
+                    Poco::JSON::Object  Configuration;
+                    if(Device.Get(Configuration)) {
+                        Answer.set("config", Configuration);
                     } else {
-                        std::cout << __LINE__ << std::endl;
                         Answer.set("config","none");
-                        std::cout << __LINE__ << std::endl;
                     }
                     ReturnObject(Request, Answer, Response);
-                    std::cout << __LINE__ << std::endl;
                     return;
                 } else {
-                    std::cout << __LINE__ << std::endl;
                     Poco::JSON::Object  Answer;
                     IT.to_json(Answer);
                     ReturnObject(Request, Answer, Response);

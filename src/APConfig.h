@@ -18,7 +18,7 @@ namespace OpenWifi {
             explicit APConfig(const std::string & SerialNumber, const std::string & DeviceType, Poco::Logger & L);
 
 
-            [[nodiscard]] bool Get(std::string &Config);
+            [[nodiscard]] bool Get(Poco::JSON::Object &Configuration);
 
             void AddConfiguration(const std::string &UUID);
             void AddVenueConfig(const std::string &UUID);

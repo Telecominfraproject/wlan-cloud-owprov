@@ -91,32 +91,24 @@ namespace OpenWifi {
     }
 
 
-    bool APConfig::Get(std::string &Config) {
+    bool APConfig::Get(Poco::JSON::Object &Configuration) {
 
         if(Config_.empty()) {
             try {
-                std::cout << __LINE__ << std::endl;
                 ProvObjects::InventoryTag   D;
-                std::cout << __LINE__ << std::endl;
                 if(Storage()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
-                    std::cout << __LINE__ << std::endl;
-
                     if(!D.deviceConfiguration.empty()) {
-                        std::cout << __LINE__ << std::endl;
                         AddConfiguration(D.deviceConfiguration);
                     }
                     if(!D.entity.empty()) {
-                        std::cout << __LINE__ << std::endl;
                         AddEntityConfig(D.entity);
                     } else if(!D.venue.empty()) {
-                        std::cout << __LINE__ << std::endl;
                         AddVenueConfig(D.venue);
                     }
                 }
 
                 //  Now we have all the config we need.
             } catch (const Poco::Exception &E ) {
-                std::cout << __LINE__ << std::endl;
                 Logger_.log(E);
             }
         }
@@ -131,30 +123,19 @@ namespace OpenWifi {
 
         Poco::JSON::Object  CFG;
         for(const auto &i:Config_) {
-            std::cout << __LINE__ << std::endl;
             for(const auto &ConfigElement:i.configuration) {
-                std::cout << __LINE__ << std::endl;
                 Poco::JSON::Parser  P;
-                std::cout << __LINE__ << std::endl;
                 auto O = P.parse(ConfigElement.configuration).extract<Poco::JSON::Object::Ptr>();
                 for(const auto &j:*O) {
-                    std::cout << __LINE__ << std::endl;
                     CFG.set(j.first,j.second);
                 }
             }
         }
 
-        std::stringstream  O;
-        Poco::JSON::Stringifier::stringify(CFG,O);
-
-        std::cout << __LINE__ << std::endl;
-        Config = O.str();
-        std::cout << __LINE__ << std::endl;
+        Configuration = CFG;
 
         if(Config_.empty())
             return false;
-
-        std::cout << __LINE__ << std::endl;
         return true;
     }
 
