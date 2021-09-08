@@ -115,7 +115,7 @@ namespace OpenWifi{
             }
             std::cout << __LINE__ << std::endl;
 
-            if(!Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
+            if(!C.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
                 BadRequest(Request, Response, "Unknown management policy.");
                 return;
             }
