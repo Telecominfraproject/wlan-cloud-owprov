@@ -227,21 +227,24 @@ namespace OpenWifi::ProvObjects {
     };
     typedef std::vector<Contact>      ContactVec;
 
-    struct ServiceConfiguration {
-        ObjectInfo info;
-        ManagementPolicy managementPolicy;
+    struct DeviceConfigurationElement {
+        std::string name;
+        std::string description;
+        uint64_t    weight;
+        std::string configuration;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+    typedef std::vector<DeviceConfigurationElement> DeviceConfigurationElementVec;
 
     struct DeviceConfiguration {
-        ObjectInfo info;
-        Types::UUID_t managementPolicy;
-        Types::StringVec deviceTypes;
-        std::string configuration;
-        Types::StringVec inUse;
-        Types::StringPairVec variables;
+    ObjectInfo                          info;
+        Types::UUID_t                   managementPolicy;
+        Types::StringVec                deviceTypes;
+        DeviceConfigurationElementVec   configuration;
+        Types::StringVec                inUse;
+        Types::StringPairVec            variables;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

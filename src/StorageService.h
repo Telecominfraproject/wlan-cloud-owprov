@@ -60,6 +60,15 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		inline bool ValidatePrefix(const std::string &P) const { return ExistFunc_.find(P)!=ExistFunc_.end(); }
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
+		inline bool AreAcceptableDeviceTypes(const Types::StringVec &S, bool WildCardAllowed=true) const {
+		    for(const auto &i:S) {
+		        if(WildCardAllowed && i=="*") {
+		           //   We allow wildcards
+		        } else if(DeviceTypes_.find(i)==DeviceTypes_.end())
+		            return false;
+		    }
+		    return true;
+		}
 
 		void run() final;
 
