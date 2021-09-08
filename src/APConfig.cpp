@@ -110,6 +110,13 @@ namespace OpenWifi {
         return true;
     }
 
+    static void ShowJSON(const Poco::JSON::Object::Ptr &Obj) {
+        std::stringstream O;
+
+        Poco::JSON::Stringifier::stringify(Obj,O);
+        std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
+    }
+
     bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
         if(Config_.empty()) {
             try {
@@ -149,6 +156,7 @@ namespace OpenWifi {
             Poco::JSON::Object::Ptr Result;
             std::cout << __LINE__ << std::endl;
             merge(Configuration, O, Result);
+            ShowJSON(Result);
             std::cout << __LINE__ << std::endl;
             Configuration = Result;
             std::cout << __LINE__ << std::endl;
