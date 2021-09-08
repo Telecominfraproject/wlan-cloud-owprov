@@ -40,6 +40,7 @@ namespace OpenWifi {
                 ShowJSON(A_Radio);
                 if(A_Radio->has("band")) {
                     std::string Band = A_Radio->get("band").toString();
+                    std::cout << "Looking for band: " << Band << std::endl;
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
                     if(FindRadio(Band,B,B_Radio)) {
                         std::cout << "Radio B:" << std::endl;
@@ -129,6 +130,8 @@ namespace OpenWifi {
         //      unit
         auto Tmp=Poco::makeShared<Poco::JSON::Object>();
         for(const auto &i:Config_) {
+            std::cout << "Iteration:" << std::endl;
+            ShowJSON(Tmp);
             Poco::JSON::Parser  P;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Result = Poco::makeShared<Poco::JSON::Object>();
