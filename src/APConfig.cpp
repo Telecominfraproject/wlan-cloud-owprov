@@ -25,9 +25,10 @@ namespace OpenWifi {
         return false;
     }
 
-    static void ShowJSON(const Poco::JSON::Object::Ptr &Obj) {
+    static void ShowJSON(const char *S, const Poco::JSON::Object::Ptr &Obj) {
         std::stringstream O;
         Poco::JSON::Stringifier::stringify(Obj,O);
+        std::cout << S << ":" << std::endl;
         std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
     }
 
@@ -136,14 +137,14 @@ namespace OpenWifi {
         //      unit
         auto Tmp=Poco::makeShared<Poco::JSON::Object>();
         for(const auto &i:Config_) {
-            std::cout << "Iteration Start:" << std::endl;
-            ShowJSON(Tmp);
+            ShowJSON("Iteration Start:", Tmp);
             Poco::JSON::Parser  P;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Result = Poco::makeShared<Poco::JSON::Object>();
+            ShowJSON("O", O);
+            ShowJSON("Tmp", Tmp);
             merge(O, Tmp, Result);
-            std::cout << "Iteration End:" << std::endl;
-            ShowJSON(Result);
+            ShowJSON("Iteration End:", Result);
             Tmp = Result;
         }
         Configuration = Tmp;
