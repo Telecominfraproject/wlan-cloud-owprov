@@ -141,7 +141,7 @@ namespace OpenWifi {
             Poco::JSON::Parser  P;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Result = Poco::makeShared<Poco::JSON::Object>();
-            merge(Tmp, O, Result);
+            merge(O, Tmp, Result);
             std::cout << "Iteration End:" << std::endl;
             ShowJSON(Result);
             Tmp = Result;
