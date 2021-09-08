@@ -31,7 +31,8 @@ namespace OpenWifi {
         ORM::Field{"qrcode",ORM::FieldType::FT_TEXT},
         ORM::Field{"geocode",ORM::FieldType::FT_TEXT},
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
-        ORM::Field{"contact",ORM::FieldType::FT_TEXT}
+        ORM::Field{"contact",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -66,6 +67,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.geoCode = In.get<12>();
     Out.location = In.get<13>();
     Out.contact = In.get<14>();
+    Out.deviceConfiguration = In.get<14>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -84,4 +86,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<12>(In.geoCode);
     Out.set<13>(In.location);
     Out.set<14>(In.contact);
+    Out.set<14>(In.deviceConfiguration);
 }
