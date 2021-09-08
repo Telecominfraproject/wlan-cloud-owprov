@@ -166,7 +166,9 @@ namespace OpenWifi {
             else {
                 Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
             }
-            Storage()->EntityDB().GetRecord("id",E.info.id,E);
+            ProvObjects::Entity NE;
+            Storage()->EntityDB().GetRecord("id",E.info.id,NE);
+            E = NE;
             return true;
         }
         return false;

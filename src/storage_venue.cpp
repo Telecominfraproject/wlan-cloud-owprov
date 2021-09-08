@@ -57,8 +57,9 @@ namespace OpenWifi {
                 Storage()->ContactDB().AddInUse("id",V.contact, Storage()->VenueDB().Prefix(), V.info.id);
             if(!V.managementPolicy.empty())
                 Storage()->PolicyDB().AddInUse("id",V.managementPolicy, Storage()->VenueDB().Prefix(), V.info.id);
-
-            Storage()->VenueDB().GetRecord("id",V.info.id,V);
+            ProvObjects::Venue  NV;
+            Storage()->VenueDB().GetRecord("id",V.info.id,NV);
+            V = NV;
             return true;
         }
         return false;
