@@ -297,6 +297,17 @@ addconfig() {
     jq < ${result_file}
 }
 
+addconfigtx() {
+    payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios TX\" , \"weight\" : 0, \"configuration\" : { \"radios\": [{ \"band\": \"2G\", \"tx-power\": 45 } ] } }] }"
+            curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -H "accept: application/json" \
+            -d "$payload" > ${result_file}
+            echo ${payload}
+            jq < ${result_file}
+}
+
 getconfig() {
     curl    ${FLAGS}  "https://${OWPROV}/api/v1/configurations/$1" \
     -H "Content-Type: application/json" \
@@ -339,6 +350,16 @@ deviceconfig() {
     jq < ${result_file}
 }
 
+adddeviceconfig() {
+    payload="{\"deviceConfiguration\" : \"$2\"}";
+    curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -362,12 +383,14 @@ case "$1" in
     "contactcount") login; contactcount ; logout;;
     "locationcount") login; locationcount ; logout;;
     "addconfig") login; addconfig "$2"; logout;;
+    "addconfigtx") login; addconfigtx "$2"; logout;;
     "listconfigs") login; listconfigs ; logout;;
     "getconfig") login; getconfig "$2"; logout;;
     "deleteconfig") login; deleteconfig "$2"; logout;;
     "assigntagentity") login; assigntagentity "$2" "$3"; logout;;
     "assigntagvenue") login; assigntagvenue "$2" "$3"; logout;;
     "setentityconfig") login; setentityconfig "$2" "$3"; logout;;
+    "adddeviceconfig") login; adddeviceconfig "$2" "$3"; logout;;
     *) help ;;
 esac
 

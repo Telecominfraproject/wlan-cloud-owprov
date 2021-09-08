@@ -236,6 +236,23 @@ namespace OpenWifi{
             AssignIfPresent(RawObject, "description", ExistingObject.info.description);
             ExistingObject.info.modified = std::time(nullptr);
 
+            std::string NewDeviceConfiguration="1";
+            AssignIfPresent(RawObject,"deviceConfiguration",NewDeviceConfiguration);
+            if(NewDeviceConfiguration!="1") {
+                if(NewDeviceConfiguration.empty()) {
+                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                    ExistingObject.deviceConfiguration.clear();
+                } else if(NewDeviceConfiguration!=ExistingObject.deviceConfiguration) {
+                    if(!Storage()->ConfigurationDB().Exists("id",NewDeviceConfiguration)) {
+                        BadRequest(Request, Response, "Inbvalid Configuration ID");
+                        return;
+                    }
+                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                    Storage()->ConfigurationDB().AddInUse("id",NewDeviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                    ExistingObject.deviceConfiguration=NewDeviceConfiguration;
+                }
+            }
+
             if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
                 if(!UnAssign && !NewEntity.empty() && NewEntity!=ExistingObject.entity) {
                     Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
