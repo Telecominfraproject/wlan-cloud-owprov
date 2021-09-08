@@ -25,15 +25,25 @@ namespace OpenWifi {
         return false;
     }
 
+    static void ShowJSON(const Poco::JSON::Object::Ptr &Obj) {
+        std::stringstream O;
+        Poco::JSON::Stringifier::stringify(Obj,O);
+        std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
+    }
+
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
         if(K=="radios") {
             int index=0;
             for(const auto &i:*A) {
                 auto A_Radio = A->get(index).extract<Poco::JSON::Object::Ptr>();
+                std::cout << "Radio A:" << std::endl;
+                ShowJSON(A_Radio);
                 if(A_Radio->has("band")) {
                     std::string Band = A_Radio->get("band").toString();
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
                     if(FindRadio(Band,B,B_Radio)) {
+                        std::cout << "Radio B:" << std::endl;
+                        ShowJSON(B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
                         merge(A_Radio,B_Radio,RR);
                         Arr.set(index, RR);
@@ -88,12 +98,6 @@ namespace OpenWifi {
         }
 
         return true;
-    }
-
-    static void ShowJSON(const Poco::JSON::Object::Ptr &Obj) {
-        std::stringstream O;
-        Poco::JSON::Stringifier::stringify(Obj,O);
-        std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
     }
 
     bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
