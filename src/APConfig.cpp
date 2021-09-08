@@ -34,7 +34,7 @@ namespace OpenWifi {
                     std::string Band = A_Radio->get("band").toString();
                     Poco::JSON::Object::Ptr B_Radio;
                     if(FindRadio(Band,B,B_Radio)) {
-                        Poco::JSON::Object RR;
+                        Poco::JSON::Object::Ptr RR;
                         merge(A_Radio,B_Radio,RR);
                         Arr.set(index, RR);
                     } else {
