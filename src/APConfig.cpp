@@ -110,7 +110,6 @@ namespace OpenWifi {
             }
         }
 
-        /*
         for(const auto &i:*B) {
             const std::string & K = i.first;
             if(!A->has(K)) {
@@ -121,7 +120,6 @@ namespace OpenWifi {
                 // ShowJSON(C);
             }
         }
-         */
 
         return true;
     }
