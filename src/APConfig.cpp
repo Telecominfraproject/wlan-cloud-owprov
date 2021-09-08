@@ -95,8 +95,12 @@ namespace OpenWifi {
 
         for(const auto &i:*B) {
             const std::string & K = i.first;
-            if(A==nullptr || !A->has(K)) {
-                (*C).set(K, i.second);
+            if(!A->has(K)) {
+                std::cout << "Before leave" << std::endl;
+                ShowJSON(C);
+                C->set(K, i.second);
+                std::cout << "After leave" << std::endl;
+                ShowJSON(C);
             }
         }
 
