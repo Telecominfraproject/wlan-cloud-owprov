@@ -200,8 +200,18 @@ addunassignedtag() {
     jq < ${result_file}
 }
 
-assigntag() {
-    payload="{\"serialNumber\" : \"$1\", \"deviceType\" : \"linksys_ea8300\" ,\"entity\" : \"$2\"}";
+assigntagentity() {
+    payload="{\"serialNumber\" : \"$1\", \"entity\" : \"$2\"}";
+    curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
+assigntagvenue() {
+    payload="{\"serialNumber\" : \"$1\", \"venue\" : \"$2\"}";
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
@@ -357,6 +367,8 @@ case "$1" in
     "listconfigs") login; listconfigs ; logout;;
     "getconfig") login; getconfig "$2"; logout;;
     "deleteconfig") login; deleteconfig "$2"; logout;;
+    "assigntagentity") login; assigntagentity "$2" "$3"; logout;;
+    "assigntagvenue") login; assigntagvenue "$2" "$3"; logout;;
     "setentityconfig") login; setentityconfig "$2" "$3"; logout;;
     *) help ;;
 esac

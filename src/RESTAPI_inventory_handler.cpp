@@ -228,7 +228,7 @@ namespace OpenWifi{
                 if(!ExistingObject.venue.empty()) {
                     Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
                 } else if(!ExistingObject.entity.empty()) {
-                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
                 }
                 ExistingObject.venue.clear();
                 ExistingObject.entity.clear();
