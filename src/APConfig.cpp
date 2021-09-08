@@ -86,13 +86,10 @@ namespace OpenWifi {
             if(!A->has(K))
                 C.set(K,i.second);
         }
-
         return true;
     }
 
-
     bool APConfig::Get(Poco::JSON::Object &Configuration) {
-
         if(Config_.empty()) {
             try {
                 ProvObjects::InventoryTag   D;
@@ -123,12 +120,10 @@ namespace OpenWifi {
 
         Poco::JSON::Object  CFG;
         for(const auto &i:Config_) {
-            for(const auto &ConfigElement:i.configuration) {
-                Poco::JSON::Parser  P;
-                auto O = P.parse(ConfigElement.configuration).extract<Poco::JSON::Object::Ptr>();
-                for(const auto &j:*O) {
-                    CFG.set(j.first,j.second);
-                }
+            Poco::JSON::Parser  P;
+            auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+            for(const auto &j:*O) {
+                CFG.set(j.first,j.second);
             }
         }
 
@@ -146,7 +141,11 @@ namespace OpenWifi {
             return;
 
         if(Storage()->ConfigurationDB().GetRecord("id", UUID,Config)) {
-            Config_.push_back(Config);
+            //  find where to insert into this list using the weight.
+            if(!Config.configuration.empty()) {
+                for(const auto &i:Config.configuration)
+                    Config_.push_back(i);
+            }
         }
     }
 

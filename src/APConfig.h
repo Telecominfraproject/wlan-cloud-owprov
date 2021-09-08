@@ -11,7 +11,7 @@
 
 namespace OpenWifi {
 
-    typedef std::vector<ProvObjects::DeviceConfiguration> ConfigVec;
+    typedef std::vector<ProvObjects::DeviceConfigurationElement> ConfigVec;
 
     class APConfig {
         public:
