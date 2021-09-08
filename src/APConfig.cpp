@@ -97,16 +97,14 @@ namespace OpenWifi {
                 std::cout << __LINE__ << std::endl;
                 const std::string & K = i.first;
                 std::cout << __LINE__ << std::endl;
-                if(A!= nullptr && !A->has(K)) {
+                if(A==nullptr || !A->has(K)) {
                     std::cout << __LINE__ << std::endl;
                     C->set(K,i.second);
                     std::cout << __LINE__ << std::endl;
                 }
             }
         }
-
         std::cout << __LINE__ << std::endl;
-
         return true;
     }
 
