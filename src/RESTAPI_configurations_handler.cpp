@@ -138,6 +138,7 @@ namespace OpenWifi{
                 std::cout << __LINE__ << std::endl;
                 for(const auto &i:C.configuration) {
                     Poco::JSON::Parser  P;
+                    std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
                     auto T = P.parse(i.configuration).extract<Poco::JSON::Object>();
                 }
                 std::cout << __LINE__ << std::endl;

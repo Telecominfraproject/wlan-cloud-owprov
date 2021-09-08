@@ -269,7 +269,7 @@ locationcount() {
 }
 
 addconfig() {
-    payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios\" , \"weight\" : 100, \"radios\": [{ \"band\": \"5G\", \"channel\": 52, \"channel-mode\": \"HE\", \"channel-width\": 80, \"country\": \"CA\" }, { \"band\": \"2G\", \"channel\": 11, \"channel-mode\": \"HE\", \"channel-width\": 20, \"country\": \"CA\" }] }] }"
+    payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios\" , \"weight\" : 100, \"configuration\" : { \"radios\": [{ \"band\": \"5G\", \"channel\": 52, \"channel-mode\": \"HE\", \"channel-width\": 80, \"country\": \"CA\" }, { \"band\": \"2G\", \"channel\": 11, \"channel-mode\": \"HE\", \"channel-width\": 20, \"country\": \"CA\" } ] } }] }"
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
