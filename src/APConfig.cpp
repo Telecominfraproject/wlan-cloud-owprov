@@ -52,54 +52,59 @@ namespace OpenWifi {
     bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object::Ptr &C) {
 
         std::cout << __LINE__ << std::endl;
-        for(const auto &i:*A) {
-            std::cout << __LINE__ << std::endl;
-            const std::string & K = i.first;
-            //  std::cout << "KEY: " << K << std::endl;
-            if(B->has(K)) {
-                if(A->isArray(K)) {
-                    std::cout << __LINE__ << std::endl;
-                    //  std::cout << "ISARRAY" << std::endl;
-                    if(B->isArray(K)) {
+        if(A!= nullptr) {
+            for(const auto &i:*A) {
+                std::cout << __LINE__ << std::endl;
+                const std::string & K = i.first;
+                //  std::cout << "KEY: " << K << std::endl;
+                if(B->has(K)) {
+                    if(A->isArray(K)) {
                         std::cout << __LINE__ << std::endl;
-                        Poco::JSON::Array   Arr;
-                        auto AR1=A->getArray(K);
-                        auto AR2=B->getArray(K);
-                        mergeArray(K,AR1,AR2,Arr);
-                        C->set(K,Arr);
-                    } else {
-                        std::cout << __LINE__ << std::endl;
-                        C->set(K,A->getArray(K));
+                        //  std::cout << "ISARRAY" << std::endl;
+                        if(B->isArray(K)) {
+                            std::cout << __LINE__ << std::endl;
+                            Poco::JSON::Array   Arr;
+                            auto AR1=A->getArray(K);
+                            auto AR2=B->getArray(K);
+                            mergeArray(K,AR1,AR2,Arr);
+                            C->set(K,Arr);
+                        } else {
+                            std::cout << __LINE__ << std::endl;
+                            C->set(K,A->getArray(K));
+                        }
                     }
-                }
-                else if(A->isObject(K) && B->isObject(K)) {
-                    std::cout << __LINE__ << std::endl;
-                    //  std::cout << "ISOBJECT" << std::endl;
-                    Poco::JSON::Object::Ptr R;
-                    merge(A->getObject(K),B->getObject(K),R);
-                    C->set(K,R);
-                }
-                else {
+                    else if(A->isObject(K) && B->isObject(K)) {
+                        std::cout << __LINE__ << std::endl;
+                        //  std::cout << "ISOBJECT" << std::endl;
+                        Poco::JSON::Object::Ptr R;
+                        merge(A->getObject(K),B->getObject(K),R);
+                        C->set(K,R);
+                    }
+                    else {
+                        std::cout << __LINE__ << std::endl;
+                        C->set(K,i.second);
+                    }
+                } else {
                     std::cout << __LINE__ << std::endl;
                     C->set(K,i.second);
                 }
-            } else {
-                std::cout << __LINE__ << std::endl;
-                C->set(K,i.second);
             }
         }
 
         std::cout << __LINE__ << std::endl;
-        for(const auto &i:*B) {
-            std::cout << __LINE__ << std::endl;
-            const std::string & K = i.first;
-            std::cout << __LINE__ << std::endl;
-            if(!A->has(K)) {
+        if(B!= nullptr) {
+            for(const auto &i:*B) {
                 std::cout << __LINE__ << std::endl;
-                C->set(K,i.second);
+                const std::string & K = i.first;
                 std::cout << __LINE__ << std::endl;
+                if(A!= nullptr && !A->has(K)) {
+                    std::cout << __LINE__ << std::endl;
+                    C->set(K,i.second);
+                    std::cout << __LINE__ << std::endl;
+                }
             }
         }
+
         std::cout << __LINE__ << std::endl;
 
         return true;
