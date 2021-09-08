@@ -25,6 +25,19 @@ namespace OpenWifi {
         return false;
     }
 
+    bool APConfig::RemoveBand(const std::string &Band, Poco::JSON::Array::Ptr &Arr) {
+        for(const auto &i:*Arr) {
+            auto R = i.extract<Poco::JSON::Object::Ptr>();
+            if(R->has("band") && R->get("band").toString()==Band) {
+            } else {
+                Arr->add(i);
+            }
+        }
+        return false;
+    }
+
+
+
     static void ShowJSON(const char *S, const Poco::JSON::Object::Ptr &Obj) {
         std::stringstream O;
         Poco::JSON::Stringifier::stringify(Obj,O);
@@ -34,7 +47,9 @@ namespace OpenWifi {
 
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
         if(K=="radios") {
-            for(const auto &i:*A) {
+            Poco::JSON::Array::Ptr  AA=A;
+            Poco::JSON::Array::Ptr  BB=B;
+            for(const auto &i:*AA) {
                 auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
                 // std::cout << "Radio A:" << std::endl;
                 // ShowJSON(A_Radio);
@@ -42,7 +57,7 @@ namespace OpenWifi {
                     std::string Band = A_Radio->get("band").toString();
                     // std::cout << "Looking for band: " << Band << std::endl;
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
-                    if(FindRadio(Band,B,B_Radio)) {
+                    if(FindRadio(Band,BB,B_Radio)) {
                         // std::cout << "Radio B:" << std::endl;
                         // ShowJSON(B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
@@ -51,12 +66,15 @@ namespace OpenWifi {
                         merge(A_Radio,B_Radio,RR);
                         // std::cout << "Merged data:" << std::endl;
                         // ShowJSON(RR);
+                        RemoveBand(Band,BB);
                         Arr.add(RR);
                     } else {
-                        Arr.add(A);
+                        Arr.add(A_Radio);
                     }
                 }
             }
+            for(const auto &i:*BB)
+                Arr.add(i);
         } else {
             Arr = *A;
         }
