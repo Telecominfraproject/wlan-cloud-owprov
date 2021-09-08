@@ -25,12 +25,12 @@ namespace OpenWifi {
         return false;
     }
 
-    bool APConfig::RemoveBand(const std::string &Band, Poco::JSON::Array::Ptr &Arr) {
-        for(const auto &i:*Arr) {
+    bool APConfig::RemoveBand(const std::string &Band, const Poco::JSON::Array::Ptr &A_in,Poco::JSON::Array::Ptr &A_Out) {
+        for(const auto &i:*A_in) {
             auto R = i.extract<Poco::JSON::Object::Ptr>();
             if(R->has("band") && R->get("band").toString()==Band) {
             } else {
-                Arr->add(i);
+                A_Out->add(i);
             }
         }
         return false;
@@ -47,11 +47,9 @@ namespace OpenWifi {
 
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
         if(K=="radios") {
-            auto AA=Poco::makeShared<Poco::JSON::Array>();
-            AA = A;
             auto BB=Poco::makeShared<Poco::JSON::Array>();
             BB = B;
-            for(const auto &i:*AA) {
+            for(const auto &i:*A) {
                 auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
                 // std::cout << "Radio A:" << std::endl;
                 // ShowJSON(A_Radio);
@@ -59,7 +57,7 @@ namespace OpenWifi {
                     std::string Band = A_Radio->get("band").toString();
                     // std::cout << "Looking for band: " << Band << std::endl;
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
-                    if(FindRadio(Band,BB,B_Radio)) {
+                    if(FindRadio(Band,B,B_Radio)) {
                         // std::cout << "Radio B:" << std::endl;
                         // ShowJSON(B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
@@ -68,7 +66,9 @@ namespace OpenWifi {
                         merge(A_Radio,B_Radio,RR);
                         // std::cout << "Merged data:" << std::endl;
                         // ShowJSON(RR);
-                        RemoveBand(Band,BB);
+                        auto CC = Poco::makeShared<Poco::JSON::Array>();
+                        RemoveBand(Band, BB, CC );
+                        BB = CC;
                         Arr.add(RR);
                     } else {
                         Arr.add(A_Radio);
