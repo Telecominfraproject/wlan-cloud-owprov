@@ -181,7 +181,7 @@ gettag() {
 }
 
 addtag() {
-    payload="{ \"name\" : \"$1\",\"entity\" : \"$2\", \"serialNumber\" : \"$1\", \"deviceType\" : \"linksys_ea8300\" }";
+    payload="{ \"name\" : \"$1\", \"serialNumber\" : \"$1\", \"deviceType\" : \"linksys_ea8300\" }";
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/inventory/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
@@ -372,7 +372,7 @@ case "$1" in
     "tree") login; tree ; logout;;
     "importtree") login; importtree $2; logout;;
     "deviceconfig") login; deviceconfig "$2"; logout;;
-    "addtag") login; addtag $2 $3; logout;;
+    "addtag") login; addtag "$2"; logout;;
     "unassigntag") login; unassigntag $2; logout;;
     "addunassignedtag") login; addunassignedtag $2 ; logout;;
     "getunassignedtags") login; getunassignedtags ; logout;;

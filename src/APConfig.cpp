@@ -49,42 +49,42 @@ namespace OpenWifi {
         return true;
     }
 
-    bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object &C) {
+    bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object::Ptr &C) {
 
         for(const auto &i:*A) {
             const std::string & K = i.first;
-            //        std::cout << "KEY: " << K << std::endl;
+            //  std::cout << "KEY: " << K << std::endl;
             if(B->has(K)) {
                 if(A->isArray(K)) {
-                    //                std::cout << "ISARRAY" << std::endl;
+                    //  std::cout << "ISARRAY" << std::endl;
                     if(B->isArray(K)) {
                         Poco::JSON::Array   Arr;
                         auto AR1=A->getArray(K);
                         auto AR2=B->getArray(K);
                         mergeArray(K,AR1,AR2,Arr);
-                        C.set(K,Arr);
+                        C->set(K,Arr);
                     } else {
-                        C.set(K,A->getArray(K));
+                        C->set(K,A->getArray(K));
                     }
                 }
                 else if(A->isObject(K) && B->isObject(K)) {
-                    //                std::cout << "ISOBJECT" << std::endl;
-                    Poco::JSON::Object R;
+                    //  std::cout << "ISOBJECT" << std::endl;
+                    Poco::JSON::Object::Ptr R;
                     merge(A->getObject(K),B->getObject(K),R);
-                    C.set(K,R);
+                    C->set(K,R);
                 }
                 else {
-                    C.set(K,i.second);
+                    C->set(K,i.second);
                 }
             } else {
-                C.set(K,i.second);
+                C->set(K,i.second);
             }
         }
 
         for(const auto &i:*B) {
             const std::string & K = i.first;
             if(!A->has(K))
-                C.set(K,i.second);
+                C->set(K,i.second);
         }
         return true;
     }
@@ -118,19 +118,20 @@ namespace OpenWifi {
         //      globals
         //      unit
 
-        Poco::JSON::Object  CFG;
+        Poco::JSON::Object::Ptr  CFG;
         for(const auto &i:Config_) {
             Poco::JSON::Parser  P;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-            for(const auto &j:*O) {
-                CFG.set(j.first,j.second);
-            }
+            Poco::JSON::Object::Ptr Result;
+            merge(CFG, O, Result);
+            CFG = Result;
         }
 
-        Configuration = CFG;
+        Configuration = *CFG;
 
         if(Config_.empty())
             return false;
+
         return true;
     }
 
