@@ -33,9 +33,8 @@ namespace OpenWifi {
 
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
         if(K=="radios") {
-            int index=0;
             for(const auto &i:*A) {
-                auto A_Radio = A->get(index).extract<Poco::JSON::Object::Ptr>();
+                auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
                 std::cout << "Radio A:" << std::endl;
                 ShowJSON(A_Radio);
                 if(A_Radio->has("band")) {
@@ -51,12 +50,11 @@ namespace OpenWifi {
                         merge(A_Radio,B_Radio,RR);
                         std::cout << "Merged data:" << std::endl;
                         ShowJSON(RR);
-                        Arr.set(index, RR);
+                        Arr.add(RR);
                     } else {
-                        Arr.set(index,A);
+                        Arr.add(A);
                     }
                 }
-                ++index;
             }
         } else {
             Arr = *A;
