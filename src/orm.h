@@ -525,11 +525,12 @@ namespace ORM {
 
                 RecordType R;
                 if(GetRecord(FieldName, ParentUUID, R)) {
-                    auto it = std::lower_bound((R.*T).begin(),(R.*T).end(),ChildUUID);
+                    auto it = std::find((R.*T).begin(),(R.*T).end(),ChildUUID);
                     if(Add) {
                         if(it!=(R.*T).end() && *it == ChildUUID)
                             return false;
-                        (R.*T).insert(it, ChildUUID);
+                        (R.*T).push_back(ChildUUID);
+                        std::sort((R.*T).begin(),(R.*T).end());
                     } else {
                         if(it!=(R.*T).end() && *it == ChildUUID)
                             (R.*T).erase(it);

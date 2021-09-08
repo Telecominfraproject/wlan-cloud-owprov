@@ -121,45 +121,53 @@ namespace OpenWifi{
 
             Poco::JSON::Parser IncomingParser;
             Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
-            ProvObjects::Entity E;
-            if (!E.from_json(Obj)) {
+            ProvObjects::Entity NewEntity;
+            if (!NewEntity.from_json(Obj)) {
                 BadRequest(Request, Response);
                 return;
             }
-            E.info.modified = E.info.created = std::time(nullptr);
+            NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
 
-            for(auto &i:E.info.notes)
+            for(auto &i:NewEntity.info.notes)
                 i.createdBy = UserInfo_.userinfo.email;
 
             //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
             //  must be conveyed through PUT.
-            E.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
+            NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
             if(UUID==EntityDB::RootUUID())
-                E.parent="";
-            else if(E.parent.empty()) {
+                NewEntity.parent="";
+            else if(NewEntity.parent.empty()) {
                 BadRequest(Request, Response, "Parent UUID must be specified");
                 return;
             } else {
-                if(!Storage()->EntityDB().Exists("id",E.parent)) {
+                if(!Storage()->EntityDB().Exists("id",NewEntity.parent)) {
                     BadRequest(Request, Response, "Parent UUID must exist");
                     return;
                 }
             }
 
-            E.venues.clear();
-            E.children.clear();
-            E.contacts.clear();
-            E.locations.clear();
+            if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
+                BadRequest(Request, Response, "Device Configuration does not exist");
+                return;
+            }
 
-            if(Storage()->EntityDB().CreateShortCut(E)) {
+            NewEntity.venues.clear();
+            NewEntity.children.clear();
+            NewEntity.contacts.clear();
+            NewEntity.locations.clear();
+
+            if(Storage()->EntityDB().CreateShortCut(NewEntity)) {
                 if(UUID==EntityDB::RootUUID())
                     Storage()->EntityDB().CheckForRoot();
                 else {
-                    Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
+                    Storage()->EntityDB().AddChild("id",NewEntity.parent,NewEntity.info.id);
                 }
 
+                if(!NewEntity.deviceConfiguration.empty())
+                    Storage()->ConfigurationDB().AddInUse("id",NewEntity.deviceConfiguration,Storage()->EntityDB().Prefix(),NewEntity.info.id);
+
                 Poco::JSON::Object  Answer;
-                E.to_json(Answer);
+                NewEntity.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }
@@ -190,21 +198,40 @@ namespace OpenWifi{
                 return;
             }
 
-            ProvObjects::Entity LocalObject;
-            if(!Storage()->EntityDB().GetRecord("id",UUID,LocalObject)) {
+            ProvObjects::Entity Existing;
+            if(!Storage()->EntityDB().GetRecord("id",UUID,Existing)) {
                 NotFound(Request, Response);
                 return;
             }
 
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
-            if(RawObject->has("notes")) {
-                SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, LocalObject.info.notes);
+            ProvObjects::Entity NewEntity;
+            if(!NewEntity.from_json(RawObject)) {
+                BadRequest(Request, Response, "Cannot parse incoming JSON document.");
+                return;
             }
 
-            AssignIfPresent(RawObject,"name",LocalObject.info.name);
-            AssignIfPresent(RawObject,"description",LocalObject.info.description);
-            LocalObject.info.modified = std::time(nullptr);
+            std::string OldConfiguration;
+            if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
+                BadRequest(Request, Response, "Device configuration does not exist");
+                return;
+            } else {
+                OldConfiguration = Existing.deviceConfiguration;
+                Existing.deviceConfiguration = NewEntity.deviceConfiguration;
+            }
+
+            for(auto &i:NewEntity.info.notes) {
+                i.createdBy = UserInfo_.userinfo.email;
+                Existing.info.notes.insert(Existing.info.notes.begin(),i);
+            }
+
+            if(!NewEntity.info.name.empty())
+                Existing.info.name = NewEntity.info.name;
+            if(!NewEntity.info.description.empty())
+                Existing.info.description = NewEntity.info.description;
+
+            Existing.info.modified = std::time(nullptr);
 
             std::string Error;
             if(!Storage()->Validate(Parameters_,Error)) {
@@ -212,7 +239,7 @@ namespace OpenWifi{
                 return;
             }
 
-            if(Storage()->EntityDB().UpdateRecord("id",UUID,LocalObject)) {
+            if(Storage()->EntityDB().UpdateRecord("id",UUID,Existing)) {
                 for(const auto &i:Request) {
                     std::string Child{i.second};
                     auto UUID_parts = Utils::Split(Child,':');
@@ -230,9 +257,18 @@ namespace OpenWifi{
                         Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
                     }
                 }
+
+                if(!OldConfiguration.empty()) {
+                    Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+                }
+
+                if(!NewEntity.deviceConfiguration.empty()) {
+                    Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+                }
+
                 Poco::JSON::Object  Answer;
-                Storage()->EntityDB().GetRecord("id",UUID, LocalObject);
-                LocalObject.to_json(Answer);
+                Storage()->EntityDB().GetRecord("id",UUID, Existing);
+                Existing.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }

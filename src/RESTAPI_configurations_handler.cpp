@@ -130,7 +130,7 @@ namespace OpenWifi{
             try {
                 for(const auto &i:C.configuration) {
                     Poco::JSON::Parser  P;
-                    std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
+                    // std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
                     P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
                 }
             } catch (const Poco::Exception &E) {
@@ -178,8 +178,10 @@ namespace OpenWifi{
                 return;
             }
 
-            for(auto &i:NewConfig.info.notes)
+            for(auto &i:NewConfig.info.notes) {
                 i.createdBy = UserInfo_.userinfo.email;
+                Existing.info.notes.insert(Existing.info.notes.begin(),i);
+            }
 
             if(NewConfig.managementPolicy.empty() || (NewConfig.managementPolicy!=Existing.managementPolicy && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy))) {
                 BadRequest(Request, Response, "Management policy is not valid.");
