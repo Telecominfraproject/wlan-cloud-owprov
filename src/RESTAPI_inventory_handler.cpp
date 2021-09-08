@@ -40,8 +40,11 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
                                         Poco::Net::HTTPServerResponse &Response) {
         try {
+            std::cout << __LINE__ << std::endl;
             std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+            std::cout << __LINE__ << std::endl;
             if(SerialNumber.empty()) {
+                std::cout << __LINE__ << std::endl;
                 BadRequest(Request, Response, "Missing SerialNumber.");
                 return;
             }
