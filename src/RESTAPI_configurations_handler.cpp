@@ -102,7 +102,7 @@ namespace OpenWifi{
             Poco::JSON::Parser IncomingParser;
             Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if (!C.from_json(Obj)) {
-                BadRequest(Request, Response);
+                BadRequest(Request, Response, "Bad JSON Document posted.");
                 return;
             }
 

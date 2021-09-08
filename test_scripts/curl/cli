@@ -268,6 +268,16 @@ locationcount() {
     jq < ${result_file}
 }
 
+addconfig() {
+    payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios\" , \"weight\" : 100, \"radios\": [{ \"band\": \"5G\", \"channel\": 52, \"channel-mode\": \"HE\", \"channel-width\": 80, \"country\": \"CA\" }, { \"band\": \"2G\", \"channel\": 11, \"channel-mode\": \"HE\", \"channel-width\": 20, \"country\": \"CA\" }] }"
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/inventory/1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -288,6 +298,7 @@ case "$1" in
     "locationcount") login; locationcount ; logout;;
     "getunassignedtags") login; getunassignedtags ; logout;;
     "importtree") login; importtree $2; logout;;
+    "addconfig") login; addconfig $2; logout;;
     *) help ;;
 esac
 
