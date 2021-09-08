@@ -110,7 +110,7 @@ namespace OpenWifi {
         return true;
     }
 
-    bool APConfig::Get(Poco::JSON::Object &Configuration) {
+    bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
         if(Config_.empty()) {
             try {
                 ProvObjects::InventoryTag   D;
@@ -140,7 +140,6 @@ namespace OpenWifi {
         //      unit
         std::cout << __LINE__ << std::endl;
 
-        Poco::JSON::Object::Ptr  CFG;
         for(const auto &i:Config_) {
             std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser  P;
@@ -149,14 +148,12 @@ namespace OpenWifi {
             std::cout << __LINE__ << std::endl;
             Poco::JSON::Object::Ptr Result;
             std::cout << __LINE__ << std::endl;
-            merge(CFG, O, Result);
+            merge(Configuration, O, Result);
             std::cout << __LINE__ << std::endl;
-            CFG = Result;
+            Configuration = Result;
             std::cout << __LINE__ << std::endl;
         }
 
-        std::cout << __LINE__ << std::endl;
-        Configuration = *CFG;
         std::cout << __LINE__ << std::endl;
 
         if(Config_.empty())
