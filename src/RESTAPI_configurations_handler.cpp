@@ -98,8 +98,6 @@ namespace OpenWifi{
                 return;
             }
 
-            std::cout << __LINE__ << std::endl;
-
             ProvObjects::DeviceConfiguration C;
             Poco::JSON::Parser IncomingParser;
             Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
@@ -107,63 +105,50 @@ namespace OpenWifi{
                 BadRequest(Request, Response, "Bad JSON Document posted.");
                 return;
             }
-            std::cout << __LINE__ << std::endl;
 
             if(C.info.name.empty()) {
                 BadRequest(Request, Response, "Missing name.");
                 return;
             }
-            std::cout << __LINE__ << std::endl;
 
             if(!C.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
                 BadRequest(Request, Response, "Unknown management policy.");
                 return;
             }
-            std::cout << __LINE__ << std::endl;
 
             C.info.modified = C.info.created = std::time(nullptr);
             C.info.id = Daemon()->CreateUUID();
             for(auto &i:C.info.notes)
                 i.createdBy = UserInfo_.userinfo.email;
-            std::cout << __LINE__ << std::endl;
 
             C.inUse.clear();
             if(C.deviceTypes.empty() || !Storage()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
                 BadRequest(Request, Response, "Missing valid device types.");
                 return;
             }
-            std::cout << __LINE__ << std::endl;
 
             try {
-                std::cout << __LINE__ << std::endl;
                 for(const auto &i:C.configuration) {
                     Poco::JSON::Parser  P;
                     std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
                     P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
                 }
-                std::cout << __LINE__ << std::endl;
             } catch (const Poco::Exception &E) {
-                std::cout << __LINE__ << std::endl;
                 BadRequest(Request, Response, "Invalid configuration portion.");
                 return;
             }
 
             if(Storage()->ConfigurationDB().CreateRecord(C)) {
-                std::cout << __LINE__ << std::endl;
                 Storage()->ConfigurationDB().GetRecord("id", C.info.id, C);
                 Poco::JSON::Object  Answer;
-                std::cout << __LINE__ << std::endl;
 
                 if(!C.managementPolicy.empty())
                     Storage()->PolicyDB().AddInUse("id",C.managementPolicy,Storage()->PolicyDB().Prefix(), C.info.id);
 
-                std::cout << __LINE__ << std::endl;
                 C.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
-                std::cout << __LINE__ << std::endl;
                 return;
             }
-            std::cout << __LINE__ << std::endl;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
