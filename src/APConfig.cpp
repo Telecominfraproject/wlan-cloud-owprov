@@ -50,7 +50,6 @@ namespace OpenWifi {
     }
 
     bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object::Ptr &C) {
-
         std::cout << __LINE__ << std::endl;
         if(A!= nullptr) {
             for(const auto &i:*A) {
@@ -144,7 +143,7 @@ namespace OpenWifi {
         //      globals
         //      unit
         std::cout << __LINE__ << std::endl;
-
+        Poco::JSON::Object::Ptr Tmp;
         for(const auto &i:Config_) {
             std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser  P;
@@ -153,14 +152,14 @@ namespace OpenWifi {
             std::cout << __LINE__ << std::endl;
             Poco::JSON::Object::Ptr Result;
             std::cout << __LINE__ << std::endl;
-            merge(Configuration, O, Result);
+            merge(Tmp, O, Result);
             ShowJSON(Result);
-            std::cout << __LINE__ << std::endl;
-            Configuration = Result;
             std::cout << __LINE__ << std::endl;
         }
 
         std::cout << __LINE__ << std::endl;
+
+        Configuration = Tmp;
 
         if(Config_.empty())
             return false;

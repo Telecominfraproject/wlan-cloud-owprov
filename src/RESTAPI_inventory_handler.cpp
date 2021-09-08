@@ -52,8 +52,8 @@ namespace OpenWifi{
                 if(HasParameter("config",Arg) && Arg=="true") {
                     APConfig    Device(SerialNumber,IT.deviceType,Logger_);
 
-                    Poco::JSON::Object          Answer;
-                    Poco::JSON::Object::Ptr     Configuration;
+                    Poco::JSON::Object  Answer;
+                    Poco::JSON::Object::Ptr  Configuration;
                     if(Device.Get(Configuration)) {
                         Answer.set("config", Configuration);
                     } else {
