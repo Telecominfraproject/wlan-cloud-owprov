@@ -51,19 +51,24 @@ namespace OpenWifi{
                 std::string Arg;
                 if(HasParameter("config",Arg) && Arg=="true") {
                     APConfig    Device(SerialNumber,IT.deviceType,Logger_);
+                    std::cout << __LINE__ << std::endl;
 
                     Poco::JSON::Object  Answer;
                     std::string C;
                     if(Device.Get(C)) {
+                        std::cout << __LINE__ << std::endl;
                         Answer.set("config", C);
-                        ReturnObject(Request, Answer, Response);
+                        std::cout << __LINE__ << std::endl;
                     } else {
+                        std::cout << __LINE__ << std::endl;
                         Answer.set("config","none");
+                        std::cout << __LINE__ << std::endl;
                     }
-
                     ReturnObject(Request, Answer, Response);
+                    std::cout << __LINE__ << std::endl;
                     return;
                 } else {
+                    std::cout << __LINE__ << std::endl;
                     Poco::JSON::Object  Answer;
                     IT.to_json(Answer);
                     ReturnObject(Request, Answer, Response);
