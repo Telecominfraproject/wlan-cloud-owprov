@@ -131,11 +131,19 @@ setroot() {
 
 addentity() {
     payload="{ \"name\" : \"$1\", \"description\" : \"sub entity.\", \"parent\" : \"0000-0000-0000\", \"notes\" : [ {\"note\" : \"CLI added\"} ] }";
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/inventory/1" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
     -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
+getentity() {
+    curl    ${FLAGS} "https://${OWPROV}/api/v1/entity/$1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -319,20 +327,21 @@ case "$1" in
     "getroot") login; getroot; logout;;
     "setroot") login; setroot; logout;;
     "addentity") login; addentity "$2" ; logout;;
+    "getentity") login; getentity "$2" ; logout;;
+    "getentities") login; getentities ; logout;;
+    "entitycount") login; entitycount ; logout;;
+    "tree") login; tree ; logout;;
+    "importtree") login; importtree $2; logout;;
     "addtag") login; addtag $2 $3; logout;;
     "unassigntag") login; unassigntag $2; logout;;
     "addunassignedtag") login; addunassignedtag $2 ; logout;;
-    "getentities") login; getentities ; logout;;
-    "tree") login; tree ; logout;;
+    "getunassignedtags") login; getunassignedtags ; logout;;
     "gettags") login; gettags ; logout;;
     "gettag") login; gettag $2 ; logout;;
     "tagcount") login; tagcount ; logout;;
-    "entitycount") login; entitycount ; logout;;
     "venuecount") login; venuecount ; logout;;
     "contactcount") login; contactcount ; logout;;
     "locationcount") login; locationcount ; logout;;
-    "getunassignedtags") login; getunassignedtags ; logout;;
-    "importtree") login; importtree $2; logout;;
     "addconfig") login; addconfig "$2"; logout;;
     "listconfigs") login; listconfigs ; logout;;
     "getconfig") login; getconfig "$2"; logout;;

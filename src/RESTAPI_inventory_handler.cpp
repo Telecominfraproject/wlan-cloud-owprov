@@ -13,6 +13,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
 #include "RESTAPI_utils.h"
+#include "APConfig.h"
 
 namespace OpenWifi{
     void RESTAPI_inventory_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -47,10 +48,27 @@ namespace OpenWifi{
 
             ProvObjects::InventoryTag   IT;
             if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
-                Poco::JSON::Object  Answer;
-                IT.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
-                return;
+                std::string Arg;
+                if(HasParameter("config",Arg) && Arg=="true") {
+                    APConfig    Device(SerialNumber,IT.deviceType,Logger_);
+
+                    Poco::JSON::Object  Answer;
+                    std::string C;
+                    if(Device.Get(C)) {
+                        Answer.set("config", C);
+                        ReturnObject(Request, Answer, Response);
+                    } else {
+                        Answer.set("config","none");
+                    }
+
+                    ReturnObject(Request, Answer, Response);
+                    return;
+                } else {
+                    Poco::JSON::Object  Answer;
+                    IT.to_json(Answer);
+                    ReturnObject(Request, Answer, Response);
+                    return;
+                }
             } else {
                 NotFound(Request,Response);
                 return;

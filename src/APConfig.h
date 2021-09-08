@@ -31,6 +31,11 @@ namespace OpenWifi {
             std::string                 CompleteConfig_;
             ConfigVec                   Config_;
             Types::StringPairVec        Errors;
+
+            bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio);
+            bool mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr);
+            bool merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object &C);
+
     };
 }
 
