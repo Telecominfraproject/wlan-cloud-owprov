@@ -352,7 +352,7 @@ case "$1" in
     "entitycount") login; entitycount ; logout;;
     "tree") login; tree ; logout;;
     "importtree") login; importtree $2; logout;;
-    "deviceconfig") login; deviceconfig $2; logout;;
+    "deviceconfig") login; deviceconfig "$2"; logout;;
     "addtag") login; addtag $2 $3; logout;;
     "unassigntag") login; unassigntag $2; logout;;
     "addunassignedtag") login; addunassignedtag $2 ; logout;;

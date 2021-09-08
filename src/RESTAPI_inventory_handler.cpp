@@ -47,9 +47,12 @@ namespace OpenWifi{
             }
 
             ProvObjects::InventoryTag   IT;
+            std::cout << __LINE__ << std::endl;
             if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
                 std::string Arg;
+                std::cout << __LINE__ << std::endl;
                 if(HasParameter("config",Arg) && Arg=="true") {
+                    std::cout << __LINE__ << std::endl;
                     APConfig    Device(SerialNumber,IT.deviceType,Logger_);
                     std::cout << __LINE__ << std::endl;
 
