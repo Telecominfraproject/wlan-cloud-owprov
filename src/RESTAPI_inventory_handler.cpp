@@ -239,17 +239,24 @@ namespace OpenWifi{
             std::string NewDeviceConfiguration="1";
             AssignIfPresent(RawObject,"deviceConfiguration",NewDeviceConfiguration);
             if(NewDeviceConfiguration!="1") {
+                std::cout << __LINE__ << std::endl;
                 if(NewDeviceConfiguration.empty()) {
-                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                    std::cout << __LINE__ << std::endl;
+                    if(!ExistingObject.deviceConfiguration.empty())
+                        Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
                     ExistingObject.deviceConfiguration.clear();
                 } else if(NewDeviceConfiguration!=ExistingObject.deviceConfiguration) {
+                    std::cout << __LINE__ << std::endl;
                     if(!Storage()->ConfigurationDB().Exists("id",NewDeviceConfiguration)) {
+                        std::cout << __LINE__ << std::endl;
                         BadRequest(Request, Response, "Inbvalid Configuration ID");
                         return;
                     }
+                    std::cout << __LINE__ << std::endl;
                     Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
                     Storage()->ConfigurationDB().AddInUse("id",NewDeviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
                     ExistingObject.deviceConfiguration=NewDeviceConfiguration;
+                    std::cout << __LINE__ << std::endl;
                 }
             }
 
