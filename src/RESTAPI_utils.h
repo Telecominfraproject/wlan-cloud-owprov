@@ -158,7 +158,7 @@ namespace OpenWifi::RESTAPI_utils {
 			OutputArr.add(i);
 		}
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::condense(OutputArr,OS, Poco::JSON_PRESERVE_KEY_ORDER );
+		Poco::JSON::Stringifier::stringify(OutputArr,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
 		return OS.str();
 	}
 
@@ -172,7 +172,7 @@ namespace OpenWifi::RESTAPI_utils {
 			OutputArr.add(O);
 		}
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::condense(OutputArr,OS, Poco::JSON_PRESERVE_KEY_ORDER);
+		Poco::JSON::Stringifier::stringify(OutputArr,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
 		return OS.str();
 	}
 
@@ -180,7 +180,7 @@ namespace OpenWifi::RESTAPI_utils {
 		Poco::JSON::Object OutputObj;
 		Object.to_json(OutputObj);
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::condense(OutputObj,OS, Poco::JSON_PRESERVE_KEY_ORDER);
+		Poco::JSON::Stringifier::stringify(OutputObj,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
 		return OS.str();
 	}
 
