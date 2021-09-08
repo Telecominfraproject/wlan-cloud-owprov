@@ -50,66 +50,48 @@ namespace OpenWifi {
     }
 
     bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object::Ptr &C) {
-        std::cout << __LINE__ << std::endl;
-        if(A!= nullptr) {
-            for(const auto &i:*A) {
-                std::cout << __LINE__ << std::endl;
-                const std::string & K = i.first;
-                //  std::cout << "KEY: " << K << std::endl;
-                if(B->has(K)) {
-                    if(A->isArray(K)) {
-                        std::cout << __LINE__ << std::endl;
-                        //  std::cout << "ISARRAY" << std::endl;
-                        if(B->isArray(K)) {
-                            std::cout << __LINE__ << std::endl;
-                            Poco::JSON::Array   Arr;
-                            auto AR1=A->getArray(K);
-                            auto AR2=B->getArray(K);
-                            mergeArray(K,AR1,AR2,Arr);
-                            C->set(K,Arr);
-                        } else {
-                            std::cout << __LINE__ << std::endl;
-                            C->set(K,A->getArray(K));
-                        }
+        for(const auto &i:*A) {
+            const std::string & K = i.first;
+            //  std::cout << "KEY: " << K << std::endl;
+            if(B->has(K)) {
+                if(A->isArray(K)) {
+                    //  std::cout << "ISARRAY" << std::endl;
+                    if(B->isArray(K)) {
+                        Poco::JSON::Array   Arr;
+                        auto AR1=A->getArray(K);
+                        auto AR2=B->getArray(K);
+                        mergeArray(K,AR1,AR2,Arr);
+                        C->set(K,Arr);
+                    } else {
+                        C->set(K,A->getArray(K));
                     }
-                    else if(A->isObject(K) && B->isObject(K)) {
-                        std::cout << __LINE__ << std::endl;
-                        //  std::cout << "ISOBJECT" << std::endl;
-                        auto R=Poco::makeShared<Poco::JSON::Object>();
-                        merge(A->getObject(K),B->getObject(K),R);
-                        C->set(K,R);
-                    }
-                    else {
-                        std::cout << __LINE__ << std::endl;
-                        C->set(K,i.second);
-                    }
-                } else {
-                    std::cout << __LINE__ << std::endl;
+                }
+                else if(A->isObject(K) && B->isObject(K)) {
+                    //  std::cout << "ISOBJECT" << std::endl;
+                    auto R=Poco::makeShared<Poco::JSON::Object>();
+                    merge(A->getObject(K),B->getObject(K),R);
+                    C->set(K,R);
+                }
+                else {
                     C->set(K,i.second);
                 }
+            } else {
+                C->set(K,i.second);
             }
         }
 
-        std::cout << __LINE__ << std::endl;
-        if(B!= nullptr) {
-            for(const auto &i:*B) {
-                std::cout << __LINE__ << std::endl;
-                const std::string & K = i.first;
-                std::cout << __LINE__ << std::endl;
-                if(A==nullptr || !A->has(K)) {
-                    std::cout << __LINE__ << std::endl;
-                    (*C).set(K, i.second);
-                    std::cout << __LINE__ << std::endl;
-                }
+        for(const auto &i:*B) {
+            const std::string & K = i.first;
+            if(A==nullptr || !A->has(K)) {
+                (*C).set(K, i.second);
             }
         }
-        std::cout << __LINE__ << std::endl;
+
         return true;
     }
 
     static void ShowJSON(const Poco::JSON::Object::Ptr &Obj) {
         std::stringstream O;
-
         Poco::JSON::Stringifier::stringify(Obj,O);
         std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
     }
@@ -128,7 +110,6 @@ namespace OpenWifi {
                         AddVenueConfig(D.venue);
                     }
                 }
-
                 //  Now we have all the config we need.
             } catch (const Poco::Exception &E ) {
                 Logger_.log(E);
@@ -142,24 +123,15 @@ namespace OpenWifi {
         //      services
         //      globals
         //      unit
-        std::cout << __LINE__ << std::endl;
         auto Tmp=Poco::makeShared<Poco::JSON::Object>();
         for(const auto &i:Config_) {
-            std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser  P;
-            std::cout << __LINE__ << std::endl;
             auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-            std::cout << __LINE__ << std::endl;
             auto Result = Poco::makeShared<Poco::JSON::Object>();
-            std::cout << __LINE__ << std::endl;
             merge(Tmp, O, Result);
             ShowJSON(Result);
             Tmp = Result;
-            std::cout << __LINE__ << std::endl;
         }
-
-        std::cout << __LINE__ << std::endl;
-
         Configuration = Tmp;
 
         if(Config_.empty())
