@@ -154,6 +154,7 @@ namespace OpenWifi {
             std::cout << __LINE__ << std::endl;
             merge(Tmp, O, Result);
             ShowJSON(Result);
+            Tmp = Result;
             std::cout << __LINE__ << std::endl;
         }
 
