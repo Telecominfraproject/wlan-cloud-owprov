@@ -143,8 +143,17 @@ namespace OpenWifi {
         if(Storage()->ConfigurationDB().GetRecord("id", UUID,Config)) {
             //  find where to insert into this list using the weight.
             if(!Config.configuration.empty()) {
-                for(const auto &i:Config.configuration)
-                    Config_.push_back(i);
+                for(const auto &i:Config.configuration) {
+                    if(i.weight==0) {
+                        Config_.push_back(i);
+                    } else {
+                        // we need to insert after everything bigger or equal
+                        auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
+                                                     [](const ProvObjects::DeviceConfigurationElement &Elem, int Value) {
+                                                            return Elem.weight>=Value; });
+                        Config_.insert(Hint,i);
+                    }
+                }
             }
         }
     }
