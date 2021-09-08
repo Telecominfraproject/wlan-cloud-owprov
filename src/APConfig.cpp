@@ -35,21 +35,21 @@ namespace OpenWifi {
         if(K=="radios") {
             for(const auto &i:*A) {
                 auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
-                std::cout << "Radio A:" << std::endl;
-                ShowJSON(A_Radio);
+                // std::cout << "Radio A:" << std::endl;
+                // ShowJSON(A_Radio);
                 if(A_Radio->has("band")) {
                     std::string Band = A_Radio->get("band").toString();
-                    std::cout << "Looking for band: " << Band << std::endl;
+                    // std::cout << "Looking for band: " << Band << std::endl;
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
                     if(FindRadio(Band,B,B_Radio)) {
-                        std::cout << "Radio B:" << std::endl;
-                        ShowJSON(B_Radio);
+                        // std::cout << "Radio B:" << std::endl;
+                        // ShowJSON(B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
-                        std::cout << "Merging data:" << std::endl;
-                        ShowJSON(B_Radio);
+                        // std::cout << "Merging data:" << std::endl;
+                        // ShowJSON(B_Radio);
                         merge(A_Radio,B_Radio,RR);
-                        std::cout << "Merged data:" << std::endl;
-                        ShowJSON(RR);
+                        // std::cout << "Merged data:" << std::endl;
+                        // ShowJSON(RR);
                         Arr.add(RR);
                     } else {
                         Arr.add(A);
@@ -96,11 +96,11 @@ namespace OpenWifi {
         for(const auto &i:*B) {
             const std::string & K = i.first;
             if(!A->has(K)) {
-                std::cout << "Before leave" << std::endl;
-                ShowJSON(C);
+                // std::cout << "Before leave" << std::endl;
+                // ShowJSON(C);
                 C->set(K, i.second);
-                std::cout << "After leave" << std::endl;
-                ShowJSON(C);
+                // std::cout << "After leave" << std::endl;
+                // ShowJSON(C);
             }
         }
 
