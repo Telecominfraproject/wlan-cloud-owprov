@@ -58,8 +58,7 @@ namespace OpenWifi {
                     // std::cout << "Looking for band: " << Band << std::endl;
                     auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
                     if(FindRadio(Band,B,B_Radio)) {
-                        // std::cout << "Radio B:" << std::endl;
-                        // ShowJSON(B_Radio);
+                        ShowJSON("Data to be merged", B_Radio);
                         auto RR = Poco::makeShared<Poco::JSON::Object>();
                         merge(A_Radio, B_Radio,RR);
                         ShowJSON("Merged data", RR);
