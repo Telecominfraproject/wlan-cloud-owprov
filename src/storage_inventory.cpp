@@ -67,7 +67,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.geoCode = In.get<12>();
     Out.location = In.get<13>();
     Out.contact = In.get<14>();
-    Out.deviceConfiguration = In.get<14>();
+    Out.deviceConfiguration = In.get<15>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -86,5 +86,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<12>(In.geoCode);
     Out.set<13>(In.location);
     Out.set<14>(In.contact);
-    Out.set<14>(In.deviceConfiguration);
+    Out.set<15>(In.deviceConfiguration);
 }
