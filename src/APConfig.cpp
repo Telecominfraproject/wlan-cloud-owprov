@@ -32,9 +32,9 @@ namespace OpenWifi {
                 auto A_Radio = A->get(index).extract<Poco::JSON::Object::Ptr>();
                 if(A_Radio->has("band")) {
                     std::string Band = A_Radio->get("band").toString();
-                    Poco::JSON::Object::Ptr B_Radio;
+                    auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
                     if(FindRadio(Band,B,B_Radio)) {
-                        Poco::JSON::Object::Ptr RR;
+                        auto RR = Poco::makeShared<Poco::JSON::Object>();
                         merge(A_Radio,B_Radio,RR);
                         Arr.set(index, RR);
                     } else {
@@ -75,7 +75,7 @@ namespace OpenWifi {
                     else if(A->isObject(K) && B->isObject(K)) {
                         std::cout << __LINE__ << std::endl;
                         //  std::cout << "ISOBJECT" << std::endl;
-                        Poco::JSON::Object::Ptr R;
+                        auto R=Poco::makeShared<Poco::JSON::Object>();
                         merge(A->getObject(K),B->getObject(K),R);
                         C->set(K,R);
                     }
@@ -143,7 +143,7 @@ namespace OpenWifi {
         //      globals
         //      unit
         std::cout << __LINE__ << std::endl;
-        Poco::JSON::Object::Ptr Tmp;
+        auto Tmp=Poco::makeShared<Poco::JSON::Object>();
         for(const auto &i:Config_) {
             std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser  P;
