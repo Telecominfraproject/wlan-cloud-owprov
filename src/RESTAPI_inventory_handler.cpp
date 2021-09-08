@@ -225,13 +225,13 @@ namespace OpenWifi{
             bool UnAssign=false;
             if(HasParameter("unassign", Arg) && Arg=="true") {
                 UnAssign=true;
-                if(!NewVenue.empty() && ExistingObject.venue!=NewVenue) {
+                if(!ExistingObject.venue.empty()) {
                     Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
-                }
-
-                if(!NewEntity.empty() && ExistingObject.entity!=NewEntity) {
+                } else if(!ExistingObject.entity.empty()) {
                     Storage()->EntityDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
                 }
+                ExistingObject.venue.clear();
+                ExistingObject.entity.clear();
             }
 
             AssignIfPresent(RawObject, "name", ExistingObject.info.name);
@@ -239,25 +239,22 @@ namespace OpenWifi{
             ExistingObject.info.modified = std::time(nullptr);
 
             if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
-                if(UnAssign) {
-                    if(!NewEntity.empty() && NewEntity!=ExistingObject.entity) {
-                        Storage()->EntityDB().AddDevice("id",NewEntity,ExistingObject.info.id);
-                        ExistingObject.entity = NewEntity;
-                        ExistingObject.venue.clear();
-                    }
-
-                    if(!NewVenue.empty() && NewVenue!=ExistingObject.venue) {
-                        Storage()->VenueDB().AddDevice("id",NewVenue,ExistingObject.info.id);
-                        ExistingObject.venue = NewVenue;
-                        ExistingObject.entity.clear();
-                    }
-                    Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+                if(!UnAssign && !NewEntity.empty() && NewEntity!=ExistingObject.entity) {
+                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
+                    Storage()->EntityDB().AddDevice("id",NewEntity,ExistingObject.info.id);
+                    ExistingObject.entity = NewEntity;
+                    ExistingObject.venue.clear();
+                } else if(!UnAssign && !NewVenue.empty() && NewVenue!=ExistingObject.venue) {
+                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                    Storage()->VenueDB().AddDevice("id",NewVenue,ExistingObject.info.id);
+                    ExistingObject.entity.clear();
+                    ExistingObject.venue = NewVenue;
                 }
-
-                Storage()->InventoryDB().GetRecord("id", ExistingObject.info.id, ExistingObject);
-
+                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+                ProvObjects::InventoryTag   NewObject;
+                Storage()->InventoryDB().GetRecord("id", ExistingObject.info.id, NewObject);
                 Poco::JSON::Object  Answer;
-                ExistingObject.to_json(Answer);
+                NewObject.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }
