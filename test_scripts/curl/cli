@@ -319,6 +319,15 @@ addconfigmetrics() {
     jq < ${result_file}
 }
 
+addconfigfile() {
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d @"$1" > ${result_file}
+    jq < ${result_file}
+}
+
 getconfig() {
     curl    ${FLAGS}  "https://${OWPROV}/api/v1/configurations/$1" \
     -H "Content-Type: application/json" \
@@ -403,6 +412,7 @@ case "$1" in
     "setentityconfig") login; setentityconfig "$2" "$3"; logout;;
     "adddeviceconfig") login; adddeviceconfig "$2" "$3"; logout;;
     "addconfigmetrics") login; addconfigmetrics "$2" ; logout;;
+    "addconfigfile") login; addconfigfile "$2" ; logout;;
     *) help ;;
 esac
 

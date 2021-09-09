@@ -267,8 +267,9 @@ namespace OpenWifi{
                 }
 
                 Poco::JSON::Object  Answer;
-                Storage()->EntityDB().GetRecord("id",UUID, Existing);
-                Existing.to_json(Answer);
+                ProvObjects::Entity NewRecord;
+                Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
+                NewRecord.to_json(Answer);
                 ReturnObject(Request, Answer, Response);
                 return;
             }

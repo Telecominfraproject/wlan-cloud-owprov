@@ -37,10 +37,12 @@ namespace OpenWifi {
     }
 
     static void ShowJSON(const char *S, const Poco::JSON::Object::Ptr &Obj) {
+        /*
         std::stringstream O;
         Poco::JSON::Stringifier::stringify(Obj,O);
         std::cout << S << ":" << std::endl;
         std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
+         */
     }
 
     bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
