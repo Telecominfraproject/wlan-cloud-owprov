@@ -299,13 +299,24 @@ addconfig() {
 
 addconfigtx() {
     payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios TX\" , \"weight\" : 0, \"configuration\" : { \"radios\": [{ \"band\": \"2G\", \"tx-power\": 45 } ] } }] }"
-            curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -H "accept: application/json" \
-            -d "$payload" > ${result_file}
-            echo ${payload}
-            jq < ${result_file}
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    echo ${payload}
+    jq < ${result_file}
+}
+
+addconfigmetrics() {
+    payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"metrics gen\" , \"weight\" : 0, \"configuration\" : { \"metrics\":  { \"statistics\": { \"interval\": 120, \"types\": [ \"ssids\", \"lldp\", \"clients\" ] } } } }] }"
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d "$payload" > ${result_file}
+    echo ${payload}
+    jq < ${result_file}
 }
 
 getconfig() {
@@ -391,6 +402,7 @@ case "$1" in
     "assigntagvenue") login; assigntagvenue "$2" "$3"; logout;;
     "setentityconfig") login; setentityconfig "$2" "$3"; logout;;
     "adddeviceconfig") login; adddeviceconfig "$2" "$3"; logout;;
+    "addconfigmetrics") login; addconfigmetrics "$2" ; logout;;
     *) help ;;
 esac
 
