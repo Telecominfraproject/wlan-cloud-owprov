@@ -131,6 +131,10 @@ namespace OpenWifi{
                 for(const auto &i:C.configuration) {
                     Poco::JSON::Parser  P;
                     // std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
+                    if(i.name.empty()) {
+                        BadRequest(Request, Response, "The configuration block name must be included.");
+                        return;
+                    }
                     P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
                 }
             } catch (const Poco::Exception &E) {
@@ -171,8 +175,8 @@ namespace OpenWifi{
             }
 
             ProvObjects::DeviceConfiguration    NewConfig;
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            Poco::JSON::Parser                  IncomingParser;
+            auto Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
             if (!NewConfig.from_json(Obj)) {
                 BadRequest(Request, Response, "Illegal JSON posted document.");
                 return;
@@ -207,6 +211,10 @@ namespace OpenWifi{
             if(!NewConfig.configuration.empty()) {
                 try {
                     for(const auto &i:NewConfig.configuration) {
+                        if(i.name.empty()) {
+                            BadRequest(Request, Response, "The configuration block name must be included.");
+                            return;
+                        }
                         Poco::JSON::Parser  P;
                         auto T = P.parse(i.configuration).extract<Poco::JSON::Object>();
                     }
@@ -214,6 +222,8 @@ namespace OpenWifi{
                     BadRequest(Request, Response, "Invalid configuration portion.");
                     return;
                 }
+
+                Existing.configuration = NewConfig.configuration;
             }
 
             if(!NewConfig.variables.empty())
@@ -230,7 +240,6 @@ namespace OpenWifi{
                 if(!OldPolicy.empty()) {
                     Storage()->PolicyDB().DeleteInUse("id",OldPolicy,Storage()->ConfigurationDB().Prefix(),Existing.info.id);
                 }
-
                 if(!Existing.managementPolicy.empty()) {
                     Storage()->PolicyDB().AddInUse("id",Existing.managementPolicy,Storage()->ConfigurationDB().Prefix(),Existing.info.id);
                 }
