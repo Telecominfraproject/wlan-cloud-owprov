@@ -1,0 +1,10 @@
+{	"services": {
+		"lldp": {
+			"describe": "uCentral",
+			"location": "universe"
+		},
+		"ssh": {
+			"port": 22
+		}
+	}
+}

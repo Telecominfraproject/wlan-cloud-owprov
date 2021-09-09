@@ -1,0 +1,31 @@
+{	"interfaces": [
+		{
+			"name": "WAN",
+			"role": "upstream",
+			"services": [ "lldp" ],
+			"ethernet": [
+				{
+					"select-ports": [
+						"WAN*"
+					]
+				}
+			],
+			"ipv4": {
+				"addressing": "dynamic"
+			},
+			"ssids": [
+				{
+					"name": "OpenWifi",
+					"wifi-bands": [
+						"2G", "5G"
+					],
+					"bss-mode": "ap",
+					"encryption": {
+						"proto": "psk2",
+						"key": "OpenWifi",
+						"ieee80211w": "optional"
+					}
+				}
+			]
+}
+
