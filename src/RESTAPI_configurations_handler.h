@@ -11,6 +11,7 @@
 #include "RESTAPI_handler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
     class RESTAPI_configurations_handler : public RESTAPIHandler {
@@ -34,6 +35,10 @@ namespace OpenWifi {
                    Poco::Net::HTTPServerResponse &Response);
         void DoDelete(Poco::Net::HTTPServerRequest &Request,
                       Poco::Net::HTTPServerResponse &Response);
+    private:
+        bool ValidateConfigBlock(const      ProvObjects::DeviceConfiguration &Config,
+                                            Poco::Net::HTTPServerRequest &Request,
+                                            Poco::Net::HTTPServerResponse &Response);
     };
 }
 

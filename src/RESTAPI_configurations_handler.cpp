@@ -89,6 +89,42 @@ namespace OpenWifi{
         BadRequest(Request, Response, "Internal error. Consult documentation and try again.");
     }
 
+    //      interfaces
+    //      metrics
+    //      radios
+    //      services
+    //      globals
+    //      unit
+    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config,
+                                                                     Poco::Net::HTTPServerRequest &Request,
+                                                                     Poco::Net::HTTPServerResponse &Response) {
+        static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
+
+        try {
+            for(const auto &i:Config.configuration) {
+                Poco::JSON::Parser  P;
+
+                if(i.name.empty()) {
+                    BadRequest(Request, Response, "The configuration block name must be included.");
+                    return false;
+                }
+                auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+                auto N = Blocks->getNames();
+
+                for(const auto &j:N) {
+                    if(std::find(SectionNames.cbegin(),SectionNames.cend(),j)==SectionNames.cend()) {
+                        BadRequest(Request, Response, "Configuration block type invalid.");
+                        return false;
+                    }
+                }
+            }
+        } catch (const Poco::Exception &E) {
+            BadRequest(Request, Response, "Invalid configuration portion.");
+            return false;
+        }
+        return true;
+    }
+
     void RESTAPI_configurations_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
                                                Poco::Net::HTTPServerResponse &Response) {
         try {
@@ -127,20 +163,8 @@ namespace OpenWifi{
                 return;
             }
 
-            try {
-                for(const auto &i:C.configuration) {
-                    Poco::JSON::Parser  P;
-                    // std::cout << "Config:>>>" << std::endl << i.configuration << std::endl << "<<<" << std::endl;
-                    if(i.name.empty()) {
-                        BadRequest(Request, Response, "The configuration block name must be included.");
-                        return;
-                    }
-                    P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-                }
-            } catch (const Poco::Exception &E) {
-                BadRequest(Request, Response, "Invalid configuration portion.");
+            if(!ValidateConfigBlock(C, Request, Response))
                 return;
-            }
 
             if(Storage()->ConfigurationDB().CreateRecord(C)) {
                 Storage()->ConfigurationDB().GetRecord("id", C.info.id, C);
@@ -208,23 +232,8 @@ namespace OpenWifi{
 
             NewConfig.info.modified = std::time(nullptr);
 
-            if(!NewConfig.configuration.empty()) {
-                try {
-                    for(const auto &i:NewConfig.configuration) {
-                        if(i.name.empty()) {
-                            BadRequest(Request, Response, "The configuration block name must be included.");
-                            return;
-                        }
-                        Poco::JSON::Parser  P;
-                        auto T = P.parse(i.configuration).extract<Poco::JSON::Object>();
-                    }
-                } catch (const Poco::Exception &E) {
-                    BadRequest(Request, Response, "Invalid configuration portion.");
-                    return;
-                }
-
-                Existing.configuration = NewConfig.configuration;
-            }
+            if(!ValidateConfigBlock(NewConfig, Request, Response))
+                return;
 
             if(!NewConfig.variables.empty())
                 Existing.variables = NewConfig.variables;

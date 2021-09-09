@@ -1,53 +1,71 @@
 {
-                "type" : "entity",
-                "name" : "world",
-                "children" : [{
-                                "type" : "entity",
-                                "name" : "root" ,
-                                "children" : [ {
-                                                    "type" : "entity" ,
-                                                    "name" : "sub-root1" ,
-                                                    "children" : [{
-                                                                        "type" : "entity" ,
-                                                                        "name" : "sub-1.1" ,
-                                                                        "children" : [] ,
-                                                                        "venues" : []
-                                                                    },
-                                                                    {
-                                                                        "type" : "entity" ,
-                                                                        "name" : "sub-1.2" ,
-                                                                        "children" : [] ,
-                                                                        "venues" : []
-                                                                    }
-                                                                ] ,
-                                                    "venues" : [{
-                                                                "type" : "venue" ,
-                                                                "name" : "sub-r1-v1" ,
-                                                                "venues" : []
-                                                            },
-                                                            {
-                                                                "type" : "venue" ,
-                                                                "name" : "sub-r1-v2" ,
-                                                                "venues" : []
-                                                        }]
-                                                },
-                                                {
-                                                    "type" : "entity" ,
-                                                    "name" : "sub-root2" ,
-                                                    "children" : [] ,
-                                                    "venues" : []
-                                                }
-                                                ] ,
-                                "venues" : [ {
-                                                    "type" : "venue" ,
-                                                    "name" : "sub-v1" ,
-                                                    "venues" : []
-                                                },
-                                                {
-                                                    "type" : "venue" ,
-                                                    "name" : "sub-v2" ,
-                                                    "venues" : []
-                                            }]
-                                }],
-                "venues" : []
-    }
+	"type": "entity",
+	"name": "world",
+	"children": [{
+			"type": "entity",
+			"name": "Canada",
+			"children": [{
+				"type": "entity",
+				"name": "Provinces",
+				"children": [{
+						"type": "entity",
+						"name": "Quebec",
+						"children": [],
+						"venues": [{
+								"type": "venue",
+								"name": "Bell Center",
+								"venues": []
+							},
+							{
+								"type": "venue",
+								"name": "Olymic Statium",
+								"venues": []
+							}
+						]
+					},
+					{
+						"type": "entity",
+						"name": "Ontario",
+						"children": [],
+						"venues": [{
+								"type": "venue",
+								"name": "CN Tower",
+								"venues": []
+							},
+							{
+								"type": "venue",
+								"name": "Rogers Center",
+								"venues": []
+							}
+						]
+					},
+					{
+						"type": "entity",
+						"name": "BC",
+						"children": [],
+						"venues": [{
+								"type": "venue",
+								"name": "BC Place",
+								"venues": []
+							},
+							{
+								"type": "venue",
+								"name": "Stanley Park",
+								"venues": []
+							}
+						]
+					}
+				],
+				"venues": []
+			}],
+			"venues": []
+		},
+		{
+			"type": "entity",
+			"name": "Mexico",
+			"children": [],
+			"venues": []
+		}
+	],
+	"venues": []
+}
