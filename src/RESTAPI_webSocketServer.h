@@ -22,10 +22,10 @@ namespace OpenWifi {
 												  Internal) {}
 		static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/ws"};}
 
-		void DoGet();
-		void DoPost();
-		void DoPut();
-		void DoDelete();
+		void DoGet() final;
+		void DoPost() final {};
+		void DoPut() final {};
+		void DoDelete() final {};
 
 		inline void RegisterProcessor(const std::string &Command, ws_processor_func & f) {
 		    CommandProcessors_[Command] = f;

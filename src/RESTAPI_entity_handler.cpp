@@ -15,143 +15,118 @@
 #include "Daemon.h"
 #include "RESTAPI_SecurityObjects.h"
 #include "RESTAPI_utils.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoGet() {
-        try {
-            std::string UUID = GetBinding("uuid", "");
-
-            if(UUID.empty()) {
-                BadRequest("Missing UUID");
-                return;
-            }
-
-            ProvObjects::Entity E;
-            if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
-                Poco::JSON::Object Answer;
-                E.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            }
-            NotFound();
+        std::string UUID = GetBinding("uuid", "");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
             return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error");
+
+        ProvObjects::Entity E;
+        if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
+            Poco::JSON::Object Answer;
+            E.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        NotFound();
     }
 
     void RESTAPI_entity_handler::DoDelete() {
-        try {
-            std::string UUID = GetBinding("uuid", "");
 
-            if(UUID.empty()) {
-                BadRequest("Missing UUID");
-                return;
-            }
+        std::string UUID = GetBinding("uuid", "");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
+        }
 
-            if(UUID == EntityDB::RootUUID()) {
-                BadRequest("Root Entity cannot be removed, only modified");
-                return;
-            }
+        if(UUID == EntityDB::RootUUID()) {
+            BadRequest(RESTAPI::Errors::CannotDeleteRoot);
+            return;
+        }
 
-            ProvObjects::Entity E;
-
-            if(!Storage()->EntityDB().GetRecord("id",UUID,E)) {
-                NotFound();
-                return;
-            }
-
-            if(!E.children.empty()) {
-                BadRequest("Entity still has children.");
-                return;
-            }
-
-            if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
-                Storage()->EntityDB().DeleteChild("id",E.parent,UUID);
-                OK();
-                return;
-            }
+        ProvObjects::Entity E;
+        if(!Storage()->EntityDB().GetRecord("id",UUID,E)) {
             NotFound();
             return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error");
+
+        if(!E.children.empty()) {
+            BadRequest(RESTAPI::Errors::StillInUse);
+            return;
+        }
+
+        if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
+            Storage()->EntityDB().DeleteChild("id",E.parent,UUID);
+            OK();
+            return;
+        }
+        NotFound();
     }
 
     void RESTAPI_entity_handler::DoPost() {
-        try {
-            std::string UUID = GetBinding("uuid", "");
-
-            if(UUID.empty()) {
-                BadRequest("Missing UUID");
-                return;
-            }
-
-            if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
-                BadRequest("Root entity must be created first.");
-                return;
-            }
-
-            auto Obj = ParseStream();
-            ProvObjects::Entity NewEntity;
-            if (!NewEntity.from_json(Obj)) {
-                BadRequest("Ill formed JSON document.");
-                return;
-            }
-            NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
-
-            for(auto &i:NewEntity.info.notes)
-                i.createdBy = UserInfo_.userinfo.email;
-
-            //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
-            //  must be conveyed through PUT.
-            NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
-            if(UUID==EntityDB::RootUUID())
-                NewEntity.parent="";
-            else if(NewEntity.parent.empty()) {
-                BadRequest("Parent UUID must be specified");
-                return;
-            } else {
-                if(!Storage()->EntityDB().Exists("id",NewEntity.parent)) {
-                    BadRequest("Parent UUID must exist");
-                    return;
-                }
-            }
-
-            if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-                BadRequest("Device Configuration does not exist");
-                return;
-            }
-
-            NewEntity.venues.clear();
-            NewEntity.children.clear();
-            NewEntity.contacts.clear();
-            NewEntity.locations.clear();
-
-            if(Storage()->EntityDB().CreateShortCut(NewEntity)) {
-                if(UUID==EntityDB::RootUUID())
-                    Storage()->EntityDB().CheckForRoot();
-                else {
-                    Storage()->EntityDB().AddChild("id",NewEntity.parent,NewEntity.info.id);
-                }
-
-                if(!NewEntity.deviceConfiguration.empty())
-                    Storage()->ConfigurationDB().AddInUse("id",NewEntity.deviceConfiguration,Storage()->EntityDB().Prefix(),NewEntity.info.id);
-
-                Poco::JSON::Object  Answer;
-                NewEntity.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            }
-            NotFound();
+        std::string UUID = GetBinding("uuid", "");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
             return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error");
+
+        if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
+            BadRequest(RESTAPI::Errors::MustCreateRootFirst);
+            return;
+        }
+
+        auto Obj = ParseStream();
+        ProvObjects::Entity NewEntity;
+        if (!NewEntity.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+        NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
+
+        for(auto &i:NewEntity.info.notes)
+            i.createdBy = UserInfo_.userinfo.email;
+
+        //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
+        //  must be conveyed through PUT.
+        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
+        if(UUID==EntityDB::RootUUID()) {
+            NewEntity.parent="";
+        } else if(NewEntity.parent.empty() || !Storage()->EntityDB().Exists("id",NewEntity.parent)) {
+            BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
+            return;
+        }
+
+        if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
+            BadRequest(RESTAPI::Errors::ConfigurationMustExist);
+            return;
+        }
+
+        NewEntity.venues.clear();
+        NewEntity.children.clear();
+        NewEntity.contacts.clear();
+        NewEntity.locations.clear();
+
+        if(Storage()->EntityDB().CreateShortCut(NewEntity)) {
+            if(UUID==EntityDB::RootUUID())
+                Storage()->EntityDB().CheckForRoot();
+            else {
+                Storage()->EntityDB().AddChild("id",NewEntity.parent,NewEntity.info.id);
+            }
+
+            if(!NewEntity.deviceConfiguration.empty())
+                Storage()->ConfigurationDB().AddInUse("id",NewEntity.deviceConfiguration,Storage()->EntityDB().Prefix(),NewEntity.info.id);
+
+            Poco::JSON::Object  Answer;
+            NewEntity.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        NotFound();
     }
 
     /*
@@ -164,91 +139,87 @@ namespace OpenWifi{
      */
 
     void RESTAPI_entity_handler::DoPut() {
-        try {
-            std::string UUID = GetBinding("uuid", "");
-
-            if(UUID.empty()) {
-                BadRequest("Missing UUID");
-                return;
-            }
-
-            ProvObjects::Entity Existing;
-            if(!Storage()->EntityDB().GetRecord("id",UUID,Existing)) {
-                NotFound();
-                return;
-            }
-
-            auto RawObject = ParseStream();
-            ProvObjects::Entity NewEntity;
-            if(!NewEntity.from_json(RawObject)) {
-                BadRequest("Cannot parse incoming JSON document.");
-                return;
-            }
-
-            std::string OldConfiguration;
-            if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-                BadRequest("Device configuration does not exist");
-                return;
-            } else {
-                OldConfiguration = Existing.deviceConfiguration;
-                Existing.deviceConfiguration = NewEntity.deviceConfiguration;
-            }
-
-            for(auto &i:NewEntity.info.notes) {
-                i.createdBy = UserInfo_.userinfo.email;
-                Existing.info.notes.insert(Existing.info.notes.begin(),i);
-            }
-
-            if(!NewEntity.info.name.empty())
-                Existing.info.name = NewEntity.info.name;
-            if(!NewEntity.info.description.empty())
-                Existing.info.description = NewEntity.info.description;
-
-            Existing.info.modified = std::time(nullptr);
-
-            std::string Error;
-            if(!Storage()->Validate(Parameters_,Error)) {
-                BadRequest(Error);
-                return;
-            }
-
-            if(Storage()->EntityDB().UpdateRecord("id",UUID,Existing)) {
-                for(const auto &i:*Request) {
-                    std::string Child{i.second};
-                    auto UUID_parts = Utils::Split(Child,':');
-                    if(i.first=="add" && UUID_parts[0] == "con") {
-                        Storage()->EntityDB().AddContact("id", UUID, UUID_parts[1]);
-                        Storage()->ContactDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(), UUID);
-                    } else if (i.first == "del" && UUID_parts[0] == "con") {
-                        Storage()->EntityDB().DeleteContact("id", UUID, UUID_parts[1]);
-                        Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
-                    } else if (i.first == "add" && UUID_parts[0] == "loc") {
-                        Storage()->EntityDB().AddLocation("id", UUID, UUID_parts[1]);
-                        Storage()->LocationDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
-                    } else if (i.first == "del" && UUID_parts[0] == "loc") {
-                        Storage()->EntityDB().DeleteLocation("id", UUID, UUID_parts[1]);
-                        Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
-                    }
-                }
-
-                if(!OldConfiguration.empty()) {
-                    Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
-                }
-
-                if(!NewEntity.deviceConfiguration.empty()) {
-                    Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
-                }
-
-                Poco::JSON::Object  Answer;
-                ProvObjects::Entity NewRecord;
-                Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
-                NewRecord.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            }
-        } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        std::string UUID = GetBinding("uuid", "");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
         }
-        BadRequest("Internal error.");
+
+        ProvObjects::Entity Existing;
+        if(!Storage()->EntityDB().GetRecord("id",UUID,Existing)) {
+            NotFound();
+            return;
+        }
+
+        auto RawObject = ParseStream();
+        ProvObjects::Entity NewEntity;
+        if(!NewEntity.from_json(RawObject)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        std::string OldConfiguration;
+        if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
+            BadRequest(RESTAPI::Errors::ConfigurationMustExist);
+            return;
+        } else {
+            OldConfiguration = Existing.deviceConfiguration;
+            Existing.deviceConfiguration = NewEntity.deviceConfiguration;
+        }
+
+        for(auto &i:NewEntity.info.notes) {
+            i.createdBy = UserInfo_.userinfo.email;
+            Existing.info.notes.insert(Existing.info.notes.begin(),i);
+        }
+
+        if(!NewEntity.info.name.empty())
+            Existing.info.name = NewEntity.info.name;
+        if(!NewEntity.info.description.empty())
+            Existing.info.description = NewEntity.info.description;
+
+        Existing.info.modified = std::time(nullptr);
+
+        std::string Error;
+        if(!Storage()->Validate(Parameters_,Error)) {
+            BadRequest(Error);
+            return;
+        }
+
+        if(Storage()->EntityDB().UpdateRecord("id",UUID,Existing)) {
+            for(const auto &i:*Request) {
+                std::string Child{i.second};
+                auto UUID_parts = Utils::Split(Child,':');
+                if(i.first=="add" && UUID_parts[0] == "con") {
+                    Storage()->EntityDB().AddContact("id", UUID, UUID_parts[1]);
+                    Storage()->ContactDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(), UUID);
+                } else if (i.first == "del" && UUID_parts[0] == "con") {
+                    Storage()->EntityDB().DeleteContact("id", UUID, UUID_parts[1]);
+                    Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                } else if (i.first == "add" && UUID_parts[0] == "loc") {
+                    Storage()->EntityDB().AddLocation("id", UUID, UUID_parts[1]);
+                    Storage()->LocationDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                } else if (i.first == "del" && UUID_parts[0] == "loc") {
+                    Storage()->EntityDB().DeleteLocation("id", UUID, UUID_parts[1]);
+                    Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                }
+            }
+
+            if(!OldConfiguration.empty()) {
+                Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+            }
+
+            if(!NewEntity.deviceConfiguration.empty()) {
+                Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+            }
+
+            Poco::JSON::Object  Answer;
+            ProvObjects::Entity NewRecord;
+            Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
+            NewRecord.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        } else {
+            BadRequest(RESTAPI::Errors::RecordNotUpdated);
+        }
     }
 }

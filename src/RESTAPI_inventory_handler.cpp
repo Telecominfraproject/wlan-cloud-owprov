@@ -14,242 +14,218 @@
 #include "Daemon.h"
 #include "RESTAPI_utils.h"
 #include "APConfig.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet() {
-        try {
-            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-            if(SerialNumber.empty()) {
-                BadRequest("Missing SerialNumber.");
-                return;
-            }
-
-            ProvObjects::InventoryTag   IT;
-            if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
-                std::string Arg;
-                if(HasParameter("config",Arg) && Arg=="true") {
-                    APConfig    Device(SerialNumber,IT.deviceType,Logger_);
-
-                    Poco::JSON::Object  Answer;
-                    Poco::JSON::Object::Ptr  Configuration;
-                    if(Device.Get(Configuration)) {
-                        Answer.set("config", Configuration);
-                    } else {
-                        Answer.set("config","none");
-                    }
-                    ReturnObject(Answer);
-                    return;
-                } else {
-                    Poco::JSON::Object  Answer;
-                    IT.to_json(Answer);
-                    ReturnObject(Answer);
-                    return;
-                }
-            } else {
-                NotFound();
-                return;
-            }
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
-        }
-        BadRequest("Internal error.");
-    }
-
-    void RESTAPI_inventory_handler::DoDelete() {
-        try {
-            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-            if(SerialNumber.empty()) {
-                BadRequest("Missing SerialNumber.");
-                return;
-            }
-
-            ProvObjects::InventoryTag   IT;
-            if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
-                NotFound();
-                return;
-            }
-
-            Storage()->InventoryDB().DeleteRecord(RESTAPI::Protocol::ID, IT.info.id);
-            OK();
+        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        if(SerialNumber.empty()) {
+            BadRequest(RESTAPI::Errors::MissingSerialNumber);
             return;
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error.");
-    }
 
-    void RESTAPI_inventory_handler::DoPost() {
-        try {
+        ProvObjects::InventoryTag   IT;
+        if(Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
+            std::string Arg;
+            if(HasParameter("config",Arg) && Arg=="true") {
+                APConfig    Device(SerialNumber,IT.deviceType,Logger_);
 
-            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-            if(SerialNumber.empty()) {
-                BadRequest("Missing SerialNumber.");
+                Poco::JSON::Object  Answer;
+                Poco::JSON::Object::Ptr  Configuration;
+                if(Device.Get(Configuration)) {
+                    Answer.set("config", Configuration);
+                } else {
+                    Answer.set("config","none");
+                }
+                ReturnObject(Answer);
                 return;
-            }
-
-            if(!Utils::ValidSerialNumber(SerialNumber)) {
-                BadRequest("Invalid SerialNumber.");
-                return;
-            }
-
-            Poco::toLowerInPlace(SerialNumber);
-
-            if(Storage()->InventoryDB().Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
-                BadRequest("SerialNumber: " + SerialNumber + " already exists.");
-                return;
-            }
-
-            auto Obj = ParseStream();
-            ProvObjects::InventoryTag IT;
-            if (!IT.from_json(Obj)) {
-                BadRequest("Cannot parse incoming POST.");
-                return;
-            }
-
-            if(IT.info.name.empty()) {
-                BadRequest( "Name cannot be empty.");
-                return;
-            }
-
-            if(IT.deviceType.empty() || !Storage()->IsAcceptableDeviceType(IT.deviceType)) {
-                BadRequest("DeviceType: '" + IT.deviceType + "' does not exist.");
-                return;
-            }
-
-            if(OpenWifi::EntityDB::IsRoot(IT.entity) || (!IT.entity.empty() && !Storage()->EntityDB().Exists("id",IT.entity))) {
-                BadRequest("Device must be associated with a non-root and existing entity. UUID="+IT.entity);
-                return;
-            }
-
-            if(!IT.venue.empty() && !Storage()->VenueDB().Exists("id",IT.venue)) {
-                BadRequest("Venue: " + IT.venue + " does not exist.");
-                return;
-            }
-
-            IT.info.modified = IT.info.created = std::time(nullptr);
-            IT.info.id = Daemon()->CreateUUID();
-
-            if(Storage()->InventoryDB().CreateRecord(IT)) {
-                if (!IT.venue.empty())
-                    Storage()->VenueDB().AddDevice("id",IT.venue,IT.info.id);
-                Poco::JSON::Object Answer;
+            } else {
+                Poco::JSON::Object  Answer;
                 IT.to_json(Answer);
                 ReturnObject(Answer);
                 return;
             }
-            BadRequest("Record could not be added.");
-            return;
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        } else {
+            NotFound();
         }
-        BadRequest("Internal error.");
+    }
+
+    void RESTAPI_inventory_handler::DoDelete() {
+        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        if(SerialNumber.empty()) {
+            BadRequest(RESTAPI::Errors::MissingSerialNumber);
+            return;
+        }
+        ProvObjects::InventoryTag   IT;
+        if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,IT)) {
+            NotFound();
+            return;
+        }
+        Storage()->InventoryDB().DeleteRecord(RESTAPI::Protocol::ID, IT.info.id);
+        OK();
+    }
+
+    void RESTAPI_inventory_handler::DoPost() {
+        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        if(SerialNumber.empty()) {
+            BadRequest(RESTAPI::Errors::MissingSerialNumber);
+            return;
+        }
+
+        if(!Utils::ValidSerialNumber(SerialNumber)) {
+            BadRequest(RESTAPI::Errors::InvalidSerialNumber);
+            return;
+        }
+
+        Poco::toLowerInPlace(SerialNumber);
+
+        if(Storage()->InventoryDB().Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
+            BadRequest(RESTAPI::Errors::SerialNumberExists + " (" + SerialNumber + ")");
+            return;
+        }
+
+        auto Obj = ParseStream();
+        ProvObjects::InventoryTag IT;
+        if (!IT.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        if(IT.info.name.empty()) {
+            BadRequest( RESTAPI::Errors::NameMustBeSet);
+            return;
+        }
+
+        if(IT.deviceType.empty() || !Storage()->IsAcceptableDeviceType(IT.deviceType)) {
+            BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
+            return;
+        }
+
+        if(OpenWifi::EntityDB::IsRoot(IT.entity) || (!IT.entity.empty() && !Storage()->EntityDB().Exists("id",IT.entity))) {
+            BadRequest(RESTAPI::Errors::ValidNonRootUUID);
+            return;
+        }
+
+        if(!IT.venue.empty() && !Storage()->VenueDB().Exists("id",IT.venue)) {
+            BadRequest(RESTAPI::Errors::VenueMustExist);
+            return;
+        }
+
+        IT.info.modified = IT.info.created = std::time(nullptr);
+        IT.info.id = Daemon()->CreateUUID();
+
+        if(Storage()->InventoryDB().CreateRecord(IT)) {
+            if (!IT.venue.empty())
+                Storage()->VenueDB().AddDevice("id",IT.venue,IT.info.id);
+            Poco::JSON::Object Answer;
+            IT.to_json(Answer);
+            ReturnObject(Answer);
+        } else {
+            BadRequest(RESTAPI::Errors::RecordNotCreated);
+        }
     }
 
     void RESTAPI_inventory_handler::DoPut() {
-        try {
-            std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-            if(SerialNumber.empty()) {
-                BadRequest("Missing SerialNumber.");
+        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        if(SerialNumber.empty()) {
+            BadRequest(RESTAPI::Errors::MissingSerialNumber);
+            return;
+        }
+
+        ProvObjects::InventoryTag   ExistingObject;
+        if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,ExistingObject)) {
+            NotFound();
+            return;
+        }
+
+        auto RawObject = ParseStream();
+        if(RawObject->has("notes")) {
+            SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
+        }
+
+        std::string NewVenue, NewEntity;
+        AssignIfPresent(RawObject, "venue",NewVenue);
+        AssignIfPresent(RawObject, "entity",NewEntity);
+
+        if(!NewEntity.empty() && !NewVenue.empty()) {
+            BadRequest(RESTAPI::Errors::NotBoth);
+            return;
+        }
+
+        if(!NewVenue.empty() && !Storage()->VenueDB().Exists("id",NewVenue)) {
+            BadRequest(RESTAPI::Errors::VenueMustExist);
+            return;
+        }
+
+        if(!NewEntity.empty() && !Storage()->EntityDB().Exists("id",NewEntity)) {
+            BadRequest(RESTAPI::Errors::EntityMustExist);
+            return;
+        }
+
+        if(RawObject->has("deviceType")) {
+            std::string DeviceType{RawObject->get("deviceType").toString()};
+            if(!Storage()->IsAcceptableDeviceType(DeviceType)) {
+                BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
                 return;
             }
+            ExistingObject.deviceType = DeviceType;
+        }
 
-            ProvObjects::InventoryTag   ExistingObject;
-            if(!Storage()->InventoryDB().GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,ExistingObject)) {
-                NotFound();
-                return;
+        std::string Arg;
+        bool UnAssign=false;
+        if(HasParameter("unassign", Arg) && Arg=="true") {
+            UnAssign=true;
+            if(!ExistingObject.venue.empty()) {
+                Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+            } else if(!ExistingObject.entity.empty()) {
+                Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
             }
+            ExistingObject.venue.clear();
+            ExistingObject.entity.clear();
+        }
 
-            auto RawObject = ParseStream();
-            if(RawObject->has("notes")) {
-                SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingObject.info.notes);
-            }
+        AssignIfPresent(RawObject, "name", ExistingObject.info.name);
+        AssignIfPresent(RawObject, "description", ExistingObject.info.description);
+        ExistingObject.info.modified = std::time(nullptr);
 
-            std::string NewVenue, NewEntity;
-            AssignIfPresent(RawObject, "venue",NewVenue);
-            AssignIfPresent(RawObject, "entity",NewEntity);
-
-            if(!NewEntity.empty() && !NewVenue.empty()) {
-                BadRequest("You cannot specify both Entity and Venue");
-                return;
-            }
-
-            if(!NewVenue.empty() && !Storage()->VenueDB().Exists("id",NewVenue)) {
-                BadRequest("Venue does not exist.");
-                return;
-            }
-
-            if(!NewEntity.empty() && !Storage()->EntityDB().Exists("id",NewEntity)) {
-                BadRequest("Entity does not exist.");
-                return;
-            }
-
-            if(RawObject->has("deviceType")) {
-                std::string DeviceType{RawObject->get("deviceType").toString()};
-                if(!Storage()->IsAcceptableDeviceType(DeviceType)) {
-                    BadRequest("DeviceType: '" + DeviceType + "' does not exist.");
+        std::string NewDeviceConfiguration="1";
+        AssignIfPresent(RawObject,"deviceConfiguration",NewDeviceConfiguration);
+        if(NewDeviceConfiguration!="1") {
+            if(NewDeviceConfiguration.empty()) {
+                if(!ExistingObject.deviceConfiguration.empty())
+                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                ExistingObject.deviceConfiguration.clear();
+            } else if(NewDeviceConfiguration!=ExistingObject.deviceConfiguration) {
+                if(!Storage()->ConfigurationDB().Exists("id",NewDeviceConfiguration)) {
+                    BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                     return;
                 }
-                ExistingObject.deviceType = DeviceType;
+                Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                Storage()->ConfigurationDB().AddInUse("id",NewDeviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
+                ExistingObject.deviceConfiguration=NewDeviceConfiguration;
             }
-
-            std::string Arg;
-            bool UnAssign=false;
-            if(HasParameter("unassign", Arg) && Arg=="true") {
-                UnAssign=true;
-                if(!ExistingObject.venue.empty()) {
-                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
-                } else if(!ExistingObject.entity.empty()) {
-                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
-                }
-                ExistingObject.venue.clear();
-                ExistingObject.entity.clear();
-            }
-
-            AssignIfPresent(RawObject, "name", ExistingObject.info.name);
-            AssignIfPresent(RawObject, "description", ExistingObject.info.description);
-            ExistingObject.info.modified = std::time(nullptr);
-
-            std::string NewDeviceConfiguration="1";
-            AssignIfPresent(RawObject,"deviceConfiguration",NewDeviceConfiguration);
-            if(NewDeviceConfiguration!="1") {
-                if(NewDeviceConfiguration.empty()) {
-                    if(!ExistingObject.deviceConfiguration.empty())
-                        Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
-                    ExistingObject.deviceConfiguration.clear();
-                } else if(NewDeviceConfiguration!=ExistingObject.deviceConfiguration) {
-                    if(!Storage()->ConfigurationDB().Exists("id",NewDeviceConfiguration)) {
-                        BadRequest( "Invalid Configuration ID");
-                        return;
-                    }
-                    Storage()->ConfigurationDB().DeleteInUse("id",ExistingObject.deviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
-                    Storage()->ConfigurationDB().AddInUse("id",NewDeviceConfiguration,Storage()->InventoryDB().Prefix(),ExistingObject.info.id);
-                    ExistingObject.deviceConfiguration=NewDeviceConfiguration;
-                }
-            }
-
-            if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
-                if(!UnAssign && !NewEntity.empty() && NewEntity!=ExistingObject.entity) {
-                    Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
-                    Storage()->EntityDB().AddDevice("id",NewEntity,ExistingObject.info.id);
-                    ExistingObject.entity = NewEntity;
-                    ExistingObject.venue.clear();
-                } else if(!UnAssign && !NewVenue.empty() && NewVenue!=ExistingObject.venue) {
-                    Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
-                    Storage()->VenueDB().AddDevice("id",NewVenue,ExistingObject.info.id);
-                    ExistingObject.entity.clear();
-                    ExistingObject.venue = NewVenue;
-                }
-                Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
-                ProvObjects::InventoryTag   NewObject;
-                Storage()->InventoryDB().GetRecord("id", ExistingObject.info.id, NewObject);
-                Poco::JSON::Object  Answer;
-                NewObject.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            }
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error.");
+
+        if(Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject)) {
+            if(!UnAssign && !NewEntity.empty() && NewEntity!=ExistingObject.entity) {
+                Storage()->EntityDB().DeleteDevice("id",ExistingObject.entity,ExistingObject.info.id);
+                Storage()->EntityDB().AddDevice("id",NewEntity,ExistingObject.info.id);
+                ExistingObject.entity = NewEntity;
+                ExistingObject.venue.clear();
+            } else if(!UnAssign && !NewVenue.empty() && NewVenue!=ExistingObject.venue) {
+                Storage()->VenueDB().DeleteDevice("id",ExistingObject.venue,ExistingObject.info.id);
+                Storage()->VenueDB().AddDevice("id",NewVenue,ExistingObject.info.id);
+                ExistingObject.entity.clear();
+                ExistingObject.venue = NewVenue;
+            }
+            Storage()->InventoryDB().UpdateRecord("id", ExistingObject.info.id, ExistingObject);
+            ProvObjects::InventoryTag   NewObject;
+            Storage()->InventoryDB().GetRecord("id", ExistingObject.info.id, NewObject);
+            Poco::JSON::Object  Answer;
+            NewObject.to_json(Answer);
+            ReturnObject(Answer);
+        } else {
+            BadRequest(RESTAPI::Errors::RecordNotUpdated);
+        }
     }
 }

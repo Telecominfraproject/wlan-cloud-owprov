@@ -12,92 +12,78 @@
 #include "StorageService.h"
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi{
     void RESTAPI_contact_handler::DoGet() {
-        try {
-            std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
-            if(UUID.empty()) {
-                BadRequest("Missing UUID.");
-                return;
-            }
-
-            ProvObjects::Contact   C;
-            if(Storage()->ContactDB().GetRecord(RESTAPI::Protocol::ID,UUID,C)) {
-                Poco::JSON::Object  Answer;
-                C.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            } else {
-                NotFound();
-                return;
-            }
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
         }
-        BadRequest("Internal error. Try again.");
+
+        ProvObjects::Contact   C;
+        if(Storage()->ContactDB().GetRecord(RESTAPI::Protocol::ID,UUID,C)) {
+            Poco::JSON::Object  Answer;
+            C.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        } else {
+            NotFound();
+            return;
+        }
     }
 
     void RESTAPI_contact_handler::DoDelete() {
-        try {
-            std::string UUID = GetBinding("uuid","");
-            if(UUID.empty()) {
-                BadRequest("Missing UUID");
-                return;
-            }
-
-            ProvObjects::Contact    ExistingContact;
-            if(!Storage()->ContactDB().GetRecord("id",UUID,ExistingContact)) {
-                NotFound();
-                return;
-            }
-
-            bool Force=false;
-            std::string Arg;
-            if(HasParameter("force",Arg) && Arg=="true")
-                Force=true;
-
-            if(!Force && !ExistingContact.inUse.empty()) {
-                BadRequest("Some entities still reference this entry. Delete them or use force=true");
-                return;
-            }
-
-        } catch( const Poco::Exception &E) {
-            Logger_.log(E);
+        std::string UUID = GetBinding("uuid","");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
         }
-        BadRequest("An error occurred and the contact was not added.");
+
+        ProvObjects::Contact    ExistingContact;
+        if(!Storage()->ContactDB().GetRecord("id",UUID,ExistingContact)) {
+            NotFound();
+            return;
+        }
+
+        bool Force=false;
+        std::string Arg;
+        if(HasParameter("force",Arg) && Arg=="true")
+            Force=true;
+
+        if(!Force && !ExistingContact.inUse.empty()) {
+            BadRequest(RESTAPI::Errors::StillInUse);
+            return;
+        }
     }
 
     void RESTAPI_contact_handler::DoPost() {
-        try {
-            std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
-            if(UUID.empty()) {
-                BadRequest("Missing UUID.");
-                return;
-            }
-
-            auto Obj = ParseStream();
-            ProvObjects::Contact C;
-            if (!C.from_json(Obj)) {
-                BadRequest("Cannot parse incoming POST.");
-                return;
-            }
-
-            C.info.id = Daemon()->CreateUUID();
-            C.info.created = C.info.modified = std::time(nullptr);
-
-            std::string f{RESTAPI::Protocol::ID};
-
-            if(Storage()->ContactDB().CreateRecord(C)) {
-                Poco::JSON::Object Answer;
-                C.to_json(Answer);
-                ReturnObject(Answer);
-                return;
-            }
-        }  catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
         }
-        BadRequest("An error occurred and the contact was not added.");
+
+        auto Obj = ParseStream();
+        ProvObjects::Contact C;
+        if (!C.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        C.info.id = Daemon()->CreateUUID();
+        C.info.created = C.info.modified = std::time(nullptr);
+
+        std::string f{RESTAPI::Protocol::ID};
+
+        if(Storage()->ContactDB().CreateRecord(C)) {
+            Poco::JSON::Object Answer;
+            C.to_json(Answer);
+            ReturnObject(Answer);
+        } else {
+            BadRequest(RESTAPI::Errors::RecordNotCreated);
+        }
     }
 
     void RESTAPI_contact_handler::DoPut() {

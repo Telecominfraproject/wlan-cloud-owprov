@@ -8,6 +8,7 @@
 
 
 #include "RESTAPI_location_handler.h"
+#include "RESTAPI_errors.h"
 
 
 namespace OpenWifi{

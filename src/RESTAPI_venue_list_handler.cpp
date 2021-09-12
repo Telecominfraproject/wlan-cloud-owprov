@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "StorageService.h"
 #include "RESTAPI_utils.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi{
     void RESTAPI_venue_list_handler::DoGet() {
@@ -60,9 +61,4 @@ namespace OpenWifi{
         }
         BadRequest("Internal error.");
     }
-
-    void RESTAPI_venue_list_handler::DoDelete() {}
-    void RESTAPI_venue_list_handler::DoPut() {}
-    void RESTAPI_venue_list_handler::DoPost() {}
-
 }

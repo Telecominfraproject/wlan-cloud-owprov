@@ -11,6 +11,7 @@
 
 #include "Utils.h"
 #include "AuthClient.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi {
 
@@ -103,6 +104,8 @@ namespace OpenWifi {
 			catch (const Poco::Exception &E) {
 				Logger_.log(E);
 			}
+		} else {
+		    BadRequest(RESTAPI::Errors::OnlyWSSupported);
 		}
 	}
 
@@ -118,8 +121,4 @@ namespace OpenWifi {
 			Logger_.log(E);
 		}
 	}
-
-	void RESTAPI_webSocketServer::DoDelete() {}
-	void RESTAPI_webSocketServer::DoPut() {}
-	void RESTAPI_webSocketServer::DoPost() {}
 }

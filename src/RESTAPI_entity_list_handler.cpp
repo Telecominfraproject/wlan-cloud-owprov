@@ -11,62 +11,52 @@
 #include "Utils.h"
 #include "StorageService.h"
 #include "RESTAPI_utils.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
-        try {
-            std::string Arg;
-            if(!QB_.Select.empty()) {
-                auto EntityUIDs = Utils::Split(QB_.Select);
-                ProvObjects::EntityVec Entities;
-                for(const auto &i:EntityUIDs) {
-                    ProvObjects::Entity E;
-                    if(Storage()->EntityDB().GetRecord("id",i,E)) {
-                        Entities.push_back(E);
-                    } else {
-                        BadRequest("Unknown UUID:" + i);
-                        return;
-                    }
+        std::string Arg;
+        if(!QB_.Select.empty()) {
+            auto EntityUIDs = Utils::Split(QB_.Select);
+            ProvObjects::EntityVec Entities;
+            for(const auto &i:EntityUIDs) {
+                ProvObjects::Entity E;
+                if(Storage()->EntityDB().GetRecord("id",i,E)) {
+                    Entities.push_back(E);
+                } else {
+                    BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
+                    return;
                 }
-                ReturnObject("entities", Entities);
-                return;
-            } else if(QB_.CountOnly) {
-                auto C = Storage()->EntityDB().Count();
-                ReturnCountOnly(C);
-                return;
-            } if (HasParameter("getTree",Arg) && Arg=="true") {
-                Poco::JSON::Object  FullTree;
-                Storage()->EntityDB().BuildTree(FullTree);
-                ReturnObject(FullTree);
-                return;
-            } else {
-                ProvObjects::EntityVec Entities;
-                Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-                ReturnObject("entities",Entities);
-                return;
             }
-        } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+            ReturnObject("entities", Entities);
+            return;
+        } else if(QB_.CountOnly) {
+            auto C = Storage()->EntityDB().Count();
+            ReturnCountOnly(C);
+            return;
+        } if (HasParameter("getTree",Arg) && Arg=="true") {
+            Poco::JSON::Object  FullTree;
+            Storage()->EntityDB().BuildTree(FullTree);
+            ReturnObject(FullTree);
+            return;
+        } else {
+            ProvObjects::EntityVec Entities;
+            Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
+            ReturnObject("entities",Entities);
+            return;
         }
-        BadRequest("Internal error");
     }
 
     void RESTAPI_entity_list_handler::DoPost() {
-        try {
-            std::string Arg;
-            if (HasParameter("setTree",Arg) && Arg=="true") {
-                auto FullTree = ParseStream();
-                Storage()->EntityDB().ImportTree(FullTree);
-                OK();
-                return;
-            }
-        } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        std::string Arg;
+        if (HasParameter("setTree",Arg) && Arg=="true") {
+            auto FullTree = ParseStream();
+            Storage()->EntityDB().ImportTree(FullTree);
+            OK();
+            return;
+        } else {
+            BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
-        BadRequest("Internal error. Please try again.");
     }
-
-    void RESTAPI_entity_list_handler::DoPut() {};
-    void RESTAPI_entity_list_handler::DoDelete() {};
 }

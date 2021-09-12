@@ -26,10 +26,10 @@ namespace OpenWifi {
             Internal) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementPolicy/{uuid}"}; };
 
-        void DoGet();
-        void DoPost();
-        void DoPut();
-        void DoDelete();
+        void DoGet() final;
+        void DoPost() final ;
+        void DoPut() final ;
+        void DoDelete() final ;
     };
 }
 
