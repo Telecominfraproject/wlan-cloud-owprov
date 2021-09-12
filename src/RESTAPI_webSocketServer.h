@@ -20,11 +20,12 @@ namespace OpenWifi {
 						 std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_GET,
 												  Poco::Net::HTTPRequest::HTTP_OPTIONS},
 												  Internal) {}
-		void handleRequest(Poco::Net::HTTPServerRequest &Request,
-						 Poco::Net::HTTPServerResponse &Response) override final;
 		static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/ws"};}
-		void DoGet(Poco::Net::HTTPServerRequest &Request,
-				   Poco::Net::HTTPServerResponse &Response);
+
+		void DoGet();
+		void DoPost();
+		void DoPut();
+		void DoDelete();
 
 		inline void RegisterProcessor(const std::string &Command, ws_processor_func & f) {
 		    CommandProcessors_[Command] = f;

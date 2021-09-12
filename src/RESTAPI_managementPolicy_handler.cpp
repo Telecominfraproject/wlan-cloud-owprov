@@ -8,38 +8,108 @@
 
 
 #include "RESTAPI_managementPolicy_handler.h"
+#include "RESTAPI_ProvObjects.h"
+#include "StorageService.h"
+#include "Poco/JSON/Parser.h"
+#include "Daemon.h"
 
 namespace OpenWifi{
-    void RESTAPI_managementPolicy_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
 
-        if (!IsAuthorized(Request, Response))
-            return;
+    void RESTAPI_managementPolicy_handler::DoGet() {
+        try {
+            std::string UUID = GetBinding("uuid","");
 
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
+            if(UUID.empty()) {
+                BadRequest("Missing UUID.");
+                return;
+            }
+
+            ProvObjects::ManagementPolicy   Existing;
+            if(!Storage()->PolicyDB().GetRecord("id", UUID, Existing)) {
+                NotFound();
+                return;
+            }
+
+            Poco::JSON::Object  Answer;
+            Existing.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest("Internal error. Please try again.");
     }
 
-    void RESTAPI_managementPolicy_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+    void RESTAPI_managementPolicy_handler::DoDelete() {
+        try {
+            std::string UUID = GetBinding("uuid","");
 
-    void RESTAPI_managementPolicy_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+            if(UUID.empty()) {
+                BadRequest("Missing UUID.");
+                return;
+            }
 
-    void RESTAPI_managementPolicy_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+            ProvObjects::ManagementPolicy   Existing;
+            if(!Storage()->PolicyDB().GetRecord("id", UUID, Existing)) {
+                NotFound();
+                return;
+            }
 
-    void RESTAPI_managementPolicy_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {}
+            if(!Existing.inUse.empty()) {
+                BadRequest("Cannot delete policy while still in use.");
+                return;
+            }
+
+            if(Storage()->PolicyDB().DeleteRecord("id", UUID)) {
+                OK();
+                return;
+            }
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest("Internal error. Please try again.");
+    }
+
+    void RESTAPI_managementPolicy_handler::DoPost() {
+        try {
+
+            std::string UUID = GetBinding("uuid","");
+            if(UUID.empty()) {
+                BadRequest("Missing UUID.");
+                return;
+            }
+
+            ProvObjects::ManagementPolicy   NewPolicy;
+            auto NewObj = ParseStream();
+            if(!NewPolicy.from_json(NewObj)) {
+                BadRequest("Ill formed JSON document.");
+                return;
+            }
+
+            if(NewPolicy.info.name.empty()) {
+                BadRequest("Name cannot be blank.");
+                return;
+            }
+
+            NewPolicy.inUse.clear();
+            NewPolicy.info.id = Daemon()->CreateUUID();
+            NewPolicy.info.created = NewPolicy.info.modified = std::time(nullptr);
+            if(Storage()->PolicyDB().CreateRecord(NewPolicy)) {
+                ProvObjects::ManagementPolicy   Policy;
+                Storage()->PolicyDB().GetRecord("id",NewPolicy.info.id,Policy);
+                Poco::JSON::Object  Answer;
+                Policy.to_json(Answer);
+                ReturnObject(Answer);
+                return;
+            }
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        BadRequest("Internal error. Please try again.");
+
+    }
+
+    void RESTAPI_managementPolicy_handler::DoPut() {
+
+    }
 }

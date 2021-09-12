@@ -12,24 +12,7 @@
 #include "Utils.h"
 
 namespace OpenWifi{
-    void RESTAPI_inventory_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-
-    void RESTAPI_inventory_list_handler::SendList(Poco::Net::HTTPServerRequest &Request, const ProvObjects::InventoryTagVec & Tags, bool SerialOnly,
-                  Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_inventory_list_handler::SendList( const ProvObjects::InventoryTagVec & Tags, bool SerialOnly) {
         Poco::JSON::Array   Array;
         for(const auto &i:Tags) {
             if(SerialOnly) {
@@ -45,11 +28,10 @@ namespace OpenWifi{
             Answer.set("serialNumbers", Array);
         else
             Answer.set("tags", Array);
-        ReturnObject(Request, Answer, Response);
+        ReturnObject(Answer);
     }
 
-    void RESTAPI_inventory_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_inventory_list_handler::DoGet() {
 
         try {
             std::string UUID;
@@ -70,49 +52,49 @@ namespace OpenWifi{
                     if(Storage()->InventoryDB().GetRecord("id",i,E)) {
                         Tags.push_back(E);
                     } else {
-                        BadRequest(Request, Response, "Unknown UUID:" + i);
+                        BadRequest("Unknown UUID:" + i);
                         return;
                     }
                 }
-                ReturnObject( Request, "tags", Tags, Response);
+                ReturnObject( "tags", Tags);
                 return;
             } else if(HasParameter("entity",UUID)) {
                 if(QB_.CountOnly) {
                     auto C = Storage()->InventoryDB().Count( Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
-                    ReturnCountOnly(Request, C, Response);
+                    ReturnCountOnly( C);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
-                SendList(Request, Tags, SerialOnly, Response);
+                SendList(Tags, SerialOnly);
                 return;
             } else if(HasParameter("venue",UUID)) {
                 if(QB_.CountOnly) {
                     auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
-                    ReturnCountOnly(Request, C, Response);
+                    ReturnCountOnly( C);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
-                SendList(Request, Tags, SerialOnly, Response);
+                SendList( Tags, SerialOnly);
                 return;
             } else if(HasParameter("unassigned",Arg) && Arg=="true") {
                 if(QB_.CountOnly) {
                     std::string Empty;
                     auto C = Storage()->InventoryDB().Count( InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
                                                                               ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ));
-                    ReturnCountOnly(Request, C, Response);
+                    ReturnCountOnly(C);
                     return;
                 }
                 ProvObjects::InventoryTagVec Tags;
                 std::string Empty;
                 Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
                                                                                                   ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ) );
-                SendList(Request, Tags, SerialOnly, Response);
+                SendList(Tags, SerialOnly);
                 return;
             } else if(QB_.CountOnly) {
                 auto C = Storage()->InventoryDB().Count();
-                ReturnCountOnly(Request, C, Response);
+                ReturnCountOnly(C);
                 return;
             } else {
                 ProvObjects::InventoryTagVec Tags;
@@ -141,12 +123,17 @@ namespace OpenWifi{
                 }
                 Poco::JSON::Object  Answer;
                 Answer.set("tags",Arr);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
+
+    void RESTAPI_inventory_list_handler::DoDelete() {}
+    void RESTAPI_inventory_list_handler::DoPut() {}
+    void RESTAPI_inventory_list_handler::DoPost() {}
+
 }

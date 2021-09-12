@@ -23,18 +23,12 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Internal) {}
-            void handleRequest(Poco::Net::HTTPServerRequest &request,
-                               Poco::Net::HTTPServerResponse &response) override final;
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/contact/{uuid}"}; };
 
-        void DoGet(Poco::Net::HTTPServerRequest &Request,
-                   Poco::Net::HTTPServerResponse &Response);
-        void DoPost(Poco::Net::HTTPServerRequest &Request,
-                    Poco::Net::HTTPServerResponse &Response);
-        void DoPut(Poco::Net::HTTPServerRequest &Request,
-                   Poco::Net::HTTPServerResponse &Response);
-        void DoDelete(Poco::Net::HTTPServerRequest &Request,
-                      Poco::Net::HTTPServerResponse &Response);
+        void DoGet();
+        void DoPost();
+        void DoPut();
+        void DoDelete();
     };
 }
 

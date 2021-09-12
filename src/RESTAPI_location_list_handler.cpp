@@ -8,23 +8,8 @@
 #include "StorageService.h"
 
 namespace OpenWifi{
-    void RESTAPI_location_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                     Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
 
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_location_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                             Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_location_list_handler::DoGet() {
 
         try {
             if(!QB_.Select.empty()) {
@@ -35,26 +20,31 @@ namespace OpenWifi{
                     if(Storage()->LocationDB().GetRecord("id",i,E)) {
                         Locations.push_back(E);
                     } else {
-                        BadRequest(Request, Response, "Unknown UUID:" + i);
+                        BadRequest("Unknown UUID:" + i);
                         return;
                     }
                 }
-                ReturnObject(Request, "locations", Locations, Response);
+                ReturnObject("locations", Locations);
                 return;
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->LocationDB().Count();
-                ReturnCountOnly(Request, C, Response);
+                ReturnCountOnly(C);
                 return;
             } else {
                 ProvObjects::LocationVec Locations;
                 Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
-                ReturnObject(Request, "locations", Locations, Response);
+                ReturnObject("locations", Locations);
                 return;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
+
+    void RESTAPI_location_list_handler::DoDelete() {}
+    void RESTAPI_location_list_handler::DoPut() {}
+    void RESTAPI_location_list_handler::DoPost() {}
+
 }

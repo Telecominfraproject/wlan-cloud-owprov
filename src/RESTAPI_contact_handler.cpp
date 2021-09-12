@@ -14,33 +14,11 @@
 #include "Daemon.h"
 
 namespace OpenWifi{
-    void RESTAPI_contact_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                               Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_contact_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                       Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_contact_handler::DoGet() {
         try {
             std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
@@ -48,30 +26,29 @@ namespace OpenWifi{
             if(Storage()->ContactDB().GetRecord(RESTAPI::Protocol::ID,UUID,C)) {
                 Poco::JSON::Object  Answer;
                 C.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             } else {
-                NotFound(Request,Response);
+                NotFound();
                 return;
             }
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error. Try again.");
     }
 
-    void RESTAPI_contact_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                         Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_contact_handler::DoDelete() {
         try {
             std::string UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
             ProvObjects::Contact    ExistingContact;
             if(!Storage()->ContactDB().GetRecord("id",UUID,ExistingContact)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
@@ -81,30 +58,28 @@ namespace OpenWifi{
                 Force=true;
 
             if(!Force && !ExistingContact.inUse.empty()) {
-                BadRequest(Request, Response, "Some entities still reference this entry. Delete them or use force=true");
+                BadRequest("Some entities still reference this entry. Delete them or use force=true");
                 return;
             }
 
         } catch( const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "An error occurred and the contact was not added.");
+        BadRequest("An error occurred and the contact was not added.");
     }
 
-    void RESTAPI_contact_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                         Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_contact_handler::DoPost() {
         try {
             std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto Obj = ParseStream();
             ProvObjects::Contact C;
             if (!C.from_json(Obj)) {
-                BadRequest(Request, Response, "Cannot parse incoming POST.");
+                BadRequest("Cannot parse incoming POST.");
                 return;
             }
 
@@ -116,17 +91,16 @@ namespace OpenWifi{
             if(Storage()->ContactDB().CreateRecord(C)) {
                 Poco::JSON::Object Answer;
                 C.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "An error occurred and the contact was not added.");
+        BadRequest("An error occurred and the contact was not added.");
     }
 
-    void RESTAPI_contact_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                    Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_contact_handler::DoPut() {
 
     }
 }

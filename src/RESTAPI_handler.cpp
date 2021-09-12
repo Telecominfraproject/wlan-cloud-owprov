@@ -29,6 +29,35 @@
 
 namespace OpenWifi {
 
+    void RESTAPIHandler::handleRequest(Poco::Net::HTTPServerRequest &RequestIn,
+                       Poco::Net::HTTPServerResponse &ResponseIn) {
+        Request = & RequestIn;
+        Response = & ResponseIn;
+
+        if (!ContinueProcessing())
+            return;
+
+        if (!IsAuthorized())
+            return;
+
+        ParseParameters();
+        if(Request->getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
+            DoGet();
+        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
+            DoPost();
+        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
+            DoDelete();
+        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
+            DoPut();
+        else
+            BadRequest("Unknown HTTP Method");
+    }
+
+    const Poco::JSON::Object::Ptr &RESTAPIHandler::ParseStream() {
+        Poco::JSON::Parser IncomingParser;
+        return IncomingParser.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+    }
+
 	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::list<const char *> & EndPoints, BindingMap &bindings) {
 		std::string Param, Value;
 
@@ -63,8 +92,8 @@ namespace OpenWifi {
 			std::cout << "Key = " << key << "  Value= " << value << std::endl;
 	}
 
-	void RESTAPIHandler::ParseParameters(Poco::Net::HTTPServerRequest &request) {
-		Poco::URI uri(request.getURI());
+	void RESTAPIHandler::ParseParameters() {
+		Poco::URI uri(Request->getURI());
 		Parameters_ = uri.getQueryParameters();
 		InitQueryBlock();
 	}
@@ -166,201 +195,185 @@ namespace OpenWifi {
 	    return false;
 	}
 
-	void RESTAPIHandler::AddCORS(Poco::Net::HTTPServerRequest &Request,
-								 Poco::Net::HTTPServerResponse &Response) {
-		auto Origin = Request.find("Origin");
-		if (Origin != Request.end()) {
-			Response.set("Access-Control-Allow-Origin", Origin->second);
-			Response.set("Vary", "Origin");
+	void RESTAPIHandler::AddCORS() {
+		auto Origin = Request->find("Origin");
+		if (Origin != Request->end()) {
+			Response->set("Access-Control-Allow-Origin", Origin->second);
+			Response->set("Vary", "Origin");
 		} else {
-			Response.set("Access-Control-Allow-Origin", "*");
+			Response->set("Access-Control-Allow-Origin", "*");
 		}
-		Response.set("Access-Control-Allow-Headers", "*");
-		Response.set("Access-Control-Allow-Methods", MakeList(Methods_));
-		Response.set("Access-Control-Max-Age", "86400");
+		Response->set("Access-Control-Allow-Headers", "*");
+		Response->set("Access-Control-Allow-Methods", MakeList(Methods_));
+		Response->set("Access-Control-Max-Age", "86400");
 	}
 
-	void RESTAPIHandler::SetCommonHeaders(Poco::Net::HTTPServerResponse &Response, bool CloseConnection) {
-		Response.setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
-		Response.setChunkedTransferEncoding(true);
-		Response.setContentType("application/json");
+	void RESTAPIHandler::SetCommonHeaders(bool CloseConnection) {
+		Response->setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
+		Response->setChunkedTransferEncoding(true);
+		Response->setContentType("application/json");
 		if(CloseConnection) {
-			Response.set("Connection", "close");
-			Response.setKeepAlive(false);
+			Response->set("Connection", "close");
+			Response->setKeepAlive(false);
 		} else {
-			Response.setKeepAlive(true);
-			Response.set("Connection", "Keep-Alive");
-			Response.set("Keep-Alive", "timeout=5, max=1000");
+			Response->setKeepAlive(true);
+			Response->set("Connection", "Keep-Alive");
+			Response->set("Keep-Alive", "timeout=5, max=1000");
 		}
 	}
 
-	void RESTAPIHandler::ProcessOptions(Poco::Net::HTTPServerRequest &Request,
-										Poco::Net::HTTPServerResponse &Response) {
-		AddCORS(Request, Response);
-		SetCommonHeaders(Response);
-		Response.setContentLength(0);
-		Response.set("Access-Control-Allow-Credentials", "true");
-		Response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-		Response.set("Vary", "Origin, Access-Control-Request-Headers, Access-Control-Request-Method");
+	void RESTAPIHandler::ProcessOptions() {
+		AddCORS();
+		SetCommonHeaders();
+		Response->setContentLength(0);
+		Response->set("Access-Control-Allow-Credentials", "true");
+		Response->setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+		Response->set("Vary", "Origin, Access-Control-Request-Headers, Access-Control-Request-Method");
 		/*	std::cout << "RESPONSE:" << std::endl;
 			for(const auto &[f,s]:Response)
 				std::cout << "First: " << f << " second:" << s << std::endl;
 		*/
-		Response.send();
+		Response->send();
 	}
 
-	void RESTAPIHandler::PrepareResponse(Poco::Net::HTTPServerRequest &Request,
-										 Poco::Net::HTTPServerResponse &Response,
-										 Poco::Net::HTTPResponse::HTTPStatus Status,
+	void RESTAPIHandler::PrepareResponse( Poco::Net::HTTPResponse::HTTPStatus Status,
 										 bool CloseConnection) {
-		Response.setStatus(Status);
-		AddCORS(Request, Response);
-		SetCommonHeaders(Response, CloseConnection);
+		Response->setStatus(Status);
+		AddCORS();
+		SetCommonHeaders(CloseConnection);
 	}
 
-	void RESTAPIHandler::BadRequest(Poco::Net::HTTPServerRequest &Request,
-									Poco::Net::HTTPServerResponse &Response,
-									const std::string & Reason) {
-		PrepareResponse(Request, Response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+	void RESTAPIHandler::BadRequest(const std::string & Reason) {
+		PrepareResponse(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 		Poco::JSON::Object	ErrorObject;
 		ErrorObject.set("ErrorCode",500);
-		ErrorObject.set("ErrorDetails",Request.getMethod());
+		ErrorObject.set("ErrorDetails",Request->getMethod());
 		ErrorObject.set("ErrorDescription",Reason.empty() ? "Command is missing parameters or wrong values." : Reason) ;
-		std::ostream &Answer = Response.send();
+		std::ostream &Answer = Response->send();
 		Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	}
 
-	void RESTAPIHandler::UnAuthorized(Poco::Net::HTTPServerRequest &Request,
-									  Poco::Net::HTTPServerResponse &Response,
-                                      const std::string & Reason) {
-		PrepareResponse(Request, Response, Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+	void RESTAPIHandler::UnAuthorized(const std::string & Reason) {
+		PrepareResponse(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		Poco::JSON::Object	ErrorObject;
 		ErrorObject.set("ErrorCode",403);
-		ErrorObject.set("ErrorDetails",Request.getMethod());
+		ErrorObject.set("ErrorDetails",Request->getMethod());
 		ErrorObject.set("ErrorDescription",Reason.empty() ? "No access allowed." : Reason) ;
-		std::ostream &Answer = Response.send();
+		std::ostream &Answer = Response->send();
 		Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	}
 
-	void RESTAPIHandler::NotFound(Poco::Net::HTTPServerRequest &Request,
-								  Poco::Net::HTTPServerResponse &Response) {
-		PrepareResponse(Request, Response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	void RESTAPIHandler::NotFound() {
+		PrepareResponse(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 		Poco::JSON::Object	ErrorObject;
 		ErrorObject.set("ErrorCode",404);
-		ErrorObject.set("ErrorDetails",Request.getMethod());
+		ErrorObject.set("ErrorDetails",Request->getMethod());
 		ErrorObject.set("ErrorDescription","This resource does not exist.");
-		std::ostream &Answer = Response.send();
+		std::ostream &Answer = Response->send();
 		Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	}
 
-	void RESTAPIHandler::OK(Poco::Net::HTTPServerRequest &Request,
-							Poco::Net::HTTPServerResponse &Response) {
-		PrepareResponse(Request, Response);
-		if(	Request.getMethod()==Poco::Net::HTTPRequest::HTTP_DELETE ||
-			Request.getMethod()==Poco::Net::HTTPRequest::HTTP_OPTIONS) {
-			Response.send();
+	void RESTAPIHandler::OK() {
+		PrepareResponse();
+		if(	Request->getMethod()==Poco::Net::HTTPRequest::HTTP_DELETE ||
+			Request->getMethod()==Poco::Net::HTTPRequest::HTTP_OPTIONS) {
+			Response->send();
 		} else {
 			Poco::JSON::Object ErrorObject;
 			ErrorObject.set("Code", 0);
-			ErrorObject.set("Operation", Request.getMethod());
+			ErrorObject.set("Operation", Request->getMethod());
 			ErrorObject.set("Details", "Command completed.");
-			std::ostream &Answer = Response.send();
+			std::ostream &Answer = Response->send();
 			Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 		}
 	}
 
-	void RESTAPIHandler::SendFile(Poco::File & File, const std::string & UUID, Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-		Response.set("Content-Type","application/octet-stream");
-		Response.set("Content-Disposition", "attachment; filename=" + UUID );
-		Response.set("Content-Transfer-Encoding","binary");
-		Response.set("Accept-Ranges", "bytes");
-		Response.set("Cache-Control", "private");
-		Response.set("Pragma", "private");
-		Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-		Response.set("Content-Length", std::to_string(File.getSize()));
-		AddCORS(Request, Response);
-		Response.sendFile(File.path(),"application/octet-stream");
+	void RESTAPIHandler::SendFile(Poco::File & File, const std::string & UUID) {
+		Response->set("Content-Type","application/octet-stream");
+		Response->set("Content-Disposition", "attachment; filename=" + UUID );
+		Response->set("Content-Transfer-Encoding","binary");
+		Response->set("Accept-Ranges", "bytes");
+		Response->set("Cache-Control", "private");
+		Response->set("Pragma", "private");
+		Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+		Response->set("Content-Length", std::to_string(File.getSize()));
+		AddCORS();
+		Response->sendFile(File.path(),"application/octet-stream");
 	}
 
-    void RESTAPIHandler::SendFile(Poco::File & File, Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPIHandler::SendFile(Poco::File & File) {
         Poco::Path  P(File.path());
         auto MT = Utils::FindMediaType(File);
         if(MT.Encoding==Utils::BINARY) {
-            Response.set("Content-Transfer-Encoding","binary");
-            Response.set("Accept-Ranges", "bytes");
+            Response->set("Content-Transfer-Encoding","binary");
+            Response->set("Accept-Ranges", "bytes");
         }
-        Response.set("Cache-Control", "private");
-        Response.set("Pragma", "private");
-        Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-        AddCORS(Request, Response);
-        Response.sendFile(File.path(),MT.ContentType);
+        Response->set("Cache-Control", "private");
+        Response->set("Pragma", "private");
+        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+        AddCORS();
+        Response->sendFile(File.path(),MT.ContentType);
     }
 
-    void RESTAPIHandler::SendFile(Poco::TemporaryFile &TempAvatar, const std::string &Type, const std::string & Name, Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPIHandler::SendFile(Poco::TemporaryFile &TempAvatar, const std::string &Type, const std::string & Name) {
         auto MT = Utils::FindMediaType(Name);
         if(MT.Encoding==Utils::BINARY) {
-            Response.set("Content-Transfer-Encoding","binary");
-            Response.set("Accept-Ranges", "bytes");
+            Response->set("Content-Transfer-Encoding","binary");
+            Response->set("Accept-Ranges", "bytes");
         }
-        Response.set("Content-Disposition", "attachment; filename=" + Name );
-        Response.set("Accept-Ranges", "bytes");
-        Response.set("Cache-Control", "private");
-        Response.set("Pragma", "private");
-        Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-        AddCORS(Request, Response);
-        Response.sendFile(TempAvatar.path(),MT.ContentType);
+        Response->set("Content-Disposition", "attachment; filename=" + Name );
+        Response->set("Accept-Ranges", "bytes");
+        Response->set("Cache-Control", "private");
+        Response->set("Pragma", "private");
+        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+        AddCORS();
+        Response->sendFile(TempAvatar.path(),MT.ContentType);
 	}
 
     void RESTAPIHandler::SendHTMLFileBack(Poco::File & File,
-                          Poco::Net::HTTPServerRequest &Request,
-                          Poco::Net::HTTPServerResponse &Response ,
                           const Types::StringPairVec & FormVars) {
-        Response.set("Pragma", "private");
-        Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-        Response.set("Content-Length", std::to_string(File.getSize()));
-        AddCORS(Request, Response);
+        Response->set("Pragma", "private");
+        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+        Response->set("Content-Length", std::to_string(File.getSize()));
+        AddCORS();
         auto FormContent = Utils::LoadFile(File.path());
         Utils::ReplaceVariables(FormContent, FormVars);
-        Response.setChunkedTransferEncoding(true);
-        Response.setContentType("text/html");
-        std::ostream& ostr = Response.send();
+        Response->setChunkedTransferEncoding(true);
+        Response->setContentType("text/html");
+        std::ostream& ostr = Response->send();
         ostr << FormContent;
 	}
 
-    void RESTAPIHandler::ReturnStatus(Poco::Net::HTTPServerRequest &Request,
-									  Poco::Net::HTTPServerResponse &Response,
-									  Poco::Net::HTTPResponse::HTTPStatus Status,
+    void RESTAPIHandler::ReturnStatus(Poco::Net::HTTPResponse::HTTPStatus Status,
 									  bool CloseConnection) {
-		PrepareResponse(Request, Response, Status, CloseConnection);
+		PrepareResponse(Status, CloseConnection);
 		if(Status == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-			Response.setContentLength(0);
-			Response.erase("Content-Type");
-			Response.setChunkedTransferEncoding(false);
+			Response->setContentLength(0);
+			Response->erase("Content-Type");
+			Response->setChunkedTransferEncoding(false);
 		}
-		Response.send();
+		Response->send();
 	}
 
-	bool RESTAPIHandler::ContinueProcessing(Poco::Net::HTTPServerRequest &Request,
-											Poco::Net::HTTPServerResponse &Response) {
-		if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_OPTIONS) {
-			ProcessOptions(Request, Response);
+	bool RESTAPIHandler::ContinueProcessing() {
+		if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_OPTIONS) {
+			ProcessOptions();
 			return false;
-		} else if (std::find(Methods_.begin(), Methods_.end(), Request.getMethod()) == Methods_.end()) {
-			BadRequest(Request, Response);
+		} else if (std::find(Methods_.begin(), Methods_.end(), Request->getMethod()) == Methods_.end()) {
+			BadRequest("Unsupported method");
 			return false;
 		}
 
 		return true;
 	}
 
-	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
-									  Poco::Net::HTTPServerResponse &Response) {
+	bool RESTAPIHandler::IsAuthorized() {
 	    if(Internal_) {
-	        return Daemon()->IsValidAPIKEY(Request);
+	        return Daemon()->IsValidAPIKEY(*Request);
 	    } else {
             if (SessionToken_.empty()) {
                 try {
-                    Poco::Net::OAuth20Credentials Auth(Request);
+                    Poco::Net::OAuth20Credentials Auth(*Request);
                     if (Auth.getScheme() == "Bearer") {
                         SessionToken_ = Auth.getBearerToken();
                     }
@@ -369,30 +382,28 @@ namespace OpenWifi {
                 }
             }
 #ifdef    TIP_SECURITY_SERVICE
-            if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
+            if (AuthService()->IsAuthorized(*Request, SessionToken_, UserInfo_)) {
 #else
-            if (AuthClient()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
+            if (AuthClient()->IsAuthorized(*Request, SessionToken_, UserInfo_)) {
 #endif
                 return true;
             } else {
-                UnAuthorized(Request, Response);
+                UnAuthorized();
             }
             return false;
         }
 	}
 
-	void RESTAPIHandler::ReturnObject(Poco::Net::HTTPServerRequest &Request, Poco::JSON::Object &Object,
-									  Poco::Net::HTTPServerResponse &Response) {
-		PrepareResponse(Request, Response);
-		std::ostream &Answer = Response.send();
+	void RESTAPIHandler::ReturnObject(Poco::JSON::Object &Object) {
+		PrepareResponse();
+		std::ostream &Answer = Response->send();
 		Poco::JSON::Stringifier::stringify(Object, Answer);
 	}
 
-	void RESTAPIHandler::ReturnCountOnly(Poco::Net::HTTPServerRequest &Request, uint64_t Count,
-                         Poco::Net::HTTPServerResponse &Response) {
+	void RESTAPIHandler::ReturnCountOnly(uint64_t Count) {
 	    Poco::JSON::Object  Answer;
 	    Answer.set("count", Count);
-        ReturnObject(Request,Answer,Response);
+        ReturnObject(Answer);
 	}
 
 	bool RESTAPIHandler::InitQueryBlock() {
@@ -438,6 +449,4 @@ namespace OpenWifi {
 	[[nodiscard]] uint64_t RESTAPIHandler::GetWhen(const Poco::JSON::Object::Ptr &Obj) {
 		return RESTAPIHandler::Get(RESTAPI::Protocol::WHEN, Obj);
 	}
-
-
 }

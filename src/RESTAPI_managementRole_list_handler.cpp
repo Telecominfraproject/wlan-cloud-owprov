@@ -9,23 +9,7 @@
 #include "StorageService.h"
 
 namespace OpenWifi{
-    void RESTAPI_managementRole_list_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                              Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_managementRole_list_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                                      Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_managementRole_list_handler::DoGet() {
         try {
             if(!QB_.Select.empty()) {
                 auto DevUUIDS = Utils::Split(QB_.Select);
@@ -35,26 +19,30 @@ namespace OpenWifi{
                     if(Storage()->RolesDB().GetRecord("id",i,E)) {
                         Roles.push_back(E);
                     } else {
-                        BadRequest(Request, Response, "Unknown UUID:" + i);
+                        BadRequest("Unknown UUID:" + i);
                         return;
                     }
                 }
-                ReturnObject(Request, "roles", Roles, Response);
+                ReturnObject("roles", Roles);
                 return;
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->RolesDB().Count();
-                ReturnCountOnly(Request,C,Response);
+                ReturnCountOnly(C);
                 return;
             } else {
                 ProvObjects::ManagementRoleVec Roles;
                 Storage()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
-                ReturnObject(Request, "roles", Roles, Response);
+                ReturnObject("roles", Roles);
                 return;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
+
+    void RESTAPI_managementRole_list_handler::DoDelete() {}
+    void RESTAPI_managementRole_list_handler::DoPut() {}
+    void RESTAPI_managementRole_list_handler::DoPost() {}
 }

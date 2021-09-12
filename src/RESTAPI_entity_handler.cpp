@@ -18,34 +18,12 @@
 
 namespace OpenWifi{
 
-    void RESTAPI_entity_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                               Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_entity_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_entity_handler::DoGet() {
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
@@ -53,77 +31,74 @@ namespace OpenWifi{
             if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
                 Poco::JSON::Object Answer;
                 E.to_json(Answer);
-                ReturnObject(Request,Answer,Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error");
     }
 
-    void RESTAPI_entity_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                                    Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_entity_handler::DoDelete() {
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
             if(UUID == EntityDB::RootUUID()) {
-                BadRequest(Request, Response, "Root Entity cannot be removed, only modified");
+                BadRequest("Root Entity cannot be removed, only modified");
                 return;
             }
 
             ProvObjects::Entity E;
 
             if(!Storage()->EntityDB().GetRecord("id",UUID,E)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
             if(!E.children.empty()) {
-                BadRequest(Request, Response, "Entity still has children.");
+                BadRequest("Entity still has children.");
                 return;
             }
 
             if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
                 Storage()->EntityDB().DeleteChild("id",E.parent,UUID);
-                OK(Request, Response);
+                OK();
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error");
     }
 
-    void RESTAPI_entity_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                                  Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_entity_handler::DoPost() {
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
             if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
-                BadRequest(Request, Response, "Root entity must be created first.");
+                BadRequest("Root entity must be created first.");
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto Obj = ParseStream();
             ProvObjects::Entity NewEntity;
             if (!NewEntity.from_json(Obj)) {
-                BadRequest(Request, Response);
+                BadRequest("Ill formed JSON document.");
                 return;
             }
             NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
@@ -137,17 +112,17 @@ namespace OpenWifi{
             if(UUID==EntityDB::RootUUID())
                 NewEntity.parent="";
             else if(NewEntity.parent.empty()) {
-                BadRequest(Request, Response, "Parent UUID must be specified");
+                BadRequest("Parent UUID must be specified");
                 return;
             } else {
                 if(!Storage()->EntityDB().Exists("id",NewEntity.parent)) {
-                    BadRequest(Request, Response, "Parent UUID must exist");
+                    BadRequest("Parent UUID must exist");
                     return;
                 }
             }
 
             if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-                BadRequest(Request, Response, "Device Configuration does not exist");
+                BadRequest("Device Configuration does not exist");
                 return;
             }
 
@@ -168,15 +143,15 @@ namespace OpenWifi{
 
                 Poco::JSON::Object  Answer;
                 NewEntity.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error");
     }
 
     /*
@@ -188,33 +163,31 @@ namespace OpenWifi{
      *      addDevice=UUID, delDevice=UUID
      */
 
-    void RESTAPI_entity_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_entity_handler::DoPut() {
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
             ProvObjects::Entity Existing;
             if(!Storage()->EntityDB().GetRecord("id",UUID,Existing)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto RawObject = ParseStream();
             ProvObjects::Entity NewEntity;
             if(!NewEntity.from_json(RawObject)) {
-                BadRequest(Request, Response, "Cannot parse incoming JSON document.");
+                BadRequest("Cannot parse incoming JSON document.");
                 return;
             }
 
             std::string OldConfiguration;
             if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-                BadRequest(Request, Response, "Device configuration does not exist");
+                BadRequest("Device configuration does not exist");
                 return;
             } else {
                 OldConfiguration = Existing.deviceConfiguration;
@@ -235,12 +208,12 @@ namespace OpenWifi{
 
             std::string Error;
             if(!Storage()->Validate(Parameters_,Error)) {
-                BadRequest(Request, Response, Error);
+                BadRequest(Error);
                 return;
             }
 
             if(Storage()->EntityDB().UpdateRecord("id",UUID,Existing)) {
-                for(const auto &i:Request) {
+                for(const auto &i:*Request) {
                     std::string Child{i.second};
                     auto UUID_parts = Utils::Split(Child,':');
                     if(i.first=="add" && UUID_parts[0] == "con") {
@@ -270,12 +243,12 @@ namespace OpenWifi{
                 ProvObjects::Entity NewRecord;
                 Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
                 NewRecord.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 }

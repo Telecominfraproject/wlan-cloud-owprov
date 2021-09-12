@@ -14,35 +14,14 @@
 #include "Daemon.h"
 
 namespace OpenWifi{
-    void RESTAPI_venue_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
 
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_venue_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_venue_handler::DoGet() {
 
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
@@ -50,24 +29,23 @@ namespace OpenWifi{
             if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
                 Poco::JSON::Object Answer;
                 V.to_json(Answer);
-                ReturnObject(Request,Answer,Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_venue_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                           Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_venue_handler::DoDelete() {
         try {
             std::string UUID = GetBinding("uuid", "");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
@@ -75,7 +53,7 @@ namespace OpenWifi{
             if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
 
                 if(!V.children.empty() || !V.devices.empty()) {
-                    BadRequest(Request, Response, "Venue still has children or devices.");
+                    BadRequest("Venue still has children or devices.");
                     return;
                 }
 
@@ -92,66 +70,63 @@ namespace OpenWifi{
                 if(!V.entity.empty())
                     Storage()->EntityDB().DeleteVenue("id",V.entity,UUID);
                 Storage()->VenueDB().DeleteRecord("id",UUID);
-                OK(Request, Response);
+                OK();
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_venue_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_venue_handler::DoPost() {
         try {
-
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto Obj = ParseStream();
             ProvObjects::Venue V;
             if (!V.from_json(Obj)) {
-                BadRequest(Request, Response, "Post document is malformed JSON.");
+                BadRequest("Post document is malformed JSON.");
                 return;
             }
 
             if(V.parent.empty() && V.entity.empty()) {
-                BadRequest(Request, Response, "Parent or Entity must be set.");
+                BadRequest("Parent or Entity must be set.");
                 return;
             }
 
             if(!V.parent.empty() && !V.entity.empty()) {
-                BadRequest(Request, Response, "Only one of Parent or Entity must be set.");
+                BadRequest("Only one of Parent or Entity must be set.");
                 return;
             }
 
             if(!V.parent.empty() && !Storage()->VenueDB().Exists("id",V.parent)) {
-                BadRequest(Request, Response, "Parent does not exist.");
+                BadRequest("Parent does not exist.");
                 return;
             }
 
             if(V.entity == EntityDB::RootUUID()) {
-                BadRequest(Request, Response, "Entity cannot be root.");
+                BadRequest("Entity cannot be root.");
                 return;
             }
 
             if(!V.entity.empty() && !Storage()->EntityDB().Exists("id",V.entity)) {
-                BadRequest(Request, Response, "Entity does not exist.");
+                BadRequest("Entity does not exist.");
                 return;
             }
 
             if(!V.contact.empty() && !Storage()->ContactDB().Exists("id",V.contact)) {
-                BadRequest(Request, Response, "Contact does not exist.");
+                BadRequest("Contact does not exist.");
                 return;
             }
 
             if(!V.location.empty() && !Storage()->LocationDB().Exists("id",V.location)) {
-                BadRequest(Request, Response, "Location does not exist.");
+                BadRequest("Location does not exist.");
                 return;
             }
 
             if(!V.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",V.managementPolicy)) {
-                BadRequest(Request, Response, "ManagementPolicy does not exist.");
+                BadRequest("ManagementPolicy does not exist.");
                 return;
             }
 
@@ -164,36 +139,33 @@ namespace OpenWifi{
             if(Storage()->VenueDB().CreateShortCut(V)) {
                 Poco::JSON::Object  Answer;
                 V.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_venue_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_venue_handler::DoPut() {
         try {
             std::string UUID = GetBinding("uuid","");
 
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
             ProvObjects::Venue  ExistingVenue;
             if(!Storage()->VenueDB().GetRecord("id",UUID, ExistingVenue)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
-
+            auto RawObject = ParseStream();
             if(RawObject->has("notes")) {
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingVenue.info.notes);
             }
@@ -202,31 +174,31 @@ namespace OpenWifi{
 
             std::string MoveEntity;
             if(AssignIfPresent(RawObject, "entity", MoveEntity) && !Storage()->EntityDB().Exists("id",MoveEntity)) {
-                BadRequest(Request, Response, "Entity " + MoveEntity + " does not exist.");
+                BadRequest("Entity " + MoveEntity + " does not exist.");
                 return;
             }
 
             std::string MoveVenue;
             if(AssignIfPresent(RawObject, "venue", MoveVenue) && !Storage()->VenueDB().Exists("id",MoveVenue)) {
-                BadRequest(Request, Response, "Venue " + MoveVenue + " does not exist.");
+                BadRequest("Venue " + MoveVenue + " does not exist.");
                 return;
             }
 
             std::string MoveLocation;
             if(AssignIfPresent(RawObject,"location",MoveLocation) && !Storage()->LocationDB().Exists("id",MoveLocation)) {
-                BadRequest(Request, Response, "Location " + MoveLocation + " does not exist.");
+                BadRequest("Location " + MoveLocation + " does not exist.");
                 return;
             }
 
             std::string MoveContact;
             if(AssignIfPresent(RawObject,"contact",MoveContact) && !Storage()->ContactDB().Exists("id",MoveContact)) {
-                BadRequest(Request, Response, "Contact " + MoveContact + " does not exist.");
+                BadRequest("Contact " + MoveContact + " does not exist.");
                 return;
             }
 
             std::string MovePolicy;
             if(AssignIfPresent(RawObject,"managementPolicy",MoveContact) && !Storage()->PolicyDB().Exists("id",MovePolicy)) {
-                BadRequest(Request, Response, "Policy " + MovePolicy + " does not exist.");
+                BadRequest("Policy " + MovePolicy + " does not exist.");
                 return;
             }
 
@@ -237,14 +209,14 @@ namespace OpenWifi{
                 Storage()->VenueDB().GetRecord("id",UUID,AddedRecord);
                 Poco::JSON::Object  Answer;
                 AddedRecord.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request,Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 }

@@ -12,33 +12,12 @@
 #include "Daemon.h"
 
 namespace OpenWifi{
-    void RESTAPI_configurations_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                         Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
 
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_configurations_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {
+        void RESTAPI_configurations_handler::DoGet() {
         try {
             auto UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
@@ -47,46 +26,45 @@ namespace OpenWifi{
                 Poco::JSON::Object  Answer;
 
                 C.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
-            NotFound(Request, Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "Internal error. Consult documentation and try again.");
+        BadRequest("Internal error. Consult documentation and try again.");
     }
 
-    void RESTAPI_configurations_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                                 Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_configurations_handler::DoDelete() {
         try {
             auto UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
             ProvObjects::DeviceConfiguration    C;
             if(Storage()->ConfigurationDB().GetRecord("id", UUID, C)) {
                 if(!C.inUse.empty()) {
-                    BadRequest(Request, Response, "Configuration still in use.");
+                    BadRequest("Configuration still in use.");
                     return;
                 }
 
                 if(Storage()->ConfigurationDB().DeleteRecord("id", UUID)) {
-                    OK(Request, Response);
+                    OK();
                     return;
                 }
-                BadRequest(Request,Response,"Internal error. Please try again");
+                BadRequest("Internal error. Please try again");
                 return;
             }
-            NotFound(Request, Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "Internal error. Consult documentation and try again.");
+        BadRequest("Internal error. Consult documentation and try again.");
     }
 
     //      interfaces
@@ -95,60 +73,54 @@ namespace OpenWifi{
     //      services
     //      globals
     //      unit
-    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config,
-                                                                     Poco::Net::HTTPServerRequest &Request,
-                                                                     Poco::Net::HTTPServerResponse &Response) {
+    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config) {
         static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
 
         try {
             for(const auto &i:Config.configuration) {
                 Poco::JSON::Parser  P;
-
                 if(i.name.empty()) {
-                    BadRequest(Request, Response, "The configuration block name must be included.");
+                    BadRequest("The configuration block name must be included.");
                     return false;
                 }
                 auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
                 auto N = Blocks->getNames();
-
                 for(const auto &j:N) {
                     if(std::find(SectionNames.cbegin(),SectionNames.cend(),j)==SectionNames.cend()) {
-                        BadRequest(Request, Response, "Configuration block type invalid.");
+                        BadRequest("Configuration block type invalid.");
                         return false;
                     }
                 }
             }
         } catch (const Poco::Exception &E) {
-            BadRequest(Request, Response, "Invalid configuration portion.");
+            BadRequest("Invalid configuration portion.");
             return false;
         }
         return true;
     }
 
-    void RESTAPI_configurations_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                               Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_configurations_handler::DoPost() {
         try {
             auto UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
             ProvObjects::DeviceConfiguration C;
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            Poco::JSON::Object::Ptr Obj = ParseStream();
             if (!C.from_json(Obj)) {
-                BadRequest(Request, Response, "Bad JSON Document posted.");
+                BadRequest("Bad JSON Document posted.");
                 return;
             }
 
             if(C.info.name.empty()) {
-                BadRequest(Request, Response, "Missing name.");
+                BadRequest("Missing name.");
                 return;
             }
 
             if(!C.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
-                BadRequest(Request, Response, "Unknown management policy.");
+                BadRequest("Unknown management policy.");
                 return;
             }
 
@@ -159,11 +131,11 @@ namespace OpenWifi{
 
             C.inUse.clear();
             if(C.deviceTypes.empty() || !Storage()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
-                BadRequest(Request, Response, "Missing valid device types.");
+                BadRequest("Missing valid device types.");
                 return;
             }
 
-            if(!ValidateConfigBlock(C, Request, Response))
+            if(!ValidateConfigBlock(C))
                 return;
 
             if(Storage()->ConfigurationDB().CreateRecord(C)) {
@@ -174,35 +146,33 @@ namespace OpenWifi{
                     Storage()->PolicyDB().AddInUse("id",C.managementPolicy,Storage()->PolicyDB().Prefix(), C.info.id);
 
                 C.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "Internal error. Consult documentation and try again.");
+        BadRequest("Internal error. Consult documentation and try again.");
     }
 
-    void RESTAPI_configurations_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                                Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_configurations_handler::DoPut() {
         try {
             auto UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
             ProvObjects::DeviceConfiguration    Existing;
             if(!Storage()->ConfigurationDB().GetRecord("id", UUID, Existing)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
             ProvObjects::DeviceConfiguration    NewConfig;
-            Poco::JSON::Parser                  IncomingParser;
-            auto Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto Obj = ParseStream();
             if (!NewConfig.from_json(Obj)) {
-                BadRequest(Request, Response, "Illegal JSON posted document.");
+                BadRequest("Illegal JSON posted document.");
                 return;
             }
 
@@ -212,12 +182,12 @@ namespace OpenWifi{
             }
 
             if(NewConfig.managementPolicy.empty() || (NewConfig.managementPolicy!=Existing.managementPolicy && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy))) {
-                BadRequest(Request, Response, "Management policy is not valid.");
+                BadRequest("Management policy is not valid.");
                 return;
             }
 
             if(!NewConfig.deviceTypes.empty() && !Storage()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
-                BadRequest(Request, Response, "Invalid device types.");
+                BadRequest("Invalid device types.");
                 return;
             }
 
@@ -232,7 +202,7 @@ namespace OpenWifi{
 
             NewConfig.info.modified = std::time(nullptr);
 
-            if(!ValidateConfigBlock(NewConfig, Request, Response))
+            if(!ValidateConfigBlock(NewConfig))
                 return;
 
             if(!NewConfig.variables.empty())
@@ -257,12 +227,12 @@ namespace OpenWifi{
                 Storage()->ConfigurationDB().GetRecord("id",UUID,D);
                 Poco::JSON::Object  Answer;
                 D.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "Internal error. Consult documentation and try again.");
+        BadRequest("Internal error. Consult documentation and try again.");
     }
 }

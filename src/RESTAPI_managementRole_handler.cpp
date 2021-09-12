@@ -12,33 +12,12 @@
 #include "Poco/StringTokenizer.h"
 
 namespace OpenWifi{
-    void RESTAPI_managementRole_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
 
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut(Request, Response);
-        else
-            BadRequest(Request, Response, "Unknown HTTP Method");
-    }
-
-    void RESTAPI_managementRole_handler::DoGet(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_managementRole_handler::DoGet() {
         try {
             std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
@@ -46,30 +25,29 @@ namespace OpenWifi{
             if(Storage()->RolesDB().GetRecord(RESTAPI::Protocol::ID,UUID,M)) {
                 Poco::JSON::Object  Answer;
                 M.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             } else {
-                NotFound(Request,Response);
+                NotFound();
                 return;
             }
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_managementRole_handler::DoDelete(Poco::Net::HTTPServerRequest &Request,
-                                           Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_managementRole_handler::DoDelete() {
         try {
             std::string UUID = GetBinding("uuid","");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID");
+                BadRequest("Missing UUID");
                 return;
             }
 
             ProvObjects::ManagementRole    ExistingManagementRole;
             if(!Storage()->RolesDB().GetRecord("id",UUID,ExistingManagementRole)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
@@ -79,34 +57,32 @@ namespace OpenWifi{
                 Force=true;
 
             if(!Force && !ExistingManagementRole.inUse.empty()) {
-                BadRequest(Request, Response, "Some entities still reference this entry. Delete them or use force=true");
+                BadRequest("Some entities still reference this entry. Delete them or use force=true");
                 return;
             }
 
             Storage()->PolicyDB().DeleteInUse("id", ExistingManagementRole.managementPolicy, Storage()->RolesDB().Prefix(), ExistingManagementRole.info.id);
             if(Storage()->RolesDB().DeleteRecord("id", ExistingManagementRole.info.id)) {
-                OK(Request,Response);
+                OK();
             }
         } catch( const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "An error occurred and the contact was not added.");
+        BadRequest("An error occurred and the contact was not added.");
     }
 
-    void RESTAPI_managementRole_handler::DoPost(Poco::Net::HTTPServerRequest &Request,
-                                         Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_managementRole_handler::DoPost() {
         try {
             std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr Obj = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto Obj = ParseStream();
             ProvObjects::Contact C;
             if (!C.from_json(Obj)) {
-                BadRequest(Request, Response, "Cannot parse incoming POST.");
+                BadRequest("Cannot parse incoming POST.");
                 return;
             }
 
@@ -118,32 +94,30 @@ namespace OpenWifi{
             if(Storage()->ContactDB().CreateRecord(C)) {
                 Poco::JSON::Object Answer;
                 C.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "An error occurred and the contact was not added.");
+        BadRequest("An error occurred and the contact was not added.");
     }
 
-    void RESTAPI_managementRole_handler::DoPut(Poco::Net::HTTPServerRequest &Request,
-                                        Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_managementRole_handler::DoPut() {
         try {
             std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
             if(UUID.empty()) {
-                BadRequest(Request, Response, "Missing UUID.");
+                BadRequest("Missing UUID.");
                 return;
             }
 
             ProvObjects::ManagementRole Existing;
             if(!Storage()->RolesDB().GetRecord("id",UUID,Existing)) {
-                NotFound(Request,Response);
+                NotFound();
                 return;
             }
 
-            Poco::JSON::Parser IncomingParser;
-            Poco::JSON::Object::Ptr RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+            auto RawObject = ParseStream();
             if(RawObject->has("notes")) {
                 SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, Existing.info.notes);
             }
@@ -154,13 +128,13 @@ namespace OpenWifi{
             std::string NewPolicy,OldPolicy = Existing.managementPolicy;
             AssignIfPresent(RawObject, "managementPolicy", NewPolicy);
             if(!NewPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewPolicy)) {
-                BadRequest(Request, Response, "Unknown Policy:" + NewPolicy);
+                BadRequest("Unknown Policy:" + NewPolicy);
                 return;
             }
 
             std::string Error;
             if(!Storage()->Validate(Parameters_,Error)) {
-                BadRequest(Request, Response, "Unknown users: " + Error);
+                BadRequest("Unknown users: " + Error);
                 return;
             }
 
@@ -186,12 +160,12 @@ namespace OpenWifi{
                 Storage()->RolesDB().GetRecord("id", UUID, Existing);
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
-                ReturnObject(Request, Answer, Response);
+                ReturnObject(Answer);
                 return;
             }
         }  catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response, "An error occurred and the contact was not added.");
+        BadRequest("An error occurred and the contact was not added.");
     }
 }
