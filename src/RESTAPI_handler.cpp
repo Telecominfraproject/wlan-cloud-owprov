@@ -8,6 +8,7 @@
 
 #include <cctype>
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <future>
@@ -37,7 +38,7 @@ namespace OpenWifi {
         if (!ContinueProcessing())
             return;
 
-        if (!IsAuthorized())
+        if (AlwaysAuthorize_ && !IsAuthorized())
             return;
 
         ParseParameters();
@@ -54,8 +55,7 @@ namespace OpenWifi {
     }
 
     const Poco::JSON::Object::Ptr &RESTAPIHandler::ParseStream() {
-        Poco::JSON::Parser IncomingParser;
-        return IncomingParser.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+        return IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
     }
 
 	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::list<const char *> & EndPoints, BindingMap &bindings) {
@@ -88,7 +88,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPIHandler::PrintBindings() {
-		for (auto &[key, value] : Bindings_)
+		for (const auto &[key, value] : Bindings_)
 			std::cout << "Key = " << key << "  Value= " << value << std::endl;
 	}
 
@@ -109,55 +109,40 @@ namespace OpenWifi {
 	}
 
 	uint64_t RESTAPIHandler::GetParameter(const std::string &Name, const uint64_t Default) {
-
-		for (const auto &i : Parameters_) {
-			if (i.first == Name) {
-				if (!is_number(i.second))
-					return Default;
-				return std::stoi(i.second);
-			}
-		}
-		return Default;
+        auto Hint = std::find_if(Parameters_.begin(),Parameters_.end(),[Name](const std::pair<std::string,std::string> &S){ return S.first==Name; });
+        if(Hint==Parameters_.end() || !is_number(Hint->second))
+            return Default;
+        return std::stoull(Hint->second);
 	}
 
 	bool RESTAPIHandler::GetBoolParameter(const std::string &Name, bool Default) {
-
-		for (const auto &i : Parameters_) {
-			if (i.first == Name) {
-				if (!is_bool(i.second))
-					return Default;
-				return i.second == "true";
-			}
-		}
-		return Default;
+        auto Hint = std::find_if(begin(Parameters_),end(Parameters_),[Name](const std::pair<std::string,std::string> &S){ return S.first==Name; });
+        if(Hint==end(Parameters_) || !is_bool(Hint->second))
+            return Default;
+		return Hint->second=="true";
 	}
 
 	std::string RESTAPIHandler::GetParameter(const std::string &Name, const std::string &Default) {
-		for (const auto &i : Parameters_) {
-			if (i.first == Name)
-				return i.second;
-		}
-		return Default;
+        auto Hint = std::find_if(begin(Parameters_),end(Parameters_),[Name](const std::pair<std::string,std::string> &S){ return S.first==Name; });
+        if(Hint==end(Parameters_))
+            return Default;
+        return Hint->second;
 	}
 
 	bool RESTAPIHandler::HasParameter(const std::string &Name, std::string &Value) {
-	    for (const auto &i : Parameters_) {
-	        if (i.first == Name) {
-	            Value = i.second;
-	            return true;
-	        }
-	    }
-	    return false;
+        auto Hint = std::find_if(begin(Parameters_),end(Parameters_),[Name](const std::pair<std::string,std::string> &S){ return S.first==Name; });
+        if(Hint==end(Parameters_))
+            return false;
+        Value = Hint->second;
+        return true;
 	}
 
 	bool RESTAPIHandler::HasParameter(const std::string &Name, uint64_t & Value) {
-	    for (const auto &i : Parameters_) {
-	        if (i.first == Name) {
-	            Value = std::stoi(i.second);
-	            return true;
-	        }
-	    }
-	    return false;
+        auto Hint = std::find_if(begin(Parameters_),end(Parameters_),[Name](const std::pair<std::string,std::string> &S){ return S.first==Name; });
+        if(Hint==end(Parameters_))
+            return false;
+        Value = std::stoull(Hint->second);
+        return true;
 	}
 
 	const std::string &RESTAPIHandler::GetBinding(const std::string &Name, const std::string &Default) {
@@ -229,10 +214,6 @@ namespace OpenWifi {
 		Response->set("Access-Control-Allow-Credentials", "true");
 		Response->setStatus(Poco::Net::HTTPResponse::HTTP_OK);
 		Response->set("Vary", "Origin, Access-Control-Request-Headers, Access-Control-Request-Method");
-		/*	std::cout << "RESPONSE:" << std::endl;
-			for(const auto &[f,s]:Response)
-				std::cout << "First: " << f << " second:" << s << std::endl;
-		*/
 		Response->send();
 	}
 
@@ -344,8 +325,7 @@ namespace OpenWifi {
         ostr << FormContent;
 	}
 
-    void RESTAPIHandler::ReturnStatus(Poco::Net::HTTPResponse::HTTPStatus Status,
-									  bool CloseConnection) {
+    void RESTAPIHandler::ReturnStatus(Poco::Net::HTTPResponse::HTTPStatus Status, bool CloseConnection) {
 		PrepareResponse(Status, CloseConnection);
 		if(Status == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
 			Response->setContentLength(0);

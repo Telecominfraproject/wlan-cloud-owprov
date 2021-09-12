@@ -92,8 +92,8 @@ namespace OpenWifi {
 
 		typedef std::map<std::string, std::string> BindingMap;
 
-		RESTAPIHandler(BindingMap map, Poco::Logger &l, std::vector<std::string> Methods, bool Internal=false)
-			: Bindings_(std::move(map)), Logger_(l), Methods_(std::move(Methods)), Internal_(Internal) {}
+		RESTAPIHandler(BindingMap map, Poco::Logger &l, std::vector<std::string> Methods, bool Internal=false, bool AlwaysAuthorize=true)
+		: Bindings_(std::move(map)), Logger_(l), Methods_(std::move(Methods)), Internal_(Internal), AlwaysAuthorize_(AlwaysAuthorize) {}
 
 		static bool ParseBindings(const std::string & Request, const std::list<const char *> & EndPoints, BindingMap &Keys);
 		void PrintBindings();
@@ -107,8 +107,6 @@ namespace OpenWifi {
 						bool CloseConnection = false);
 		bool ContinueProcessing();
 		bool IsAuthorized();
-/*		bool ValidateAPIKey(Poco::Net::HTTPServerRequest &Request,
-							Poco::Net::HTTPServerResponse &Response); */
 
 		uint64_t GetParameter(const std::string &Name, uint64_t Default);
 		std::string GetParameter(const std::string &Name, const std::string &Default);
@@ -140,8 +138,8 @@ namespace OpenWifi {
 		bool HasParameter(const std::string &QueryParameter, std::string &Value);
 		bool HasParameter(const std::string &QueryParameter, uint64_t & Value);
 
-		bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value);
-		bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, uint64_t &Value);
+		static bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value);
+		static bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, uint64_t &Value);
 
 		template<typename T> void ReturnObject(const char *Name, const std::vector<T> & Objects) {
 		    Poco::JSON::Object  Answer;
@@ -152,7 +150,7 @@ namespace OpenWifi {
 		Poco::Logger & Logger() { return Logger_; }
 
 		void handleRequest(Poco::Net::HTTPServerRequest &request,
-                           Poco::Net::HTTPServerResponse &response) override final;
+                           Poco::Net::HTTPServerResponse &response) final;
 
 		virtual void DoGet() = 0 ;
 		virtual void DoDelete() = 0 ;
@@ -173,6 +171,8 @@ namespace OpenWifi {
 		bool                        QueryBlockInitialized_=false;
 		Poco::Net::HTTPServerRequest    *Request= nullptr;
 		Poco::Net::HTTPServerResponse   *Response= nullptr;
+		bool                        AlwaysAuthorize_=true;
+		Poco::JSON::Parser          IncomingParser_;
 	};
 
 	class RESTAPI_UnknownRequestHandler : public RESTAPIHandler {
