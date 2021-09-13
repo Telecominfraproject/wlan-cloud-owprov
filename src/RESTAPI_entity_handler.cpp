@@ -21,26 +21,22 @@ namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoGet() {
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
+        ProvObjects::Entity Existing;
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
+            NotFound();
             return;
         }
 
-        ProvObjects::Entity E;
-        if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
-            Poco::JSON::Object Answer;
-            E.to_json(Answer);
-            ReturnObject(Answer);
-            return;
-        }
-        NotFound();
+        Poco::JSON::Object Answer;
+        Existing.to_json(Answer);
+        ReturnObject(Answer);
     }
 
     void RESTAPI_entity_handler::DoDelete() {
-
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
+        ProvObjects::Entity Existing;
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
+            NotFound();
             return;
         }
 
@@ -49,23 +45,17 @@ namespace OpenWifi{
             return;
         }
 
-        ProvObjects::Entity E;
-        if(!Storage()->EntityDB().GetRecord("id",UUID,E)) {
-            NotFound();
-            return;
-        }
-
-        if(!E.children.empty()) {
+        if(!Existing.children.empty()) {
             BadRequest(RESTAPI::Errors::StillInUse);
             return;
         }
 
-        if(Storage()->EntityDB().DeleteRecord("id",UUID)) {
-            Storage()->EntityDB().DeleteChild("id",E.parent,UUID);
+        if(DB_.DeleteRecord("id",UUID)) {
+            DB_.DeleteChild("id",Existing.parent,UUID);
             OK();
             return;
         }
-        NotFound();
+        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     void RESTAPI_entity_handler::DoPost() {
@@ -75,7 +65,7 @@ namespace OpenWifi{
             return;
         }
 
-        if(!Storage()->EntityDB().RootExists() && UUID != EntityDB::RootUUID()) {
+        if(!DB_.RootExists() && UUID != EntityDB::RootUUID()) {
             BadRequest(RESTAPI::Errors::MustCreateRootFirst);
             return;
         }
@@ -96,7 +86,7 @@ namespace OpenWifi{
         NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";
-        } else if(NewEntity.parent.empty() || !Storage()->EntityDB().Exists("id",NewEntity.parent)) {
+        } else if(NewEntity.parent.empty() || !DB_.Exists("id",NewEntity.parent)) {
             BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
             return;
         }
@@ -111,22 +101,22 @@ namespace OpenWifi{
         NewEntity.contacts.clear();
         NewEntity.locations.clear();
 
-        if(Storage()->EntityDB().CreateShortCut(NewEntity)) {
-            if(UUID==EntityDB::RootUUID())
-                Storage()->EntityDB().CheckForRoot();
-            else {
-                Storage()->EntityDB().AddChild("id",NewEntity.parent,NewEntity.info.id);
+        if(DB_.CreateShortCut(NewEntity)) {
+            if(UUID==EntityDB::RootUUID()) {
+                DB_.CheckForRoot();
+            } else {
+                DB_.AddChild("id",NewEntity.parent,NewEntity.info.id);
             }
 
             if(!NewEntity.deviceConfiguration.empty())
-                Storage()->ConfigurationDB().AddInUse("id",NewEntity.deviceConfiguration,Storage()->EntityDB().Prefix(),NewEntity.info.id);
+                Storage()->ConfigurationDB().AddInUse("id",NewEntity.deviceConfiguration, DB_.Prefix(),NewEntity.info.id);
 
             Poco::JSON::Object  Answer;
             NewEntity.to_json(Answer);
             ReturnObject(Answer);
             return;
         }
-        NotFound();
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
     }
 
     /*
@@ -140,13 +130,8 @@ namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoPut() {
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::Entity Existing;
-        if(!Storage()->EntityDB().GetRecord("id",UUID,Existing)) {
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             NotFound();
             return;
         }
@@ -185,31 +170,31 @@ namespace OpenWifi{
             return;
         }
 
-        if(Storage()->EntityDB().UpdateRecord("id",UUID,Existing)) {
+        if(DB_.UpdateRecord("id",UUID,Existing)) {
             for(const auto &i:*Request) {
                 std::string Child{i.second};
                 auto UUID_parts = Utils::Split(Child,':');
                 if(i.first=="add" && UUID_parts[0] == "con") {
-                    Storage()->EntityDB().AddContact("id", UUID, UUID_parts[1]);
-                    Storage()->ContactDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(), UUID);
+                    DB_.AddContact("id", UUID, UUID_parts[1]);
+                    Storage()->ContactDB().AddInUse("id",UUID_parts[1],DB_.Prefix(), UUID);
                 } else if (i.first == "del" && UUID_parts[0] == "con") {
-                    Storage()->EntityDB().DeleteContact("id", UUID, UUID_parts[1]);
-                    Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                    DB_.DeleteContact("id", UUID, UUID_parts[1]);
+                    Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 } else if (i.first == "add" && UUID_parts[0] == "loc") {
-                    Storage()->EntityDB().AddLocation("id", UUID, UUID_parts[1]);
-                    Storage()->LocationDB().AddInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                    DB_.AddLocation("id", UUID, UUID_parts[1]);
+                    Storage()->LocationDB().AddInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 } else if (i.first == "del" && UUID_parts[0] == "loc") {
-                    Storage()->EntityDB().DeleteLocation("id", UUID, UUID_parts[1]);
-                    Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],Storage()->EntityDB().Prefix(),UUID);
+                    DB_.DeleteLocation("id", UUID, UUID_parts[1]);
+                    Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 }
             }
 
             if(!OldConfiguration.empty()) {
-                Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+                Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, DB_.Prefix(), Existing.info.id);
             }
 
             if(!NewEntity.deviceConfiguration.empty()) {
-                Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, Storage()->EntityDB().Prefix(), Existing.info.id);
+                Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, DB_.Prefix(), Existing.info.id);
             }
 
             Poco::JSON::Object  Answer;
@@ -218,8 +203,7 @@ namespace OpenWifi{
             NewRecord.to_json(Answer);
             ReturnObject(Answer);
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::RecordNotUpdated);
         }
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }
 }

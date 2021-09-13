@@ -18,13 +18,8 @@ namespace OpenWifi{
 
     void RESTAPI_managementPolicy_handler::DoGet() {
         std::string UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::ManagementPolicy   Existing;
-        if(!Storage()->PolicyDB().GetRecord("id", UUID, Existing)) {
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
             NotFound();
             return;
         }
@@ -59,28 +54,23 @@ namespace OpenWifi{
 
     void RESTAPI_managementPolicy_handler::DoDelete() {
         std::string UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::ManagementPolicy   Existing;
-        if(!Storage()->PolicyDB().GetRecord("id", UUID, Existing)) {
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
             NotFound();
             return;
         }
 
         if(!Existing.inUse.empty()) {
-            BadRequest("Cannot delete policy while still in use.");
+            BadRequest(RESTAPI::Errors::StillInUse);
             return;
         }
 
         if(Storage()->PolicyDB().DeleteRecord("id", UUID)) {
             OK();
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
         }
+
+        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     void RESTAPI_managementPolicy_handler::DoPost() {
@@ -105,19 +95,47 @@ namespace OpenWifi{
         NewPolicy.inUse.clear();
         NewPolicy.info.id = Daemon()->CreateUUID();
         NewPolicy.info.created = NewPolicy.info.modified = std::time(nullptr);
-        if(Storage()->PolicyDB().CreateRecord(NewPolicy)) {
+        if(DB_.CreateRecord(NewPolicy)) {
             ProvObjects::ManagementPolicy   Policy;
-            Storage()->PolicyDB().GetRecord("id",NewPolicy.info.id,Policy);
+            DB_.GetRecord("id",NewPolicy.info.id,Policy);
             Poco::JSON::Object  Answer;
             Policy.to_json(Answer);
             ReturnObject(Answer);
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_managementPolicy_handler::DoPut() {
+        std::string UUID = GetBinding("uuid","");
+        ProvObjects::ManagementPolicy   Existing;
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
+            NotFound();
+            return;
+        }
 
+        ProvObjects::ManagementPolicy   NewPolicy;
+        auto NewObj = ParseStream();
+        if(!NewPolicy.from_json(NewObj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        AssignIfPresent(NewObj, "name", Existing.info.name);
+        AssignIfPresent(NewObj, "description", Existing.info.description);
+        Existing.info.modified = std::time(nullptr);
+
+        if(!NewPolicy.entries.empty())
+            Existing.entries = NewPolicy.entries;
+
+        if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
+           ProvObjects::ManagementPolicy   P;
+            DB_.GetRecord("id",Existing.info.id,P);
+            Poco::JSON::Object  Answer;
+            P.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }
 }

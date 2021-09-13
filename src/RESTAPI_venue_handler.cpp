@@ -18,137 +18,149 @@ namespace OpenWifi{
 
     void RESTAPI_venue_handler::DoGet() {
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
+        ProvObjects::Venue Existing;
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
+            NotFound();
             return;
         }
-
-        ProvObjects::Venue V;
-        if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
-            Poco::JSON::Object Answer;
-            V.to_json(Answer);
-            ReturnObject(Answer);
-            return;
-        }
-        NotFound();
+        Poco::JSON::Object Answer;
+        Existing.to_json(Answer);
+        ReturnObject(Answer);
     }
 
     void RESTAPI_venue_handler::DoDelete() {
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
+        ProvObjects::Venue Existing;
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
+            NotFound();
             return;
         }
 
-        ProvObjects::Venue V;
-        if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
-
-            if(!V.children.empty() || !V.devices.empty()) {
-                BadRequest(RESTAPI::Errors::StillInUse);
-                return;
-            }
-
-            if(!V.contact.empty())
-                Storage()->ContactDB().DeleteInUse("id",V.contact,Storage()->VenueDB().Prefix(),UUID);
-            if(!V.location.empty())
-                Storage()->LocationDB().DeleteInUse("id",V.location,Storage()->VenueDB().Prefix(),UUID);
-            if(!V.managementPolicy.empty())
-                Storage()->PolicyDB().DeleteInUse("id",V.managementPolicy,Storage()->VenueDB().Prefix(),UUID);
-            if(!V.deviceConfiguration.empty())
-                Storage()->ConfigurationDB().DeleteInUse("id",V.deviceConfiguration,Storage()->VenueDB().Prefix(),UUID);
-            if(!V.parent.empty())
-                Storage()->VenueDB().DeleteChild("id",V.parent,UUID);
-            if(!V.entity.empty())
-                Storage()->EntityDB().DeleteVenue("id",V.entity,UUID);
-            Storage()->VenueDB().DeleteRecord("id",UUID);
-            OK();
+        if(!Existing.children.empty() || !Existing.devices.empty()) {
+            BadRequest(RESTAPI::Errors::StillInUse);
             return;
         }
-        NotFound();
+
+        if(!Existing.contact.empty())
+            Storage()->ContactDB().DeleteInUse("id",Existing.contact,Storage()->VenueDB().Prefix(),UUID);
+        if(!Existing.location.empty())
+            Storage()->LocationDB().DeleteInUse("id",Existing.location,Storage()->VenueDB().Prefix(),UUID);
+        if(!Existing.managementPolicy.empty())
+            Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,Storage()->VenueDB().Prefix(),UUID);
+        if(!Existing.deviceConfiguration.empty())
+            Storage()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,Storage()->VenueDB().Prefix(),UUID);
+        if(!Existing.parent.empty())
+            Storage()->VenueDB().DeleteChild("id",Existing.parent,UUID);
+        if(!Existing.entity.empty())
+            Storage()->EntityDB().DeleteVenue("id",Existing.entity,UUID);
+        DB_.DeleteRecord("id",UUID);
+        OK();
     }
 
     void RESTAPI_venue_handler::DoPost() {
-        auto Obj = ParseStream();
-        ProvObjects::Venue V;
-        if (!V.from_json(Obj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
-        }
-
-        if(V.parent.empty() && V.entity.empty()) {
-            BadRequest(RESTAPI::Errors::ParentOrEntityMustBeSet);
-            return;
-        }
-
-        if(!V.parent.empty() && !V.entity.empty()) {
-            BadRequest(RESTAPI::Errors::NotBoth);
-            return;
-        }
-
-        if(!V.parent.empty() && !Storage()->VenueDB().Exists("id",V.parent)) {
-            BadRequest(RESTAPI::Errors::VenueMustExist);
-            return;
-        }
-
-        if(V.entity == EntityDB::RootUUID()) {
-            BadRequest(RESTAPI::Errors::ValidNonRootUUID);
-            return;
-        }
-
-        if(!V.entity.empty() && !Storage()->EntityDB().Exists("id",V.entity)) {
-            BadRequest(RESTAPI::Errors::EntityMustExist);
-            return;
-        }
-
-        if(!V.contact.empty() && !Storage()->ContactDB().Exists("id",V.contact)) {
-            BadRequest(RESTAPI::Errors::ContactMustExist);
-            return;
-        }
-
-        if(!V.location.empty() && !Storage()->LocationDB().Exists("id",V.location)) {
-            BadRequest(RESTAPI::Errors::LocationMustExist);
-            return;
-        }
-
-        if(!V.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",V.managementPolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
-        }
-
-        V.children.clear();
-        V.info.modified = V.info.created = std::time(nullptr);
-        V.info.id = Daemon()->CreateUUID() ;
-        for(auto &i:V.info.notes)
-            i.createdBy = UserInfo_.userinfo.email;
-
-        if(Storage()->VenueDB().CreateShortCut(V)) {
-            Poco::JSON::Object  Answer;
-            V.to_json(Answer);
-            ReturnObject(Answer);
-            return;
-        }
-        NotFound();
-    }
-
-    void RESTAPI_venue_handler::DoPut() {
         std::string UUID = GetBinding("uuid", "");
         if(UUID.empty()) {
             BadRequest(RESTAPI::Errors::MissingUUID);
             return;
         }
 
-        ProvObjects::Venue  ExistingVenue;
-        if(!Storage()->VenueDB().GetRecord("id",UUID, ExistingVenue)) {
+        auto Obj = ParseStream();
+        ProvObjects::Venue NewObject;
+        if (!NewObject.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        if(NewObject.parent.empty() && NewObject.entity.empty()) {
+            BadRequest(RESTAPI::Errors::ParentOrEntityMustBeSet);
+            return;
+        }
+
+        if(!NewObject.parent.empty() && !NewObject.entity.empty()) {
+            BadRequest(RESTAPI::Errors::NotBoth);
+            return;
+        }
+
+        if(!NewObject.parent.empty() && !DB_.Exists("id",NewObject.parent)) {
+            BadRequest(RESTAPI::Errors::VenueMustExist);
+            return;
+        }
+
+        if(NewObject.entity == EntityDB::RootUUID()) {
+            BadRequest(RESTAPI::Errors::ValidNonRootUUID);
+            return;
+        }
+
+        if(!NewObject.entity.empty() && !Storage()->EntityDB().Exists("id",NewObject.entity)) {
+            BadRequest(RESTAPI::Errors::EntityMustExist);
+            return;
+        }
+
+        if(!NewObject.contact.empty() && !Storage()->ContactDB().Exists("id",NewObject.contact)) {
+            BadRequest(RESTAPI::Errors::ContactMustExist);
+            return;
+        }
+
+        if(!NewObject.location.empty() && !Storage()->LocationDB().Exists("id",NewObject.location)) {
+            BadRequest(RESTAPI::Errors::LocationMustExist);
+            return;
+        }
+
+        if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            return;
+        }
+
+        NewObject.children.clear();
+        NewObject.info.modified = NewObject.info.created = std::time(nullptr);
+        NewObject.info.id = Daemon()->CreateUUID() ;
+        for(auto &i:NewObject.info.notes)
+            i.createdBy = UserInfo_.userinfo.email;
+
+        if(DB_.CreateShortCut(NewObject)) {
+            if(!NewObject.entity.empty())
+                Storage()->EntityDB().AddVenue("id", NewObject.entity, NewObject.info.id);
+            if(!NewObject.parent.empty())
+                DB_.AddChild("id", NewObject.parent, NewObject.info.id);
+            if(!NewObject.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id", NewObject.managementPolicy, DB_.Prefix(), NewObject.info.id);
+            if(!NewObject.location.empty())
+                Storage()->LocationDB().AddInUse("id", NewObject.location, DB_.Prefix(), NewObject.info.id);
+            if(!NewObject.contact.empty())
+                Storage()->ContactDB().AddInUse("id", NewObject.contact, DB_.Prefix(), NewObject.info.id);
+
+            ProvObjects::Venue  NewRecord;
+            DB_.GetRecord("id",NewObject.info.id,NewRecord);
+            Poco::JSON::Object  Answer;
+            NewRecord.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
+    }
+
+    void RESTAPI_venue_handler::DoPut() {
+        std::string UUID = GetBinding("uuid", "");
+        ProvObjects::Venue Existing;
+        if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             NotFound();
             return;
         }
 
         auto RawObject = ParseStream();
-        if(RawObject->has("notes")) {
-            SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, ExistingVenue.info.notes);
+        ProvObjects::Venue NewObject;
+        if (!NewObject.from_json(RawObject)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
         }
-        AssignIfPresent(RawObject, "name", ExistingVenue.info.name);
-        AssignIfPresent(RawObject, "description", ExistingVenue.info.description);
+
+        for(auto &i:NewObject.info.notes) {
+            i.createdBy = UserInfo_.userinfo.email;
+            Existing.info.notes.insert(Existing.info.notes.begin(),i);
+        }
+
+        AssignIfPresent(RawObject, "name", Existing.info.name);
+        AssignIfPresent(RawObject, "description", Existing.info.description);
 
         std::string MoveEntity;
         if(AssignIfPresent(RawObject, "entity", MoveEntity) && !Storage()->EntityDB().Exists("id",MoveEntity)) {
@@ -180,14 +192,51 @@ namespace OpenWifi{
             return;
         }
 
-        if(Storage()->VenueDB().UpdateRecord("id", UUID, ExistingVenue)) {
+        if(Storage()->VenueDB().UpdateRecord("id", UUID, Existing)) {
+            if(MoveContact != Existing.contact) {
+                if(!Existing.contact.empty())
+                    Storage()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
+                if(!MoveContact.empty())
+                    Storage()->ContactDB().AddInUse("id", MoveContact, DB_.Prefix(), Existing.info.id);
+                Existing.contact = MoveContact;
+            }
+            if(MoveEntity != Existing.entity) {
+                if(!Existing.entity.empty())
+                    Storage()->EntityDB().DeleteVenue("id", Existing.entity, Existing.info.id);
+                if(!MoveEntity.empty())
+                    Storage()->EntityDB().AddVenue("id",MoveEntity,Existing.info.id);
+                Existing.entity = MoveEntity;
+            }
+            if(MoveVenue != Existing.parent) {
+               if(!Existing.parent.empty())
+                   DB_.DeleteChild("id",Existing.parent,Existing.info.id);
+               if(!MoveVenue.empty())
+                   DB_.AddChild("id", MoveVenue, Existing.info.id);
+               Existing.parent = MoveVenue;
+            }
+            if(MoveLocation != Existing.location) {
+                if(!Existing.location.empty())
+                    Storage()->LocationDB().DeleteInUse("id", Existing.location, DB_.Prefix(), Existing.info.id);
+                if(!MoveLocation.empty())
+                    Storage()->LocationDB().AddInUse("id", MoveLocation, DB_.Prefix(), Existing.info.id);
+                Existing.location = MoveLocation;
+            }
+            if(MovePolicy != Existing.managementPolicy) {
+                if(!Existing.managementPolicy.empty())
+                    Storage()->PolicyDB().DeleteInUse("id", Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
+                if(!MovePolicy.empty())
+                    Storage()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
+                Existing.managementPolicy = MovePolicy;
+            }
+
+            DB_.UpdateRecord("id",Existing.info.id, Existing);
             ProvObjects::Venue AddedRecord;
-            Storage()->VenueDB().GetRecord("id",UUID,AddedRecord);
+            DB_.GetRecord("id",UUID,AddedRecord);
             Poco::JSON::Object  Answer;
             AddedRecord.to_json(Answer);
             ReturnObject(Answer);
             return;
         }
-        NotFound();
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }
 }

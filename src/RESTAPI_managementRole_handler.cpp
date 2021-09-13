@@ -15,15 +15,9 @@
 namespace OpenWifi{
 
     void RESTAPI_managementRole_handler::DoGet() {
-
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::ManagementRole   Existing;
-        if(!Storage()->RolesDB().GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
+        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             NotFound();
             return;
         }
@@ -57,14 +51,9 @@ namespace OpenWifi{
     }
 
     void RESTAPI_managementRole_handler::DoDelete() {
-        std::string UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
-        ProvObjects::ManagementRole    ExistingManagementRole;
-        if(!Storage()->RolesDB().GetRecord("id",UUID,ExistingManagementRole)) {
+        ProvObjects::ManagementRole   Existing;
+        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             NotFound();
             return;
         }
@@ -74,18 +63,19 @@ namespace OpenWifi{
         if(HasParameter("force",Arg) && Arg=="true")
             Force=true;
 
-        if(!Force && !ExistingManagementRole.inUse.empty()) {
+        if(!Force && !Existing.inUse.empty()) {
             BadRequest(RESTAPI::Errors::StillInUse);
             return;
         }
 
-        Storage()->PolicyDB().DeleteInUse("id", ExistingManagementRole.managementPolicy, Storage()->RolesDB().Prefix(), ExistingManagementRole.info.id);
-        if(Storage()->RolesDB().DeleteRecord("id", ExistingManagementRole.info.id)) {
-            OK();
-        } else {
-            BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
-        }
+        if(!Existing.managementPolicy.empty())
+            Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
 
+        if(Storage()->RolesDB().DeleteRecord("id", Existing.info.id)) {
+            OK();
+            return;
+        }
+        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     void RESTAPI_managementRole_handler::DoPost() {
@@ -96,43 +86,52 @@ namespace OpenWifi{
         }
 
         auto Obj = ParseStream();
-        ProvObjects::Contact C;
-        if (!C.from_json(Obj)) {
+        ProvObjects::ManagementRole NewObject;
+        if (!NewObject.from_json(Obj)) {
             BadRequest(RESTAPI::Errors::InvalidJSONDocument);
             return;
         }
 
-        C.info.id = Daemon()->CreateUUID();
-        C.info.created = C.info.modified = std::time(nullptr);
+        if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            return;
+        }
+        NewObject.info.id = Daemon()->CreateUUID();
+        NewObject.info.created = NewObject.info.modified = std::time(nullptr);
 
         std::string f{RESTAPI::Protocol::ID};
 
-        if(Storage()->ContactDB().CreateRecord(C)) {
+        if(DB_.CreateRecord(NewObject)) {
+            if(!NewObject.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id", NewObject.managementPolicy, DB_.Prefix(), NewObject.info.id);
             Poco::JSON::Object Answer;
-            C.to_json(Answer);
+            ProvObjects::ManagementRole Role;
+            DB_.GetRecord("id", NewObject.info.id,Role);
+            Role.to_json(Answer);
             ReturnObject(Answer);
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_managementRole_handler::DoPut() {
+        ProvObjects::ManagementRole   Existing;
         std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
-        ProvObjects::ManagementRole Existing;
-        if(!Storage()->RolesDB().GetRecord("id",UUID,Existing)) {
+        if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             NotFound();
             return;
         }
 
         auto RawObject = ParseStream();
-        if(RawObject->has("notes")) {
-            SecurityObjects::append_from_json(RawObject, UserInfo_.userinfo, Existing.info.notes);
+        ProvObjects::ManagementRole NewObject;
+        if(!NewObject.from_json(RawObject)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        for(auto &i:NewObject.info.notes) {
+            i.createdBy = UserInfo_.userinfo.email;
+            Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
         AssignIfPresent(RawObject, "name", Existing.info.name);
@@ -145,38 +144,23 @@ namespace OpenWifi{
             return;
         }
 
-        std::string Error;
-        if(!Storage()->Validate(Parameters_,Error)) {
-            BadRequest("Unknown users: " + Error);
-            return;
-        }
-
         if(!NewPolicy.empty())
             Existing.managementPolicy = NewPolicy;
 
-        if(Storage()->RolesDB().UpdateRecord("id",UUID,Existing)) {
+        if(DB_.UpdateRecord("id",UUID,Existing)) {
             if(!OldPolicy.empty())
-                Storage()->PolicyDB().DeleteInUse("id",OldPolicy,Storage()->RolesDB().Prefix(),UUID);
-            for(const auto &i:Parameters_) {
-                if(i.first=="add") {
-                    auto T = Poco::StringTokenizer(i.second,":");
-                    if(T[0]==SecurityDBProxy()->Prefix()) {
-                        Storage()->RolesDB().AddUser("id",UUID,T[1]);
-                    }
-                } else if(i.second=="del") {
-                    auto T = Poco::StringTokenizer(i.second,":");
-                    if(T[0]==SecurityDBProxy()->Prefix()) {
-                        Storage()->RolesDB().DelUser("id",UUID,T[1]);
-                    }
-                }
-            }
-            Storage()->RolesDB().GetRecord("id", UUID, Existing);
+                Storage()->PolicyDB().DeleteInUse("id",OldPolicy,DB_.Prefix(),UUID);
+            if(!NewPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id",NewPolicy,DB_.Prefix(),UUID);
+
+            ProvObjects::ManagementRole NewRecord;
+
+            DB_.GetRecord("id", UUID, NewRecord);
             Poco::JSON::Object  Answer;
-            Existing.to_json(Answer);
+            NewRecord.to_json(Answer);
             ReturnObject(Answer);
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::RecordNotUpdated);
         }
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }
 }

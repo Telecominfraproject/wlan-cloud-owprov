@@ -12,19 +12,16 @@
 
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
+#include "RESTAPI_protocol.h"
+#include "Daemon.h"
 
 namespace OpenWifi{
 
     void RESTAPI_location_handler::DoGet() {
         std::string UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::Location   Existing;
-        if(!Storage()->LocationDB().GetRecord("id", UUID, Existing)) {
-            NotFound();
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
             return;
         }
 
@@ -56,9 +53,90 @@ namespace OpenWifi{
         ReturnObject(Answer);
     }
 
-    void RESTAPI_location_handler::DoDelete() {}
+    void RESTAPI_location_handler::DoDelete() {
+        std::string UUID = GetBinding("uuid","");
+        ProvObjects::Location   Existing;
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
+            NotFound();
+            return;
+        }
 
-    void RESTAPI_location_handler::DoPost() {}
+        bool Force=false;
+        std::string Arg;
+        if(HasParameter("force",Arg) && Arg=="true")
+            Force=true;
 
-    void RESTAPI_location_handler::DoPut() {}
+        if(!Force && !Existing.inUse.empty()) {
+            BadRequest(RESTAPI::Errors::StillInUse);
+            return;
+        }
+
+        if(DB_.DeleteRecord("id",UUID)) {
+            OK();
+            return;
+        }
+        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
+    }
+
+    void RESTAPI_location_handler::DoPost() {
+        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        if(UUID.empty()) {
+            BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
+        }
+
+        auto Obj = ParseStream();
+        ProvObjects::Location NewObject;
+        if (!NewObject.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        NewObject.info.id = Daemon()->CreateUUID();
+        NewObject.info.created = NewObject.info.modified = std::time(nullptr);
+        NewObject.inUse.clear();
+
+        if(DB_.CreateRecord(NewObject)) {
+            Poco::JSON::Object Answer;
+            NewObject.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
+    }
+
+    void RESTAPI_location_handler::DoPut() {
+        std::string UUID = GetBinding("uuid","");
+        ProvObjects::Location   Existing;
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
+            NotFound();
+            return;
+        }
+
+        auto Obj = ParseStream();
+        ProvObjects::Location NewObject;
+        if (!NewObject.from_json(Obj)) {
+            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            return;
+        }
+
+        for(auto &i:NewObject.info.notes) {
+            i.createdBy = UserInfo_.userinfo.email;
+            Existing.info.notes.insert(Existing.info.notes.begin(),i);
+        }
+
+        AssignIfPresent(Obj,"name",Existing.info.name);
+        AssignIfPresent(Obj,"description",Existing.info.description);
+        Existing.info.modified = std::time(nullptr);
+
+        if(DB_.UpdateRecord("id", UUID, Existing)) {
+            ProvObjects::Location    NewObjectAdded;
+            DB_.GetRecord("id", UUID, NewObjectAdded);
+            Poco::JSON::Object  Answer;
+            NewObjectAdded.to_json(Answer);
+            ReturnObject(Answer);
+            return;
+        }
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
+    }
 }

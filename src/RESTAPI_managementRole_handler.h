@@ -8,6 +8,7 @@
 #include "RESTAPI_handler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
     class RESTAPI_managementRole_handler : public RESTAPIHandler {
@@ -18,9 +19,11 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_GET, Poco::Net::HTTPRequest::HTTP_POST,
             Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
-            Internal) {}
+            Internal),
+            DB_(Storage()->RolesDB()){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementRole/{uuid}"}; };
-
+    private:
+        ManagementRoleDB    &DB_;
         void DoGet() final ;
         void DoPost() final ;
         void DoPut() final ;

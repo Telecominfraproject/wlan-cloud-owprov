@@ -16,13 +16,8 @@ namespace OpenWifi{
 
     void RESTAPI_configurations_handler::DoGet() {
         std::string UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::DeviceConfiguration   Existing;
-        if(!Storage()->ConfigurationDB().GetRecord("id", UUID, Existing)) {
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
             NotFound();
             return;
         }
@@ -56,27 +51,23 @@ namespace OpenWifi{
     }
 
     void RESTAPI_configurations_handler::DoDelete() {
-        auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
+        std::string UUID = GetBinding("uuid","");
+        ProvObjects::DeviceConfiguration   Existing;
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
+            NotFound();
             return;
         }
 
-        ProvObjects::DeviceConfiguration    C;
-        if(Storage()->ConfigurationDB().GetRecord("id", UUID, C)) {
-            if(!C.inUse.empty()) {
-                BadRequest(RESTAPI::Errors::StillInUse);
-                return;
-            }
-
-            if(Storage()->ConfigurationDB().DeleteRecord("id", UUID)) {
-                OK();
-            } else {
-                BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
-            }
-        } else {
-            NotFound();
+        if(!Existing.inUse.empty()) {
+            BadRequest(RESTAPI::Errors::StillInUse);
+            return;
         }
+
+        if(DB_.DeleteRecord("id", UUID)) {
+            OK();
+            return;
+        }
+        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     //      interfaces
@@ -144,30 +135,23 @@ namespace OpenWifi{
         if(!ValidateConfigBlock(C))
             return;
 
-        if(Storage()->ConfigurationDB().CreateRecord(C)) {
-            Storage()->ConfigurationDB().GetRecord("id", C.info.id, C);
-            Poco::JSON::Object  Answer;
-
+        if(DB_.CreateRecord(C)) {
+            DB_.GetRecord("id", C.info.id, C);
             if(!C.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id",C.managementPolicy,Storage()->PolicyDB().Prefix(), C.info.id);
+                Storage()->PolicyDB().AddInUse("id",C.managementPolicy,DB_.Prefix(), C.info.id);
 
+            Poco::JSON::Object  Answer;
             C.to_json(Answer);
             ReturnObject(Answer);
-        } else {
-            BadRequest(RESTAPI::Errors::RecordNotCreated);
+            return;
         }
-
+        BadRequest(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_configurations_handler::DoPut() {
         auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
-        }
-
         ProvObjects::DeviceConfiguration    Existing;
-        if(!Storage()->ConfigurationDB().GetRecord("id", UUID, Existing)) {
+        if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
             NotFound();
             return;
         }
@@ -179,6 +163,14 @@ namespace OpenWifi{
             return;
         }
 
+        if(!NewConfig.deviceTypes.empty() && !Storage()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
+            BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
+            return;
+        }
+
+        if(!ValidateConfigBlock(NewConfig))
+            return;
+
         for(auto &i:NewConfig.info.notes) {
             i.createdBy = UserInfo_.userinfo.email;
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
@@ -189,45 +181,35 @@ namespace OpenWifi{
             return;
         }
 
-        if(!NewConfig.deviceTypes.empty() && !Storage()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
-            BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
-            return;
-        }
-
         if(!NewConfig.deviceTypes.empty())
             Existing.deviceTypes = NewConfig.deviceTypes;
 
         if(!NewConfig.info.name.empty())
             Existing.info.name = NewConfig.info.name;
 
-        if(!NewConfig.info.description.empty())
-            Existing.info.description = NewConfig.info.description;
-
+        AssignIfPresent(Obj, "name", Existing.info.name);
+        AssignIfPresent(Obj,"description", Existing.info.description);
         NewConfig.info.modified = std::time(nullptr);
-
-        if(!ValidateConfigBlock(NewConfig))
-            return;
 
         if(!NewConfig.variables.empty())
             Existing.variables = NewConfig.variables;
 
-        std::string OldPolicy;
-        OldPolicy = Existing.managementPolicy;
+        std::string OldPolicy = Existing.managementPolicy;
         if(!NewConfig.managementPolicy.empty() && Existing.managementPolicy!=NewConfig.managementPolicy) {
             OldPolicy = Existing.managementPolicy;
             Existing.managementPolicy = NewConfig.managementPolicy;
         }
 
-        if(Storage()->ConfigurationDB().UpdateRecord("id",UUID,Existing)) {
+        if(DB_.UpdateRecord("id",UUID,Existing)) {
             if(!OldPolicy.empty()) {
-                Storage()->PolicyDB().DeleteInUse("id",OldPolicy,Storage()->ConfigurationDB().Prefix(),Existing.info.id);
+                Storage()->PolicyDB().DeleteInUse("id",OldPolicy,DB_.Prefix(),Existing.info.id);
             }
             if(!Existing.managementPolicy.empty()) {
-                Storage()->PolicyDB().AddInUse("id",Existing.managementPolicy,Storage()->ConfigurationDB().Prefix(),Existing.info.id);
+                Storage()->PolicyDB().AddInUse("id",Existing.managementPolicy, DB_.Prefix(),Existing.info.id);
             }
 
             ProvObjects::DeviceConfiguration    D;
-            Storage()->ConfigurationDB().GetRecord("id",UUID,D);
+            DB_.GetRecord("id",UUID,D);
             Poco::JSON::Object  Answer;
             D.to_json(Answer);
             ReturnObject(Answer);

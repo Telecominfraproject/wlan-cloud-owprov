@@ -12,6 +12,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "RESTAPI_ProvObjects.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
     class RESTAPI_configurations_handler : public RESTAPIHandler {
@@ -22,7 +23,8 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_GET, Poco::Net::HTTPRequest::HTTP_POST,
             Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
-            Internal) {}
+            Internal),
+            DB_(Storage()->ConfigurationDB()){}
 
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/configurations/{uuid}"}; };
 
@@ -32,6 +34,7 @@ namespace OpenWifi {
         void DoDelete();
     private:
         bool ValidateConfigBlock(const      ProvObjects::DeviceConfiguration &Config);
+        ConfigurationDB     &DB_;
     };
 }
 

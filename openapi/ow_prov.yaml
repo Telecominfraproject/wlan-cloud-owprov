@@ -335,9 +335,6 @@ components:
           type: array
           items:
             type: string
-        contact:
-          type: string
-          format: uuid
         inUse:
           type: array
           items:
