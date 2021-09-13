@@ -359,4 +359,52 @@ namespace OpenWifi::ProvObjects {
         tenants.clear();
     }
 
+    void ExpandedUseEntry::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj, "uuid", uuid);
+        RESTAPI_utils::field_to_json(Obj, "name", name);
+        RESTAPI_utils::field_to_json(Obj, "description", description);
+    }
+
+    bool ExpandedUseEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json( Obj,"uuid",uuid);
+            RESTAPI_utils::field_from_json( Obj,"name",name);
+            RESTAPI_utils::field_from_json( Obj,"description",description);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void ExpandedUseEntryMap::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj, "type", type);
+        RESTAPI_utils::field_to_json(Obj, "entries", entries);
+    }
+
+    bool ExpandedUseEntryMap::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json( Obj,"type",type);
+            RESTAPI_utils::field_from_json( Obj,"entries",entries);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void ExpandedUseEntryMapList::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj, "entries", entries);
+    }
+
+    bool ExpandedUseEntryMapList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json( Obj,"entries",entries);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
 };

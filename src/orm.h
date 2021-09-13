@@ -450,6 +450,31 @@ namespace ORM {
             return false;
         }
 
+        template <typename T> bool GetNameAndDescription(const char *FieldName, T & Value, std::string & Name, std::string & Description ) {
+            try {
+                assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+                Poco::Data::Session     Session = Pool_.get();
+                Poco::Data::Statement   Select(Session);
+                RecordTuple             RT;
+
+                std::string St = "select " + SelectFields_ + " from " + DBName + " where " + FieldName + "=?" ;
+                RecordType R;
+                Select  << ConvertParams(St) ,
+                Poco::Data::Keywords::into(RT),
+                Poco::Data::Keywords::use(Value);
+                if(Select.execute()==1) {
+                    Convert(RT,R);
+                    Name = R.info.name;
+                    Description = R.info.description;
+                    return true;
+                }
+                return false;
+            } catch (const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return false;
+        }
+
         template <typename T> bool DeleteRecord( const char *FieldName, T Value) {
             try {
                 assert( FieldNames_.find(FieldName) != FieldNames_.end() );
@@ -610,6 +635,15 @@ namespace ORM {
         inline bool DeleteInUse(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
             std::string FakeUUID{ Prefix + ":" + ChildUUID};
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, false);
+        }
+
+        inline bool GetInUse(const char *FieldName, std::string & UUID, std::vector<std::string> & UUIDs ) {
+            RecordType  R;
+            if(GetRecord(FieldName,UUID,R)) {
+                UUIDs = R.inUse;
+                return true;
+            }
+            return false;
         }
 
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {

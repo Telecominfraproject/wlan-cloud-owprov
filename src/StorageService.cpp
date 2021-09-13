@@ -65,6 +65,16 @@ namespace OpenWifi {
         ExistFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return RolesDB_->Exists(F,V); };
         ExistFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V) ->bool { return SecurityDBProxy()->Exists(F,V); };
 
+        ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[VenueDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return VenueDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[ContactDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return ContactDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[InventoryDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return InventoryDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return ConfigurationDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return LocationDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return RolesDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SecurityDBProxy()->Exists(F,V); };
+
         EntityDB_->CheckForRoot();
         Updater_.start(*this);
 
@@ -162,6 +172,32 @@ namespace OpenWifi {
             return true;
         return false;
 	}
+
+    bool Storage::ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap &Map, std::vector<std::string> & Errors) {
+        for(const auto &i:UUIDs) {
+            auto uuid_parts = Utils::Split(i,':');
+            if(uuid_parts.size()==2) {
+                auto F = ExpandFunc_.find(uuid_parts[0]);
+                if(F!=ExpandFunc_.end()) {
+                    std::string Name, Description;
+                    if(!F->second("id", uuid_parts[1], Name, Description)) {
+                        Errors.push_back(i);
+                    } else {
+                        auto Hint = Map.find(uuid_parts[0]);
+                        ExpandedInUse   X{.uuid=uuid_parts[1],.name=Name, .description=Description};
+                        if(Hint==Map.end()) {
+                            ExpandedInUseList L;
+                            L.push_back(X);
+                            Map[uuid_parts[0]] = L;
+                        } else {
+                            Hint->second.push_back(X);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
 }
 

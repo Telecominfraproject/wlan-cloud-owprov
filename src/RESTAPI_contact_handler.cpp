@@ -16,22 +16,44 @@
 
 namespace OpenWifi{
     void RESTAPI_contact_handler::DoGet() {
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding("uuid","");
         if(UUID.empty()) {
             BadRequest(RESTAPI::Errors::MissingUUID);
             return;
         }
 
-        ProvObjects::Contact   C;
-        if(Storage()->ContactDB().GetRecord(RESTAPI::Protocol::ID,UUID,C)) {
-            Poco::JSON::Object  Answer;
-            C.to_json(Answer);
-            ReturnObject(Answer);
-            return;
-        } else {
+        ProvObjects::Contact   Existing;
+        if(!Storage()->ContactDB().GetRecord("id", UUID, Existing)) {
             NotFound();
             return;
         }
+
+        std::string Arg;
+        if(HasParameter("expandInUse",Arg) && Arg=="true") {
+            Storage::ExpandedListMap    M;
+            std::vector<std::string>    Errors;
+            Poco::JSON::Object  Inner;
+            if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
+                for(const auto &[type,list]:M) {
+                    Poco::JSON::Array   ObjList;
+                    for(const auto &i:list) {
+                        Poco::JSON::Object  O;
+                        ProvObjects::ExpandedUseEntry   E;
+                        E.to_json(O);
+                        ObjList.add(O);
+                    }
+                    Inner.set(type,ObjList);
+                }
+            }
+            Poco::JSON::Object  Answer;
+            Answer.set("entries", Inner);
+            ReturnObject(Answer);
+            return;
+        }
+
+        Poco::JSON::Object  Answer;
+        Existing.to_json(Answer);
+        ReturnObject(Answer);
     }
 
     void RESTAPI_contact_handler::DoDelete() {

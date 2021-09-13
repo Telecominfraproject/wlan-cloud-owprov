@@ -46,6 +46,12 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		int 	Start() override;
 		void 	Stop() override;
 
+		struct ExpandedInUse {
+		    std::string uuid, name, description;
+		};
+		typedef std::list<ExpandedInUse>    ExpandedInUseList;
+		typedef std::map<std::string, ExpandedInUseList>    ExpandedListMap;
+
 		OpenWifi::EntityDB & EntityDB() { return *EntityDB_; };
 		OpenWifi::PolicyDB & PolicyDB() { return *PolicyDB_; };
 		OpenWifi::VenueDB & VenueDB() { return *VenueDB_; };
@@ -58,6 +64,7 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
 		inline bool ValidatePrefix(const std::string &P) const { return ExistFunc_.find(P)!=ExistFunc_.end(); }
+		bool ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap & Map, std::vector<std::string> & Errors);
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
 		inline bool AreAcceptableDeviceTypes(const Types::StringVec &S, bool WildCardAllowed=true) const {
@@ -91,7 +98,9 @@ class Storage : public SubSystemServer, Poco::Runnable {
 
 
 		typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
+		typedef std::function<bool(const char *FieldName, std::string &Value, std::string &Name, std::string &Description)>   expand_func;
 		std::map<std::string, exist_func>                   ExistFunc_;
+		std::map<std::string, expand_func>                  ExpandFunc_;
 
 		Poco::Thread                                        Updater_;
 		std::set<std::string>                               DeviceTypes_;

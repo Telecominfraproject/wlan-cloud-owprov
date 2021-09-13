@@ -15,21 +15,44 @@
 namespace OpenWifi{
 
     void RESTAPI_configurations_handler::DoGet() {
-        auto UUID = GetBinding("uuid","");
+        std::string UUID = GetBinding("uuid","");
         if(UUID.empty()) {
             BadRequest(RESTAPI::Errors::MissingUUID);
             return;
         }
 
-        ProvObjects::DeviceConfiguration    C;
-        if(Storage()->ConfigurationDB().GetRecord("id", UUID, C)) {
-            Poco::JSON::Object  Answer;
+        ProvObjects::DeviceConfiguration   Existing;
+        if(!Storage()->ConfigurationDB().GetRecord("id", UUID, Existing)) {
+            NotFound();
+            return;
+        }
 
-            C.to_json(Answer);
+        std::string Arg;
+        if(HasParameter("expandInUse",Arg) && Arg=="true") {
+            Storage::ExpandedListMap    M;
+            std::vector<std::string>    Errors;
+            Poco::JSON::Object  Inner;
+            if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
+                for(const auto &[type,list]:M) {
+                    Poco::JSON::Array   ObjList;
+                    for(const auto &i:list) {
+                        Poco::JSON::Object  O;
+                        ProvObjects::ExpandedUseEntry   E;
+                        E.to_json(O);
+                        ObjList.add(O);
+                    }
+                    Inner.set(type,ObjList);
+                }
+            }
+            Poco::JSON::Object  Answer;
+            Answer.set("entries", Inner);
             ReturnObject(Answer);
             return;
         }
-        NotFound();
+
+        Poco::JSON::Object  Answer;
+        Existing.to_json(Answer);
+        ReturnObject(Answer);
     }
 
     void RESTAPI_configurations_handler::DoDelete() {

@@ -508,6 +508,35 @@ components:
           type: integer
           format: int64
 
+    ExpandedUseEntry:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+
+    ExpandedUseEntryMap:
+      type: object
+      properties:
+        type:
+          type: string
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpandedUseEntry'
+
+    ExpandedUseEntryMapList:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpandedUseEntryMap'
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -830,10 +859,21 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: expandInUse
+          schema:
+            type: boolean
+          required: false
 
       responses:
         200:
-          $ref: '#/components/schemas/Contact'
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Contact'
+                  - $ref: '#/components/schemas/ExpandedUseEntryMapList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -991,10 +1031,21 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: expandInUse
+          schema:
+            type: boolean
+          required: false
 
       responses:
         200:
-          $ref: '#/components/schemas/Location'
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Location'
+                  - $ref: '#/components/schemas/ExpandedUseEntryMapList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1529,10 +1580,21 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: expandInUse
+          schema:
+            type: boolean
+          required: false
 
       responses:
         200:
-          $ref: '#/components/schemas/ManagementPolicy'
+          description: Succesful retrieve a management policy
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ManagementPolicy'
+                  - $ref: '#/components/schemas/ExpandedUseEntryMapList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1685,13 +1747,20 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: expandInUse
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
-          description: Return a management role
+          description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ManagementRole'
+                oneOf:
+                  - $ref: '#/components/schemas/ManagementRole'
+                  - $ref: '#/components/schemas/ExpandedUseEntryMapList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1835,10 +1904,21 @@ paths:
             format: uuid
             example: When looking for the root entity, the uuid 0000-0000-0000 must be entered.
           required: true
+        - in: query
+          name: expandInUse
+          schema:
+            type: boolean
+          required: false
 
       responses:
         200:
-          $ref: '#/components/schemas/DeviceConfiguration'
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DeviceConfiguration'
+                  - $ref: '#/components/schemas/ExpandedUseEntryMapList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
