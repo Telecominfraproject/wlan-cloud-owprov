@@ -56,7 +56,7 @@ namespace OpenWifi {
         std::unique_ptr<json_validator>  Validator_;
     };
 
-    bool ValidateUCentralConfiguration(const std::string &C) { return ConfigurationValidator::instance()->Validate(C); }
+    inline bool ValidateUCentralConfiguration(const std::string &C) { return ConfigurationValidator::instance()->Validate(C); }
 }
 
 #endif //OWPROV_CONFIGURATIONVALIDATOR_H

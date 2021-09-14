@@ -1934,6 +1934,11 @@ paths:
             format: uuid
             example: When creating the root entity, the uuid 0000-0000-0000 must be entered. When creating a non-root entity, uuid must be 1
           required: true
+        - in: query
+          name: validateOnly
+          schema:
+            type: boolean
+          required: false
       requestBody:
         description: Information used to create the new entity
         content:

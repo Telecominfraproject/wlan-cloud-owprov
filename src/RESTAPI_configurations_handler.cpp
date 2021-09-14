@@ -12,6 +12,8 @@
 #include "Daemon.h"
 #include "RESTAPI_errors.h"
 
+#include "ConfigurationValidator.h"
+
 namespace OpenWifi{
 
     void RESTAPI_configurations_handler::DoGet() {
@@ -100,6 +102,21 @@ namespace OpenWifi{
         auto UUID = GetBinding("uuid","");
         if(UUID.empty()) {
             BadRequest(RESTAPI::Errors::MissingUUID);
+            return;
+        }
+
+        std::string Arg;
+        if(HasParameter("validateOnly",Arg) && Arg=="true") {
+            auto Body = ParseStream();
+            if(!Body->has("configuration")) {
+                BadRequest("Must have 'configuration' element.");
+                return;
+            }
+            auto Config=Body->get("configuration").toString();
+            Poco::JSON::Object  Answer;
+            auto Res = ValidateUCentralConfiguration(Config);
+            Answer.set("valid",Res);
+            ReturnObject(Answer);
             return;
         }
 

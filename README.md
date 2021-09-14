@@ -1,5 +1,10 @@
 # OpenWiFi Provisioning
 
+## Build from source.
+You need: https://github.com/pboettch/json-schema-validator.git
+You need: https://github.com/nlohmann/json.git
+build and install them.
+
 ## Root entity
 It's UUID value is 0000-0000-0000. Its parent entity must be empty.
 
