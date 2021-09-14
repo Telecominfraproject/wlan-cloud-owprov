@@ -26,14 +26,13 @@ namespace OpenWifi{
         if(HasParameter("expandInUse",Arg) && Arg=="true") {
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
-            Poco::JSON::Object  Inner;
+            Poco::JSON::Object          Inner;
             if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
                 for(const auto &[type,list]:M) {
                     Poco::JSON::Array   ObjList;
-                    for(const auto &i:list) {
+                    for(const auto &i:list.entries) {
                         Poco::JSON::Object  O;
-                        ProvObjects::ExpandedUseEntry   E;
-                        E.to_json(O);
+                        i.to_json(O);
                         ObjList.add(O);
                     }
                     Inner.set(type,ObjList);

@@ -377,12 +377,12 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
-    void ExpandedUseEntryMap::to_json(Poco::JSON::Object &Obj) const {
+    void ExpandedUseEntryList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json(Obj, "type", type);
         RESTAPI_utils::field_to_json(Obj, "entries", entries);
     }
 
-    bool ExpandedUseEntryMap::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    bool ExpandedUseEntryList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             RESTAPI_utils::field_from_json( Obj,"type",type);
             RESTAPI_utils::field_from_json( Obj,"entries",entries);

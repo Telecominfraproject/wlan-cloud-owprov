@@ -14,6 +14,7 @@
 #include "Daemon.h"
 #include "Utils.h"
 #include "OpenAPIRequest.h"
+#include "RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 
@@ -184,13 +185,14 @@ namespace OpenWifi {
                         Errors.push_back(i);
                     } else {
                         auto Hint = Map.find(uuid_parts[0]);
-                        ExpandedInUse   X{.uuid=uuid_parts[1],.name=Name, .description=Description};
+                        ProvObjects::ExpandedUseEntry   X{.uuid=uuid_parts[1],.name=Name, .description=Description};
                         if(Hint==Map.end()) {
-                            ExpandedInUseList L;
-                            L.push_back(X);
+                            ProvObjects::ExpandedUseEntryList   L;
+                            L.type = uuid_parts[0];
+                            L.entries.push_back(X);
                             Map[uuid_parts[0]] = L;
                         } else {
-                            Hint->second.push_back(X);
+                            Hint->second.entries.push_back(X);
                         }
                     }
                 }

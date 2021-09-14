@@ -46,11 +46,8 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		int 	Start() override;
 		void 	Stop() override;
 
-		struct ExpandedInUse {
-		    std::string uuid, name, description;
-		};
-		typedef std::list<ExpandedInUse>    ExpandedInUseList;
-		typedef std::map<std::string, ExpandedInUseList>    ExpandedListMap;
+		typedef std::list<ProvObjects::ExpandedUseEntry>                    ExpandedInUseList;
+		typedef std::map<std::string, ProvObjects::ExpandedUseEntryList>    ExpandedListMap;
 
 		OpenWifi::EntityDB & EntityDB() { return *EntityDB_; };
 		OpenWifi::PolicyDB & PolicyDB() { return *PolicyDB_; };

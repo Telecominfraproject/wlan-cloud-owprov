@@ -286,8 +286,8 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    struct ExpandedUseEntryMap {
-        std::string type;
+    struct ExpandedUseEntryList {
+        std::string                     type;
         std::vector<ExpandedUseEntry>   entries;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -295,7 +295,7 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct ExpandedUseEntryMapList {
-        std::vector<ExpandedUseEntryMap>    entries;
+        std::vector<ExpandedUseEntryList>    entries;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
