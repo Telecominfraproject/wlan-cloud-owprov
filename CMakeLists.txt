@@ -36,6 +36,8 @@ find_package(Boost      REQUIRED system)
 find_package(OpenSSL    REQUIRED)
 find_package(AWSSDK     REQUIRED COMPONENTS s3)
 find_package(Poco       REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite)
+find_package(nlohmann_json  REQUIRED)
+find_package(nlohmann_json_schema_validator REQUIRED)
 
 if(SMALL_BUILD)
     find_package(Poco REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite)
@@ -94,5 +96,5 @@ target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}
         ${Boost_LIBRARIES}
         ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES}
-        CppKafka::cppkafka )
+        CppKafka::cppkafka nlohmann_json_schema_validator)
 
