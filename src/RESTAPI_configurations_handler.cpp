@@ -187,6 +187,8 @@ namespace OpenWifi{
         if(!ValidateConfigBlock(NewConfig))
             return;
 
+        Existing.configuration = NewConfig.configuration;
+
         for(auto &i:NewConfig.info.notes) {
             i.createdBy = UserInfo_.userinfo.email;
             Existing.info.notes.insert(Existing.info.notes.begin(),i);

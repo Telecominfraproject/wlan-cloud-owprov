@@ -2102,8 +2102,8 @@ namespace OpenWifi {
     bool ConfigurationValidator::Validate(const std::string &C) {
         Init();
         if(Working_) {
-            auto Doc = json::parse(C);
             try {
+                auto Doc = json::parse(C);
                 Validator_->validate(Doc);
                 return true;
             } catch(const std::exception &E) {
