@@ -51,7 +51,7 @@ namespace OpenWifi {
         }
 
         [[nodiscard]] inline bool LogIt(const std::string &Method, bool External) const {
-            auto Offset = (External ? 0 : 4;)
+            auto Offset = (External ? 0 : 4);
             if(Method == Poco::Net::HTTPRequest::HTTP_GET)
                 return LogFlags_[Offset+LOG_GET];
             if(Method == Poco::Net::HTTPRequest::HTTP_POST)
