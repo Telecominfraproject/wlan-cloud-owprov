@@ -51,6 +51,7 @@ namespace OpenWifi {
 											   Path,
 											   Poco::Net::HTTPMessage::HTTP_1_1);
 				Request.add("X-API-KEY", Svc.AccessKey);
+				Request.add("X-INTERNAL-NAME", Daemon()->PublicEndPoint());
 				Session.sendRequest(Request);
 
 				Poco::Net::HTTPResponse Response;

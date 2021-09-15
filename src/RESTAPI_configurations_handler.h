@@ -13,16 +13,18 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
+#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
-    class RESTAPI_configurations_handler : public RESTAPIHandler {
+    class RESTAPI_configurations_handler : public RESTAPIHandler, RESTAPI_GenericServer {
     public:
-        RESTAPI_configurations_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
+        RESTAPI_configurations_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, bool Internal)
         : RESTAPIHandler(bindings, L,
                          std::vector<std::string>{
             Poco::Net::HTTPRequest::HTTP_GET, Poco::Net::HTTPRequest::HTTP_POST,
             Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
+            Server,
             Internal),
             DB_(Storage()->ConfigurationDB()){}
 

@@ -36,11 +36,6 @@ namespace OpenWifi {
 
     class RESTAPI_server *RESTAPI_server::instance_ = nullptr;
 
-    RESTAPI_server::RESTAPI_server() noexcept:
-    SubSystemServer("RESTAPIServer", "RESTAPIServer", "openwifi.restapi")
-    {
-    }
-
     int RESTAPI_server::Start() {
         Logger_.information("Starting.");
 
@@ -59,17 +54,14 @@ namespace OpenWifi {
             Params->setMaxQueued(200);
             Params->setKeepAlive(true);
 
-            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory, Pool_, Sock, Params);
+            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory(*this), Pool_, Sock, Params);
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
-
         return 0;
     }
 
     Poco::Net::HTTPRequestHandler *RequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest & Request) {
-
-        Logger_.debug(Poco::format("REQUEST(%s): %s %s", Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
 
         Poco::URI uri(Request.getURI());
         auto *Path = uri.getPath().c_str();
@@ -93,7 +85,7 @@ namespace OpenWifi {
                 RESTAPI_configurations_handler,
                 RESTAPI_configurations_list_handler,
                 RESTAPI_webSocketServer
-                >(Path,Bindings,Logger_);
+                >(Path,Bindings,Logger_, Server_);
     }
 
     void RESTAPI_server::Stop() {

@@ -357,7 +357,22 @@ namespace OpenWifi {
 
 	bool RESTAPIHandler::IsAuthorized() {
 	    if(Internal_) {
-	        return Daemon()->IsValidAPIKEY(*Request);
+	        auto Allowed = Daemon()->IsValidAPIKEY(*Request);
+	        if(!Allowed) {
+	            if(Server_.LogBadTokens(false)) {
+	                Logger_.debug(Poco::format("I-REQ-DENIED(%s): Method='%s' Path='%s",
+                                               Utils::FormatIPv6(Request->clientAddress().toString()),
+                                               Request->getMethod(), Request->getURI()));
+	            }
+	        } else {
+	            auto Id = Request->get("X-INTERNAL-NAME", "unknown");
+	            if(Server_.LogIt(Request->getMethod(),true)) {
+	                Logger_.debug(Poco::format("I-REQ-ALLOWED(%s): User='%s' Method='%s' Path='%s",
+                                               Utils::FormatIPv6(Request->clientAddress().toString()), Id,
+                                               Request->getMethod(), Request->getURI()));
+	            }
+	        }
+            return Allowed;
 	    } else {
             if (SessionToken_.empty()) {
                 try {
@@ -374,8 +389,18 @@ namespace OpenWifi {
 #else
             if (AuthClient()->IsAuthorized(*Request, SessionToken_, UserInfo_)) {
 #endif
+                if(Server_.LogIt(Request->getMethod(),true)) {
+                    Logger_.debug(Poco::format("X-REQ-ALLOWED(%s): User='%s' Method='%s' Path='%s",
+                         Utils::FormatIPv6(Request->clientAddress().toString()), UserInfo_.userinfo.email,
+                         Request->getMethod(), Request->getURI()));
+                }
                 return true;
             } else {
+                if(Server_.LogBadTokens(true)) {
+                    Logger_.debug(Poco::format("X-REQ-DENIED(%s): Method='%s' Path='%s",
+                         Utils::FormatIPv6(Request->clientAddress().toString()),
+                         Request->getMethod(), Request->getURI()));
+                }
                 UnAuthorized();
             }
             return false;

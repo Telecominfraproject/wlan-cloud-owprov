@@ -19,10 +19,6 @@ namespace OpenWifi {
 
     class RESTAPI_InternalServer *RESTAPI_InternalServer::instance_ = nullptr;
 
-    RESTAPI_InternalServer::RESTAPI_InternalServer() noexcept: SubSystemServer("RESTAPIInternalServer", "REST-ISRV", "openwifi.internal.restapi")
-    {
-    }
-
     int RESTAPI_InternalServer::Start() {
         Logger_.information("Starting.");
 
@@ -40,7 +36,7 @@ namespace OpenWifi {
             Params->setMaxQueued(200);
             Params->setKeepAlive(true);
 
-            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new InternalRequestHandlerFactory, Pool_, Sock, Params);
+            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new InternalRequestHandlerFactory(*this), Pool_, Sock, Params);
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
@@ -66,7 +62,7 @@ namespace OpenWifi {
 
         return RESTAPI_Router_I<
                 RESTAPI_system_command
-        >(Path, Bindings, Logger_);
+        >(Path, Bindings, Logger_, Server_);
     }
 
 }
