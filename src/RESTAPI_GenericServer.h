@@ -26,7 +26,7 @@ namespace OpenWifi {
 
         void inline SetFlags(bool External, const std::string &Methods) {
             Poco::StringTokenizer   Tokens(Methods,",");
-            auto Offset = External ? 0 : 4;
+            auto Offset = (External ? 0 : 4);
             for(const auto &i:Tokens) {
                 if(Poco::icompare(i,Poco::Net::HTTPRequest::HTTP_DELETE)==0)
                     LogFlags_[Offset+LOG_DELETE]=true;
@@ -51,7 +51,7 @@ namespace OpenWifi {
         }
 
         [[nodiscard]] inline bool LogIt(const std::string &Method, bool External) const {
-            auto Offset = External ? 0 : 4;
+            auto Offset = (External ? 0 : 4;)
             if(Method == Poco::Net::HTTPRequest::HTTP_GET)
                 return LogFlags_[Offset+LOG_GET];
             if(Method == Poco::Net::HTTPRequest::HTTP_POST)
@@ -64,7 +64,7 @@ namespace OpenWifi {
         };
 
         [[nodiscard]] inline bool LogBadTokens(bool External) const {
-            return LogBadTokens_[ External ? 0 : 1 ];
+            return LogBadTokens_[ (External ? 0 : 1) ];
         };
 
     private:
