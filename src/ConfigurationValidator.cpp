@@ -2084,18 +2084,29 @@ namespace OpenWifi {
         if(Initialized_)
             return;
 
+        std::cout << __LINE__ << std::endl;
         std::string FileName{ Daemon()->DataDir() + "/ucentral.schema.json" };
         try {
+            std::cout << __LINE__ << std::endl;
+
             std::ifstream       input(FileName);
+            std::cout << __LINE__ << std::endl;
             std::stringstream   schema_file;
             schema_file << input.rdbuf();
+            std::cout << __LINE__ << std::endl;
             input.close();
+            std::cout << __LINE__ << std::endl;
             auto schema = json::parse(schema_file.str());
+            std::cout << __LINE__ << std::endl;
             Validator_->set_root_schema(schema);
             Initialized_ = Working_ = true;
+            std::cout << __LINE__ << std::endl;
         } catch (const std::exception &E ) {
+            std::cout << __LINE__ << std::endl;
             Validator_->set_root_schema(DefaultUCentralSchema);
+            std::cout << __LINE__ << std::endl;
             Initialized_ = Working_ = true;
+            std::cout << __LINE__ << std::endl;
         }
     }
 
