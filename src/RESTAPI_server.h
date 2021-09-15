@@ -21,7 +21,7 @@
 
 namespace OpenWifi {
 
-    class RESTAPI_server : public SubSystemServer, RESTAPI_GenericServer {
+    class RESTAPI_server : public SubSystemServer {
 
     public:
         static RESTAPI_server *instance() {
@@ -36,12 +36,12 @@ namespace OpenWifi {
     private:
         static RESTAPI_server *instance_;
         std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
-        Poco::ThreadPool	Pool_;
+        Poco::ThreadPool	    Pool_;
+        RESTAPI_GenericServer   LogServer_;
 
         RESTAPI_server() noexcept:
             SubSystemServer("RESTAPIServer", "RESTAPIServer", "openwifi.restapi")
             {
-                RESTAPI_GenericServer::InitLogging();
             }
     };
 

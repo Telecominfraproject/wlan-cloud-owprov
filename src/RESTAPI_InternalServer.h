@@ -20,7 +20,7 @@
 
 namespace OpenWifi {
 
-    class RESTAPI_InternalServer : public SubSystemServer, RESTAPI_GenericServer {
+    class RESTAPI_InternalServer : public SubSystemServer {
 
     public:
         static RESTAPI_InternalServer *instance() {
@@ -36,12 +36,12 @@ namespace OpenWifi {
     private:
         static RESTAPI_InternalServer *instance_;
         std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
-        Poco::ThreadPool	Pool_;
+        Poco::ThreadPool	    Pool_;
+        RESTAPI_GenericServer   LogServer_;
 
         RESTAPI_InternalServer() noexcept
             :SubSystemServer("RESTAPIInternalServer", "REST-ISRV", "openwifi.internal.restapi")
         {
-            RESTAPI_GenericServer::InitLogging();
         }
     };
 

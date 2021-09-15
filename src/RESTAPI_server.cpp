@@ -38,6 +38,7 @@ namespace OpenWifi {
 
     int RESTAPI_server::Start() {
         Logger_.information("Starting.");
+        LogServer_.InitLogging();
 
         for(const auto & Svr: ConfigServersList_) {
             Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
@@ -54,7 +55,7 @@ namespace OpenWifi {
             Params->setMaxQueued(200);
             Params->setKeepAlive(true);
 
-            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory(*this), Pool_, Sock, Params);
+            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory(LogServer_), Pool_, Sock, Params);
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
