@@ -9,7 +9,7 @@
 #include "Daemon.h"
 
 namespace OpenWifi {
-    static json DefaultUCentralSchema{R"(
+    static json DefaultUCentralSchema = R"(
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title" : "ucentral",
@@ -2076,7 +2076,7 @@ namespace OpenWifi {
 }
 }
 }
-    )"_json};
+    )"_json;
 
     class ConfigurationValidator *ConfigurationValidator::instance_ = nullptr;
 
