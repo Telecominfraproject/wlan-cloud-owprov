@@ -9,7 +9,6 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "RESTAPI_ProvObjects.h"
-#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
 

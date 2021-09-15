@@ -13,7 +13,6 @@
 #include "RESTAPI_handler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
     class RESTAPI_entity_list_handler : public RESTAPIHandler {

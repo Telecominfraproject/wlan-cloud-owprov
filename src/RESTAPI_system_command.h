@@ -10,7 +10,6 @@
 #define UCENTRALGW_RESTAPI_SYSTEM_COMMAND_H
 
 #include "RESTAPI_handler.h"
-#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
 class RESTAPI_system_command : public RESTAPIHandler {

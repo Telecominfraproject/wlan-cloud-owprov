@@ -14,7 +14,6 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "StorageService.h"
-#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
     class RESTAPI_location_handler : public RESTAPIHandler {

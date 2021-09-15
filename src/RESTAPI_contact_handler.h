@@ -16,7 +16,7 @@
 #include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
-    class RESTAPI_contact_handler : public RESTAPIHandler, RESTAPI_GenericServer {
+    class RESTAPI_contact_handler : public RESTAPIHandler {
     public:
         RESTAPI_contact_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, bool Internal)
         : RESTAPIHandler(bindings, L,

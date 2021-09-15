@@ -13,10 +13,9 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
-#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
-    class RESTAPI_configurations_handler : public RESTAPIHandler, RESTAPI_GenericServer {
+    class RESTAPI_configurations_handler : public RESTAPIHandler {
     public:
         RESTAPI_configurations_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, bool Internal)
         : RESTAPIHandler(bindings, L,
