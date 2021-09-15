@@ -107,25 +107,16 @@ namespace OpenWifi{
 
         std::string Arg;
         if(HasParameter("validateOnly",Arg) && Arg=="true") {
-            std::cout << __LINE__ << std::endl;
             auto Body = ParseStream();
-            std::cout << __LINE__ << std::endl;
             if(!Body->has("configuration")) {
-                std::cout << __LINE__ << std::endl;
                 BadRequest("Must have 'configuration' element.");
                 return;
             }
-            std::cout << __LINE__ << std::endl;
             auto Config=Body->get("configuration").toString();
-            std::cout << __LINE__ << std::endl;
             Poco::JSON::Object  Answer;
-            std::cout << __LINE__ << std::endl;
             auto Res = ValidateUCentralConfiguration(Config);
-            std::cout << __LINE__ << std::endl;
             Answer.set("valid",Res);
-            std::cout << __LINE__ << std::endl;
             ReturnObject(Answer);
-            std::cout << __LINE__ << std::endl;
             return;
         }
 
