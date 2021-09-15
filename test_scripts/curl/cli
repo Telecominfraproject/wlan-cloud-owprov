@@ -380,6 +380,15 @@ adddeviceconfig() {
     jq < ${result_file}
 }
 
+validateconfig() {
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1?validateOnly=true" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" \
+    -d @"$1" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -413,6 +422,7 @@ case "$1" in
     "adddeviceconfig") login; adddeviceconfig "$2" "$3"; logout;;
     "addconfigmetrics") login; addconfigmetrics "$2" ; logout;;
     "addconfigfile") login; addconfigfile "$2" ; logout;;
+    "validateconfig") login; validateconfig "$2"; logout;;
     *) help ;;
 esac
 
