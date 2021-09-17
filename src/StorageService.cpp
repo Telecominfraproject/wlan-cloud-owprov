@@ -21,7 +21,7 @@ namespace OpenWifi {
 	class Storage *Storage::instance_ = nullptr;
 
     int Storage::Start() {
-		SubMutexGuard		Guard(Mutex_);
+		std::lock_guard		Guard(Mutex_);
 
 		Logger_.setLevel(Poco::Message::PRIO_NOTICE);
         Logger_.notice("Starting.");
@@ -115,7 +115,7 @@ namespace OpenWifi {
 	        auto StatusCode = Req.Do(Response);
 	        if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 	            if(Response->isArray("deviceTypes")) {
-	                SubMutexGuard G(Mutex_);
+	                std::lock_guard G(Mutex_);
 	                DeviceTypes_.clear();
 	                auto Array = Response->getArray("deviceTypes");
 	                for(const auto &i:*Array) {
