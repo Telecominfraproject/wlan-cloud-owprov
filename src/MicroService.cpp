@@ -341,14 +341,23 @@ namespace OpenWifi {
 		return false;
 	}
 
+	void MicroService::Reload(const std::string &Sub) {
+		for (auto i : SubSystems_) {
+			if (Poco::toLower(Sub) == Poco::toLower(i->Name())) {
+				i->reinitialize(Poco::Util::Application::instance());
+				return;
+			}
+		}
+	}
+
 	Types::StringVec MicroService::GetSubSystems() const {
 		Types::StringVec Result;
 		for(auto i:SubSystems_)
-			Result.push_back(i->Name());
+			Result.push_back(Poco::toLower(i->Name()));
 		return Result;
 	}
 
-	Types::StringPairVec MicroService::GetLogLevels() const {
+	Types::StringPairVec MicroService::GetLogLevels() {
 		Types::StringPairVec Result;
 
 		for(auto &i:SubSystems_) {
@@ -358,7 +367,7 @@ namespace OpenWifi {
 		return Result;
 	}
 
-	const Types::StringVec & MicroService::GetLogLevelNames() const {
+	const Types::StringVec & MicroService::GetLogLevelNames() {
 		static Types::StringVec LevelNames{"none", "fatal", "critical", "error", "warning", "notice", "information", "debug", "trace" };
 		return LevelNames;
 	}

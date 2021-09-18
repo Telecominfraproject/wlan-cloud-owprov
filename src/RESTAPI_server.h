@@ -32,6 +32,7 @@ namespace OpenWifi {
         }
         int Start() override;
         void Stop() override;
+        void reinitialize(Poco::Util::Application &self) override;
 
     private:
         static RESTAPI_server *instance_;

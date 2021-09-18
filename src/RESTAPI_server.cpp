@@ -93,6 +93,14 @@ namespace OpenWifi {
         Logger_.information("Stopping ");
         for( const auto & svr : RESTServers_ )
             svr->stop();
+        RESTServers_.clear();
     }
+
+    void RESTAPI_server::reinitialize(Poco::Util::Application &self) {
+        Logger_.information("Reinitializing.");
+        Stop();
+        Start();
+    }
+
 
 }  // namespace

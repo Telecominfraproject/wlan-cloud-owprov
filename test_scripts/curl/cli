@@ -390,10 +390,26 @@ validateconfig() {
 }
 
 systeminfo() {
-    curl  ${FLAGS} -X GET "https://${OWGW}/api/v1/system?command=info" \
+    curl  ${FLAGS} -X GET "https://${OWPROV}/api/v1/system?command=info" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
+}
+
+getsubsystemnames() {
+    payload="{ \"command\" : \"getsubsystemnames\" }"
+            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+            -H  "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"
+}
+
+reloadsubsystem() {
+    payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"OUIServer\" , \"CommandManager\" ] }"
+            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+            -H  "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"
 }
 
 shopt -s nocasematch
@@ -431,6 +447,8 @@ case "$1" in
     "addconfigfile") login; addconfigfile "$2" ; logout;;
     "validateconfig") login; validateconfig "$2"; logout;;
     "systeminfo") login; systeminfo ; logout;;
+    "getsubsystemnames") login; getsubsystemnames; logout ;;
+    "reloadsubsystem") login; reloadsubsystem; logout ;;
     *) help ;;
 esac
 
