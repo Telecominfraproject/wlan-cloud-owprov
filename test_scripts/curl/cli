@@ -389,6 +389,13 @@ validateconfig() {
     jq < ${result_file}
 }
 
+systeminfo() {
+    curl  ${FLAGS} -X GET "https://${OWGW}/api/v1/system?command=info" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -423,6 +430,7 @@ case "$1" in
     "addconfigmetrics") login; addconfigmetrics "$2" ; logout;;
     "addconfigfile") login; addconfigfile "$2" ; logout;;
     "validateconfig") login; validateconfig "$2"; logout;;
+    "systeminfo") login; systeminfo ; logout;;
     *) help ;;
 esac
 
