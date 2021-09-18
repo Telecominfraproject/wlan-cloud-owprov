@@ -619,6 +619,24 @@ components:
         note:
           type: string
 
+    SystemInfoResults:
+      type: object
+      properties:
+        version:
+          type: string
+        uptime:
+          type: integer
+          format: integer64
+        start:
+          type: integer
+          format: integer64
+        os:
+          type: string
+        processors:
+          type: integer
+        hostname:
+          type: string
+
     Dashboard:
       type: object
       properties:
@@ -2061,8 +2079,7 @@ paths:
           schema:
             type: string
             enum:
-              - version
-              - times
+              - info
           required: true
 
       responses:
@@ -2071,7 +2088,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TagValuePair'
+                oneOf:
+                  - $ref: '#/components/schemas/SystemInfoResults'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
