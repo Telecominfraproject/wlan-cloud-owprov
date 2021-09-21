@@ -68,5 +68,4 @@ namespace OpenWifi {
                 RESTAPI_system_command
         >(Path, Bindings, Logger_, Server_);
     }
-
 }
