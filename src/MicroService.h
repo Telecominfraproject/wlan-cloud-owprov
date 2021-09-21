@@ -145,6 +145,7 @@ namespace OpenWifi {
 
 		void Reload(const std::string &Name);   //  reload a subsystem
 		void Reload();                          //  reload the daemon itself
+		void LoadMyConfig();
 
 		void LoadConfigurationFile();
 

@@ -172,6 +172,11 @@ namespace OpenWifi {
 	}
 
     void MicroService::Reload() {
+	    LoadConfigurationFile();
+	    LoadMyConfig();
+	}
+
+    void MicroService::LoadMyConfig() {
 	    std::string KeyFile = ConfigPath("openwifi.service.key");
 	    std::string KeyFilePassword = ConfigPath("openwifi.service.key.password" , "" );
 	    AppKey_ = Poco::SharedPtr<Poco::Crypto::RSAKey>(new Poco::Crypto::RSAKey("", KeyFile, KeyFilePassword));
@@ -198,19 +203,6 @@ namespace OpenWifi {
 
 		LoadConfigurationFile();
 
-/*		std::string Location = Poco::Environment::get(DAEMON_CONFIG_ENV_VAR,".");
-		Poco::Path ConfigFile;
-		ConfigFile = ConfigFileName_.empty() ? Location + "/" + DAEMON_PROPERTIES_FILENAME : ConfigFileName_;
-		if(!ConfigFile.isFile())
-		{
-			std::cerr << DAEMON_APP_NAME << ": Configuration "
-					  << ConfigFile.toString() << " does not seem to exist. Please set " + DAEMON_CONFIG_ENV_VAR
-												  + " env variable the path of the " + DAEMON_PROPERTIES_FILENAME + " file." << std::endl;
-			std::exit(Poco::Util::Application::EXIT_CONFIG);
-		}
-		loadConfiguration(ConfigFile.toString());
-*/
-
         static const char * LogFilePathKey = "logging.channels.c2.path";
 
 		if(LogDir_.empty()) {
@@ -230,7 +222,7 @@ namespace OpenWifi {
 			}
 		}
 
-		Reload();
+		LoadMyConfig();
 
 		InitializeSubSystemServers();
 		ServerApplication::initialize(self);
