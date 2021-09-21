@@ -40,6 +40,8 @@ namespace OpenWifi {
         Logger_.information("Starting.");
         LogServer_.InitLogging();
 
+        std::cout << "TESTER: " << Daemon()->ConfigGetString("tester") << std::endl;
+
         for(const auto & Svr: ConfigServersList_) {
             Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
                                              Svr.KeyFile(),Svr.CertFile()));
@@ -97,6 +99,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_server::reinitialize(Poco::Util::Application &self) {
+        std::cout << "TESTER: " << Daemon()->ConfigGetString("tester") << std::endl;
         Logger_.information("Reinitializing.");
         Stop();
         Start();
