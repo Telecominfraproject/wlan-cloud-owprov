@@ -429,7 +429,7 @@ systeminfo() {
 }
 
 reloadsubsystem() {
-    payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"OUIServer\" , \"CommandManager\" ] }"
+    payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"$1\" ] }"
             curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
@@ -474,7 +474,7 @@ case "$1" in
     "getloglevels") login; getloglevels; logout ;;
     "getloglevelnames") login; getloglevelnames; logout ;;
     "getsubsystemnames") login; getsubsystemnames; logout ;;
-    "reloadsubsystem") login; reloadsubsystem; logout ;;
+    "reloadsubsystem") login; reloadsubsystem "$2"; logout ;;
     "systeminfo") login; systeminfo ; logout;;
     *) help ;;
 esac

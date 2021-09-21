@@ -99,6 +99,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_server::reinitialize(Poco::Util::Application &self) {
+        Daemon()->LoadConfigurationFile();
         std::cout << "TESTER: " << Daemon()->ConfigGetString("tester") << std::endl;
         Logger_.information("Reinitializing.");
         Stop();
