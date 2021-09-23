@@ -514,7 +514,7 @@ components:
     InventoryTagList:
       type: object
       properties:
-        tags:
+        taglist:
           type: array
           items:
             $ref: '#/components/schemas/InventoryTag'

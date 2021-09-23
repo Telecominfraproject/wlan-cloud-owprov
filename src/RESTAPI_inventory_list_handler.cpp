@@ -28,7 +28,7 @@ namespace OpenWifi{
         if(SerialOnly)
             Answer.set("serialNumbers", Array);
         else
-            Answer.set("tags", Array);
+            Answer.set("taglist", Array);
         ReturnObject(Answer);
     }
 
@@ -55,7 +55,7 @@ namespace OpenWifi{
                     return;
                 }
             }
-            ReturnObject( "tags", Tags);
+            ReturnObject( "taglist", Tags);
             return;
         } else if(HasParameter("entity",UUID)) {
             if(QB_.CountOnly) {
@@ -121,7 +121,7 @@ namespace OpenWifi{
                 Arr.add(O);
             }
             Poco::JSON::Object  Answer;
-            Answer.set("tags",Arr);
+            Answer.set("taglist",Arr);
             ReturnObject(Answer);
             return;
         }
