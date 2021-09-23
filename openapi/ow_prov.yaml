@@ -87,6 +87,11 @@ components:
         modified:
           type: integer
           format: int64
+        tags:
+          type: array
+          items:
+            type: integer
+            format: int64
 
     # uuids: mpe:<uuid>
     ManagementPolicyEntry:
@@ -186,6 +191,12 @@ components:
           items:
             type: string
             format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
 
     EntityList:
       type: object
@@ -248,6 +259,12 @@ components:
         location:
           type: string
           format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
 
     VenueList:
       type: object
@@ -444,6 +461,12 @@ components:
           items:
             type: string
             format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
 
     DeviceConfigurationList:
       type: object
@@ -481,6 +504,12 @@ components:
         deviceConfiguration:
           type: string
           format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
 
     InventoryTagList:
       type: object
