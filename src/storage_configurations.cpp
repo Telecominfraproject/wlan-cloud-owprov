@@ -27,7 +27,9 @@ namespace OpenWifi {
         ORM::Field{"deviceTypes",ORM::FieldType::FT_TEXT},
         ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
-        ORM::Field{"variables",ORM::FieldType::FT_TEXT}
+        ORM::Field{"variables",ORM::FieldType::FT_TEXT},
+        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ConfigurationDB_Indexes{
@@ -53,6 +55,8 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<8>());
     OpenWifi::Types::from_string(In.get<9>(), Out.inUse);
     OpenWifi::Types::from_string(In.get<10>(), Out.variables);
+    Out.rrm = In.get<11>();
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<12>());
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(OpenWifi::ProvObjects::DeviceConfiguration &In, OpenWifi::ConfigurationDBRecordType &Out) {
@@ -67,4 +71,6 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.configuration));
     Out.set<9>(OpenWifi::Types::to_string(In.inUse));
     Out.set<10>(OpenWifi::Types::to_string(In.variables));
+    Out.set<11>(In.rrm);
+    Out.set<12>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }

@@ -35,7 +35,8 @@ namespace OpenWifi {
         ORM::Field{"primaryEmail",ORM::FieldType::FT_TEXT},
         ORM::Field{"secondaryEmail",ORM::FieldType::FT_TEXT},
         ORM::Field{"accessPIN",ORM::FieldType::FT_TEXT},
-        ORM::Field{"inUse",ORM::FieldType::FT_TEXT}
+        ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ContactDB_Indexes{
@@ -71,6 +72,7 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.secondaryEmail = In.get<16>();
     Out.accessPIN = In.get<17>();
     OpenWifi::Types::from_string(In.get<18>(), Out.inUse);
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<19>());
 }
 
 template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
@@ -93,4 +95,5 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.set<16>(In.secondaryEmail);
     Out.set<17>(In.accessPIN);
     Out.set<18>(OpenWifi::Types::to_string(In.inUse));
+    Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }

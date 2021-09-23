@@ -54,6 +54,13 @@ namespace OpenWifi::RESTAPI_utils {
 		Obj.set(Field,A);
 	}
 
+	inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const Types::TagList &V) {
+	    Poco::JSON::Array	A;
+	    for(const auto &i:V)
+	        A.add(i);
+	    Obj.set(Field,A);
+	}
+
     inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const Types::CountedMap &M) {
         Poco::JSON::Array	A;
         for(const auto &[Key,Value]:M) {
@@ -121,6 +128,16 @@ namespace OpenWifi::RESTAPI_utils {
 		}
 	}
 
+	inline void field_from_json(Poco::JSON::Object::Ptr Obj, const char *Field, Types::TagList &V) {
+	    if(Obj->isArray(Field)) {
+	        V.clear();
+	        Poco::JSON::Array::Ptr A = Obj->getArray(Field);
+	        for(const auto &i:*A) {
+	            V.push_back(i);
+	        }
+	    }
+	}
+
 	template<class T> void field_to_json(Poco::JSON::Object &Obj, const char *Field, const std::vector<T> &Value) {
 		Poco::JSON::Array Arr;
 		for(const auto &i:Value) {
@@ -148,6 +165,18 @@ namespace OpenWifi::RESTAPI_utils {
 			Poco::JSON::Object::Ptr	A = Obj->getObject(Field);
 			Value.from_json(A);
 		}
+	}
+
+	inline std::string to_string(const Types::TagList & ObjectArray) {
+	    Poco::JSON::Array OutputArr;
+	    if(ObjectArray.empty())
+	        return "[]";
+	    for(auto const &i:ObjectArray) {
+	        OutputArr.add(i);
+	    }
+	    std::ostringstream OS;
+	    Poco::JSON::Stringifier::stringify(OutputArr,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
+	    return OS.str();
 	}
 
 	inline std::string to_string(const Types::StringVec & ObjectArray) {
@@ -202,6 +231,23 @@ namespace OpenWifi::RESTAPI_utils {
         return Result;
     }
 
+    inline OpenWifi::Types::TagList to_taglist(const std::string & ObjectString) {
+	    Types::TagList 	Result;
+	    if(ObjectString.empty())
+	        return Result;
+
+	    try {
+	        Poco::JSON::Parser P;
+	        auto Object = P.parse(ObjectString).template extract<Poco::JSON::Array::Ptr>();
+	        for (auto const &i : *Object) {
+	            Result.push_back(i);
+	        }
+	    } catch (...) {
+
+	    }
+	    return Result;
+	}
+
     template<class T> std::vector<T> to_object_array(const std::string & ObjectString) {
 
 		std::vector<T>	Result;
@@ -211,7 +257,7 @@ namespace OpenWifi::RESTAPI_utils {
 		try {
 			Poco::JSON::Parser P;
 			auto Object = P.parse(ObjectString).template extract<Poco::JSON::Array::Ptr>();
-			for (auto const i : *Object) {
+			for (auto const &i : *Object) {
 				auto InnerObject = i.template extract<Poco::JSON::Object::Ptr>();
 				T Obj;
 				Obj.from_json(InnerObject);

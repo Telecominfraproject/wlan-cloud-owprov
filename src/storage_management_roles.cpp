@@ -24,7 +24,8 @@ namespace OpenWifi {
         ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"users",ORM::FieldType::FT_TEXT},
-        ORM::Field{"inUse",ORM::FieldType::FT_TEXT}
+        ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    RolesDB_Indexes{
@@ -49,6 +50,7 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.managementPolicy = In.get<6>();
     OpenWifi::Types::from_string(In.get<7>(), Out.users);
     OpenWifi::Types::from_string(In.get<8>(), Out.inUse);
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<9>());
 }
 
 template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(OpenWifi::ProvObjects::ManagementRole &In, OpenWifi::ManagementRoleDBRecordType &Out) {
@@ -61,4 +63,5 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.set<6>(In.managementPolicy);
     Out.set<7>(OpenWifi::Types::to_string(In.users));
     Out.set<8>(OpenWifi::Types::to_string(In.inUse));
+    Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }

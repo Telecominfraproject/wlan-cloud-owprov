@@ -19,6 +19,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json(Obj,"created",created);
         RESTAPI_utils::field_to_json(Obj,"modified",modified);
         RESTAPI_utils::field_to_json(Obj,"notes",notes);
+        RESTAPI_utils::field_to_json(Obj,"tags",tags);
     }
 
     bool ObjectInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -29,6 +30,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json(Obj,"created",created);
             RESTAPI_utils::field_from_json(Obj,"modified",modified);
             RESTAPI_utils::field_from_json(Obj,"notes",notes);
+            RESTAPI_utils::field_from_json(Obj,"tags",tags);
             return true;
         } catch(...) {
 
@@ -84,6 +86,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
         RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
         RESTAPI_utils::field_to_json( Obj,"devices",devices);
+        RESTAPI_utils::field_to_json( Obj,"rrm",rrm);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -97,6 +100,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
             RESTAPI_utils::field_from_json( Obj,"devices",devices);
+            RESTAPI_utils::field_from_json( Obj,"rrm",rrm);
             return true;
         } catch(...) {
 
@@ -133,7 +137,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
         RESTAPI_utils::field_to_json( Obj,"contact",contact);
         RESTAPI_utils::field_to_json( Obj,"location",location);
-
+        RESTAPI_utils::field_to_json( Obj,"rrm",rrm);
     }
 
     bool Venue::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -150,6 +154,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
             RESTAPI_utils::field_from_json( Obj,"contact",contact);
             RESTAPI_utils::field_from_json( Obj,"location",location);
+            RESTAPI_utils::field_from_json( Obj,"rrm",rrm);
             return true;
         } catch (...) {
 
@@ -283,7 +288,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json(Obj, "location", location);
         RESTAPI_utils::field_to_json(Obj, "contact", contact);
         RESTAPI_utils::field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
-
+        RESTAPI_utils::field_to_json( Obj,"rrm",rrm);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -299,6 +304,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"location",location);
             RESTAPI_utils::field_from_json( Obj,"contact",contact);
             RESTAPI_utils::field_from_json( Obj,"deviceConfiguration",deviceConfiguration);
+            RESTAPI_utils::field_from_json( Obj,"rrm",rrm);
             return true;
         } catch(...) {
 
@@ -333,6 +339,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"configuration",configuration);
         RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
         RESTAPI_utils::field_to_json( Obj,"variables",variables);
+        RESTAPI_utils::field_to_json( Obj,"rrm",rrm);
     }
 
     bool DeviceConfiguration::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -343,6 +350,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"configuration",configuration);
             RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
             RESTAPI_utils::field_from_json( Obj,"variables",variables);
+            RESTAPI_utils::field_from_json( Obj,"rrm",rrm);
             return true;
         } catch(...) {
 

@@ -24,7 +24,8 @@ namespace OpenWifi {
         ORM::Field{"created",ORM::FieldType::FT_BIGINT},
         ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
         ORM::Field{"entries",ORM::FieldType::FT_TEXT},
-        ORM::Field{"inUse",ORM::FieldType::FT_TEXT}
+        ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    PolicyDB_Indexes{
@@ -48,8 +49,8 @@ template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects:
     Out.info.modified = In.get<5>();
     Out.entries = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::ManagementPolicyEntry>(In.get<6>());
     OpenWifi::Types::from_string(In.get<7>(), Out.inUse);
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<8>());
 }
-
 
 template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(OpenWifi::ProvObjects::ManagementPolicy &In, OpenWifi::PolicyDBRecordType &Out) {
     Out.set<0>(In.info.id);
@@ -60,4 +61,5 @@ template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects:
     Out.set<5>(In.info.modified);
     Out.set<6>(OpenWifi::RESTAPI_utils::to_string(In.entries));
     Out.set<7>(OpenWifi::Types::to_string(In.inUse));
+    Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }

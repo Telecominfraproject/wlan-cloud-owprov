@@ -34,8 +34,10 @@ namespace OpenWifi {
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"venues",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
-        ORM::Field{"devices",ORM::FieldType::FT_TEXT}
-    };
+        ORM::Field{"devices",ORM::FieldType::FT_TEXT},
+        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
+     };
 
     static  ORM::IndexVec    EntityDB_Indexes{
                                 { std::string("entity_name_index"),
@@ -191,6 +193,8 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     OpenWifi::Types::from_string(In.get<11>(), Out.venues);
     Out.deviceConfiguration = In.get<12>();
     OpenWifi::Types::from_string(In.get<13>(), Out.devices);
+    Out.rrm = In.get<14>();
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -208,4 +212,6 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<11>(OpenWifi::Types::to_string(In.venues));
     Out.set<12>(In.deviceConfiguration);
     Out.set<13>(OpenWifi::Types::to_string(In.devices));
+    Out.set<14>(In.rrm);
+    Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }

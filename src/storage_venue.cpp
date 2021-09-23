@@ -32,7 +32,9 @@ namespace OpenWifi {
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
         ORM::Field{"design",ORM::FieldType::FT_TEXT},
         ORM::Field{"contact",ORM::FieldType::FT_TEXT},
-        ORM::Field{"location",ORM::FieldType::FT_TEXT}
+        ORM::Field{"location",ORM::FieldType::FT_TEXT},
+        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -82,6 +84,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.design = In.get<11>();
     Out.contact = In.get<12>();
     Out.location = In.get<13>();
+    Out.rrm = In.get<14>();
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -99,4 +103,6 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<11>(In.design);
     Out.set<12>(In.contact);
     Out.set<13>(In.location);
+    Out.set<14>(In.rrm);
+    Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
 }
