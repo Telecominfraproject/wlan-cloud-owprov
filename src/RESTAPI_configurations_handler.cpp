@@ -207,6 +207,7 @@ namespace OpenWifi{
 
         AssignIfPresent(Obj, "name", Existing.info.name);
         AssignIfPresent(Obj,"description", Existing.info.description);
+        AssignIfPresent(Obj, "rrm", Existing.rrm);
         NewConfig.info.modified = std::time(nullptr);
 
         if(!NewConfig.variables.empty())

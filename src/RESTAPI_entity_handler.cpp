@@ -157,10 +157,9 @@ namespace OpenWifi{
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
-        if(!NewEntity.info.name.empty())
-            Existing.info.name = NewEntity.info.name;
-        if(!NewEntity.info.description.empty())
-            Existing.info.description = NewEntity.info.description;
+        AssignIfPresent(RawObject, "rrm", Existing.rrm);
+        AssignIfPresent(RawObject, "name", Existing.info.name);
+        AssignIfPresent(RawObject, "description", Existing.info.description);
 
         Existing.info.modified = std::time(nullptr);
 

@@ -177,6 +177,7 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "entity",NewEntity);
         AssignIfPresent(RawObject, "location",NewLocation);
         AssignIfPresent(RawObject, "contact",NewContact);
+        AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         if(!NewEntity.empty() && !NewVenue.empty()) {
             BadRequest(RESTAPI::Errors::NotBoth);

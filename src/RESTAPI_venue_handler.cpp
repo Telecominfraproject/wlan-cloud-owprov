@@ -161,6 +161,7 @@ namespace OpenWifi{
 
         AssignIfPresent(RawObject, "name", Existing.info.name);
         AssignIfPresent(RawObject, "description", Existing.info.description);
+        AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         std::string MoveEntity;
         if(AssignIfPresent(RawObject, "entity", MoveEntity) && !Storage()->EntityDB().Exists("id",MoveEntity)) {
