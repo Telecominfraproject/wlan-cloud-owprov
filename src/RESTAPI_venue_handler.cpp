@@ -164,71 +164,95 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         std::string MoveEntity;
-        if(AssignIfPresent(RawObject, "entity", MoveEntity) && !Storage()->EntityDB().Exists("id",MoveEntity)) {
-            BadRequest(RESTAPI::Errors::EntityMustExist);
-            return;
+        bool MovingEntity=false;
+        if(AssignIfPresent(RawObject, "entity", MoveEntity)) {
+            if(!Storage()->EntityDB().Exists("id",MoveEntity)) {
+                BadRequest(RESTAPI::Errors::EntityMustExist);
+                return;
+            }
+            MovingEntity = MoveEntity != Existing.entity;
         }
 
         std::string MoveVenue;
-        if(AssignIfPresent(RawObject, "venue", MoveVenue) && !Storage()->VenueDB().Exists("id",MoveVenue)) {
-            BadRequest(RESTAPI::Errors::VenueMustExist);
-            return;
+        bool MovingVenue=false;
+        if(AssignIfPresent(RawObject, "venue", MoveVenue)) {
+            if(!Storage()->VenueDB().Exists("id",MoveVenue)) {
+                BadRequest(RESTAPI::Errors::VenueMustExist);
+                return;
+            }
+            MovingVenue = MoveVenue != Existing.parent;
         }
 
         std::string MoveLocation;
-        if(AssignIfPresent(RawObject,"location",MoveLocation) && !Storage()->LocationDB().Exists("id",MoveLocation)) {
-            BadRequest(RESTAPI::Errors::LocationMustExist);
-            return;
+        bool MovingLocation=false;
+        if(AssignIfPresent(RawObject,"location",MoveLocation)) {
+            if(!Storage()->LocationDB().Exists("id",MoveLocation)) {
+                BadRequest(RESTAPI::Errors::LocationMustExist);
+                return;
+            }
+            MovingLocation = MoveLocation!=Existing.location;
         }
 
         std::string MoveContact;
-        if(AssignIfPresent(RawObject,"contact",MoveContact) && !Storage()->ContactDB().Exists("id",MoveContact)) {
-            BadRequest(RESTAPI::Errors::ContactMustExist);
-            return;
+        bool MovingContact=false;
+        if(AssignIfPresent(RawObject,"contact",MoveContact)) {
+            if(!Storage()->ContactDB().Exists("id",MoveContact)) {
+                BadRequest(RESTAPI::Errors::ContactMustExist);
+                return;
+            }
+            MovingContact = MoveContact!=Existing.contact;
         }
 
         std::string MovePolicy;
-        if(AssignIfPresent(RawObject,"managementPolicy",MoveContact) && !Storage()->PolicyDB().Exists("id",MovePolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+        bool MovingPolicy=false;
+        if(AssignIfPresent(RawObject,"managementPolicy",MoveContact)) {
+            if(!Storage()->PolicyDB().Exists("id",MovePolicy)) {
+                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+                return;
+            }
+            MovingPolicy = MovePolicy != Existing.managementPolicy;
         }
 
         std::string MoveConfiguration;
-        if(AssignIfPresent(RawObject,"deviceConfiguration",MoveConfiguration) && !Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
-            BadRequest(RESTAPI::Errors::DeviceConfigurationUUID);
-            return;
-        }
+        bool MovingConfiguration=false;
+         if(AssignIfPresent(RawObject,"deviceConfiguration",MoveConfiguration)) {
+             if(!Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
+                BadRequest(RESTAPI::Errors::DeviceConfigurationUUID);
+                return;
+            }
+            MovingConfiguration = MoveConfiguration != Existing.deviceConfiguration;
+         }
 
         if(Storage()->VenueDB().UpdateRecord("id", UUID, Existing)) {
-            if(MoveContact != Existing.contact) {
+            if(MovingContact) {
                 if(!Existing.contact.empty())
                     Storage()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
                 if(!MoveContact.empty())
                     Storage()->ContactDB().AddInUse("id", MoveContact, DB_.Prefix(), Existing.info.id);
                 Existing.contact = MoveContact;
             }
-            if(MoveEntity != Existing.entity) {
+            if(MovingEntity) {
                 if(!Existing.entity.empty())
                     Storage()->EntityDB().DeleteVenue("id", Existing.entity, Existing.info.id);
                 if(!MoveEntity.empty())
                     Storage()->EntityDB().AddVenue("id",MoveEntity,Existing.info.id);
                 Existing.entity = MoveEntity;
             }
-            if(MoveVenue != Existing.parent) {
+            if(MovingVenue) {
                if(!Existing.parent.empty())
                    DB_.DeleteChild("id",Existing.parent,Existing.info.id);
                if(!MoveVenue.empty())
                    DB_.AddChild("id", MoveVenue, Existing.info.id);
                Existing.parent = MoveVenue;
             }
-            if(MoveLocation != Existing.location) {
+            if(MovingLocation) {
                 if(!Existing.location.empty())
                     Storage()->LocationDB().DeleteInUse("id", Existing.location, DB_.Prefix(), Existing.info.id);
                 if(!MoveLocation.empty())
                     Storage()->LocationDB().AddInUse("id", MoveLocation, DB_.Prefix(), Existing.info.id);
                 Existing.location = MoveLocation;
             }
-            if(MovePolicy != Existing.managementPolicy) {
+            if(MovingPolicy) {
                 if(!Existing.managementPolicy.empty())
                     Storage()->PolicyDB().DeleteInUse("id", Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
                 if(!MovePolicy.empty())
@@ -236,7 +260,7 @@ namespace OpenWifi{
                 Existing.managementPolicy = MovePolicy;
             }
 
-            if(MoveConfiguration != Existing.deviceConfiguration) {
+            if(MovingConfiguration) {
                 if(!Existing.deviceConfiguration.empty())
                     Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
                 if(!MoveConfiguration.empty())
