@@ -193,6 +193,12 @@ namespace OpenWifi{
             return;
         }
 
+        std::string MoveConfiguration;
+        if(AssignIfPresent(RawObject,"deviceConfiguration",MoveConfiguration) && !Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
+            BadRequest(RESTAPI::Errors::DeviceConfigurationUUID);
+            return;
+        }
+
         if(Storage()->VenueDB().UpdateRecord("id", UUID, Existing)) {
             if(MoveContact != Existing.contact) {
                 if(!Existing.contact.empty())
@@ -228,6 +234,14 @@ namespace OpenWifi{
                 if(!MovePolicy.empty())
                     Storage()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
                 Existing.managementPolicy = MovePolicy;
+            }
+
+            if(MoveConfiguration != Existing.deviceConfiguration) {
+                if(!Existing.deviceConfiguration.empty())
+                    Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
+                if(!MoveConfiguration.empty())
+                    Storage()->ConfigurationDB().AddInUse("id", MoveConfiguration, DB_.Prefix(), Existing.info.id);
+                Existing.deviceConfiguration = MoveConfiguration;
             }
 
             DB_.UpdateRecord("id",Existing.info.id, Existing);
