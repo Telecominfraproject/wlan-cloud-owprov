@@ -168,6 +168,10 @@ namespace OpenWifi {
             else {
                 Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
             }
+            if(!E.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id",E.managementPolicy, Prefix(), E.info.id);
+            if(!E.deviceConfiguration.empty())
+                Storage()->ConfigurationDB().AddInUse("id", E.deviceConfiguration, Prefix(), E.info.id);
             ProvObjects::Entity NE;
             Storage()->EntityDB().GetRecord("id",E.info.id,NE);
             E = NE;

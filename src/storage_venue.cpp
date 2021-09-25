@@ -34,7 +34,8 @@ namespace OpenWifi {
         ORM::Field{"contact",ORM::FieldType::FT_TEXT},
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
-        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -59,6 +60,8 @@ namespace OpenWifi {
                 Storage()->ContactDB().AddInUse("id",V.contact, Storage()->VenueDB().Prefix(), V.info.id);
             if(!V.managementPolicy.empty())
                 Storage()->PolicyDB().AddInUse("id",V.managementPolicy, Storage()->VenueDB().Prefix(), V.info.id);
+            if(!V.deviceConfiguration.empty())
+                Storage()->ConfigurationDB().AddInUse("id", V.deviceConfiguration, Storage()->ConfigurationDB().Prefix(), V.info.id);
             ProvObjects::Venue  NV;
             Storage()->VenueDB().GetRecord("id",V.info.id,NV);
             V = NV;
@@ -86,6 +89,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.location = In.get<13>();
     Out.rrm = In.get<14>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
+    Out.deviceConfiguration = In.get<16>();
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -105,4 +109,5 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<13>(In.location);
     Out.set<14>(In.rrm);
     Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
+    Out.set<16>(In.deviceConfiguration);
 }
