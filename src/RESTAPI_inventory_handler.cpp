@@ -140,6 +140,11 @@ namespace OpenWifi{
             return;
         }
 
+        if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            return;
+        }
+
         NewObject.info.modified = NewObject.info.created = std::time(nullptr);
         NewObject.info.id = Daemon()->CreateUUID();
 
@@ -154,6 +159,8 @@ namespace OpenWifi{
                 Storage()->ContactDB().AddInUse("id",NewObject.contact,DB_.Prefix(),NewObject.info.id);
             if (!NewObject.deviceConfiguration.empty())
                 Storage()->ConfigurationDB().AddInUse("id",NewObject.deviceConfiguration,DB_.Prefix(),NewObject.info.id);
+            if (!NewObject.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
 
             ProvObjects::InventoryTag   NewTag;
             DB_.GetRecord("id",NewObject.info.id,NewTag);
@@ -192,12 +199,13 @@ namespace OpenWifi{
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
-        std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration;
+        std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration, NewPolicy;
         bool    MovingVenue=false,
                 MovingEntity=false,
                 MovingLocation=false,
                 MovingContact=false,
-                MovingConfiguration=false;
+                MovingConfiguration=false,
+                MovingPolicy=false;
 
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
@@ -246,6 +254,14 @@ namespace OpenWifi{
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
 
+        if(AssignIfPresent(RawObject, "managementPolicy",NewPolicy)) {
+            if(!Storage()->PolicyDB().Exists("id",NewPolicy)) {
+                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+                return;
+            }
+            MovingPolicy = Existing.managementPolicy != NewPolicy;
+        }
+
         std::string Arg;
         bool UnAssign=false;
         if(HasParameter("unassign", Arg) && Arg=="true") {
@@ -261,11 +277,14 @@ namespace OpenWifi{
                 Storage()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
             if(!Existing.deviceConfiguration.empty())
                 Storage()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
+            if(!Existing.managementPolicy.empty())
+                Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
             Existing.venue.clear();
             Existing.entity.clear();
             Existing.deviceConfiguration.clear();
             Existing.contact.clear();
             Existing.location.clear();
+            Existing.managementPolicy.clear();
         }
 
         AssignIfPresent(RawObject, "name", Existing.info.name);
@@ -308,6 +327,13 @@ namespace OpenWifi{
                     if(!NewLocation.empty())
                         Storage()->LocationDB().AddInUse("id",NewLocation,DB_.Prefix(),Existing.info.id);
                     Existing.location = NewLocation;
+                }
+                if(MovingPolicy) {
+                    if(!Existing.managementPolicy.empty())
+                        Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
+                    if(!NewPolicy.empty())
+                        Storage()->PolicyDB().AddInUse("id",NewPolicy,DB_.Prefix(),Existing.info.id);
+                    Existing.managementPolicy = NewPolicy;
                 }
             }
             DB_.UpdateRecord("id", Existing.info.id, Existing);

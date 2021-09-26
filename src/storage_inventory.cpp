@@ -34,7 +34,8 @@ namespace OpenWifi {
         ORM::Field{"contact",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
-        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -72,6 +73,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.deviceConfiguration = In.get<15>();
     Out.rrm = In.get<16>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<17>());
+    Out.managementPolicy = In.get<18>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -93,4 +95,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<15>(In.deviceConfiguration);
     Out.set<16>(In.rrm);
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
+    Out.set<18>(In.managementPolicy);
 }

@@ -510,6 +510,9 @@ components:
             - off
             - on
             - inherit
+        managementPolicy:
+          type: string
+          format: uuid
 
     InventoryTagList:
       type: object

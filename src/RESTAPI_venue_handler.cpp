@@ -215,8 +215,9 @@ namespace OpenWifi{
                 return;
             }
             MovingConfiguration = MoveConfiguration != Existing.deviceConfiguration;
-         }
+        }
 
+        Existing.info.modified = std::time(nullptr);
         if(Storage()->VenueDB().UpdateRecord("id", UUID, Existing)) {
             if(MovingContact) {
                 if(!Existing.contact.empty())
@@ -253,7 +254,6 @@ namespace OpenWifi{
                     Storage()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
                 Existing.managementPolicy = MovePolicy;
             }
-
             if(MovingConfiguration) {
                 if(!Existing.deviceConfiguration.empty())
                     Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
