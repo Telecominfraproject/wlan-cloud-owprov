@@ -45,9 +45,20 @@ namespace OpenWifi{
             return;
         }
 
-        if(!Existing.children.empty()) {
+        if(!Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty()) {
             BadRequest(RESTAPI::Errors::StillInUse);
             return;
+        }
+
+        if(!Existing.deviceConfiguration.empty())
+            Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
+
+        for(auto &i:Existing.locations) {
+            Storage()->LocationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
+        }
+
+        for(auto &i:Existing.contacts) {
+            Storage()->ContactDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
         }
 
         if(DB_.DeleteRecord("id",UUID)) {
@@ -193,7 +204,7 @@ namespace OpenWifi{
                 if(!Existing.deviceConfiguration.empty())
                     Storage()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
                 if(!NewConfiguration.empty())
-                    Storage()->ConfigurationDB().DeleteInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
+                    Storage()->ConfigurationDB().AddInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
                 Existing.deviceConfiguration = NewConfiguration;
             }
 

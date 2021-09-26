@@ -65,6 +65,9 @@ namespace OpenWifi{
         if(!Existing.contact.empty())
             Storage()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
 
+        if(!Existing.deviceConfiguration.empty())
+            Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
+
         if(DB_.DeleteRecord("id", Existing.info.id)) {
             DB_.DeleteRecord(RESTAPI::Protocol::ID, Existing.info.id);
             OK();
