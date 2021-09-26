@@ -160,7 +160,7 @@ namespace OpenWifi{
         std::string MoveEntity;
         bool MovingEntity=false;
         if(AssignIfPresent(RawObject, "entity", MoveEntity)) {
-            if(!Storage()->EntityDB().Exists("id",MoveEntity)) {
+            if(!MoveEntity.empty() && !Storage()->EntityDB().Exists("id",MoveEntity)) {
                 BadRequest(RESTAPI::Errors::EntityMustExist);
                 return;
             }
@@ -170,7 +170,7 @@ namespace OpenWifi{
         std::string MoveVenue;
         bool MovingVenue=false;
         if(AssignIfPresent(RawObject, "venue", MoveVenue)) {
-            if(!Storage()->VenueDB().Exists("id",MoveVenue)) {
+            if(!MoveVenue.empty() && !Storage()->VenueDB().Exists("id",MoveVenue)) {
                 BadRequest(RESTAPI::Errors::VenueMustExist);
                 return;
             }
@@ -180,7 +180,7 @@ namespace OpenWifi{
         std::string MoveLocation;
         bool MovingLocation=false;
         if(AssignIfPresent(RawObject,"location",MoveLocation)) {
-            if(!Storage()->LocationDB().Exists("id",MoveLocation)) {
+            if(!MoveLocation.empty() && !Storage()->LocationDB().Exists("id",MoveLocation)) {
                 BadRequest(RESTAPI::Errors::LocationMustExist);
                 return;
             }
@@ -190,7 +190,7 @@ namespace OpenWifi{
         std::string MoveContact;
         bool MovingContact=false;
         if(AssignIfPresent(RawObject,"contact",MoveContact)) {
-            if(!Storage()->ContactDB().Exists("id",MoveContact)) {
+            if(!MoveContact.empty() && !Storage()->ContactDB().Exists("id",MoveContact)) {
                 BadRequest(RESTAPI::Errors::ContactMustExist);
                 return;
             }
@@ -199,8 +199,8 @@ namespace OpenWifi{
 
         std::string MovePolicy;
         bool MovingPolicy=false;
-        if(AssignIfPresent(RawObject,"managementPolicy",MoveContact)) {
-            if(!Storage()->PolicyDB().Exists("id",MovePolicy)) {
+        if(AssignIfPresent(RawObject,"managementPolicy",MovePolicy)) {
+            if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",MovePolicy)) {
                 BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
                 return;
             }
@@ -210,7 +210,7 @@ namespace OpenWifi{
         std::string MoveConfiguration;
         bool MovingConfiguration=false;
          if(AssignIfPresent(RawObject,"deviceConfiguration",MoveConfiguration)) {
-             if(!Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
+             if(!MoveConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
                 BadRequest(RESTAPI::Errors::DeviceConfigurationUUID);
                 return;
             }

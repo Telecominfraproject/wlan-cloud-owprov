@@ -160,14 +160,14 @@ namespace OpenWifi{
         bool        MovingConfiguration=false,
                     MovingManagementPolicy=false;
         if(AssignIfPresent(RawObject,"deviceConfiguration",NewConfiguration)) {
-            if(!Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
+            if(!NewConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
                 BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                 return;
             }
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
         if(AssignIfPresent(RawObject,"managementPolicy",NewManagementPolicy)) {
-            if(!Storage()->PolicyDB().Exists("id",NewManagementPolicy)) {
+            if(!NewManagementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewManagementPolicy)) {
                 BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
                 return;
             }

@@ -173,8 +173,8 @@ namespace OpenWifi{
         }
 
         ProvObjects::DeviceConfiguration    NewConfig;
-        auto Obj = ParseStream();
-        if (!NewConfig.from_json(Obj)) {
+        auto ParsedObj = ParseStream();
+        if (!NewConfig.from_json(ParsedObj)) {
             BadRequest(RESTAPI::Errors::InvalidJSONDocument);
             return;
         }
@@ -194,38 +194,36 @@ namespace OpenWifi{
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
-        if(!NewConfig.managementPolicy.empty() && (NewConfig.managementPolicy!=Existing.managementPolicy && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy))) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+        std::string MovePolicy;
+        bool        MovingPolicy=false;
+        if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
+            if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
+                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+                return;
+            }
+            MovingPolicy = NewConfig.managementPolicy != Existing.managementPolicy;
         }
 
         if(!NewConfig.deviceTypes.empty())
             Existing.deviceTypes = NewConfig.deviceTypes;
 
-        if(!NewConfig.info.name.empty())
-            Existing.info.name = NewConfig.info.name;
-
-        AssignIfPresent(Obj, "name", Existing.info.name);
-        AssignIfPresent(Obj,"description", Existing.info.description);
-        AssignIfPresent(Obj, "rrm", Existing.rrm);
+        AssignIfPresent(ParsedObj, "name", Existing.info.name);
+        AssignIfPresent(ParsedObj,"description", Existing.info.description);
+        AssignIfPresent(ParsedObj, "rrm", Existing.rrm);
         NewConfig.info.modified = std::time(nullptr);
 
         if(!NewConfig.variables.empty())
             Existing.variables = NewConfig.variables;
 
-        std::string OldPolicy = Existing.managementPolicy;
-        if(!NewConfig.managementPolicy.empty() && Existing.managementPolicy!=NewConfig.managementPolicy) {
-            OldPolicy = Existing.managementPolicy;
-            Existing.managementPolicy = NewConfig.managementPolicy;
-        }
-
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            if(!OldPolicy.empty()) {
-                Storage()->PolicyDB().DeleteInUse("id",OldPolicy,DB_.Prefix(),Existing.info.id);
+            if(MovingPolicy) {
+                if(!Existing.managementPolicy.empty())
+                    Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
+                if(!MovePolicy.empty())
+                    Storage()->PolicyDB().AddInUse("id",MovePolicy,DB_.Prefix(),Existing.info.id);
+                Existing.managementPolicy = MovePolicy;
             }
-            if(!Existing.managementPolicy.empty()) {
-                Storage()->PolicyDB().AddInUse("id",Existing.managementPolicy, DB_.Prefix(),Existing.info.id);
-            }
+            DB_.UpdateRecord("id", UUID, Existing);
 
             ProvObjects::DeviceConfiguration    D;
             DB_.GetRecord("id",UUID,D);
@@ -233,8 +231,7 @@ namespace OpenWifi{
             D.to_json(Answer);
             ReturnObject(Answer);
             return;
-        } else {
-            InternalError(RESTAPI::Errors::RecordNotUpdated);
         }
+        InternalError(RESTAPI::Errors::RecordNotUpdated);
     }
 }

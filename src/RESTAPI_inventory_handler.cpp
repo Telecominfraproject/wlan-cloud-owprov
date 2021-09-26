@@ -210,7 +210,7 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         if(AssignIfPresent(RawObject, "venue",NewVenue)) {
-            if(!Storage()->VenueDB().Exists("id",NewVenue)) {
+            if(!NewVenue.empty() && !Storage()->VenueDB().Exists("id",NewVenue)) {
                 BadRequest(RESTAPI::Errors::VenueMustExist);
                 return;
             }
@@ -218,7 +218,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "entity",NewEntity)) {
-            if(!Storage()->EntityDB().Exists("id",NewEntity)) {
+            if(!NewEntity.empty() && !Storage()->EntityDB().Exists("id",NewEntity)) {
                 BadRequest(RESTAPI::Errors::EntityMustExist);
                 return;
             }
@@ -231,7 +231,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "location",NewLocation)) {
-            if(!Storage()->LocationDB().Exists("id",NewLocation)) {
+            if(!NewLocation.empty() && !Storage()->LocationDB().Exists("id",NewLocation)) {
                 BadRequest(RESTAPI::Errors::LocationMustExist);
                 return;
             }
@@ -239,7 +239,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "contact",NewContact)) {
-            if(!Storage()->ContactDB().Exists("id",NewContact)) {
+            if(!NewContact.empty() && !Storage()->ContactDB().Exists("id",NewContact)) {
                 BadRequest(RESTAPI::Errors::ContactMustExist);
                 return;
             }
@@ -247,7 +247,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "deviceConfiguration",NewConfiguration)) {
-            if(!Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
+            if(!NewConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
                 BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                 return;
             }
@@ -255,7 +255,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "managementPolicy",NewPolicy)) {
-            if(!Storage()->PolicyDB().Exists("id",NewPolicy)) {
+            if(!NewPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewPolicy)) {
                 BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
                 return;
             }
