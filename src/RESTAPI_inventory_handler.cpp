@@ -247,7 +247,7 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "deviceConfiguration",NewConfiguration)) {
-            if(!Storage()->ContactDB().Exists("id",NewContact)) {
+            if(!Storage()->ConfigurationDB().Exists("id",NewContact)) {
                 BadRequest(RESTAPI::Errors::ContactMustExist);
                 return;
             }
