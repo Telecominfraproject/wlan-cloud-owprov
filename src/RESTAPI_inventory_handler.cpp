@@ -247,8 +247,8 @@ namespace OpenWifi{
         }
 
         if(AssignIfPresent(RawObject, "deviceConfiguration",NewConfiguration)) {
-            if(!Storage()->ConfigurationDB().Exists("id",NewContact)) {
-                BadRequest(RESTAPI::Errors::ContactMustExist);
+            if(!Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
+                BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                 return;
             }
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
