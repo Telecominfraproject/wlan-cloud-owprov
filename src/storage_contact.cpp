@@ -36,7 +36,9 @@ namespace OpenWifi {
         ORM::Field{"secondaryEmail",ORM::FieldType::FT_TEXT},
         ORM::Field{"accessPIN",ORM::FieldType::FT_TEXT},
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
-        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
+        ORM::Field{"owner",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ContactDB_Indexes{
@@ -51,14 +53,13 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ContactDBRecordType &In, OpenWifi::ProvObjects::Contact &Out) {
+template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ContactDBRecordType &In, OpenWifi::ProvObjects::Contact &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
     Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
-
     Out.type = OpenWifi::ProvObjects::contact_from_string(In.get<6>());
     Out.title = In.get<7>();
     Out.salutation = In.get<8>();
@@ -73,9 +74,11 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.accessPIN = In.get<17>();
     OpenWifi::Types::from_string(In.get<18>(), Out.inUse);
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<19>());
+    Out.managementPolicy = In.get<20>();
+    Out.owner = In.get<21>();
 }
 
-template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
+template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);
@@ -96,4 +99,6 @@ template<> void ORM::DB<    OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects
     Out.set<17>(In.accessPIN);
     Out.set<18>(OpenWifi::Types::to_string(In.inUse));
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
+    Out.set<20>(In.managementPolicy);
+    Out.set<21>(In.owner);
 }
