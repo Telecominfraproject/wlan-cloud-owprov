@@ -55,8 +55,7 @@ namespace OpenWifi{
             Storage()->EntityDB().ImportTree(FullTree);
             OK();
             return;
-        } else {
-            BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
+        BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
 }

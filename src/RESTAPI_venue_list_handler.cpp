@@ -59,6 +59,6 @@ namespace OpenWifi{
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest("Internal error.");
+        InternalError("Internal error.");
     }
 }

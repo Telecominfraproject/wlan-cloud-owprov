@@ -69,7 +69,7 @@ namespace OpenWifi{
             return;
         }
 
-        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
+        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     void RESTAPI_managementPolicy_handler::DoPost() {
@@ -102,7 +102,7 @@ namespace OpenWifi{
             ReturnObject(Answer);
             return;
         }
-        BadRequest(RESTAPI::Errors::RecordNotCreated);
+        InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_managementPolicy_handler::DoPut() {
@@ -135,6 +135,6 @@ namespace OpenWifi{
             ReturnObject(Answer);
             return;
         }
-        BadRequest(RESTAPI::Errors::RecordNotUpdated);
+        InternalError(RESTAPI::Errors::RecordNotUpdated);
     }
 }

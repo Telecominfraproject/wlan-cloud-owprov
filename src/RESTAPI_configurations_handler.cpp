@@ -68,7 +68,7 @@ namespace OpenWifi{
             OK();
             return;
         }
-        BadRequest(RESTAPI::Errors::CouldNotBeDeleted);
+        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     //      interfaces
@@ -161,7 +161,7 @@ namespace OpenWifi{
             ReturnObject(Answer);
             return;
         }
-        BadRequest(RESTAPI::Errors::RecordNotCreated);
+        InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_configurations_handler::DoPut() {
@@ -234,7 +234,7 @@ namespace OpenWifi{
             ReturnObject(Answer);
             return;
         } else {
-            BadRequest(RESTAPI::Errors::RecordNotUpdated);
+            InternalError(RESTAPI::Errors::RecordNotUpdated);
         }
     }
 }
