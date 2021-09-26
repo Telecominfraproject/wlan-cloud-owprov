@@ -33,6 +33,14 @@ namespace OpenWifi {
         void DoPost() final;
         void DoPut() final;
         void DoDelete() final;
+
+        template <typename T> bool IdExists(T &DB, const std::string &Field, const std::string &Error) {
+            if(!Field.empty() && !DB.Exists("id",Field)) {
+                BadRequest(Error);
+                return false;
+            }
+            return true;
+        }
     };
 }
 

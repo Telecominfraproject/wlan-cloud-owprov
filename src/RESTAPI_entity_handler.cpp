@@ -143,13 +143,14 @@ namespace OpenWifi{
             return;
         }
 
-        std::string OldConfiguration;
-        if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-            BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-            return;
-        } else {
-            OldConfiguration = Existing.deviceConfiguration;
-            Existing.deviceConfiguration = NewEntity.deviceConfiguration;
+        std::string NewConfiguration;
+        bool        MovingConfiguration=false;
+        if(AssignIfPresent(RawObject,"deviceConfiguration",NewConfiguration)) {
+            if(!Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
+                BadRequest(RESTAPI::Errors::ConfigurationMustExist);
+                return;
+            }
+            MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
 
         for(auto &i:NewEntity.info.notes) {
@@ -188,13 +189,15 @@ namespace OpenWifi{
                 }
             }
 
-            if(!OldConfiguration.empty()) {
-                Storage()->ConfigurationDB().DeleteInUse("id", OldConfiguration, DB_.Prefix(), Existing.info.id);
+            if(MovingConfiguration) {
+                if(!Existing.deviceConfiguration.empty())
+                    Storage()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
+                if(!NewConfiguration.empty())
+                    Storage()->ConfigurationDB().DeleteInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
+                Existing.deviceConfiguration = NewConfiguration;
             }
 
-            if(!NewEntity.deviceConfiguration.empty()) {
-                Storage()->ConfigurationDB().AddInUse("id", NewEntity.deviceConfiguration, DB_.Prefix(), Existing.info.id);
-            }
+            DB_.UpdateRecord("id", Existing.info.id, Existing);
 
             Poco::JSON::Object  Answer;
             ProvObjects::Entity NewRecord;

@@ -111,6 +111,11 @@ namespace OpenWifi{
             return;
         }
 
+        if(!NewObject.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewObject.deviceConfiguration)) {
+            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            return;
+        }
+
         NewObject.children.clear();
         NewObject.info.modified = NewObject.info.created = std::time(nullptr);
         NewObject.info.id = Daemon()->CreateUUID() ;
@@ -118,17 +123,6 @@ namespace OpenWifi{
             i.createdBy = UserInfo_.userinfo.email;
 
         if(DB_.CreateShortCut(NewObject)) {
-            if(!NewObject.entity.empty())
-                Storage()->EntityDB().AddVenue("id", NewObject.entity, NewObject.info.id);
-            if(!NewObject.parent.empty())
-                DB_.AddChild("id", NewObject.parent, NewObject.info.id);
-            if(!NewObject.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id", NewObject.managementPolicy, DB_.Prefix(), NewObject.info.id);
-            if(!NewObject.location.empty())
-                Storage()->LocationDB().AddInUse("id", NewObject.location, DB_.Prefix(), NewObject.info.id);
-            if(!NewObject.contact.empty())
-                Storage()->ContactDB().AddInUse("id", NewObject.contact, DB_.Prefix(), NewObject.info.id);
-
             ProvObjects::Venue  NewRecord;
             DB_.GetRecord("id",NewObject.info.id,NewRecord);
             Poco::JSON::Object  Answer;
