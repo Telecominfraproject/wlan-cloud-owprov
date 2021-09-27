@@ -167,7 +167,7 @@ namespace OpenWifi {
                 Explanation_ += "From: " + i.uuid + "\n" ;
                 std::ostringstream OS;
                 Poco::JSON::Stringifier::stringify(Result, OS);
-                Explanation_ += OS.str();
+                Explanation_ += OS.str() + "\n\n";
             }
             Tmp = Result;
         }
