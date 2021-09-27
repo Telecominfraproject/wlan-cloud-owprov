@@ -34,6 +34,8 @@ namespace OpenWifi{
             Poco::JSON::Object::Ptr  Configuration;
             if(Device.Get(Configuration)) {
                 Answer.set("config", Configuration);
+                if(Explain)
+                    Answer.set("explanation", Device.Explanation());
             } else {
                 Answer.set("config","none");
             }

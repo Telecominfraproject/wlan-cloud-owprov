@@ -164,8 +164,10 @@ namespace OpenWifi {
             merge(O, Tmp, Result);
             ShowJSON("Iteration End:", Result);
             if(Explain_) {
-                std::string T{"__source_" + std::to_string(Pos++) + "__" };
-                Result->set(T, i.uuid);
+                Explanation_ += "From: " + i.uuid + "\n" ;
+                std::ostringstream OS;
+                Poco::JSON::Stringifier::stringify(Result, OS);
+                Explanation_ += OS.str();
             }
             Tmp = Result;
         }
