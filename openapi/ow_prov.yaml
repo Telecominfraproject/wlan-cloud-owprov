@@ -680,6 +680,15 @@ components:
           type: integer
         hostname:
           type: string
+        certificates:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+              expires:
+                type: string
 
     Dashboard:
       type: object
