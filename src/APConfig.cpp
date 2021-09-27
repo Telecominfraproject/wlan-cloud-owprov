@@ -160,30 +160,26 @@ namespace OpenWifi {
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
-            auto Result = Poco::makeShared<Poco::JSON::Object>();
-            ShowJSON("O", O);
-            ShowJSON("Tmp", Tmp);
-            merge(O, Tmp, Result);
-            ShowJSON("Iteration End:", Result);
-            if(Sections.find(Names[0]) != Sections.end()) {
+            auto SectionInfo = O->get(Names[0]);
+            auto InsertInfo = Sections.insert(Names[0]);
+            if(InsertInfo.second) {
+                if(Explain_) {
+                    Poco::JSON::Object  ExObj;
+                    ExObj.set("from", i.uuid);
+                    ExObj.set("added", true);
+                    ExObj.set("element",SectionInfo);
+                    Explanation_.add(ExObj);
+                }
+                Tmp->set(Names[0],O->get(Names[0]));
+            } else {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from", i.uuid);
                     ExObj.set("added", false);
-                    ExObj.set("elements",Result);
+                    ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
-                continue;
             }
-            Sections.insert(Names[0]);
-            if(Explain_) {
-                Poco::JSON::Object  ExObj;
-                ExObj.set("from", i.uuid);
-                ExObj.set("added", true);
-                ExObj.set("elements",Result);
-                Explanation_.add(ExObj);
-            }
-            Tmp = Result;
         }
         Configuration = Tmp;
         if(Config_.empty())
