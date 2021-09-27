@@ -209,7 +209,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"mobiles",mobiles);
         RESTAPI_utils::field_to_json( Obj,"geoCode",geoCode);
         RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
-        RESTAPI_utils::field_to_json( Obj,"owner",owner);
+        RESTAPI_utils::field_to_json( Obj,"entity",entity);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
     }
 
@@ -229,7 +229,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"mobiles",mobiles);
             RESTAPI_utils::field_from_json( Obj,"geoCode",geoCode);
             RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
-            RESTAPI_utils::field_from_json( Obj,"owner",owner);
+            RESTAPI_utils::field_from_json( Obj,"entity",entity);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             return true;
         } catch (...) {
@@ -253,7 +253,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"secondaryEmail",secondaryEmail);
         RESTAPI_utils::field_to_json( Obj,"accessPIN",accessPIN);
         RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
-        RESTAPI_utils::field_to_json( Obj,"owner",owner);
+        RESTAPI_utils::field_to_json( Obj,"entity",entity);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
     }
 
@@ -275,7 +275,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"secondaryEmail",secondaryEmail);
             RESTAPI_utils::field_from_json( Obj,"accessPIN",accessPIN);
             RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
-            RESTAPI_utils::field_from_json( Obj,"owner",owner);
+            RESTAPI_utils::field_from_json( Obj,"entity",entity);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             return true;
         } catch (...) {

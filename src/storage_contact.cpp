@@ -38,7 +38,7 @@ namespace OpenWifi {
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
-        ORM::Field{"owner",ORM::FieldType::FT_TEXT}
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ContactDB_Indexes{
@@ -75,7 +75,7 @@ template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Co
     OpenWifi::Types::from_string(In.get<18>(), Out.inUse);
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<19>());
     Out.managementPolicy = In.get<20>();
-    Out.owner = In.get<21>();
+    Out.entity = In.get<21>();
 }
 
 template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
@@ -100,5 +100,5 @@ template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Co
     Out.set<18>(OpenWifi::Types::to_string(In.inUse));
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<20>(In.managementPolicy);
-    Out.set<21>(In.owner);
+    Out.set<21>(In.entity);
 }

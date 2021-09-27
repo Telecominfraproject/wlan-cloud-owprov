@@ -91,6 +91,16 @@ namespace OpenWifi{
             return;
         }
 
+        if(NewObject.entity.empty() || !Storage()->EntityDB().Exists("id",NewObject.entity)) {
+            BadRequest(RESTAPI::Errors::EntityMustExist);
+            return;
+        }
+
+        if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            return;
+        }
+
         NewObject.info.id = Daemon()->CreateUUID();
         NewObject.info.created = NewObject.info.modified = std::time(nullptr);
         NewObject.inUse.clear();
@@ -112,11 +122,28 @@ namespace OpenWifi{
             return;
         }
 
-        auto Obj = ParseStream();
+        auto RawObject = ParseStream();
         ProvObjects::Location NewObject;
-        if (!NewObject.from_json(Obj)) {
+        if (!NewObject.from_json(RawObject)) {
             BadRequest(RESTAPI::Errors::InvalidJSONDocument);
             return;
+        }
+
+        std::string MoveEntity, MovePolicy;
+        bool MovingEntity=false, MovingPolicy=false;
+        if(AssignIfPresent(RawObject,"managementPolicy",MovePolicy)) {
+            if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",MovePolicy)) {
+                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+                return;
+            }
+            MovingPolicy = MovePolicy != Existing.managementPolicy;
+        }
+        if(AssignIfPresent(RawObject,"entity",MoveEntity)) {
+            if(MoveEntity.empty() || !Storage()->PolicyDB().Exists("id",MoveEntity)) {
+                BadRequest(RESTAPI::Errors::EntityMustExist);
+                return;
+            }
+            MovingEntity = MoveEntity != Existing.entity;
         }
 
         for(auto &i:NewObject.info.notes) {
@@ -124,11 +151,23 @@ namespace OpenWifi{
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
-        AssignIfPresent(Obj,"name",Existing.info.name);
-        AssignIfPresent(Obj,"description",Existing.info.description);
+        AssignIfPresent(RawObject,"name",Existing.info.name);
+        AssignIfPresent(RawObject,"description",Existing.info.description);
         Existing.info.modified = std::time(nullptr);
 
         if(DB_.UpdateRecord("id", UUID, Existing)) {
+            if(MovingPolicy) {
+                if(!Existing.managementPolicy.empty())
+                    Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
+                if(!MovePolicy.empty())
+                    Storage()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
+                Existing.managementPolicy = MovePolicy;
+            }
+            if(MovingEntity) {
+                Existing.entity = MoveEntity;
+            }
+
+            DB_.UpdateRecord("id",UUID,Existing);
             ProvObjects::Location    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);
             Poco::JSON::Object  Answer;

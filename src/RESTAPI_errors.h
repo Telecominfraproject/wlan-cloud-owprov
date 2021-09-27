@@ -37,6 +37,7 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string LocationMustExist{"Location must exist."};
     static const std::string OnlyWSSupported{"This endpoint only supports WebSocket."};
     static const std::string DeviceConfigurationUUID{"Unknown DeviceConfiguration UUID."};
+    static const std::string OwnerMissing{"Missing owning entity UUID."};
 
 }
 
