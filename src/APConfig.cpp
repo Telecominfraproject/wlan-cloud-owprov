@@ -153,7 +153,7 @@ namespace OpenWifi {
         //      globals
         //      unit
         auto Tmp=Poco::makeShared<Poco::JSON::Object>();
-        auto Pos=0;
+        Explanation_.clear();
         for(const auto &i:Config_) {
             ShowJSON("Iteration Start:", Tmp);
             Poco::JSON::Parser  P;
@@ -164,15 +164,14 @@ namespace OpenWifi {
             merge(O, Tmp, Result);
             ShowJSON("Iteration End:", Result);
             if(Explain_) {
-                Explanation_ += "From: " + i.uuid + "\n" ;
-                std::ostringstream OS;
-                Poco::JSON::Stringifier::stringify(Result, OS);
-                Explanation_ += OS.str() + "\n\n";
+                Poco::JSON::Object  ExObj;
+                ExObj.set("from", i.uuid);
+                ExObj.set("elements",Result);
+                Explanation_.add(ExObj);
             }
             Tmp = Result;
         }
         Configuration = Tmp;
-
         if(Config_.empty())
             return false;
 

@@ -27,7 +27,7 @@ namespace OpenWifi {
             void AddConfiguration(const std::string &UUID);
             void AddVenueConfig(const std::string &UUID);
             void AddEntityConfig(const std::string &UUID);
-            const std::string Explanation() { return Explanation_; };
+            const Poco::JSON::Array & Explanation() { return Explanation_; };
         private:
             std::string                 SerialNumber_;
             std::string                 DeviceType_;
@@ -36,7 +36,7 @@ namespace OpenWifi {
             ConfigVec                   Config_;
             Types::StringPairVec        Errors;
             bool                        Explain_=false;
-            std::string                 Explanation_;
+            Poco::JSON::Array           Explanation_;
 
             bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio);
             bool mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr);
