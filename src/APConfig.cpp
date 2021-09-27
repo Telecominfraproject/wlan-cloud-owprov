@@ -127,6 +127,7 @@ namespace OpenWifi {
 
     bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
         if(Config_.empty()) {
+            Explanation_.clear();
             try {
                 ProvObjects::InventoryTag   D;
                 if(Storage()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
@@ -153,7 +154,6 @@ namespace OpenWifi {
         //      globals
         //      unit
         auto Tmp=Poco::makeShared<Poco::JSON::Object>();
-        Explanation_.clear();
         std::set<std::string>   Sections;
         for(const auto &i:Config_) {
             ShowJSON("Iteration Start:", Tmp);
@@ -188,6 +188,14 @@ namespace OpenWifi {
         return true;
     }
 
+    static bool DeviceTypeMatch(const std::string &DeviceType, const Types::StringVec & Types) {
+        for(const auto &i:Types) {
+            if(i=="*" || Poco::icompare(DeviceType,i)==0)
+                return true;
+        }
+        return false;
+    }
+
     void APConfig::AddConfiguration(const std::string &UUID) {
 
         ProvObjects::DeviceConfiguration    Config;
@@ -197,18 +205,26 @@ namespace OpenWifi {
         if(Storage()->ConfigurationDB().GetRecord("id", UUID,Config)) {
             //  find where to insert into this list using the weight.
             if(!Config.configuration.empty()) {
-                for(const auto &i:Config.configuration) {
-                    if(i.weight==0) {
-                        VerboseElement  VE{ .element = i, .uuid = UUID};
-                        Config_.push_back(VE);
-                    } else {
-                        // we need to insert after everything bigger or equal
-                        auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
-                                                     [](const VerboseElement &Elem, int Value) {
-                                                            return Elem.element.weight>=Value; });
-                        VerboseElement  VE{ .element = i, .uuid = UUID};
-                        Config_.insert(Hint,VE);
+                if(DeviceTypeMatch(DeviceType_,Config.deviceTypes)) {
+                    for(const auto &i:Config.configuration) {
+                        if(i.weight==0) {
+                            VerboseElement  VE{ .element = i, .uuid = UUID};
+                            Config_.push_back(VE);
+                        } else {
+                            // we need to insert after everything bigger or equal
+                            auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
+                                                         [](const VerboseElement &Elem, int Value) {
+                                return Elem.element.weight>=Value; });
+                            VerboseElement  VE{ .element = i, .uuid = UUID};
+                            Config_.insert(Hint,VE);
+                        }
                     }
+                } else {
+                    Poco::JSON::Object  ExObj;
+                    ExObj.set("from", UUID);
+                    ExObj.set("added", false);
+                    ExObj.set("reason", "deviceType mismatch");
+                    Explanation_.add(ExObj);
                 }
             }
         }
