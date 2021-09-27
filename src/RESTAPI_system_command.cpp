@@ -119,6 +119,7 @@ namespace OpenWifi {
 			Poco::JSON::Array   Certificates;
 			auto SubSystems = Daemon()->GetFullSubSystems();
 			std::set<std::string>   CertNames;
+
 			for(const auto &i:SubSystems) {
 			    auto Hosts=i->HostSize();
 			    for(uint64_t j=0;j<Hosts;++j) {
