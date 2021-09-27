@@ -11,11 +11,15 @@
 
 namespace OpenWifi {
 
-    typedef std::vector<ProvObjects::DeviceConfigurationElement> ConfigVec;
+    struct VerboseElement {
+        ProvObjects::DeviceConfigurationElement     element;
+        std::string                                 uuid;
+    };
+    typedef std::vector<VerboseElement> ConfigVec;
 
     class APConfig {
         public:
-            explicit APConfig(const std::string & SerialNumber, const std::string & DeviceType, Poco::Logger & L);
+            explicit APConfig(const std::string & SerialNumber, const std::string & DeviceType, Poco::Logger & L, bool Explain=false);
 
 
             [[nodiscard]] bool Get(Poco::JSON::Object::Ptr &Configuration);
@@ -31,6 +35,7 @@ namespace OpenWifi {
             std::string                 CompleteConfig_;
             ConfigVec                   Config_;
             Types::StringPairVec        Errors;
+            bool                        Explain_=false;
 
             bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio);
             bool mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr);

@@ -8,10 +8,11 @@
 
 namespace OpenWifi {
 
-    APConfig::APConfig(const std::string &SerialNumber, const std::string &DeviceType, Poco::Logger &L)
+    APConfig::APConfig(const std::string &SerialNumber, const std::string &DeviceType, Poco::Logger &L, bool Explain)
         :   SerialNumber_(SerialNumber),
             DeviceType_(DeviceType),
-            Logger_(L)
+            Logger_(L),
+            Explain_(Explain)
     {}
 
     bool APConfig::FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio) {
@@ -155,12 +156,14 @@ namespace OpenWifi {
         for(const auto &i:Config_) {
             ShowJSON("Iteration Start:", Tmp);
             Poco::JSON::Parser  P;
-            auto O = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+            auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Result = Poco::makeShared<Poco::JSON::Object>();
             ShowJSON("O", O);
             ShowJSON("Tmp", Tmp);
             merge(O, Tmp, Result);
             ShowJSON("Iteration End:", Result);
+            if(Explain_)
+                Result->set("__source__", i.uuid);
             Tmp = Result;
         }
         Configuration = Tmp;
@@ -172,8 +175,8 @@ namespace OpenWifi {
     }
 
     void APConfig::AddConfiguration(const std::string &UUID) {
-        ProvObjects::DeviceConfiguration    Config;
 
+        ProvObjects::DeviceConfiguration    Config;
         if(UUID.empty())
             return;
 
@@ -182,13 +185,15 @@ namespace OpenWifi {
             if(!Config.configuration.empty()) {
                 for(const auto &i:Config.configuration) {
                     if(i.weight==0) {
-                        Config_.push_back(i);
+                        VerboseElement  VE{ .element = i, .uuid = UUID};
+                        Config_.push_back(VE);
                     } else {
                         // we need to insert after everything bigger or equal
                         auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
-                                                     [](const ProvObjects::DeviceConfigurationElement &Elem, int Value) {
-                                                            return Elem.weight>=Value; });
-                        Config_.insert(Hint,i);
+                                                     [](const VerboseElement &Elem, int Value) {
+                                                            return Elem.element.weight>=Value; });
+                        VerboseElement  VE{ .element = i, .uuid = UUID};
+                        Config_.insert(Hint,VE);
                     }
                 }
             }
