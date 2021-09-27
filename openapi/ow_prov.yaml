@@ -688,7 +688,8 @@ components:
               filename:
                 type: string
               expires:
-                type: string
+                type: integer
+                format: int64
 
     Dashboard:
       type: object

@@ -129,8 +129,7 @@ namespace OpenWifi {
 			            Inner.set("filename", CertFileName);
 			            Poco::Crypto::X509Certificate   C(CertFileName);
 			            auto ExpiresOn = C.expiresOn();
-			            auto TimeString = Poco::DateTimeFormatter::format(ExpiresOn,Poco::DateTimeFormat::HTTP_FORMAT);
-			            Inner.set("expiresOn",TimeString);
+			            Inner.set("expiresOn",ExpiresOn.timestamp().epochTime());
 			            Certificates.add(Inner);
 			        }
 			    }
