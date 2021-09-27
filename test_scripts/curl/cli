@@ -363,7 +363,7 @@ listconfigs() {
 }
 
 deviceconfig() {
-    curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory/$1?config=true" \
+    curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory/$1?config=true&explain=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}

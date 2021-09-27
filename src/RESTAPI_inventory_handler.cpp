@@ -28,7 +28,7 @@ namespace OpenWifi{
         std::string Arg;
         if(HasParameter("config",Arg) && Arg=="true") {
             bool Explain = (HasParameter("explain",Arg) && Arg == "true");
-            APConfig    Device(SerialNumber,Existing.deviceType,Logger_);
+            APConfig    Device(SerialNumber,Existing.deviceType,Logger_, Explain);
 
             Poco::JSON::Object       Answer;
             Poco::JSON::Object::Ptr  Configuration;
