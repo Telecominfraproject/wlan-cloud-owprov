@@ -423,7 +423,7 @@ namespace OpenWifi {
 	void RESTAPIHandler::ReturnObject(Poco::JSON::Object &Object) {
 		PrepareResponse();
 		std::ostream &Answer = Response->send();
-		Poco::JSON::Stringifier::stringify(Object, Answer);
+		Poco::JSON::Stringifier::condense(Object, Answer);
 	}
 
 	void RESTAPIHandler::ReturnCountOnly(uint64_t Count) {
