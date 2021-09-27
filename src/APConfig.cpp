@@ -160,21 +160,22 @@ namespace OpenWifi {
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
+            auto Result = Poco::makeShared<Poco::JSON::Object>();
+            ShowJSON("O", O);
+            ShowJSON("Tmp", Tmp);
+            merge(O, Tmp, Result);
+            ShowJSON("Iteration End:", Result);
             if(Sections.find(Names[0]) != Sections.end()) {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from", i.uuid);
                     ExObj.set("added", false);
+                    ExObj.set("elements",Result);
                     Explanation_.add(ExObj);
                 }
                 continue;
             }
-            auto Result = Poco::makeShared<Poco::JSON::Object>();
             Sections.insert(Names[0]);
-            ShowJSON("O", O);
-            ShowJSON("Tmp", Tmp);
-            merge(O, Tmp, Result);
-            ShowJSON("Iteration End:", Result);
             if(Explain_) {
                 Poco::JSON::Object  ExObj;
                 ExObj.set("from", i.uuid);
