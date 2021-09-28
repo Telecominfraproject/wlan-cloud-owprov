@@ -211,7 +211,7 @@ namespace OpenWifi{
         bool MovingConfiguration=false;
          if(AssignIfPresent(RawObject,"deviceConfiguration",MoveConfiguration)) {
              if(!MoveConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",MoveConfiguration)) {
-                BadRequest(RESTAPI::Errors::DeviceConfigurationUUID);
+                BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                 return;
             }
             MovingConfiguration = MoveConfiguration != Existing.deviceConfiguration;
