@@ -358,7 +358,7 @@ namespace OpenWifi {
 			ProcessOptions();
 			return false;
 		} else if (std::find(Methods_.begin(), Methods_.end(), Request->getMethod()) == Methods_.end()) {
-			BadRequest("Unsupported method");
+			BadRequest(RESTAPI::Errors::UnsupportedHTTPMethod);
 			return false;
 		}
 
@@ -423,7 +423,7 @@ namespace OpenWifi {
 	void RESTAPIHandler::ReturnObject(Poco::JSON::Object &Object) {
 		PrepareResponse();
 		std::ostream &Answer = Response->send();
-		Poco::JSON::Stringifier::condense(Object, Answer);
+		Poco::JSON::Stringifier::stringify(Object, Answer);
 	}
 
 	void RESTAPIHandler::ReturnCountOnly(uint64_t Count) {
