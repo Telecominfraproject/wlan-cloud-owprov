@@ -86,6 +86,9 @@ namespace OpenWifi {
                 return true;
             };
             Iterate(Function);
+            uuid=UUID;
+            if(!uuid.empty())
+                std::cout << "Found venue: " << uuid << std::endl;
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
