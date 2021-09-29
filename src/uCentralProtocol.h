@@ -89,6 +89,7 @@ namespace OpenWifi::uCentralProtocol {
     static const char * SYSTEM = "system";
     static const char * HOST = "host";
     static const char * CONNECTIONIP = "connectionIp";
+    static const char * TELEMETRY = "telemetry";
 
 	enum EVENT_MSG {
 			ET_UNKNOWN,
@@ -100,7 +101,8 @@ namespace OpenWifi::uCentralProtocol {
 			ET_PING,
 			ET_CFGPENDING,
 			ET_RECOVERY,
-			ET_DEVICEUPDATE
+			ET_DEVICEUPDATE,
+			ET_TELEMETRY
 		};
 
 	static EVENT_MSG EventFromString(const std::string & Method) {
@@ -122,6 +124,8 @@ namespace OpenWifi::uCentralProtocol {
 			return ET_RECOVERY;
 		} else if (!Poco::icompare(Method, DEVICEUPDATE)) {
 			return ET_DEVICEUPDATE;
+		} else if (!Poco::icompare(Method, TELEMETRY)) {
+			return ET_TELEMETRY;
 		} else
 			return ET_UNKNOWN;
 	};
