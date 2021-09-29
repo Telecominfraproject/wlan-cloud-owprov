@@ -88,6 +88,7 @@ namespace OpenWifi::uCentralProtocol {
     static const char * TIMESTAMP = "timestamp";
     static const char * SYSTEM = "system";
     static const char * HOST = "host";
+    static const char * CONNECTIONIP = "connectionIp";
 
 	enum EVENT_MSG {
 			ET_UNKNOWN,

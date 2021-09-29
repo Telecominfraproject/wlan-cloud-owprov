@@ -19,6 +19,7 @@
 #include "RESTAPI_server.h"
 #include "RESTAPI_InternalServer.h"
 #include "SecurityDBProxy.h"
+#include "AutoDiscovery.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -35,7 +36,8 @@ namespace OpenWifi {
 									   AuthClient(),
 									   RESTAPI_server(),
 									   RESTAPI_InternalServer(),
-									   SecurityDBProxy()
+									   SecurityDBProxy(),
+									   AutoDiscovery()
 								   });
 		}
 		return instance_;
