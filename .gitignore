@@ -22,6 +22,9 @@ _deps
 /docker-compose/.env_*
 /cmake-build/
 /uploads/
+/data/
+/.idea/
+/openapi/access.json
 test_scripts/curl/token.json
 .vscode/c_cpp_properties.json
 test_scripts/curl/result.json
