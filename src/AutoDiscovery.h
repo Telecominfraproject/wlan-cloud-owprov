@@ -12,7 +12,6 @@ namespace OpenWifi {
     class AutoDiscovery : public SubSystemServer, Poco::Runnable {
     public:
 
-        void initialize(Poco::Util::Application & self) override;
         static AutoDiscovery *instance() {
             if(instance_== nullptr)
                 instance_ = new AutoDiscovery;
