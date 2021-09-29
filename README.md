@@ -1,8 +1,10 @@
 # OpenWiFi Provisioning
 
 ## Build from source.
-You need: https://github.com/pboettch/json-schema-validator.git
-You need: https://github.com/nlohmann/json.git
+You need:
+- https://github.com/pboettch/json-schema-validator.git
+- https://github.com/nlohmann/json.git
+
 build and install them.
 
 ## Root entity
