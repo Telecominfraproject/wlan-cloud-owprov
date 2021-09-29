@@ -527,14 +527,18 @@ namespace ORM {
             try {
 
                 uint64_t    Offset=1;
+                uint64_t    Batch=50;
                 bool Done=false;
                 while(!Done) {
                     std::vector<RecordType> Records;
-                    if(GetRecords(Offset,50,Records)) {
+                    if(GetRecords(Offset,Batch,Records)) {
                         for(const auto &i:Records) {
                             if(!F(i))
                                 return true;
                         }
+                        if(Records.size()<Batch)
+                            return true;
+                        Offset += Batch;
                     } else {
                         Done=true;
                     }
