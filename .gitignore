@@ -23,7 +23,7 @@ _deps
 /cmake-build/
 /uploads/
 /data/
-/.id
+/.idea/
 /openapi/access.json
 test_scripts/curl/token.json
 .vscode/c_cpp_properties.json
