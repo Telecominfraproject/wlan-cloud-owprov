@@ -49,6 +49,8 @@ namespace OpenWifi {
                             if( PingMessage->has(uCentralProtocol::FIRMWARE) &&
                                 PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
                                 PingMessage->has(uCentralProtocol::COMPATIBLE)) {
+                                if(PayloadObj->has(uCentralProtocol::CONNECTIONIP) )
+                                    ConnectedIP = PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
                                 SerialNumber = PingMessage->get( uCentralProtocol::SERIALNUMBER).toString();
                                 DeviceType = PingMessage->get( uCentralProtocol::COMPATIBLE).toString();
                             }

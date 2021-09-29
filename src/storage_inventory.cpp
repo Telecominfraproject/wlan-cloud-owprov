@@ -12,6 +12,7 @@
 #include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 
@@ -51,6 +52,33 @@ namespace OpenWifi {
 
     InventoryDB::InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
+
+    bool InventoryDB::CreateFromInventory(const std::string &SerialNumber, const std::string &ConnectionInfo,
+                                          const std::string &DeviceType) {
+        std::string SNum{SerialNumber};
+        if(!Exists("serialNumber",SNum)) {
+            ProvObjects::InventoryTag   NewDevice;
+            uint64_t Now = std::time(nullptr);
+
+            auto Tokens = Poco::StringTokenizer(ConnectionInfo,"@:");
+
+            NewDevice.info.id = Daemon()->CreateUUID();
+            NewDevice.info.name = SerialNumber;
+            NewDevice.info.created = NewDevice.info.modified = Now;
+            NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
+            NewDevice.serialNumber = SerialNumber;
+            NewDevice.deviceType = DeviceType;
+
+            if(CreateRecord(NewDevice)) {
+                std::cout << "Added " << SerialNumber << " to DB with IP=" << Tokens[1] << std::endl;
+                Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
+                return true;
+            } else {
+                std::cout << "Could not add " << SerialNumber << " to DB." << std::endl;
+            }
+        }
+        return false;
+    }
 
 }
 

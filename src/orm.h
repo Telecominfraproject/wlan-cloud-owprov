@@ -660,6 +660,8 @@ namespace ORM {
             }
         }
 
+        Poco::Logger & Logger() { return Logger_; }
+
     private:
         DBType                      Type;
         std::string                 DBName;

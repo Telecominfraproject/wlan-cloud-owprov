@@ -39,6 +39,7 @@ namespace OpenWifi {
     class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
     public:
         InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        bool CreateFromInventory(const std::string & SerialNumber, const std::string & ConnectionInfo, const std::string & DeviceType);
     private:
     };
 }
