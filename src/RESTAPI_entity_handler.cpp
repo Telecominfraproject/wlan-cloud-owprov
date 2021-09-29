@@ -16,6 +16,7 @@
 #include "RESTAPI_SecurityObjects.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_errors.h"
+#include "CIDRUtils.h"
 
 namespace OpenWifi{
 
@@ -112,6 +113,11 @@ namespace OpenWifi{
             return;
         }
 
+        if(!NewEntity.sourceIP.empty() && !CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
+            BadRequest(RESTAPI::Errors::InvalidIPRanges);
+            return;
+        }
+
         NewEntity.venues.clear();
         NewEntity.children.clear();
         NewEntity.contacts.clear();
@@ -172,6 +178,14 @@ namespace OpenWifi{
                 return;
             }
             MovingManagementPolicy = Existing.managementPolicy != NewManagementPolicy;
+        }
+
+        if(RawObject->has("sourceIP")) {
+            if(!NewEntity.sourceIP.empty() && CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
+                BadRequest(RESTAPI::Errors::InvalidIPRanges);
+                return;
+            }
+            Existing.sourceIP = NewEntity.sourceIP;
         }
 
         for(auto &i:NewEntity.info.notes) {

@@ -13,6 +13,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
 #include "RESTAPI_errors.h"
+#include "CIDRUtils.h"
 
 namespace OpenWifi{
 
@@ -116,6 +117,11 @@ namespace OpenWifi{
             return;
         }
 
+        if(!NewObject.sourceIP.empty() && CIDR::ValidateIpRanges(NewObject.sourceIP)) {
+            BadRequest(RESTAPI::Errors::InvalidIPRanges);
+            return;
+        }
+
         NewObject.children.clear();
         NewObject.info.modified = NewObject.info.created = std::time(nullptr);
         NewObject.info.id = Daemon()->CreateUUID() ;
@@ -156,6 +162,14 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "name", Existing.info.name);
         AssignIfPresent(RawObject, "description", Existing.info.description);
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
+
+        if(RawObject->has("sourceIP")) {
+            if(!NewObject.sourceIP.empty() && !CIDR::ValidateIpRanges(NewObject.sourceIP)) {
+                BadRequest(RESTAPI::Errors::InvalidIPRanges);
+                return;
+            }
+            Existing.sourceIP = NewObject.sourceIP;
+        }
 
         std::string MoveEntity;
         bool MovingEntity=false;

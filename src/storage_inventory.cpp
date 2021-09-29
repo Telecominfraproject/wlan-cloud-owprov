@@ -13,6 +13,7 @@
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 #include "Daemon.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -72,10 +73,22 @@ namespace OpenWifi {
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
             NewDevice.serialNumber = SerialNumber;
             NewDevice.deviceType = DeviceType;
+            std::string UUID;
+            if(!IP.empty()) {
+                Storage()->VenueDB().GetByIP(IP,UUID);
+                if(!UUID.empty()) {
+                    NewDevice.venue = UUID;
+                } else {
+                    Storage()->EntityDB().GetByIP(IP,UUID);
+                    NewDevice.entity = UUID;
+                }
+            }
 
             if(CreateRecord(NewDevice)) {
-                std::cout << "Added " << SerialNumber << " to DB with IP=" << IP << std::endl;
-                Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
+                std::cout << "Added " << SerialNumber << " to DB with IP=" << IP << " and UUID=" << UUID << std::endl;
+                if(!IP.empty()) {
+                    Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
+                }
                 return true;
             } else {
                 Logger().information(Poco::format("Could not add %s to inventory.",SerialNumber));
