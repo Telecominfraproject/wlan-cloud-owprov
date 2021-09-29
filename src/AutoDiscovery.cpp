@@ -33,6 +33,8 @@ namespace OpenWifi {
                     Poco::JSON::Parser  Parser;
                     auto Object = Parser.parse(S.second).extract<Poco::JSON::Object::Ptr>();
 
+                    std::cout << ">>>>>" << S.second << std::endl << "<<<<<" << std::endl;
+
                     if(Object->has(uCentralProtocol::PAYLOAD)) {
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
                         std::string ConnectedIP, SerialNumber, DeviceType;
