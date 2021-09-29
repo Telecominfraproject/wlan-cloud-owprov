@@ -197,6 +197,8 @@ components:
             - off
             - on
             - inherit
+        sourceIP:
+          $ref: '#/components/schemas/StringList'
 
     EntityList:
       type: object
@@ -265,6 +267,8 @@ components:
             - off
             - on
             - inherit
+        sourceIP:
+          $ref: '#/components/schemas/StringList'
 
     VenueList:
       type: object

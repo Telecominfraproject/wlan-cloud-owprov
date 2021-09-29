@@ -523,6 +523,29 @@ namespace ORM {
             return false;
         }
 
+        bool Iterate( std::function<bool(const RecordType &R)> &F) {
+            try {
+
+                uint64_t    Offset=1;
+                bool Done=false;
+                while(!Done) {
+                    std::vector<RecordType> Records;
+                    if(GetRecords(Offset,50,Records)) {
+                        for(const auto &i:Records) {
+                            if(!F(i))
+                                return true;
+                        }
+                    } else {
+                        Done=true;
+                    }
+                }
+                return true;
+            } catch(const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return false;
+        }
+
         uint64_t Count( const std::string & Where="" ) {
             try {
                 uint64_t Cnt=0;

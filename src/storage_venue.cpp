@@ -13,6 +13,8 @@
 #include "RESTAPI_SecurityObjects.h"
 
 #include "StorageService.h"
+#include "CIDRUtils.h"
+#include <functional>
 
 namespace OpenWifi {
 
@@ -35,7 +37,8 @@ namespace OpenWifi {
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
-        ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT}
+        ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
+        ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -70,6 +73,25 @@ namespace OpenWifi {
         return false;
     }
 
+    bool VenueDB::GetByIP(const std::string &IP, std::string & uuid) {
+        try {
+            std::string UUID;
+            std::function<bool(const ProvObjects::Venue &E)> Function = [&UUID,IP] (const ProvObjects::Venue &E) ->bool {
+                if(E.sourceIP.empty())
+                    return true;
+                if(CIDR::IpInRanges(IP, E.sourceIP)) {
+                    UUID = E.info.id;
+                    return false;
+                }
+                return true;
+            };
+            Iterate(Function);
+        } catch (const Poco::Exception &E) {
+            Logger().log(E);
+        }
+        return false;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::VenueDBRecordType &In, OpenWifi::ProvObjects::Venue &Out) {
@@ -90,6 +112,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.rrm = In.get<14>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
     Out.deviceConfiguration = In.get<16>();
+    OpenWifi::Types::from_string(In.get<17>(), Out.sourceIP);
+
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -110,4 +134,5 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<14>(In.rrm);
     Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<16>(In.deviceConfiguration);
+    Out.set<17>(OpenWifi::Types::to_string(In.sourceIP));
 }
