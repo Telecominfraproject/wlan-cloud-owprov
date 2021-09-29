@@ -6,8 +6,6 @@
 //	Arilia Wireless Inc.
 //
 
-/// test
-
 #ifndef UCENTRAL_UCENTRAL_H
 #define UCENTRAL_UCENTRAL_H
 
