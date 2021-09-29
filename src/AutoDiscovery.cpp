@@ -6,6 +6,8 @@
 #include "uCentralProtocol.h"
 #include "KafkaManager.h"
 #include "Kafka_topics.h"
+#include "storage_inventory.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -49,14 +51,15 @@ namespace OpenWifi {
                             if( PingMessage->has(uCentralProtocol::FIRMWARE) &&
                                 PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
                                 PingMessage->has(uCentralProtocol::COMPATIBLE)) {
-                                if(PayloadObj->has(uCentralProtocol::CONNECTIONIP) )
-                                    ConnectedIP = PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
+                                if(PingMessage->has(uCentralProtocol::CONNECTIONIP) )
+                                    ConnectedIP = PingMessage->get(uCentralProtocol::CONNECTIONIP).toString();
                                 SerialNumber = PingMessage->get( uCentralProtocol::SERIALNUMBER).toString();
                                 DeviceType = PingMessage->get( uCentralProtocol::COMPATIBLE).toString();
                             }
                         }
                         if(!SerialNumber.empty()) {
                             std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
+                            Storage()->InventoryDB().CreateFromInventory(SerialNumber,ConnectedIP,DeviceType);
                         }
                     }
                 } catch (const Poco::Exception &E) {

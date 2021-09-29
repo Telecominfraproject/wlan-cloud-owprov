@@ -61,6 +61,10 @@ namespace OpenWifi {
             uint64_t Now = std::time(nullptr);
 
             auto Tokens = Poco::StringTokenizer(ConnectionInfo,"@:");
+            std::string IP;
+            if(Tokens.count()==3) {
+                IP = Tokens[1];
+            }
 
             NewDevice.info.id = Daemon()->CreateUUID();
             NewDevice.info.name = SerialNumber;
@@ -70,7 +74,7 @@ namespace OpenWifi {
             NewDevice.deviceType = DeviceType;
 
             if(CreateRecord(NewDevice)) {
-                std::cout << "Added " << SerialNumber << " to DB with IP=" << Tokens[1] << std::endl;
+                std::cout << "Added " << SerialNumber << " to DB with IP=" << IP << std::endl;
                 Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
                 return true;
             } else {
