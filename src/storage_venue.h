@@ -39,6 +39,7 @@ namespace OpenWifi {
     public:
         VenueDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         bool CreateShortCut(ProvObjects::Venue &V);
+        bool GetByIP(const std::string &IP, std::string & uuid);
     private:
     };
 }

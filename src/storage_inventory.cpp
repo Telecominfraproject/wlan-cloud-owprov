@@ -78,7 +78,7 @@ namespace OpenWifi {
                 Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
                 return true;
             } else {
-                std::cout << "Could not add " << SerialNumber << " to DB." << std::endl;
+                Logger().information(Poco::format("Could not add %s to inventory.",SerialNumber));
             }
         }
         return false;

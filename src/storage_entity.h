@@ -47,6 +47,7 @@ namespace OpenWifi {
         void ImportTree(const Poco::JSON::Object::Ptr &Ptr, const std::string & Node = RootUUID_ );
         void ImportVenues(const Poco::JSON::Object::Ptr &Ptr, const std::string & Node = RootUUID_ );
         bool CreateShortCut( ProvObjects::Entity & E);
+        bool GetByIP(const std::string &IP, std::string & uuid);
     private:
         bool RootExists_=false;
     };
