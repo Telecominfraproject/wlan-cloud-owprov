@@ -407,8 +407,6 @@ namespace ORM {
                         (Where.empty() ? "" : " where " + Where) +
                         ComputeRange(Offset, HowMany) ;
 
-                // std::cout << "GetRecords: " << St << std::endl;
-
                 Select  << St ,
                     Poco::Data::Keywords::into(RL);
 

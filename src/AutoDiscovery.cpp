@@ -58,7 +58,7 @@ namespace OpenWifi {
                             }
                         }
                         if(!SerialNumber.empty()) {
-                            std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
+                            // std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
                             Storage()->InventoryDB().CreateFromInventory(SerialNumber,ConnectedIP,DeviceType);
                         }
                     }
