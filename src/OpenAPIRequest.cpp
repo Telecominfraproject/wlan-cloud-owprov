@@ -117,6 +117,8 @@ namespace OpenWifi {
 	                ResponseObject = P.parse(is).extract<Poco::JSON::Object::Ptr>();
 	                std::cout << "Response OK" << std::endl;
 	            } else {
+	                Poco::JSON::Parser	P;
+	                ResponseObject = P.parse(is).extract<Poco::JSON::Object::Ptr>();
 	                std::cout << "Response: " << Response.getStatus() << std::endl;
 	            }
 	            return Response.getStatus();
