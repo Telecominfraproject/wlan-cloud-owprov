@@ -5,10 +5,13 @@
 #include <iostream>
 #include <fstream>
 #include "ConfigurationValidator.h"
-
+#include "Utils.h"
 #include "Daemon.h"
 
 namespace OpenWifi {
+
+    static const std::string GitUCentralJSONSchemaFile{"https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
+
     static json DefaultUCentralSchema = R"(
 {
     "$id": "https://openwrt.org/ucentral.schema.json",
@@ -2158,19 +2161,23 @@ namespace OpenWifi {
         if(Initialized_)
             return;
 
-        std::string FileName{ Daemon()->DataDir() + "/ucentral.schema.json" };
-        try {
-            std::ifstream       input(FileName);
-            std::stringstream   schema_file;
-            schema_file << input.rdbuf();
-            input.close();
-            auto schema = json::parse(schema_file.str());
-            Validator_->set_root_schema(schema);
-            Initialized_ = Working_ = true;
-        } catch (const std::exception &E ) {
-            Validator_->set_root_schema(DefaultUCentralSchema);
-            Initialized_ = Working_ = true;
+        std::string GitSchema;
+        if(Utils::wgets(GitUCentralJSONSchemaFile, GitSchema)) {
+
+        } else {
+            std::string FileName{ Daemon()->DataDir() + "/ucentral.schema.json" };
+            try {
+                std::ifstream       input(FileName);
+                std::stringstream   schema_file;
+                schema_file << input.rdbuf();
+                input.close();
+                GitSchema = schema_file.str();
+            } catch (const Poco::Exception &E) {
+                GitSchema = DefaultUCentralSchema;
+            }
         }
+        Validator_->set_root_schema(GitSchema);
+        Initialized_ = Working_ = true;
     }
 
     bool ConfigurationValidator::Validate(const std::string &C) {

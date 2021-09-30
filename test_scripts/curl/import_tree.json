@@ -42,7 +42,11 @@
 					{
 						"type": "entity",
 						"name": "BC",
-						"children": [],
+						"children": [{
+                                        "type": "entity",
+                                        "name": "Bowen",
+                                        "children": [],
+                                        "venues": []}],
 						"venues": [{
 								"type": "venue",
 								"name": "BC Place",
