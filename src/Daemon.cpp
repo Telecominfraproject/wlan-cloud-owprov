@@ -20,6 +20,7 @@
 #include "RESTAPI_InternalServer.h"
 #include "SecurityDBProxy.h"
 #include "AutoDiscovery.h"
+#include "ConfigurationValidator.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -33,6 +34,7 @@ namespace OpenWifi {
 								   vDAEMON_BUS_TIMER,
 								   Types::SubSystemVec{
 									   OpenWifi::Storage(),
+									   ConfigurationValidator(),
 									   AuthClient(),
 									   RESTAPI_server(),
 									   RESTAPI_InternalServer(),
