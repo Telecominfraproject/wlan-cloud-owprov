@@ -59,7 +59,7 @@ namespace OpenWifi {
         std::unique_ptr<json_validator>  Validator_=std::make_unique<json_validator>(nullptr, my_format_checker);
 
         ConfigurationValidator():
-            SubSystemServer("KafkaManager", "KAFKA-SVR", "openwifi.kafka") {
+            SubSystemServer("configvalidator", "CFG-VALIDATOR", "config.validator") {
         }
     };
 
