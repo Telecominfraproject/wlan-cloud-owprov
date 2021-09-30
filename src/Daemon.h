@@ -50,6 +50,7 @@ namespace OpenWifi {
 			void initialize(Poco::Util::Application &self);
 			static Daemon *instance();
 			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
+			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }
 	  	private:
 			static Daemon 				*instance_;
 			OpenWifi::TopoDashboard		DB_{};
