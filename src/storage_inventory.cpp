@@ -95,7 +95,10 @@ namespace OpenWifi {
                 if(!FullUUID.empty()) {
                     Poco::JSON::Object::Ptr Response;
                     if(SDK::DeviceSetVenue(NewDevice.serialNumber,FullUUID,Response)) {
+                        std::cout << "Set GW done " << SerialNumber << std::endl;
                         Logger().information(Poco::format("%s: GW set entity/venue property.", NewDevice.serialNumber));
+                    } else {
+                        std::cout << "Could not set GW " << SerialNumber << std::endl;
                     }
                 }
 
