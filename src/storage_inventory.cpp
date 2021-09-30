@@ -14,6 +14,7 @@
 #include "RESTAPI_SecurityObjects.h"
 #include "Daemon.h"
 #include "StorageService.h"
+#include "SDK_stubs.h"
 
 namespace OpenWifi {
 
@@ -54,7 +55,7 @@ namespace OpenWifi {
     InventoryDB::InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
 
-    bool InventoryDB::CreateFromInventory(const std::string &SerialNumber, const std::string &ConnectionInfo,
+        bool InventoryDB::CreateFromConnection(const std::string &SerialNumber, const std::string &ConnectionInfo,
                                           const std::string &DeviceType) {
         std::string SNum{SerialNumber};
         if(!Exists("serialNumber",SNum)) {
@@ -81,10 +82,23 @@ namespace OpenWifi {
             }
 
             if(CreateRecord(NewDevice)) {
-                if(!NewDevice.entity.empty())
+                std::string FullUUID;
+                if(!NewDevice.entity.empty()) {
                     Storage()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
-                else if(!NewDevice.venue.empty())
+                    FullUUID = Storage()->EntityDB().Prefix() + ":" + NewDevice.entity;
+                }
+                else if(!NewDevice.venue.empty()) {
                     Storage()->VenueDB().AddDevice("id",NewDevice.venue,NewDevice.info.id);
+                    FullUUID = Storage()->VenueDB().Prefix() + ":" + NewDevice.venue;
+                }
+
+                if(!FullUUID.empty()) {
+                    Poco::JSON::Object::Ptr Response;
+                    if(SDK::DeviceSetVenue(NewDevice.serialNumber,FullUUID,Response)) {
+                        Logger().information(Poco::format("%s: GW set entity/venue property.", NewDevice.serialNumber));
+                    }
+                }
+
                 Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
                 return true;
             } else {

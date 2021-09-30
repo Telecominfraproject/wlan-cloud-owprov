@@ -28,6 +28,22 @@ namespace OpenWifi {
 		Types::StringPairVec 	QueryData_;
 		uint64_t 				msTimeout_;
 	};
+
+	class OpenAPIRequestPut {
+        public:
+            explicit OpenAPIRequestPut( std::string Type,
+                                        std::string EndPoint,
+                                        Types::StringPairVec & QueryData,
+                                        Poco::JSON::Object Body,
+                                        uint64_t msTimeout);
+            int Do(Poco::JSON::Object::Ptr &ResponseObject);
+        private:
+            std::string 			Type_;
+            std::string 			EndPoint_;
+            Types::StringPairVec 	QueryData_;
+            uint64_t 				msTimeout_;
+            Poco::JSON::Object      Body_;
+	};
 }
 
 #endif // UCENTRALGW_OPENAPIREQUEST_H

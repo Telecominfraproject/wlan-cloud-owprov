@@ -69,4 +69,60 @@ namespace OpenWifi {
 		}
 		return -1;
 	}
+
+	OpenAPIRequestPut::OpenAPIRequestPut( std::string ServiceType,
+                std::string EndPoint,
+                Types::StringPairVec & QueryData,
+                Poco::JSON::Object Body,
+                uint64_t msTimeout) :
+                    Type_(std::move(ServiceType)),
+                    EndPoint_(std::move(EndPoint)),
+                    QueryData_(QueryData),
+                    msTimeout_(msTimeout),
+                    Body_(std::move(Body)){}
+
+	    int OpenAPIRequestPut::Do(Poco::JSON::Object::Ptr &ResponseObject) {
+	    try {
+	        auto Services = Daemon()->GetServices(Type_);
+	        for(auto const &Svc:Services) {
+	            Poco::URI	URI(Svc.PrivateEndPoint);
+	            Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
+
+	            URI.setPath(EndPoint_);
+	            for (const auto &qp : QueryData_)
+	                URI.addQueryParameter(qp.first, qp.second);
+
+	            std::string Path(URI.getPathAndQuery());
+	            Session.setTimeout(Poco::Timespan(msTimeout_/1000, msTimeout_ % 1000));
+
+	            Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_POST,
+                                               Path,
+                                               Poco::Net::HTTPMessage::HTTP_1_1);
+	            std::ostringstream obody;
+	            Poco::JSON::Stringifier::stringify(Body_,obody);
+
+	            Request.setContentType("application/json");
+	            Request.setContentLength(obody.str().size());
+
+	            Request.add("X-API-KEY", Svc.AccessKey);
+	            Request.add("X-INTERNAL-NAME", Daemon()->PublicEndPoint());
+
+	            std::ostream & os = Session.sendRequest(Request);
+	            os << obody.str();
+
+	            Poco::Net::HTTPResponse Response;
+	            std::istream &is = Session.receiveResponse(Response);
+	            if(Response.getStatus()==Poco::Net::HTTPResponse::HTTP_OK) {
+	                Poco::JSON::Parser	P;
+	                ResponseObject = P.parse(is).extract<Poco::JSON::Object::Ptr>();
+	            }
+	            return Response.getStatus();
+	        }
+	    }
+	    catch (const Poco::Exception &E)
+	    {
+	        std::cerr << E.displayText() << std::endl;
+	    }
+	    return -1;
+	}
 }

@@ -59,7 +59,7 @@ namespace OpenWifi {
                         }
                         if(!SerialNumber.empty()) {
                             // std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
-                            Storage()->InventoryDB().CreateFromInventory(SerialNumber,ConnectedIP,DeviceType);
+                            Storage()->InventoryDB().CreateFromConnection(SerialNumber,ConnectedIP,DeviceType);
                         }
                     }
                 } catch (const Poco::Exception &E) {
