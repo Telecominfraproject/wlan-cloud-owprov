@@ -58,7 +58,6 @@ namespace OpenWifi {
         try {
             std::string UUID;
             std::function<bool(const ProvObjects::Entity &E)> Function = [&UUID,IP] (const ProvObjects::Entity &E) ->bool {
-                std::cout << "Name:" << E.info.name << " Size:" << E.sourceIP.size() << std::endl;
                 if(E.sourceIP.empty())
                     return true;
                 if(CIDR::IpInRanges(IP, E.sourceIP)) {
@@ -69,8 +68,6 @@ namespace OpenWifi {
             };
             Iterate(Function);
             uuid=UUID;
-            if(!uuid.empty())
-                std::cout << "Found entity: " << uuid << std::endl;
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }

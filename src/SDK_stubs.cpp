@@ -21,7 +21,12 @@ namespace OpenWifi::SDK {
                                       10000);
         if(R.Do(Response) == Poco::Net::HTTPResponse::HTTP_OK) {
             return true;
+        } else {
+            std::ostringstream os;
+            Poco::JSON::Stringifier::stringify(Response,os);
+            std::cout << "Response: " << os.str() << std::endl;
         }
+
         return false;
     }
 
