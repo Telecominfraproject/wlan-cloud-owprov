@@ -24,7 +24,7 @@ namespace OpenWifi::SDK {
         } else {
             std::ostringstream os;
             Poco::JSON::Stringifier::stringify(Response,os);
-            std::cout << "Response: " << os.str() << std::endl;
+            // std::cout << "Response: " << os.str() << std::endl;
         }
 
         return false;

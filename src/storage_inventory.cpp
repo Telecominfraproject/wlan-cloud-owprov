@@ -95,13 +95,13 @@ namespace OpenWifi {
                 if(!FullUUID.empty()) {
                     Poco::JSON::Object::Ptr Response;
                     if(SDK::DeviceSetVenue(NewDevice.serialNumber,FullUUID,Response)) {
-                        std::cout << "Set GW done " << SerialNumber << std::endl;
+                        // std::cout << "Set GW done " << SerialNumber << std::endl;
                         Logger().information(Poco::format("%s: GW set entity/venue property.", NewDevice.serialNumber));
                     } else {
-                        std::cout << "Could not set GW " << SerialNumber << std::endl;
+                        // std::cout << "Could not set GW " << SerialNumber << std::endl;
+                        Logger().information(Poco::format("%s: could not set GW entity/venue property.", NewDevice.serialNumber));
                     }
                 }
-
                 Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
                 return true;
             } else {
