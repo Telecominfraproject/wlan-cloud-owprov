@@ -181,7 +181,7 @@ namespace OpenWifi{
         }
 
         if(RawObject->has("sourceIP")) {
-            if(!NewEntity.sourceIP.empty() && CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
+            if(!NewEntity.sourceIP.empty() && !CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
                 BadRequest(RESTAPI::Errors::InvalidIPRanges);
                 return;
             }
