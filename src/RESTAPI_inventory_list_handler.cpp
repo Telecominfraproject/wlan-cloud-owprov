@@ -43,6 +43,14 @@ namespace OpenWifi{
         if(HasParameter("serialOnly",Arg) && Arg=="true")
             SerialOnly=true;
 
+        std::string OrderBy{"serialnumber:a"};
+        if(HasParameter("orderBy",Arg)) {
+            if(!Storage()->InventoryDB().PrepareOrderBy(Arg,OrderBy)) {
+                BadRequest(RESTAPI::Errors::InvalidLOrderBy);
+                return;
+            }
+        }
+
         if(!QB_.Select.empty()) {
             auto DevUUIDS = Utils::Split(QB_.Select);
             ProvObjects::InventoryTagVec Tags;
@@ -64,7 +72,7 @@ namespace OpenWifi{
                 return;
             }
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
+            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("entity",ORM::EQ,UUID), OrderBy);
             SendList(Tags, SerialOnly);
             return;
         } else if(HasParameter("venue",UUID)) {
@@ -74,7 +82,7 @@ namespace OpenWifi{
                 return;
             }
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
+            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("venue",ORM::EQ,UUID), OrderBy);
             SendList( Tags, SerialOnly);
             return;
         } else if(HasParameter("unassigned",Arg) && Arg=="true") {
@@ -88,7 +96,7 @@ namespace OpenWifi{
             ProvObjects::InventoryTagVec Tags;
             std::string Empty;
             Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
-                                                                                              ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ) );
+                                                                                              ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ) , OrderBy );
             SendList(Tags, SerialOnly);
             return;
         } else if(QB_.CountOnly) {
@@ -97,7 +105,7 @@ namespace OpenWifi{
             return;
         } else {
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags);
+            Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
             Poco::JSON::Array   Arr;
             for(const auto &i:Tags) {
                 Poco::JSON::Object  O;

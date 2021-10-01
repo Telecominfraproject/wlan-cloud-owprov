@@ -26,7 +26,7 @@ namespace OpenWifi {
         ORM::Field{"notes",ORM::FieldType::FT_TEXT},
         ORM::Field{"created",ORM::FieldType::FT_BIGINT},
         ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
-        ORM::Field{"serialNumber",ORM::FieldType::FT_TEXT},
+        ORM::Field{"serialnumber",ORM::FieldType::FT_TEXT},
         ORM::Field{"venue",ORM::FieldType::FT_TEXT},
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"subscriber",ORM::FieldType::FT_TEXT},

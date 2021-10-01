@@ -23,6 +23,7 @@
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Logger.h"
+#include "Poco/StringTokenizer.h"
 
 namespace ORM {
     enum DBType {
@@ -398,13 +399,13 @@ namespace ORM {
 
         typedef std::vector<RecordTuple> RecordList;
 
-        bool GetRecords( uint64_t Offset, uint64_t HowMany, std::vector<RecordType> & Records, const std::string & Where = "") {
+        bool GetRecords( uint64_t Offset, uint64_t HowMany, std::vector<RecordType> & Records, const std::string & Where = "", const std::string & OrderBy = "") {
             try {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordList RL;
                 std::string St = "select " + SelectFields_ + " from " + DBName +
-                        (Where.empty() ? "" : " where " + Where) +
+                        (Where.empty() ? "" : " where " + Where) + OrderBy +
                         ComputeRange(Offset, HowMany) ;
 
                 Select  << St ,
@@ -546,6 +547,34 @@ namespace ORM {
                 Logger_.log(E);
             }
             return false;
+        }
+
+        bool PrepareOrderBy(const std::string &OrderByList, std::string &OrderByString) {
+            auto items = Poco::StringTokenizer(OrderByList,",");
+            std::string ItemList;
+
+            for(const auto &i:items) {
+                auto T = Poco::StringTokenizer(i,":");
+                if(T.count()!=2) {
+                    return false;
+                }
+                if(T[1]!="a" && T[1]!="d") {
+                    return false;
+                }
+                if(!ItemList.empty())
+                    ItemList += " , ";
+                auto hint = FieldNames_.find(T[0]);
+                if(hint==FieldNames_.end()) {
+                    return false;
+                }
+                ItemList += T[0] + (T[1]=="a" ? " ASC" : " DESC");
+            }
+
+            if(!ItemList.empty()) {
+                OrderByString = " ORDER BY " + ItemList;
+            }
+
+            return true;
         }
 
         uint64_t Count( const std::string & Where="" ) {
