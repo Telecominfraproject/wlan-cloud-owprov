@@ -43,7 +43,7 @@ namespace OpenWifi{
         if(HasParameter("serialOnly",Arg) && Arg=="true")
             SerialOnly=true;
 
-        std::string OrderBy{"serialnumber:a"};
+        std::string OrderBy{" ORDER BY serialnumber ASC "};
         if(HasParameter("orderBy",Arg)) {
             if(!Storage()->InventoryDB().PrepareOrderBy(Arg,OrderBy)) {
                 BadRequest(RESTAPI::Errors::InvalidLOrderBy);
