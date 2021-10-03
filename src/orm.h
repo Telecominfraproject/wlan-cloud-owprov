@@ -52,6 +52,12 @@ namespace ORM {
         bool        Index=false;
 
 
+        Field(std::string N, FieldType T, int S=0, bool Index=false) :
+            Name(std::move(N)),
+            Type(T),
+            Size(S),
+            Index(Index) {}
+
         explicit Field(std::string N) :
             Name(std::move(N))
         {
@@ -61,13 +67,19 @@ namespace ORM {
         Field(std::string N, int S) :
             Name(std::move(N)), Size(S)
         {
-            Type = FT_TEXT;
+            if(Size>0 && Size<255)
+                Type = FT_VARCHAR;
+            else
+                Type = FT_TEXT;
         }
 
         Field(std::string N, int S, bool I):
             Name(std::move(N)), Size(S), Index(I)
         {
-            Type = FT_TEXT;
+            if(Size>0 && Size<255)
+                Type = FT_VARCHAR;
+            else
+                Type = FT_TEXT;
         }
     };
     typedef std::vector<Field>  FieldVec;
