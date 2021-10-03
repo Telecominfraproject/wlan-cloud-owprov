@@ -12,7 +12,7 @@ namespace OpenWifi {
 
     static  ORM::FieldVec    TagsDictionary_Fields{
         // object info
-        ORM::Field{"entity",ORM::FieldType::FT_INT, 64},
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT, 64},
         ORM::Field{"id",ORM::FieldType::FT_INT, 0,true},
         ORM::Field{"name",ORM::FieldType::FT_TEXT, 32, }
     };
@@ -29,7 +29,7 @@ namespace OpenWifi {
 
     static  ORM::FieldVec    TagsObject_Fields{
         // object info
-        ORM::Field{"entity",ORM::FieldType::FT_INT, 64},
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT, 64},
         ORM::Field{"arn",ORM::FieldType::FT_TEXT, 64,true},      // ARN:uuid
         ORM::Field{"entries",ORM::FieldType::FT_TEXT}
     };
