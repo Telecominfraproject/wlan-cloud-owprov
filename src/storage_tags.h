@@ -10,18 +10,20 @@
 
 namespace OpenWifi {
     struct TagsDictionary {
+        std::string     entity;
         uint32_t        id=0;
         std::string     name;
     };
 
     typedef Poco::Tuple<
+        std::string,
         uint32_t,
         std::string
     > TagsDictionaryRecordType;
 
     struct TagsObject {
-        std::string         uuid;
-        std::string         prefix;
+        std::string         entity;
+        std::string         arn;    // <prefix>:uuid
         Types::StringVec    entries;
     };
 

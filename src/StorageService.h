@@ -30,7 +30,10 @@
 #include "storage_inventory.h"
 #include "storage_management_roles.h"
 #include "storage_configurations.h"
+#include "storage_tags.h"
+
 #include "SecurityDBProxy.h"
+
 
 namespace OpenWifi {
 
@@ -57,6 +60,8 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		OpenWifi::InventoryDB & InventoryDB() { return *InventoryDB_; };
 		OpenWifi::ManagementRoleDB & RolesDB() { return *RolesDB_; };
 		OpenWifi::ConfigurationDB & ConfigurationDB() { return *ConfigurationDB_; };
+		OpenWifi::TagsDictionaryDB & TagsDictionaryDB() { return *TagsDictionaryDB_; };
+		OpenWifi::TagsObjectDB & TagsObjectDB() { return *TagsObjectDB_; };
 
 		bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
@@ -91,8 +96,8 @@ class Storage : public SubSystemServer, Poco::Runnable {
 		std::unique_ptr<OpenWifi::InventoryDB>              InventoryDB_;
 		std::unique_ptr<OpenWifi::ManagementRoleDB>         RolesDB_;
 		std::unique_ptr<OpenWifi::ConfigurationDB>          ConfigurationDB_;
-
-
+		std::unique_ptr<OpenWifi::TagsDictionaryDB>         TagsDictionaryDB_;
+		std::unique_ptr<OpenWifi::TagsObjectDB>             TagsObjectDB_;
 
 		typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
 		typedef std::function<bool(const char *FieldName, std::string &Value, std::string &Name, std::string &Description)>   expand_func;
