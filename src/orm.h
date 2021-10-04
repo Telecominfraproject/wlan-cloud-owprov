@@ -534,7 +534,7 @@ namespace ORM {
             return false;
         }
 
-        bool Iterate( std::function<bool(const RecordType &R)> &F) {
+        bool Iterate( std::function<bool(const RecordType &R)> F) {
             try {
 
                 uint64_t    Offset=1;

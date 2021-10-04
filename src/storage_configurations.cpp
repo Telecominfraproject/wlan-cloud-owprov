@@ -29,7 +29,9 @@ namespace OpenWifi {
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"variables",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
-        ORM::Field{"tags",ORM::FieldType::FT_TEXT}
+        ORM::Field{"tags",ORM::FieldType::FT_TEXT},
+        ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT},
+        ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_INT}
     };
 
     static  ORM::IndexVec    ConfigurationDB_Indexes{
@@ -57,6 +59,8 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     OpenWifi::Types::from_string(In.get<10>(), Out.variables);
     Out.rrm = In.get<11>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<12>());
+    Out.firmwareUpgrade = In.get<13>();
+    Out.firmwareRCOnly = In.get<14>();
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(OpenWifi::ProvObjects::DeviceConfiguration &In, OpenWifi::ConfigurationDBRecordType &Out) {
@@ -73,4 +77,6 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<10>(OpenWifi::Types::to_string(In.variables));
     Out.set<11>(In.rrm);
     Out.set<12>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
+    Out.set<13>(In.firmwareUpgrade);
+    Out.set<14>(In.firmwareRCOnly);
 }

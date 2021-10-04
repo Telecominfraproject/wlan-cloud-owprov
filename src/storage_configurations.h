@@ -28,7 +28,9 @@ namespace OpenWifi {
     std::string,
     std::string,
     std::string,
-    std::string
+    std::string,
+    std::string,
+    uint32_t
     > ConfigurationDBRecordType;
 
     class ConfigurationDB : public ORM::DB<ConfigurationDBRecordType, ProvObjects::DeviceConfiguration> {

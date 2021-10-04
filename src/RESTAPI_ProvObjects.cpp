@@ -354,6 +354,8 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"inUse",inUse);
         RESTAPI_utils::field_to_json( Obj,"variables",variables);
         RESTAPI_utils::field_to_json( Obj,"rrm",rrm);
+        RESTAPI_utils::field_to_json( Obj,"firmwareUpgrade",firmwareUpgrade);
+        RESTAPI_utils::field_to_json( Obj,"firmwareRCOnly",firmwareRCOnly);
     }
 
     bool DeviceConfiguration::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -365,6 +367,8 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"inUse",inUse);
             RESTAPI_utils::field_from_json( Obj,"variables",variables);
             RESTAPI_utils::field_from_json( Obj,"rrm",rrm);
+            RESTAPI_utils::field_from_json( Obj,"firmwareUpgrade",firmwareUpgrade);
+            RESTAPI_utils::field_from_json( Obj,"firmwareRCOnly",firmwareRCOnly);
             return true;
         } catch(...) {
 

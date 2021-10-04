@@ -254,7 +254,9 @@ namespace OpenWifi::ProvObjects {
         DeviceConfigurationElementVec   configuration;
         Types::StringVec                inUse;
         Types::StringPairVec            variables;
-        std::string             rrm;
+        std::string                     rrm;
+        std::string                     firmwareUpgrade;
+        bool                            firmwareRCOnly=false;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

@@ -483,6 +483,11 @@ components:
             - off
             - on
             - inherit
+        firmwareUpgrade:
+          type: string
+          example: "auto" or a time string of the format "DOW-HH:MM"
+        firmwareRCOnly:
+          type: boolean
 
     DeviceConfigurationList:
       type: object
