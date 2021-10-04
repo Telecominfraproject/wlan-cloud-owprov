@@ -211,6 +211,8 @@ namespace OpenWifi{
         AssignIfPresent(ParsedObj,"description", Existing.info.description);
         AssignIfPresent(ParsedObj, "rrm", Existing.rrm);
         NewConfig.info.modified = std::time(nullptr);
+        AssignIfPresent(ParsedObj,"firmwareUpgrade",Existing.firmwareUpgrade);
+        AssignIfPresent(ParsedObj,"firmwareRCOnly", Existing.firmwareRCOnly);
 
         if(!NewConfig.variables.empty())
             Existing.variables = NewConfig.variables;
