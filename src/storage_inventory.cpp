@@ -111,7 +111,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForEntity(std::string &EntityUUID, std::string &firmwareUpgrade,
+    bool InventoryDB::FindFirmwareOptionsForEntity(const std::string &EntityUUID, std::string &firmwareUpgrade,
                                                    bool &firmwareRCOnly) {
         std::string UUID = EntityUUID;
         while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
@@ -142,7 +142,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForVenue(std::string &VenueUUID, std::string &firmwareUpgrade,
+    bool InventoryDB::FindFirmwareOptionsForVenue(const std::string &VenueUUID, std::string &firmwareUpgrade,
                                                    bool &firmwareRCOnly) {
         std::string UUID = VenueUUID;
         while(!UUID.empty()) {
