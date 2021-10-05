@@ -1,0 +1,258 @@
+# System
+replicaCount: 1
+strategyType: Recreate
+
+nameOverride: ""
+fullnameOverride: ""
+
+images:
+  owprov:
+    repository: tip-tip-wlan-cloud-ucentral.jfrog.io/owprov
+    tag: main
+    pullPolicy: Always
+#    regcred:
+#      registry: tip-tip-wlan-cloud-ucentral.jfrog.io
+#      username: username
+#      password: password
+
+services:
+  owprov:
+    type: LoadBalancer
+    ports:
+      restapi:
+        servicePort: 16005
+        targetPort: 16005
+        protocol: TCP
+      restapiinternal:
+        servicePort: 17005
+        targetPort: 17005
+        protocol: TCP
+
+checks:
+  owprov:
+    liveness:
+      httpGet:
+        path: /
+        port: 16105
+    readiness:
+      httpGet:
+        path: /
+        port: 16105
+
+ingresses:
+  restapi:
+    enabled: false
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+    - restapi.chart-example.local
+    paths:
+    - path: /
+      serviceName: owprov
+      servicePort: restapi
+
+volumes:
+  owprov:
+    - name: config
+      mountPath: /owprov-data/owprov.properties
+      subPath: owprov.properties
+      # Template below will be rendered in template
+      volumeDefinition: |
+        secret:
+          secretName: {{ include "owprov.fullname" . }}-config
+    - name: certs
+      mountPath: /owprov-data/certs
+      volumeDefinition: |
+        secret:
+          secretName: {{ include "owprov.fullname" . }}-certs
+    # Change this if you want to use another volume type
+    - name: persist
+      mountPath: /owprov-data/persist
+      volumeDefinition: |
+        persistentVolumeClaim:
+          claimName: {{ template "owprov.fullname" . }}-pvc
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+  enabled: true
+  # storageClassName: "-"
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+# Application
+public_env_variables:
+  OWPROV_ROOT: /owprov-data
+  OWPROV_CONFIG: /owprov-data
+
+secret_env_variables: {}
+
+configProperties:
+  # -> Public part
+  # REST API
+  openwifi.restapi.host.0.backlog: 100
+  openwifi.restapi.host.0.security: relaxed
+  openwifi.restapi.host.0.rootca: $OWPROV_ROOT/certs/restapi-ca.pem
+  openwifi.restapi.host.0.address: "*"
+  openwifi.restapi.host.0.port: 16005
+  openwifi.restapi.host.0.cert: $OWPROV_ROOT/certs/restapi-cert.pem
+  openwifi.restapi.host.0.key: $OWPROV_ROOT/certs/restapi-key.pem
+  openwifi.internal.restapi.host.0.backlog: 100
+  openwifi.internal.restapi.host.0.security: relaxed
+  openwifi.internal.restapi.host.0.rootca: $OWPROV_ROOT/certs/restapi-ca.pem
+  openwifi.internal.restapi.host.0.address: "*"
+  openwifi.internal.restapi.host.0.port: 17005
+  openwifi.internal.restapi.host.0.cert: $OWPROV_ROOT/certs/restapi-cert.pem
+  openwifi.internal.restapi.host.0.key: $OWPROV_ROOT/certs/restapi-key.pem
+  # ALB
+  alb.enable: "true"
+  alb.port: 16105
+  # Kafka
+  openwifi.kafka.enable: "false"
+  openwifi.kafka.group.id: prov
+  openwifi.kafka.client.id: prov1
+  openwifi.kafka.brokerlist: localhost:9092
+  openwifi.kafka.auto.commit: false
+  openwifi.kafka.queue.buffering.max.ms: 50
+  # Storage
+  storage.type: sqlite # (sqlite|postgresql|mysql|odbc)
+  ## SQLite
+  storage.type.sqlite.db: prov.db
+  storage.type.sqlite.idletime: 120
+  storage.type.sqlite.maxsessions: 128
+  ## PostgreSQL
+  storage.type.postgresql.maxsessions: 64
+  storage.type.postgresql.idletime: 60
+  storage.type.postgresql.host: localhost
+  storage.type.postgresql.database: owprov
+  storage.type.postgresql.port: 5432
+  storage.type.postgresql.connectiontimeout: 60
+  ## MySQL
+  storage.type.mysql.maxsessions: 64
+  storage.type.mysql.idletime: 60
+  storage.type.mysql.host: localhost
+  storage.type.mysql.database: owprov
+  storage.type.mysql.port: 3306
+  storage.type.mysql.connectiontimeout: 60
+  # System
+  openwifi.service.key: $OWPROV_ROOT/certs/restapi-key.pem
+  openwifi.system.data: $OWPROV_ROOT/persist
+  openwifi.system.debug: "true"
+  openwifi.system.uri.private: https://localhost:17005
+  openwifi.system.uri.public: https://localhost:16005
+  openwifi.system.uri.ui: https://localhost
+  openwifi.system.commandchannel: /tmp/app_owprov
+  # Logging
+  logging.formatters.f1.class: PatternFormatter
+  logging.formatters.f1.pattern: "%Y-%m-%d %H:%M:%S %s: [%p] %t"
+  logging.formatters.f1.times: UTC
+  logging.channels.c1.class: ConsoleChannel
+  logging.channels.c1.formatter: f1
+  logging.channels.c2.class: FileChannel
+  logging.channels.c2.path: /tmp/log_owprov
+  logging.channels.c2.formatter.class: PatternFormatter
+  logging.channels.c2.formatter.pattern: "%Y-%m-%d %H:%M:%S %s: [%p] %t"
+  logging.channels.c2.rotation: "20 M"
+  logging.channels.c2.archive: timestamp
+  logging.channels.c2.purgeCount: 20
+  logging.channels.c3.class: ConsoleChannel
+  logging.channels.c3.pattern: "%s: [%p] %t"
+  logging.loggers.root.channel: c1
+  logging.loggers.root.level: debug
+
+  # -> Secret part
+  # REST API
+  openwifi.restapi.host.0.key.password: mypassword
+  openwifi.internal.restapi.host.0.key.password: mypassword
+  # Storage
+  ## PostgreSQL
+  storage.type.postgresql.username: stephb
+  storage.type.postgresql.password: snoopy99
+  ## MySQL
+  storage.type.mysql.username: stephb
+  storage.type.mysql.password: snoopy99
+
+certs:
+  # restapi-ca.pem: ""
+  # restapi-cert.pem: ""
+  # restapi-key.pem: ""
+
+# PostgreSQL (https://github.com/bitnami/charts/tree/master/bitnami/postgresql)
+postgresql:
+  enabled: false
+
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 11.13.0-debian-10-r0
+
+  postgresqlPostgresPassword: ""
+  postgresqlUsername: postgres
+  postgresqlPassword: ""
+  postgresqlDatabase: ""
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 8Gi
+
+# MySQL (https://github.com/bitnami/charts/tree/master/bitnami/mysql)
+mysql:
+  enabled: false
+
+  image:
+    registry: docker.io
+    repository: bitnami/mysql
+    tag: 8.0.26-debian-10-r10
+
+  auth:
+    rootPassword: ""
+    database: my_database
+    username: ""
+    password: ""
+
+  primary:
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 8Gi
+
+# MariaDB (https://github.com/bitnami/charts/tree/master/bitnami/mariadb)
+mariadb:
+  enabled: false
+
+  image:
+    registry: docker.io
+    repository: bitnami/mariadb
+    tag: 10.5.12-debian-10-r0
+
+  auth:
+    rootPassword: ""
+    database: my_database
+    username: ""
+    password: ""
+
+  primary:
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 8Gi
