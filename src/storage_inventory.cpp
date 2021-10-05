@@ -111,6 +111,110 @@ namespace OpenWifi {
         return false;
     }
 
+    bool InventoryDB::FindFirmwareOptionsForEntity(std::string &EntityUUID, std::string &firmwareUpgrade,
+                                                   bool &firmwareRCOnly) {
+        std::string UUID = EntityUUID;
+        while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
+            ProvObjects::Entity                 E;
+            if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
+                if(!E.deviceConfiguration.empty()) {
+                    ProvObjects::DeviceConfiguration    C;
+                    if(Storage()->ConfigurationDB().GetRecord("id",E.deviceConfiguration,C)) {
+                        if(C.firmwareUpgrade=="no") {
+                            firmwareUpgrade="no";
+                            return false;
+                        }
+                        if(C.firmwareUpgrade=="yes") {
+                            firmwareUpgrade="yes";
+                            firmwareRCOnly=C.firmwareRCOnly;
+                            return true;
+                        }
+                    }
+                } else {
+                    UUID = E.parent;
+                }
+            } else {
+                break;
+            }
+        }
+        firmwareUpgrade="no";
+        firmwareRCOnly= false;
+        return false;
+    }
+
+    bool InventoryDB::FindFirmwareOptionsForVenue(std::string &VenueUUID, std::string &firmwareUpgrade,
+                                                   bool &firmwareRCOnly) {
+        std::string UUID = VenueUUID;
+        while(!UUID.empty()) {
+            ProvObjects::Venue                 V;
+            if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
+                if(!V.deviceConfiguration.empty()) {
+                    ProvObjects::DeviceConfiguration    C;
+                    if(Storage()->ConfigurationDB().GetRecord("id",V.deviceConfiguration,C)) {
+                        if(C.firmwareUpgrade=="no") {
+                            firmwareUpgrade="no";
+                            return false;
+                        }
+                        if(C.firmwareUpgrade=="yes") {
+                            firmwareUpgrade="yes";
+                            firmwareRCOnly=C.firmwareRCOnly;
+                            return true;
+                        }
+                    }
+                }
+                //  must be inherit...
+                if(!V.entity.empty()) {
+                    return FindFirmwareOptionsForEntity(V.entity,firmwareUpgrade,firmwareRCOnly);
+                } else {
+                    UUID=V.parent;
+                }
+            } else {
+                break;
+            }
+        }
+        firmwareUpgrade="no";
+        firmwareRCOnly= false;
+        return false;
+    }
+
+    bool InventoryDB::FindFirmwareOptions(std::string &SerialNumber, std::string &firmwareUpgrade,
+                                          bool &firmwareRCOnly) {
+
+        ProvObjects::InventoryTag   T;
+        firmwareRCOnly = false;
+        firmwareUpgrade.clear();
+        if(GetRecord("serialNumber",SerialNumber,T)) {
+            //  if there is a local configuration, use this
+            firmwareRCOnly = false;
+            firmwareUpgrade.clear();
+            if(!T.deviceConfiguration.empty()) {
+                ProvObjects::DeviceConfiguration    C;
+                if(Storage()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
+                    if(C.firmwareUpgrade=="no") {
+                        firmwareUpgrade="no";
+                        return false;
+                    }
+                    if(C.firmwareUpgrade=="yes") {
+                        firmwareUpgrade="yes";
+                        firmwareRCOnly = C.firmwareRCOnly;
+                        return true;
+                    }
+                }
+            }
+
+            //  look at entity...
+            if(!T.entity.empty()) {
+                return FindFirmwareOptionsForEntity(T.entity,firmwareUpgrade,firmwareRCOnly);
+            }
+
+            if(!T.venue.empty()) {
+                return FindFirmwareOptionsForVenue(T.entity,firmwareUpgrade,firmwareRCOnly);
+            }
+            return false;
+        }
+        return false;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::InventoryDBRecordType &In, OpenWifi::ProvObjects::InventoryTag &Out) {

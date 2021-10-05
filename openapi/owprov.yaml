@@ -485,7 +485,7 @@ components:
             - inherit
         firmwareUpgrade:
           type: string
-          example: "auto" or a time string of the format "DOW-HH:MM"
+          example: auto or a time string of the format DOW-HH:MM
         firmwareRCOnly:
           type: boolean
 
@@ -586,6 +586,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExpandedUseEntryMap'
+
+    FirmwareOptions:
+      type: object
+      properties:
+        firmwareUpgrade:
+          type: string
+          example: auto or a time string of the format DOW-HH:MM
+        firmwareRCOnly:
+          type: boolean
+        from:
+          type: string
+
 
     #########################################################################################
     ##
@@ -774,7 +786,7 @@ components:
           items:
             type: string
 
-    SystemGetSubSystemNemesResult:
+    SystemGetSubSystemNamesResult:
       type: object
       properties:
         taglist:
@@ -1389,9 +1401,30 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: config
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: explain
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: firmwareOptions
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
-          $ref: '#/components/schemas/InventoryTag'
+          description: Succesful retrieve configuratiopn or part of the configuration
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InventoryTag'
+                  - $ref: '#/components/schemas/FirmwareOptions'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1414,7 +1447,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InventoryTag'
-
       responses:
         200:
           $ref: '#/components/schemas/InventoryTag'
@@ -2213,7 +2245,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/SystemGetLogLevelsResult'
                   - $ref: '#/components/schemas/SystemCommandGetLogLevelNamesResult'
-                  - $ref: '#/components/schemas/SystemGetSubSystemNemesResult'
+                  - $ref: '#/components/schemas/SystemGetSubSystemNamesResult'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

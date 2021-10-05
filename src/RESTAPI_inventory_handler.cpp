@@ -41,6 +41,18 @@ namespace OpenWifi{
             }
             ReturnObject(Answer);
             return;
+        } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
+            Poco::JSON::Object  Answer;
+
+            std::string firmwareUpgrade;
+            bool firmwareRCOnly=false;
+
+            Storage()->InventoryDB().FindFirmwareOptions(SerialNumber,firmwareUpgrade, firmwareRCOnly);
+
+            Answer.set("firmwareUpgrade",firmwareUpgrade);
+            Answer.set("firmwareRCOnly", firmwareRCOnly);
+            ReturnObject(Answer);
+            return;
         }
 
         Poco::JSON::Object  Answer;
