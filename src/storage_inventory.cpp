@@ -208,7 +208,7 @@ namespace OpenWifi {
             }
 
             if(!T.venue.empty()) {
-                return FindFirmwareOptionsForVenue(T.entity,firmwareUpgrade,firmwareRCOnly);
+                return FindFirmwareOptionsForVenue(T.venue,firmwareUpgrade,firmwareRCOnly);
             }
             return false;
         }
