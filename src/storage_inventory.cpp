@@ -129,6 +129,9 @@ namespace OpenWifi {
                             firmwareRCOnly=C.firmwareRCOnly;
                             return true;
                         }
+                        if(C.firmwareUpgrade.empty() || C.firmwareUpgrade=="inherit") {
+                            UUID = E.parent;
+                        }
                     }
                 } else {
                     UUID = E.parent;
@@ -210,6 +213,7 @@ namespace OpenWifi {
             if(!T.venue.empty()) {
                 return FindFirmwareOptionsForVenue(T.venue,firmwareUpgrade,firmwareRCOnly);
             }
+            firmwareUpgrade="no";
             return false;
         }
         return false;
