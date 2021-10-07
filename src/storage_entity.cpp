@@ -48,7 +48,7 @@ namespace OpenWifi {
                                              ORM::Indextype::ASC} } }
                                 };
 
-    EntityDB::EntityDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    EntityDB::EntityDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L, "ent") {
 
         CheckForRoot();

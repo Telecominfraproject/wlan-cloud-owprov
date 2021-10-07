@@ -38,7 +38,7 @@ namespace OpenWifi {
     class EntityDB : public ORM::DB<EntityDBRecordType, ProvObjects::Entity> {
     public:
         static const std::string RootUUID_;
-        EntityDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        EntityDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         inline bool RootExists() const { return RootExists_; };
         static inline bool IsRoot(const std::string &UUID) { return (UUID == RootUUID_); }
         static inline const std::string RootUUID() { return RootUUID_; }

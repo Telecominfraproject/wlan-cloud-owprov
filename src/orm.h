@@ -24,13 +24,9 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Logger.h"
 #include "Poco/StringTokenizer.h"
+#include "Storage.h"
 
 namespace ORM {
-    enum DBType {
-        sqlite,
-        postgresql,
-        mysql
-    };
 
     enum FieldType {
         FT_INT,
@@ -96,7 +92,7 @@ namespace ORM {
     };
     typedef std::vector<Index>      IndexVec;
 
-    inline std::string FieldTypeToChar(DBType Type, FieldType T, int Size=0) {
+    inline std::string FieldTypeToChar(OpenWifi::DBType Type, FieldType T, int Size=0) {
         switch(T) {
             case FT_INT:    return "INT";
             case FT_BIGINT: return "BIGINT";
@@ -107,11 +103,11 @@ namespace ORM {
                 else
                     return "TEXT";
                 case FT_BLOB:
-                    if(Type==DBType::mysql)
+                    if(Type==OpenWifi::DBType::mysql)
                         return "LONGBLOB";
-                    else if(Type==DBType::postgresql)
+                    else if(Type==OpenWifi::DBType::pgsql)
                         return "BYTEA";
-                    else if(Type==DBType::sqlite)
+                    else if(Type==OpenWifi::DBType::sqlite)
                         return "BLOB";
                     default:
                         assert(false);
@@ -160,7 +156,7 @@ namespace ORM {
 
     template <typename RecordTuple, typename RecordType> class DB {
     public:
-        DB( DBType dbtype,
+        DB( OpenWifi::DBType dbtype,
             const char *TableName,
             const FieldVec & Fields,
             const IndexVec & Indexes,
@@ -200,7 +196,7 @@ namespace ORM {
             SelectList_ += ")";
 
             if(!Indexes.empty()) {
-                if(Type==sqlite || Type==postgresql) {
+                if(Type==OpenWifi::DBType::sqlite || Type==OpenWifi::DBType::pgsql) {
                     for(const auto &j:Indexes) {
                         std::string IndexLine;
 
@@ -217,7 +213,7 @@ namespace ORM {
                         IndexLine += " );";
                         IndexCreation += IndexLine;
                     }
-                } else if(Type==mysql) {
+                } else if(Type==OpenWifi::DBType::mysql) {
                     bool firstIndex = true;
                     std::string IndexLine;
                     for(const auto &j:Indexes) {
@@ -285,12 +281,12 @@ namespace ORM {
         inline bool  Create() {
             std::string S;
 
-            if(Type==mysql) {
+            if(Type==OpenWifi::DBType::mysql) {
                 if(IndexCreation.empty())
                     S = "create table if not exists " + DBName +" ( " + CreateFields_ + " )" ;
                 else
                     S = "create table if not exists " + DBName +" ( " + CreateFields_ + " ), " + IndexCreation + " )";
-            } else if (Type==postgresql || Type==sqlite) {
+            } else if (Type==OpenWifi::DBType::pgsql || Type==OpenWifi::DBType::sqlite) {
                 S = "create table if not exists " + DBName + " ( " + CreateFields_ + " ); " + IndexCreation ;
             }
 
@@ -310,24 +306,22 @@ namespace ORM {
         }
 
         [[nodiscard]] std::string ConvertParams(const std::string & S) const {
+            if(Type!=OpenWifi::DBType::pgsql)
+                return S;
+
             std::string R;
-
             R.reserve(S.size()*2+1);
-
-            if(Type==postgresql) {
-                auto Idx=1;
-                for(auto const & i:S)
-                {
-                    if(i=='?') {
-                        R += '$';
-                        R.append(std::to_string(Idx++));
-                    } else {
-                        R += i;
-                    }
+            auto Idx=1;
+            for(auto const & i:S)
+            {
+                if(i=='?') {
+                    R += '$';
+                    R.append(std::to_string(Idx++));
+                } else {
+                    R += i;
                 }
-            } else {
-                R = S;
             }
+
             return R;
         }
 
@@ -717,11 +711,11 @@ namespace ORM {
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
             if(From<1) From=1;
             switch(Type) {
-                case ORM::sqlite:
+                case OpenWifi::DBType::sqlite:
                     return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) +  " ";
-                case ORM::postgresql:
+                case OpenWifi::DBType::pgsql:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-                case ORM::mysql:
+                    case OpenWifi::DBType::mysql:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
                 default:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
@@ -731,7 +725,7 @@ namespace ORM {
         Poco::Logger & Logger() { return Logger_; }
 
     private:
-        DBType                      Type;
+        OpenWifi::DBType            Type;
         std::string                 DBName;
         std::string                 CreateFields_;
         std::string                 SelectFields_;

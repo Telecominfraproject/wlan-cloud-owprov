@@ -28,7 +28,7 @@ namespace OpenWifi {
 
     class PolicyDB : public ORM::DB<PolicyDBRecordType, ProvObjects::ManagementPolicy> {
     public:
-        PolicyDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        PolicyDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
     private:
     };
 }

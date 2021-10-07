@@ -35,7 +35,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    PolicyDB::PolicyDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    PolicyDB::PolicyDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "policies", PolicyDB_Fields, PolicyDB_Indexes, P, L, "pol") {}
 
 }

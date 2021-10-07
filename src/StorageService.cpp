@@ -28,26 +28,23 @@ namespace OpenWifi {
         std::string DBType = Daemon()->ConfigGetString("storage.type");
 
         if (DBType == "sqlite") {
-            DBType_ = ORM::DBType::sqlite;
             Setup_SQLite();
         } else if (DBType == "postgresql") {
-            DBType_ = ORM::DBType::postgresql;
             Setup_PostgreSQL();
         } else if (DBType == "mysql") {
-            DBType_ = ORM::DBType::mysql;
             Setup_MySQL();
         }
 
-        EntityDB_ = std::make_unique<OpenWifi::EntityDB>(DBType_,*Pool_, Logger_);
-        PolicyDB_ = std::make_unique<OpenWifi::PolicyDB>(DBType_, *Pool_, Logger_);
-        VenueDB_ = std::make_unique<OpenWifi::VenueDB>(DBType_, *Pool_, Logger_);
-        LocationDB_ = std::make_unique<OpenWifi::LocationDB>(DBType_, *Pool_, Logger_);
-        ContactDB_ = std::make_unique<OpenWifi::ContactDB>(DBType_, *Pool_, Logger_);
-        InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(DBType_, *Pool_, Logger_);
-        RolesDB_ = std::make_unique<OpenWifi::ManagementRoleDB>(DBType_, *Pool_, Logger_);
-        ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(DBType_, *Pool_, Logger_);
-        TagsDictionaryDB_ = std::make_unique<OpenWifi::TagsDictionaryDB>(DBType_, *Pool_, Logger_);
-        TagsObjectDB_ = std::make_unique<OpenWifi::TagsObjectDB>(DBType_, *Pool_, Logger_);
+        EntityDB_ = std::make_unique<OpenWifi::EntityDB>(dbType_,*Pool_, Logger_);
+        PolicyDB_ = std::make_unique<OpenWifi::PolicyDB>(dbType_, *Pool_, Logger_);
+        VenueDB_ = std::make_unique<OpenWifi::VenueDB>(dbType_, *Pool_, Logger_);
+        LocationDB_ = std::make_unique<OpenWifi::LocationDB>(dbType_, *Pool_, Logger_);
+        ContactDB_ = std::make_unique<OpenWifi::ContactDB>(dbType_, *Pool_, Logger_);
+        InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(dbType_, *Pool_, Logger_);
+        RolesDB_ = std::make_unique<OpenWifi::ManagementRoleDB>(dbType_, *Pool_, Logger_);
+        ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(dbType_, *Pool_, Logger_);
+        TagsDictionaryDB_ = std::make_unique<OpenWifi::TagsDictionaryDB>(dbType_, *Pool_, Logger_);
+        TagsObjectDB_ = std::make_unique<OpenWifi::TagsObjectDB>(dbType_, *Pool_, Logger_);
 
         EntityDB_->Create();
         PolicyDB_->Create();

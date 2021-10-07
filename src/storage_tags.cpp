@@ -24,7 +24,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    TagsDictionaryDB::TagsDictionaryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    TagsDictionaryDB::TagsDictionaryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "TagsDictionary", TagsDictionary_Fields, TagsDictionaryDB_Indexes, P, L, "tgd") {}
 
     static  ORM::FieldVec    TagsObject_Fields{
@@ -36,7 +36,7 @@ namespace OpenWifi {
 
     static  ORM::IndexVec    TagsObject_Indexes{};
 
-    TagsObjectDB::TagsObjectDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    TagsObjectDB::TagsObjectDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "TagsObject", TagsObject_Fields, TagsObject_Indexes, P, L, "tag") {}
 }
 

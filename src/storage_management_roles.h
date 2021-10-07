@@ -15,22 +15,22 @@
 
 namespace OpenWifi {
     typedef Poco::Tuple<
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    uint64_t,
-    uint64_t,
-    std::string,
-    std::string,
-    std::string,
-    std::string
+        std::string,
+        std::string,
+        std::string,
+        std::string,
+        uint64_t,
+        uint64_t,
+        std::string,
+        std::string,
+        std::string,
+        std::string
     > ManagementRoleDBRecordType;
 
     class ManagementRoleDB : public ORM::DB<ManagementRoleDBRecordType, ProvObjects::ManagementRole> {
-    public:
-        ManagementRoleDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-    private:
+        public:
+            ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        private:
     };
 }
 

@@ -20,7 +20,11 @@ namespace OpenWifi {
 		explicit OpenAPIRequestGet( std::string Type,
 								   	std::string EndPoint,
 									Types::StringPairVec & QueryData,
-									uint64_t msTimeout);
+									uint64_t msTimeout):
+            Type_(std::move(Type)),
+            EndPoint_(std::move(EndPoint)),
+            QueryData_(QueryData),
+            msTimeout_(msTimeout) {};
 		int Do(Poco::JSON::Object::Ptr &ResponseObject);
 	  private:
 		std::string 			Type_;
@@ -35,14 +39,40 @@ namespace OpenWifi {
                                         std::string EndPoint,
                                         Types::StringPairVec & QueryData,
                                         Poco::JSON::Object Body,
-                                        uint64_t msTimeout);
-            int Do(Poco::JSON::Object::Ptr &ResponseObject);
+                                        uint64_t msTimeout):
+            Type_(std::move(Type)),
+            EndPoint_(std::move(EndPoint)),
+            QueryData_(QueryData),
+            msTimeout_(msTimeout),
+            Body_(std::move(Body)){};
+        int Do(Poco::JSON::Object::Ptr &ResponseObject);
         private:
             std::string 			Type_;
             std::string 			EndPoint_;
             Types::StringPairVec 	QueryData_;
             uint64_t 				msTimeout_;
             Poco::JSON::Object      Body_;
+	};
+
+	class OpenAPIRequestPost {
+	public:
+	    explicit OpenAPIRequestPost( std::string Type,
+                                    std::string EndPoint,
+                                    Types::StringPairVec & QueryData,
+                                    Poco::JSON::Object Body,
+                                    uint64_t msTimeout):
+            Type_(std::move(Type)),
+            EndPoint_(std::move(EndPoint)),
+            QueryData_(QueryData),
+            msTimeout_(msTimeout),
+            Body_(std::move(Body)){};
+	    int Do(Poco::JSON::Object::Ptr &ResponseObject);
+	private:
+	    std::string 			Type_;
+	    std::string 			EndPoint_;
+	    Types::StringPairVec 	QueryData_;
+	    uint64_t 				msTimeout_;
+	    Poco::JSON::Object      Body_;
 	};
 }
 

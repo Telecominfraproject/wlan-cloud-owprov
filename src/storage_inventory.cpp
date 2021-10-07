@@ -52,7 +52,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    InventoryDB::InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    InventoryDB::InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
 
         bool InventoryDB::CreateFromConnection(const std::string &SerialNumber, const std::string &ConnectionInfo,

@@ -46,7 +46,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    LocationDB::LocationDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    LocationDB::LocationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "locations", LocationDB_Fields, LocationDB_Indexes, P, L, "loc") {}
 
 }

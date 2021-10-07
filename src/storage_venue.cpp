@@ -48,7 +48,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    VenueDB::VenueDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    VenueDB::VenueDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
 
     bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {

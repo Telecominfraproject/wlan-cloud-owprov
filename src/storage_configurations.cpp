@@ -41,7 +41,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    ConfigurationDB::ConfigurationDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    ConfigurationDB::ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L, "cfg") {}
 }
 

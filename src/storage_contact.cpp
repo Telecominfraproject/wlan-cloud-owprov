@@ -48,7 +48,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    ContactDB::ContactDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    ContactDB::ContactDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "contacts", ContactDB_Fields, ContactDB_Indexes, P, L, "con") {}
 
 }

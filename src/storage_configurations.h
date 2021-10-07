@@ -35,7 +35,7 @@ namespace OpenWifi {
 
     class ConfigurationDB : public ORM::DB<ConfigurationDBRecordType, ProvObjects::DeviceConfiguration> {
     public:
-        ConfigurationDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
     private:
     };
 }

@@ -37,13 +37,13 @@ namespace OpenWifi {
     > InventoryDBRecordType;
 
     class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
-    public:
-        InventoryDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-        bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo, const std::string & DeviceType);
-        bool FindFirmwareOptions(std::string  & SerialNumber, std::string &firmwareUpgrade, bool &firmwareRCOnly);
-        static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
-        static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
-    private:
+        public:
+            InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+            bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo, const std::string & DeviceType);
+            bool FindFirmwareOptions(std::string  & SerialNumber, std::string &firmwareUpgrade, bool &firmwareRCOnly);
+            static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
+            static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
+        private:
     };
 }
 

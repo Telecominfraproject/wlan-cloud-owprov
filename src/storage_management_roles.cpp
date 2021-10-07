@@ -35,7 +35,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    ManagementRoleDB::ManagementRoleDB( ORM::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
+    ManagementRoleDB::ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "roles", RolesDB_Fields, RolesDB_Indexes, P, L, "rol") {}
 
 }
