@@ -15,6 +15,7 @@
 #include "RESTAPI_utils.h"
 #include "APConfig.h"
 #include "RESTAPI_errors.h"
+#include "AutoDiscovery.h"
 
 namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet() {
@@ -44,8 +45,8 @@ namespace OpenWifi{
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
             Poco::JSON::Object  Answer;
 
-            std::string firmwareUpgrade;
-            bool firmwareRCOnly=false;
+            std::string firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
+            bool firmwareRCOnly = AutoDiscovery()->firmwareRCOnly();
 
             Storage()->InventoryDB().FindFirmwareOptions(SerialNumber,firmwareUpgrade, firmwareRCOnly);
 

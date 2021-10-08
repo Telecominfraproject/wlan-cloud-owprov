@@ -213,7 +213,6 @@ namespace OpenWifi {
             if(!T.venue.empty()) {
                 return FindFirmwareOptionsForVenue(T.venue,firmwareUpgrade,firmwareRCOnly);
             }
-            firmwareUpgrade="no";
             return false;
         }
         return false;
