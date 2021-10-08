@@ -8,13 +8,13 @@
 
 
 #include "storage_inventory.h"
-#include "Utils.h"
 #include "OpenWifiTypes.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_SecurityObjects.h"
 #include "Daemon.h"
 #include "StorageService.h"
 #include "SDK_stubs.h"
+#include "AutoDiscovery.h"
 
 namespace OpenWifi {
 
@@ -140,8 +140,8 @@ namespace OpenWifi {
                 break;
             }
         }
-        firmwareUpgrade="no";
-        firmwareRCOnly= false;
+        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
+        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
         return false;
     }
 
@@ -175,8 +175,8 @@ namespace OpenWifi {
                 break;
             }
         }
-        firmwareUpgrade="no";
-        firmwareRCOnly= false;
+        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
+        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
         return false;
     }
 
@@ -184,8 +184,8 @@ namespace OpenWifi {
                                           bool &firmwareRCOnly) {
 
         ProvObjects::InventoryTag   T;
-        firmwareRCOnly = false;
-        firmwareUpgrade.clear();
+        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
+        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
         if(GetRecord("serialNumber",SerialNumber,T)) {
             //  if there is a local configuration, use this
             firmwareRCOnly = false;

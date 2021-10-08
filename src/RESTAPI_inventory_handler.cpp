@@ -52,6 +52,7 @@ namespace OpenWifi{
             Answer.set("firmwareUpgrade",firmwareUpgrade);
             Answer.set("firmwareRCOnly", firmwareRCOnly);
             ReturnObject(Answer);
+
             return;
         }
 

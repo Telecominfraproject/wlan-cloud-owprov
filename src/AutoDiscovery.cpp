@@ -8,6 +8,7 @@
 #include "Kafka_topics.h"
 #include "storage_inventory.h"
 #include "StorageService.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 
@@ -70,6 +71,8 @@ namespace OpenWifi {
     };
 
     int AutoDiscovery::Start() {
+        firmwareUpgrade_ = Daemon()->ConfigGetString("firmware.updater.upgrade","no");
+        firmwareRCOnly_ = Daemon()->ConfigGetBool("firmware.updater.rconly",false);
         Types::TopicNotifyFunction F = [this](std::string s1,std::string s2) { this->ConnectionReceived(s1,s2); };
         ConnectionWatcherId_ = KafkaManager()->RegisterTopicWatcher(KafkaTopics::CONNECTION, F);
         Worker_.start(*this);

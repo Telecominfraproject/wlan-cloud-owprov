@@ -22,6 +22,8 @@ namespace OpenWifi {
         void Stop() override;
         void run() override;
         void ConnectionReceived( const std::string & Key, const std::string & Message);
+        [[nodiscard]] const std::string & firmwareUpgrade() { return firmwareUpgrade_; }
+        bool firmwareRCOnly() const { return firmwareRCOnly_; }
 
     private:
         static AutoDiscovery 		*instance_;
@@ -29,6 +31,8 @@ namespace OpenWifi {
         std::atomic_bool            Running_ = false;
         int                         ConnectionWatcherId_=0;
         Types::StringPairQueue      NewConnections_;
+        std::string                 firmwareUpgrade_{"no"};
+        bool                        firmwareRCOnly_=false;
 
         AutoDiscovery() noexcept:
             SubSystemServer("AutoDiscovery", "AUTO-DISCOVERY", "discovery")
