@@ -362,12 +362,14 @@ components:
             type: string
             format: uuid
             example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
-        entity:
+        owner:
           type: string
           format: uuid
         managementPolicy:
           type: string
           format: uuid
+        geoCode:
+          type: string
 
     LocationList:
       type: object
@@ -425,7 +427,7 @@ components:
           items:
             type: string
             format: uuid
-        entity:
+        owner:
           type: string
           format: uuid
         managementPolicy:

@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "Daemon.h"
 #include "Poco/Logger.h"
+#include "CountryCodes.h"
 
 namespace OpenWifi {
 

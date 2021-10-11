@@ -153,19 +153,19 @@ namespace OpenWifi::ProvObjects {
     }
 
     struct Location {
-        ObjectInfo  info;
-        LocationType type;
-        std::string buildingName;
-        Types::StringVec addressLines;
-        std::string city;
-        std::string state;
-        std::string postal;
-        std::string country;
+        ObjectInfo          info;
+        LocationType        type;
+        std::string         buildingName;
+        Types::StringVec    addressLines;
+        std::string         city;
+        std::string         state;
+        std::string         postal;
+        std::string         country;
         Types::StringVec    phones;
         Types::StringVec    mobiles;
         std::string         geoCode;
         Types::StringVec    inUse;
-        Types::UUID_t       entity;
+        Types::UUID_t       owner;
         Types::UUID_t       managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -228,7 +228,7 @@ namespace OpenWifi::ProvObjects {
         std::string secondaryEmail;
         std::string accessPIN;
         Types::StringVec inUse;
-        Types::UUID_t   entity;
+        Types::UUID_t   owner;
         Types::UUID_t   managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;

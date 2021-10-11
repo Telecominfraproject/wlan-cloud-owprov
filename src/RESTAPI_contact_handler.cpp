@@ -91,7 +91,7 @@ namespace OpenWifi{
             return;
         }
 
-        if(NewObject.entity.empty() || !Storage()->EntityDB().Exists("id",NewObject.entity)) {
+        if(NewObject.owner.empty() || !Storage()->EntityDB().Exists("id",NewObject.owner)) {
             BadRequest(RESTAPI::Errors::EntityMustExist);
             return;
         }
@@ -148,7 +148,7 @@ namespace OpenWifi{
                 BadRequest(RESTAPI::Errors::EntityMustExist);
                 return;
             }
-            MovingEntity = MoveEntity != Existing.entity;
+            MovingEntity = MoveEntity != Existing.owner;
         }
 
         AssignIfPresent(RawObject,"name",Existing.info.name);
@@ -164,7 +164,7 @@ namespace OpenWifi{
                 Existing.managementPolicy = MovePolicy;
             }
             if(MovingEntity) {
-                Existing.entity = MoveEntity;
+                Existing.owner = MoveEntity;
             }
             DB_.UpdateRecord("id",UUID,Existing);
 

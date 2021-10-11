@@ -36,7 +36,7 @@ namespace OpenWifi {
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
-        ORM::Field{"entity",ORM::FieldType::FT_TEXT}
+        ORM::Field{"owner",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    LocationDB_Indexes{
@@ -71,7 +71,7 @@ template<> void ORM::DB<OpenWifi::LocationDBRecordType , OpenWifi::ProvObjects::
     OpenWifi::Types::from_string(In.get<16>(), Out.inUse);
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<17>());
     Out.managementPolicy = In.get<18>();
-    Out.entity = In.get<19>();
+    Out.owner = In.get<19>();
 }
 
 template<> void ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::Location>::Convert(OpenWifi::ProvObjects::Location &In, OpenWifi::LocationDBRecordType &Out) {
@@ -94,5 +94,5 @@ template<> void ORM::DB<OpenWifi::LocationDBRecordType, OpenWifi::ProvObjects::L
     Out.set<16>(OpenWifi::Types::to_string(In.inUse));
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<18>(In.managementPolicy);
-    Out.set<19>(In.entity);
+    Out.set<19>(In.owner);
 }
