@@ -16,6 +16,8 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWPROV_CONFIG"/owprov.properties ]];
   INTERNAL_RESTAPI_HOST_CERT=${INTERNAL_RESTAPI_HOST_CERT:-"\$OWPROV_ROOT/certs/restapi-cert.pem"} \
   INTERNAL_RESTAPI_HOST_KEY=${INTERNAL_RESTAPI_HOST_KEY:-"\$OWPROV_ROOT/certs/restapi-key.pem"} \
   INTERNAL_RESTAPI_HOST_KEY_PASSWORD=${INTERNAL_RESTAPI_HOST_KEY_PASSWORD:-"mypassword"} \
+  FIRMWARE_UPDATER_UPGRADE=${FIRMWARE_UPDATER_UPGRADE:-"yes"} \
+  FIRMWARE_UPDATER_RCONLY=${FIRMWARE_UPDATER_RCONLY:-"no"} \
   SERVICE_KEY=${SERVICE_KEY:-"\$OWPROV_ROOT/certs/restapi-key.pem"} \
   SERVICE_KEY_PASSWORD=${SERVICE_KEY_PASSWORD:-"mypassword"} \
   SYSTEM_DATA=${SYSTEM_DATA:-"\$OWPROV_ROOT/data"} \
@@ -35,7 +37,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWPROV_CONFIG"/owprov.properties ]];
   STORAGE_TYPE_MYSQL_PASSWORD=${STORAGE_TYPE_MYSQL_PASSWORD:-"owprov"} \
   STORAGE_TYPE_MYSQL_DATABASE=${STORAGE_TYPE_MYSQL_DATABASE:-"owprov"} \
   STORAGE_TYPE_MYSQL_PORT=${STORAGE_TYPE_MYSQL_PORT:-"3306"} \
-  envsubst < $OWPROV_CONFIG/owprov.properties.tmpl > $OWPROV_CONFIG/owprov.properties
+  envsubst < /owprov.properties.tmpl > $OWPROV_CONFIG/owprov.properties
 fi
 
 if [ "$1" = '/openwifi/owprov' -a "$(id -u)" = '0' ]; then

@@ -72,7 +72,7 @@ COPY --from=builder /poco/cmake-build/lib/* /lib/
 COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-cpp-sdk-core.so /lib/
 COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /lib/
 
-COPY owprov.properties.tmpl ${OWPROV_CONFIG}/
+COPY owprov.properties.tmpl /
 COPY docker-entrypoint.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
