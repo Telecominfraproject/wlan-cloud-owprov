@@ -94,6 +94,14 @@ namespace OpenWifi{
                     return false;
                 }
             }
+
+            if(ValidateUCentralConfiguration(i.configuration)) {
+                std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> ACCEPTED" << std::endl;
+            } else {
+                std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
+                return false;
+            }
+
         }
         return true;
     }
