@@ -168,26 +168,26 @@ namespace OpenWifi{
         auto UUID = GetBinding("uuid","");
         ProvObjects::DeviceConfiguration    Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         ProvObjects::DeviceConfiguration    NewConfig;
         auto ParsedObj = ParseStream();
         if (!NewConfig.from_json(ParsedObj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         if(!NewConfig.deviceTypes.empty() && !Storage()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
-            BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
-        if(!ValidateConfigBlock(NewConfig))
-            return;
+        if(!ValidateConfigBlock(NewConfig)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+        }
 
-        Existing.configuration = NewConfig.configuration;
+        if(ParsedObj->has("configuration")) {
+            Existing.configuration = NewConfig.configuration;
+        }
 
         for(auto &i:NewConfig.info.notes) {
             i.createdBy = UserInfo_.userinfo.email;
