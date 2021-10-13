@@ -58,16 +58,19 @@ namespace OpenWifi{
             Poco::JSON::Object       Answer;
             Poco::JSON::Object::Ptr  Configuration;
 
+            Types::StringVec Errors, Warnings;
+            Poco::JSON::Object  ErrorsObj, WarningsObj;
+            int ErrorCode;
             if(Device.Get(Configuration)) {
                 Answer.set("appliedConfiguration", Configuration);
-                Types::StringVec Errors, Warnings;
-                Poco::JSON::Object  ErrorsObj, WarningsObj;
-                RESTAPI_utils::field_to_json(Answer,"errors", Errors);
-                RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
-                Answer.set("errorCode",0);
+                ErrorCode=0;
             } else {
-                Answer.set("config","none");
+                Answer.set("appliedConfiguration", "");
+                ErrorCode=1;
             }
+            Answer.set("errorCode",ErrorCode);
+            RESTAPI_utils::field_to_json(Answer,"errors", Errors);
+            RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
             return ReturnObject(Answer);
         }
 
@@ -80,8 +83,7 @@ namespace OpenWifi{
         ProvObjects::InventoryTag   Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(!Existing.venue.empty())
