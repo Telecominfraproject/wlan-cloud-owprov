@@ -2201,6 +2201,7 @@ namespace OpenWifi {
                 Validator_->validate(Doc);
                 return true;
             } catch(const std::exception &E) {
+                std::cout << "Validation failed, here is why: " << E.what() << "\n";
                 return false;
             }
         }
