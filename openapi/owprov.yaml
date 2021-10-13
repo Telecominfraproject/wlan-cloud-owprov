@@ -600,6 +600,21 @@ components:
         from:
           type: string
 
+    InventoryConfigApplyResult:
+      type: object
+      properties:
+        appliedConfiguration:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        errorCode:
+          type: integer
 
     #########################################################################################
     ##
@@ -1418,6 +1433,11 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: applyConfiguration
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
           description: Succesful retrieve configuratiopn or part of the configuration
@@ -1427,6 +1447,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/InventoryTag'
                   - $ref: '#/components/schemas/FirmwareOptions'
+                  - $ref: '#/components/schemas/InventoryConfigApplyResult'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
