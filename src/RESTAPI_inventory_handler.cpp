@@ -40,8 +40,7 @@ namespace OpenWifi{
             } else {
                 Answer.set("config","none");
             }
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
             Poco::JSON::Object  Answer;
 
@@ -52,9 +51,24 @@ namespace OpenWifi{
 
             Answer.set("firmwareUpgrade",firmwareUpgrade);
             Answer.set("firmwareRCOnly", firmwareRCOnly);
-            ReturnObject(Answer);
+            return ReturnObject(Answer);
+        } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
+            APConfig    Device(SerialNumber,Existing.deviceType,Logger_, false);
 
-            return;
+            Poco::JSON::Object       Answer;
+            Poco::JSON::Object::Ptr  Configuration;
+
+            if(Device.Get(Configuration)) {
+                Answer.set("appliedConfiguration", Configuration);
+                Types::StringVec Errors, Warnings;
+                Poco::JSON::Object  ErrorsObj, WarningsObj;
+                RESTAPI_utils::field_to_json(Answer,"errors", Errors);
+                RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
+                Answer.set("errorCode",0);
+            } else {
+                Answer.set("config","none");
+            }
+            return ReturnObject(Answer);
         }
 
         Poco::JSON::Object  Answer;
