@@ -161,23 +161,52 @@ namespace OpenWifi {
 	    return false;
 	}
 
+	bool Storage::ValidateSingle(const std::string &P, std::string & Error) {
+        auto uuid_parts = Utils::Split(P,':');
+        if(uuid_parts.size()==2) {
+            auto F = ExistFunc_.find(uuid_parts[0]);
+            if(F!=ExistFunc_.end()) {
+                if(!F->second("id", uuid_parts[1])) {
+                    Error = "Unknown " + F->first + " UUID:" + uuid_parts[1] ;
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     bool Storage::Validate(const Types::StringVec &P, std::string &Error) {
         for(const auto &i:P) {
-            auto uuid_parts = Utils::Split(i,':');
-            if(uuid_parts.size()==2) {
-                auto F = ExistFunc_.find(uuid_parts[0]);
-                if(F!=ExistFunc_.end()) {
-                    if(!F->second("id", uuid_parts[1])) {
-                        Error = "Unknown " + F->first + " UUID:" + uuid_parts[1] ;
-                        break;
-                    }
-                }
-            }
+            if(!ValidateSingle(i,Error))
+                return false;
         }
         if(Error.empty())
             return true;
         return false;
 	}
+
+	bool Storage::Validate(const std::string &P) {
+        std::string Error;
+        return ValidateSingle(P,Error);
+    }
+
+/*    bool Storage::DeleteContact(const std::string &P, const std::string &Prefix, const std::string &Id) {
+        auto uuid_parts = Utils::Split(P,':');
+        if(uuid_parts.size()!=2)
+            return false;
+        if(uuid_parts[0]=="ent") {
+            return EntityDB_->DeleteContact("id",uuid_parts[1],Prefix,Id);
+        } else if(uuid_parts[0]=="ven") {
+            return VenueDB_->DeleteContact("id",uuid_parts[1],Prefix,Id);
+        }
+        return false;
+    }
+*/
 
     bool Storage::ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap &Map, std::vector<std::string> & Errors) {
         for(const auto &i:UUIDs) {

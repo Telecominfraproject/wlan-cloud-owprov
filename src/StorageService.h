@@ -65,6 +65,8 @@ namespace OpenWifi {
             bool Validate(const Types::StringVec &P, std::string &Error);
             inline bool ValidatePrefix(const std::string &P) const { return ExistFunc_.find(P)!=ExistFunc_.end(); }
             bool ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap & Map, std::vector<std::string> & Errors);
+            bool ValidateSingle(const std::string &P, std::string & Error);
+            bool Validate(const std::string &P);
 
             inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
             inline bool AreAcceptableDeviceTypes(const Types::StringVec &S, bool WildCardAllowed=true) const {
@@ -76,6 +78,8 @@ namespace OpenWifi {
                 }
                 return true;
             }
+
+            bool DeleteContact(const std::string &P, const std::string &Prefix, const std::string &Id);
 
             void run() final;
 

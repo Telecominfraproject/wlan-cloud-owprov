@@ -91,7 +91,7 @@ namespace OpenWifi{
             return;
         }
 
-        if(NewObject.owner.empty() || !Storage()->EntityDB().Exists("id",NewObject.owner)) {
+        if(NewObject.entity.empty() || !Storage()->EntityDB().Exists("id",NewObject.entity)) {
             BadRequest(RESTAPI::Errors::EntityMustExist);
             return;
         }
@@ -106,8 +106,16 @@ namespace OpenWifi{
         NewObject.inUse.clear();
 
         if(DB_.CreateRecord(NewObject)) {
+
+            Storage()->EntityDB().AddContact("id",NewObject.entity,DB_.Prefix(),NewObject.info.id);
+            if(!NewObject.managementPolicy.empty())
+                Storage()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
+
+            ProvObjects::Contact    NewContact;
+            Storage()->ContactDB().GetRecord("id", NewObject.info.id, NewContact);
+
             Poco::JSON::Object Answer;
-            NewObject.to_json(Answer);
+            NewContact.to_json(Answer);
             ReturnObject(Answer);
             return;
         }
@@ -134,39 +142,68 @@ namespace OpenWifi{
             Existing.info.notes.insert(Existing.info.notes.begin(),i);
         }
 
-        std::string MoveEntity, MovePolicy;
-        bool MovingEntity=false, MovingPolicy=false;
-        if(AssignIfPresent(RawObject,"managementPolicy",MovePolicy)) {
-            if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",MovePolicy)) {
+        std::string MoveToPolicy, MoveFromPolicy;
+        bool MovingPolicy=false;
+        if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
+            if(!MoveToPolicy.empty() && !Storage()->PolicyDB().Exists("id",MoveToPolicy)) {
                 BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
                 return;
             }
-            MovingPolicy = MovePolicy != Existing.managementPolicy;
+            MoveFromPolicy = Existing.managementPolicy;
+            MovingPolicy = MoveToPolicy != Existing.managementPolicy;
         }
-        if(AssignIfPresent(RawObject,"entity",MoveEntity)) {
-            if(MoveEntity.empty() || !Storage()->PolicyDB().Exists("id",MoveEntity)) {
+
+        std::string MoveToentity,MoveFromentity;
+        bool        Movingentity=false;
+        if(AssignIfPresent(RawObject,"entity",MoveToentity) && MoveToentity!=Existing.entity) {
+            if(!MoveToentity.empty() || !Storage()->Validate(MoveToentity)) {
                 BadRequest(RESTAPI::Errors::EntityMustExist);
                 return;
             }
-            MovingEntity = MoveEntity != Existing.owner;
+            MoveFromentity = Existing.entity;
+            Movingentity = true ;
         }
 
         AssignIfPresent(RawObject,"name",Existing.info.name);
         AssignIfPresent(RawObject,"description",Existing.info.description);
+        AssignIfPresent(RawObject, "title", Existing.title);
+        AssignIfPresent(RawObject, "salutation", Existing.salutation);
+        AssignIfPresent(RawObject, "firstname", Existing.firstname);
+        AssignIfPresent(RawObject, "lastname", Existing.lastname);
+        AssignIfPresent(RawObject, "initials", Existing.initials);
+        AssignIfPresent(RawObject, "visual", Existing.visual);
+        AssignIfPresent(RawObject, "primaryEmail", Existing.primaryEmail);
+        AssignIfPresent(RawObject, "secondaryEmail", Existing.secondaryEmail);
+        AssignIfPresent(RawObject, "accessPIN", Existing.accessPIN);
+        if(RawObject->has("type"))
+            Existing.type = NewObject.type;
+        if(RawObject->has("mobiles"))
+            Existing.mobiles = NewObject.mobiles;
+        if(RawObject->has("phones"))
+            Existing.phones = NewObject.phones;
+
+
+        Existing.entity = MoveToentity;
         Existing.info.modified = std::time(nullptr);
+        Existing.managementPolicy = MoveToPolicy;
 
         if(DB_.UpdateRecord("id", UUID, Existing)) {
+
             if(MovingPolicy) {
-                if(!Existing.managementPolicy.empty())
-                    Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
-                if(!MovePolicy.empty())
-                    Storage()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
-                Existing.managementPolicy = MovePolicy;
+                if(!MoveFromPolicy.empty())
+                    Storage()->PolicyDB().DeleteInUse("id",MoveFromPolicy,DB_.Prefix(),Existing.info.id);
+                if(!MoveToPolicy.empty())
+                    Storage()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
             }
-            if(MovingEntity) {
-                Existing.owner = MoveEntity;
+
+            if(Movingentity) {
+                if(!MoveFromentity.empty()) {
+                    Storage()->EntityDB().DeleteContact("id", MoveFromentity, DB_.Prefix(), Existing.info.id);
+                }
+                if(!MoveToentity.empty()) {
+                    Storage()->EntityDB().AddContact("id", MoveToentity, DB_.Prefix(), Existing.info.id);
+                }
             }
-            DB_.UpdateRecord("id",UUID,Existing);
 
             ProvObjects::Contact    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);

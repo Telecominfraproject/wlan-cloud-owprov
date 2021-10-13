@@ -53,8 +53,8 @@ namespace OpenWifi::ProvObjects {
         Types::UUID_t           parent;
         Types::UUIDvec_t        children;
         Types::UUIDvec_t        venues;
-        Types::UUIDvec_t        contacts;
-        Types::UUIDvec_t        locations;
+        Types::UUIDvec_t        contacts;       // all contacts associated in this entity
+        Types::UUIDvec_t        locations;      // all locations associated in this entity
         Types::UUID_t           managementPolicy;
         std::string             deviceConfiguration;
         Types::UUIDvec_t        devices;
@@ -165,7 +165,7 @@ namespace OpenWifi::ProvObjects {
         Types::StringVec    mobiles;
         std::string         geoCode;
         Types::StringVec    inUse;
-        Types::UUID_t       owner;
+        Types::UUID_t       entity;
         Types::UUID_t       managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -228,7 +228,7 @@ namespace OpenWifi::ProvObjects {
         std::string secondaryEmail;
         std::string accessPIN;
         Types::StringVec inUse;
-        Types::UUID_t   owner;
+        Types::UUID_t   entity;
         Types::UUID_t   managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;

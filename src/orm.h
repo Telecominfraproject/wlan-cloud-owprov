@@ -699,6 +699,26 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, false);
         }
 
+        inline bool DeleteContact(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, FakeUUID, false);
+        }
+
+        inline bool AddContact(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, FakeUUID, true);
+        }
+
+        inline bool DeleteLocation(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, FakeUUID, false);
+        }
+
+        inline bool AddLocation(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
+            std::string FakeUUID{ Prefix + ":" + ChildUUID};
+            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, FakeUUID, true);
+        }
+
         inline bool GetInUse(const char *FieldName, std::string & UUID, std::vector<std::string> & UUIDs ) {
             RecordType  R;
             if(GetRecord(FieldName,UUID,R)) {
@@ -715,7 +735,7 @@ namespace ORM {
                     return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) +  " ";
                 case OpenWifi::DBType::pgsql:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-                    case OpenWifi::DBType::mysql:
+                case OpenWifi::DBType::mysql:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
                 default:
                     return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
