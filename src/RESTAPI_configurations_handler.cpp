@@ -77,7 +77,7 @@ namespace OpenWifi{
     //      services
     //      globals
     //      unit
-    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config) {
+    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
         static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
 
         for(const auto &i:Config.configuration) {
@@ -95,7 +95,7 @@ namespace OpenWifi{
                 }
             }
 
-            if(ValidateUCentralConfiguration(i.configuration)) {
+            if(ValidateUCentralConfiguration(i.configuration, Error)) {
                 std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> ACCEPTED" << std::endl;
             } else {
                 std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
@@ -122,8 +122,10 @@ namespace OpenWifi{
             }
             auto Config=Body->get("configuration").toString();
             Poco::JSON::Object  Answer;
-            auto Res = ValidateUCentralConfiguration(Config);
+            std::string Error;
+            auto Res = ValidateUCentralConfiguration(Config,Error);
             Answer.set("valid",Res);
+            Answer.set("error", Error);
             ReturnObject(Answer);
             return;
         }
@@ -156,8 +158,10 @@ namespace OpenWifi{
             return;
         }
 
-        if(!ValidateConfigBlock(C))
-            return;
+        std::string Error;
+        if(!ValidateConfigBlock(C,Error)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
+        }
 
         if(DB_.CreateRecord(C)) {
             DB_.GetRecord("id", C.info.id, C);
@@ -189,8 +193,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
-        if(!ValidateConfigBlock(NewConfig)) {
-            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+        std::string Error;
+        if(!ValidateConfigBlock( NewConfig,Error)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
         }
 
         if(ParsedObj->has("configuration")) {
@@ -218,7 +223,7 @@ namespace OpenWifi{
         AssignIfPresent(ParsedObj, "name", Existing.info.name);
         AssignIfPresent(ParsedObj,"description", Existing.info.description);
         AssignIfPresent(ParsedObj, "rrm", Existing.rrm);
-        NewConfig.info.modified = std::time(nullptr);
+        Existing.info.modified = std::time(nullptr);
         AssignIfPresent(ParsedObj,"firmwareUpgrade",Existing.firmwareUpgrade);
         AssignIfPresent(ParsedObj,"firmwareRCOnly", Existing.firmwareRCOnly);
 

@@ -34,7 +34,7 @@ namespace OpenWifi {
         void DoPut();
         void DoDelete();
     private:
-        bool ValidateConfigBlock(const      ProvObjects::DeviceConfiguration &Config);
+        bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error);
         ConfigurationDB     &DB_;
     };
 }

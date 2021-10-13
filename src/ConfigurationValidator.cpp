@@ -2194,13 +2194,14 @@ namespace OpenWifi {
 
     }
 
-    bool ConfigurationValidator::Validate(const std::string &C) {
+    bool ConfigurationValidator::Validate(const std::string &C, std::string &Error) {
         if(Working_) {
             try {
                 auto Doc = json::parse(C);
                 Validator_->validate(Doc);
                 return true;
             } catch(const std::exception &E) {
+                Error = E.what();
                 std::cout << "Validation failed, here is why: " << E.what() << "\n";
                 return false;
             }

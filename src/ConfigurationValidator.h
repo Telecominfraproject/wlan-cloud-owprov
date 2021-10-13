@@ -22,7 +22,7 @@ namespace OpenWifi {
             return instance_;
         }
 
-        bool Validate(const std::string &C);
+        bool Validate(const std::string &C, std::string &Error);
         static void my_format_checker(const std::string &format, const std::string &value)
         {
             /*
@@ -64,7 +64,7 @@ namespace OpenWifi {
     };
 
     inline ConfigurationValidator * ConfigurationValidator() { return ConfigurationValidator::instance(); }
-    inline bool ValidateUCentralConfiguration(const std::string &C) { return ConfigurationValidator::instance()->Validate(C); }
+    inline bool ValidateUCentralConfiguration(const std::string &C, std::string &Error) { return ConfigurationValidator::instance()->Validate(C, Error); }
 }
 
 #endif //OWPROV_CONFIGURATIONVALIDATOR_H
