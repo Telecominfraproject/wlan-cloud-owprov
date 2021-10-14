@@ -66,9 +66,15 @@ namespace OpenWifi{
 
                 Poco::JSON::Object::Ptr Response;
                 if(SDK::SendConfigureCommand(SerialNumber,Configuration,Response)) {
+                    std::ostringstream os;
+                    Response->stringify(os);
+                    std::cout << "Success: " << os.str() << std::endl;
                     ErrorCode=0;
                 } else {
+                    std::ostringstream os;
+                    Response->stringify(os);
                     ErrorCode=1;
+                    std::cout << "Failure: " << os.str() << std::endl;
                 }
                 Answer.set("appliedConfiguration", Configuration);
                 Answer.set("response", Response);
