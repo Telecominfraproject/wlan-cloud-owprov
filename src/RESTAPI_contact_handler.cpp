@@ -78,7 +78,8 @@ namespace OpenWifi{
     }
 
     void RESTAPI_contact_handler::DoPost() {
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
+
         if(UUID.empty()) {
             BadRequest(RESTAPI::Errors::MissingUUID);
             return;
@@ -123,18 +124,16 @@ namespace OpenWifi{
     }
 
     void RESTAPI_contact_handler::DoPut() {
-        std::string UUID = GetBinding("uuid","");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
         ProvObjects::Contact   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         auto RawObject = ParseStream();
         ProvObjects::Contact NewObject;
         if (!NewObject.from_json(RawObject)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         for(auto &i:NewObject.info.notes) {
@@ -146,8 +145,7 @@ namespace OpenWifi{
         bool MovingPolicy=false;
         if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
             if(!MoveToPolicy.empty() && !Storage()->PolicyDB().Exists("id",MoveToPolicy)) {
-                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-                return;
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MoveFromPolicy = Existing.managementPolicy;
             MovingPolicy = MoveToPolicy != Existing.managementPolicy;
@@ -157,8 +155,7 @@ namespace OpenWifi{
         bool        Movingentity=false;
         if(AssignIfPresent(RawObject,"entity",MoveToentity) && MoveToentity!=Existing.entity) {
             if(!MoveToentity.empty() || !Storage()->Validate(MoveToentity)) {
-                BadRequest(RESTAPI::Errors::EntityMustExist);
-                return;
+                return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MoveFromentity = Existing.entity;
             Movingentity = true ;
@@ -209,8 +206,7 @@ namespace OpenWifi{
             DB_.GetRecord("id", UUID, NewObjectAdded);
             Poco::JSON::Object  Answer;
             NewObjectAdded.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
     }

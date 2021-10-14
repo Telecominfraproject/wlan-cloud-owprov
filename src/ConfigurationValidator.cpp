@@ -2194,6 +2194,35 @@ namespace OpenWifi {
 
     }
 
+    void ConfigurationValidator::my_format_checker(const std::string &format, const std::string &value)
+    {
+        if(format == "uc-cidr4") {
+            // throw std::invalid_argument("value is not a good something");
+        } else if(format == "uc-cidr6") {
+
+        } else if(format == "uc-mac") {
+
+        } else if(format == "uc-timeout") {
+
+        } else if(format == "uc-host") {
+
+        } else if(format == "uc-base64") {
+
+        } else if(format == "fqdn") {
+
+        } else if(format == "uri") {
+
+        } else if(format == "ip") {
+
+        } else {
+            try {
+                nlohmann::json_schema::default_string_format_check(format,value);
+            } catch (const std::logic_error &E) {
+                std::string Error{"JSON Schema validation: "};
+            }
+        }
+    }
+
     bool ConfigurationValidator::Validate(const std::string &C, std::string &Error) {
         if(Working_) {
             try {

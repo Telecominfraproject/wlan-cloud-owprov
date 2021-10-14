@@ -23,30 +23,7 @@ namespace OpenWifi {
         }
 
         bool Validate(const std::string &C, std::string &Error);
-        static void my_format_checker(const std::string &format, const std::string &value)
-        {
-            /*
-                "format": "uc-mac"
-                "format": "uc-timeout",
-                "format": "uc-cidr4",
-                "format": "uc-cidr6",
-                "uc-format": "cidr",
-                "format": "fqdn",
-                "format": "uc-host",
-                "format": "uri"
-                "format": "hostname"
-                "format": "uc-base64"
-
-
-                if (format == "something") {
-                    return;
-                    if (!check_value_for_something(value))
-                                throw std::invalid_argument("value is not a good something");
-                        } else
-                        throw std::logic_error("Don't know how to validate " + format);
-            */
-        }
-
+        static void my_format_checker(const std::string &format, const std::string &value);
         int Start() override;
         void Stop() override;
         void reinitialize(Poco::Util::Application &self) override;
