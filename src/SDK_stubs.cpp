@@ -44,7 +44,7 @@ namespace OpenWifi::SDK {
         Body.set("when",0);
         Body.set("configuration", Configuration);
 
-        OpenWifi::OpenAPIRequestPut R(OpenWifi::uSERVICE_GATEWAY,
+        OpenWifi::OpenAPIRequestPost R(OpenWifi::uSERVICE_GATEWAY,
                                       "/api/v1/device/" + SerialNumber + "/configure",
                                       QueryData,
                                       Body,
