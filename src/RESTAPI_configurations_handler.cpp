@@ -96,9 +96,9 @@ namespace OpenWifi{
             }
 
             if(ValidateUCentralConfiguration(i.configuration, Error)) {
-                std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> ACCEPTED" << std::endl;
+                /* nothing to do */ ;
             } else {
-                std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
+                // std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
                 return false;
             }
 

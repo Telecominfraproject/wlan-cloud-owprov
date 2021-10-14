@@ -19,6 +19,20 @@
 #include "SDK_stubs.h"
 
 namespace OpenWifi{
+
+    void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
+        try {
+            if(Response->has("results")) {
+                auto Results = Response->get("results").extract<Poco::JSON::Object::Ptr>();
+                auto Status = Results->get("status").extract<Poco::JSON::Object::Ptr>();
+                auto Rejected = Status->getArray("rejected");
+                for(const auto &i:*Rejected)
+                    Warnings.push_back(i.toString());
+            }
+        } catch (...) {
+        }
+    }
+
     void RESTAPI_inventory_handler::DoGet() {
         ProvObjects::InventoryTag   Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
@@ -63,18 +77,18 @@ namespace OpenWifi{
             Poco::JSON::Object  ErrorsObj, WarningsObj;
             int ErrorCode;
             if(Device.Get(Configuration)) {
-
                 Poco::JSON::Object::Ptr Response;
                 if(SDK::SendConfigureCommand(SerialNumber,Configuration,Response)) {
                     std::ostringstream os;
                     Response->stringify(os);
-                    std::cout << "Success: " << os.str() << std::endl;
+                    // std::cout << "Success: " << os.str() << std::endl;
+                    GetRejectedLines(Response, Warnings);
                     ErrorCode=0;
                 } else {
                     std::ostringstream os;
                     Response->stringify(os);
                     ErrorCode=1;
-                    std::cout << "Failure: " << os.str() << std::endl;
+                    // std::cout << "Failure: " << os.str() << std::endl;
                 }
                 Answer.set("appliedConfiguration", Configuration);
                 Answer.set("response", Response);
