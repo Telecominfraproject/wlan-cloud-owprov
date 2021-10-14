@@ -10,7 +10,7 @@
 namespace OpenWifi::SDK {
 
     bool DeviceSetVenue(const std::string & SerialNumber, const std::string &uuid, Poco::JSON::Object::Ptr & Response);
-
+    bool SendConfigureCommand(const std::string &serialNumber, Poco::JSON::Object::Ptr &Configuration, Poco::JSON::Object::Ptr & Response);
 
 };
 

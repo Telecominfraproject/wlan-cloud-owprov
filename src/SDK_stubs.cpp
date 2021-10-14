@@ -30,4 +30,35 @@ namespace OpenWifi::SDK {
         return false;
     }
 
+    bool SendConfigureCommand(const std::string &SerialNumber, Poco::JSON::Object::Ptr & Configuration, Poco::JSON::Object::Ptr & Response) {
+
+        Types::StringPairVec    QueryData;
+        Poco::JSON::Object      Body;
+
+        Poco::JSON::Parser P;
+        uint64_t Now = std::time(nullptr);
+
+        Configuration->set("uuid", Now);
+        Body.set("serialNumber", SerialNumber);
+        Body.set("UUID", Now);
+        Body.set("when",0);
+        Body.set("configuration", Configuration);
+
+        OpenWifi::OpenAPIRequestPut R(OpenWifi::uSERVICE_GATEWAY,
+                                      "/api/v1/device/" + SerialNumber + "/configure",
+                                      QueryData,
+                                      Body,
+                                      10000);
+
+        if(R.Do(Response) == Poco::Net::HTTPResponse::HTTP_OK) {
+            return true;
+        }
+
+        std::ostringstream os;
+        Poco::JSON::Stringifier::stringify(Response,os);
+
+        return false;
+    }
+
+
 }

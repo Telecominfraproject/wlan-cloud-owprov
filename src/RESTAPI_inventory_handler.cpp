@@ -16,6 +16,7 @@
 #include "APConfig.h"
 #include "RESTAPI_errors.h"
 #include "AutoDiscovery.h"
+#include "SDK_stubs.h"
 
 namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet() {
@@ -62,8 +63,15 @@ namespace OpenWifi{
             Poco::JSON::Object  ErrorsObj, WarningsObj;
             int ErrorCode;
             if(Device.Get(Configuration)) {
+
+                Poco::JSON::Object::Ptr Response;
+                if(SDK::SendConfigureCommand(SerialNumber,Configuration,Response)) {
+                    ErrorCode=0;
+                } else {
+                    ErrorCode=1;
+                }
                 Answer.set("appliedConfiguration", Configuration);
-                ErrorCode=0;
+                Answer.set("response", Response);
             } else {
                 Answer.set("appliedConfiguration", "");
                 ErrorCode=1;
