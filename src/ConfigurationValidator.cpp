@@ -4,11 +4,15 @@
 
 #include <iostream>
 #include <fstream>
+#include <regex>
+
 #include "ConfigurationValidator.h"
 #include "Utils.h"
 #include "Daemon.h"
 #include "Poco/Logger.h"
+#include "Poco/URI.h"
 #include "CountryCodes.h"
+#include "Poco/StringTokenizer.h"
 
 namespace OpenWifi {
 
@@ -2197,23 +2201,57 @@ namespace OpenWifi {
     void ConfigurationValidator::my_format_checker(const std::string &format, const std::string &value)
     {
         if(format == "uc-cidr4") {
-            // throw std::invalid_argument("value is not a good something");
+            auto Tokens = Poco::StringTokenizer(value,"/");
+            Poco::Net::IPAddress    A;
+            if(Tokens.count()==2 && Poco::Net::IPAddress::tryParse(Tokens[0],A) && A.family()==Poco::Net::IPAddress::IPv4) {
+                auto Mask = std::atoi(Tokens[1].c_str());
+                if(Mask>=0 && Mask<=32)
+                    return;
+            }
+            throw std::invalid_argument(value + " is not a valid CIDR IPv4: should be something like 192.168.0.0/16.");
         } else if(format == "uc-cidr6") {
-
+            auto Tokens = Poco::StringTokenizer(value,"/");
+            Poco::Net::IPAddress    A;
+            if(Tokens.count()==2 && Poco::Net::IPAddress::tryParse(Tokens[0],A) && A.family()==Poco::Net::IPAddress::IPv6) {
+                auto Mask = std::atoi(Tokens[1].c_str());
+                if(Mask>=48 && Mask<=128)
+                    return;
+            }
+            throw std::invalid_argument(value + " is not a valid CIDR IPv6: should be something like 2e60:3500::/64.");
         } else if(format == "uc-mac") {
-
+            const std::regex  mac{"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"};
+            if(std::regex_match(value,mac))
+                return;
+            throw std::invalid_argument(value + " is not a valid MAC: should be something like 2e60:3500::/64.");
         } else if(format == "uc-timeout") {
-
-        } else if(format == "uc-host") {
-
+            const std::regex uc_timeout_regex{"([0-9]+[d|m|s|h]|infinite)"};
+            if(std::regex_match(value,uc_timeout_regex))
+                return;
+            throw std::invalid_argument(value + " is not a proper timeout value: 6d, 300m, 24h, 84000s, infinite");
+        } else if(format == "uc-host" || format == "fqdn") {
+            std::regex host_regex{"^(?=.{1,254}$)((?=[a-z0-9-]{1,63}\\.)(xn--+)?[a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,63}$"};
+            if(std::regex_match(value,host_regex))
+                return;
+            throw std::invalid_argument(value + " is not a proper FQDN.");
         } else if(format == "uc-base64") {
-
-        } else if(format == "fqdn") {
-
+            std::string s{value};
+            Poco::trimInPlace(s);
+            std::regex b64("^[a-zA-Z0-9\\+/]*={0,3}$");
+            if( (s.size() %4 ==0) && std::regex_match(s,b64))
+                return;
+            throw std::invalid_argument(value + " is not a base64 encoded value.");
         } else if(format == "uri") {
-
+            try {
+                Poco::URI   uri(value);
+                return;
+            } catch (...) {
+            }
+            throw std::invalid_argument(value + " is not a valid URI: should be something like https://hello.world.com.");
         } else if(format == "ip") {
-
+            Poco::Net::IPAddress    A;
+            if(Poco::Net::IPAddress::tryParse(value,A))
+                return;
+            throw std::invalid_argument(value + " is not a valid IP address.");
         } else {
             try {
                 nlohmann::json_schema::default_string_format_check(format,value);
