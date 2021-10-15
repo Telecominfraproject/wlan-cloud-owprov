@@ -17,6 +17,7 @@ namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
         std::string Arg;
+        bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
         if(!QB_.Select.empty()) {
             auto EntityUIDs = Utils::Split(QB_.Select);
             ProvObjects::EntityVec Entities;
@@ -25,26 +26,52 @@ namespace OpenWifi{
                 if(Storage()->EntityDB().GetRecord("id",i,E)) {
                     Entities.push_back(E);
                 } else {
-                    BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                    return;
+                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
                 }
             }
-            ReturnObject("entities", Entities);
-            return;
+            return ReturnObject("entities", Entities);
         } else if(QB_.CountOnly) {
             auto C = Storage()->EntityDB().Count();
-            ReturnCountOnly(C);
-            return;
+            return ReturnCountOnly(C);
         } if (HasParameter("getTree",Arg) && Arg=="true") {
             Poco::JSON::Object  FullTree;
             Storage()->EntityDB().BuildTree(FullTree);
-            ReturnObject(FullTree);
-            return;
+            return ReturnObject(FullTree);
         } else {
             ProvObjects::EntityVec Entities;
             Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-            ReturnObject("entities",Entities);
-            return;
+            if(AdditionalInfo) {
+                Poco::JSON::Array   ObjArray;
+                for(const auto &i:Entities) {
+                    Poco::JSON::Object  O;
+                    i.to_json(O);
+                    Poco::JSON::Object  EI;
+                    if(!i.managementPolicy.empty()) {
+                        Poco::JSON::Object  PolObj;
+                        ProvObjects::ManagementPolicy Policy;
+                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
+                            PolObj.set( "name", Policy.info.name);
+                            PolObj.set( "description", Policy.info.description);
+                        }
+                        EI.set("managementPolicy",PolObj);
+                    }
+                    if(!i.deviceConfiguration.empty()) {
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::DeviceConfiguration DevConf;
+                        if(Storage()->ConfigurationDB().GetRecord("id",i.deviceConfiguration,DevConf)) {
+                            EntObj.set( "name", DevConf.info.name);
+                            EntObj.set( "description", DevConf.info.description);
+                        }
+                        EI.set("deviceConfiguration",EntObj);
+                    }
+                    O.set("extendedInfo", EI);
+                    ObjArray.add(O);
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("entities",ObjArray);
+                return ReturnObject(Answer);
+            }
+            return ReturnObject("entities",Entities);
         }
     }
 

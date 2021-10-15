@@ -95,6 +95,15 @@ namespace OpenWifi{
                             }
                             EI.set("location",EntObj);
                         }
+                        if(!i.deviceConfiguration.empty()) {
+                            Poco::JSON::Object  EntObj;
+                            ProvObjects::DeviceConfiguration DevConf;
+                            if(Storage()->ConfigurationDB().GetRecord("id",i.deviceConfiguration,DevConf)) {
+                                EntObj.set( "name", DevConf.info.name);
+                                EntObj.set( "description", DevConf.info.description);
+                            }
+                            EI.set("deviceConfiguration",EntObj);
+                        }
                         Obj.set("extendedInfo", EI);
                         i.to_json(Obj);
                         ObjArr.add(Obj);

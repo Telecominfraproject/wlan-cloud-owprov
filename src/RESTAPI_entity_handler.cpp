@@ -21,7 +21,9 @@
 namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoGet() {
-        std::string UUID = GetBinding("uuid", "");
+        std::string UUID = GetBinding("uuid", ""), Arg;
+        bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
+
         ProvObjects::Entity Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             NotFound();
@@ -29,6 +31,28 @@ namespace OpenWifi{
         }
 
         Poco::JSON::Object Answer;
+        if(AdditionalInfo) {
+            Poco::JSON::Object  EI;
+            if(!Existing.managementPolicy.empty()) {
+                Poco::JSON::Object  PolObj;
+                ProvObjects::ManagementPolicy Policy;
+                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
+                    PolObj.set( "name", Policy.info.name);
+                    PolObj.set( "description", Policy.info.description);
+                }
+                EI.set("managementPolicy",PolObj);
+            }
+            if(!Existing.deviceConfiguration.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::DeviceConfiguration DevConf;
+                if(Storage()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DevConf)) {
+                    EntObj.set( "name", DevConf.info.name);
+                    EntObj.set( "description", DevConf.info.description);
+                }
+                EI.set("deviceConfiguration",EntObj);
+            }
+            Answer.set("extendedInfo", EI);
+        }
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }
