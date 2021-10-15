@@ -33,8 +33,41 @@ namespace OpenWifi{
         } else {
             ProvObjects::LocationVec Locations;
             Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
-            ReturnObject("locations", Locations);
-            return;
+
+            std::string Arg;
+            if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+                Poco::JSON::Array   ObjArray;
+                for(const auto &i:Locations) {
+                    Poco::JSON::Object  Obj;
+                    i.to_json(Obj);
+                    Poco::JSON::Object  EI;
+                    if(!i.entity.empty()) {
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::Entity Entity;
+                        if(Storage()->EntityDB().GetRecord("id",i.entity,Entity)) {
+                            EntObj.set( "name", Entity.info.name);
+                            EntObj.set( "description", Entity.info.description);
+                        }
+                        EI.set("entity",EntObj);
+                    }
+
+                    if(!i.managementPolicy.empty()) {
+                        Poco::JSON::Object  PolObj;
+                        ProvObjects::ManagementPolicy Policy;
+                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
+                            PolObj.set( "name", Policy.info.name);
+                            PolObj.set( "description", Policy.info.description);
+                        }
+                        EI.set("managementPolicy",PolObj);
+                    }
+                    Obj.set("extendedInfo", EI);
+                    ObjArray.add(Obj);
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("locations",ObjArray);
+                return ReturnObject(Answer);
+            }
+            return ReturnObject("locations", Locations);
         }
     }
 }
