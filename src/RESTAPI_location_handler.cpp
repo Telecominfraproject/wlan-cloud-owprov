@@ -25,6 +25,7 @@ namespace OpenWifi{
         }
 
         std::string Arg;
+        Poco::JSON::Object  Answer;
         if(HasParameter("expandInUse",Arg) && Arg=="true") {
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
@@ -40,12 +41,31 @@ namespace OpenWifi{
                     Inner.set(type,ObjList);
                 }
             }
-            Poco::JSON::Object  Answer;
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
+        } else if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            Poco::JSON::Object  EI;
+
+            if(!Existing.entity.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Entity Entity;
+                if(Storage()->EntityDB().GetRecord("id",Existing.entity,Entity)) {
+                    Entity.to_json(EntObj);
+                }
+                EI.set("entity",EntObj);
+            }
+
+            if(!Existing.managementPolicy.empty()) {
+                Poco::JSON::Object  PolObj;
+                ProvObjects::ManagementPolicy Policy;
+                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
+                    Policy.to_json(PolObj);
+                }
+                EI.set("managementPolicy",PolObj);
+            }
+            Answer.set("extendedInfo", EI);
         }
 
-        Poco::JSON::Object  Answer;
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }

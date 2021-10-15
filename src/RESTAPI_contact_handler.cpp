@@ -20,11 +20,12 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::Contact   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
+        Poco::JSON::Object  Answer;
         std::string Arg;
+
         if(HasParameter("expandInUse",Arg) && Arg=="true") {
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
@@ -40,13 +41,30 @@ namespace OpenWifi{
                     Inner.set(type,ObjList);
                 }
             }
-            Poco::JSON::Object  Answer;
             Answer.set("entries", Inner);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
+        } else if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            Poco::JSON::Object  EI;
+            if(!Existing.entity.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Entity Entity;
+                if(Storage()->EntityDB().GetRecord("id",Existing.entity,Entity)) {
+                    Entity.to_json(EntObj);
+                }
+                EI.set("entity",EntObj);
+            }
+
+            if(!Existing.managementPolicy.empty()) {
+                Poco::JSON::Object  PolObj;
+                ProvObjects::ManagementPolicy Policy;
+                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
+                    Policy.to_json(PolObj);
+                }
+                EI.set("managementPolicy",PolObj);
+            }
+            Answer.set("extendedInfo", EI);
         }
 
-        Poco::JSON::Object  Answer;
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }
@@ -151,13 +169,13 @@ namespace OpenWifi{
             MovingPolicy = MoveToPolicy != Existing.managementPolicy;
         }
 
-        std::string MoveToentity,MoveFromentity;
+        std::string MoveToEntity,MoveFromEntity;
         bool        Movingentity=false;
-        if(AssignIfPresent(RawObject,"entity",MoveToentity) && MoveToentity!=Existing.entity) {
-            if(!MoveToentity.empty() || !Storage()->Validate(MoveToentity)) {
+        if(AssignIfPresent(RawObject,"entity",MoveToEntity) && MoveToEntity!=Existing.entity) {
+            if(!MoveToEntity.empty() || !Storage()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
-            MoveFromentity = Existing.entity;
+            MoveFromEntity = Existing.entity;
             Movingentity = true ;
         }
 
@@ -180,7 +198,7 @@ namespace OpenWifi{
             Existing.phones = NewObject.phones;
 
 
-        Existing.entity = MoveToentity;
+        Existing.entity = MoveToEntity;
         Existing.info.modified = std::time(nullptr);
         Existing.managementPolicy = MoveToPolicy;
 
@@ -194,11 +212,11 @@ namespace OpenWifi{
             }
 
             if(Movingentity) {
-                if(!MoveFromentity.empty()) {
-                    Storage()->EntityDB().DeleteContact("id", MoveFromentity, DB_.Prefix(), Existing.info.id);
+                if(!MoveFromEntity.empty()) {
+                    Storage()->EntityDB().DeleteContact("id", MoveFromEntity, DB_.Prefix(), Existing.info.id);
                 }
-                if(!MoveToentity.empty()) {
-                    Storage()->EntityDB().AddContact("id", MoveToentity, DB_.Prefix(), Existing.info.id);
+                if(!MoveToEntity.empty()) {
+                    Storage()->EntityDB().AddContact("id", MoveToEntity, DB_.Prefix(), Existing.info.id);
                 }
             }
 
