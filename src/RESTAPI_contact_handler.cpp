@@ -199,7 +199,6 @@ namespace OpenWifi{
         if(RawObject->has("phones"))
             Existing.phones = NewObject.phones;
 
-
         Existing.entity = MoveToEntity;
         Existing.info.modified = std::time(nullptr);
         Existing.managementPolicy = MoveToPolicy;

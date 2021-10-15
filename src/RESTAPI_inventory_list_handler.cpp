@@ -35,6 +35,7 @@ namespace OpenWifi{
     void RESTAPI_inventory_list_handler::DoGet() {
         std::string UUID;
         std::string Arg;
+
         bool AddAdditionalInfo=false;
         if(HasParameter("withExtendedInfo",Arg) && Arg=="true")
             AddAdditionalInfo = true;
@@ -107,6 +108,7 @@ namespace OpenWifi{
             ProvObjects::InventoryTagVec Tags;
             Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
             Poco::JSON::Array   Arr;
+
             for(const auto &i:Tags) {
                 Poco::JSON::Object  O;
                 i.to_json(O);
@@ -158,14 +160,22 @@ namespace OpenWifi{
                         }
                         EI.set("location",EntObj);
                     }
+                    if(!i.deviceConfiguration.empty()) {
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::DeviceConfiguration DevConf;
+                        if(Storage()->ConfigurationDB().GetRecord("id",i.deviceConfiguration,DevConf)) {
+                            EntObj.set( "name", DevConf.info.name);
+                            EntObj.set( "description", DevConf.info.description);
+                        }
+                        EI.set("deviceConfiguration",EntObj);
+                    }
                     O.set("extendedInfo", EI);
                 }
                 Arr.add(O);
             }
             Poco::JSON::Object  Answer;
             Answer.set("taglist",Arr);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
     }
 }
