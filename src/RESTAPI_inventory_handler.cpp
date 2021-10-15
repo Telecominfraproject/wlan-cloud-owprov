@@ -41,12 +41,12 @@ namespace OpenWifi{
             return;
         }
 
-        std::string Arg;
+        Poco::JSON::Object  Answer;
+         std::string Arg;
         if(HasParameter("config",Arg) && Arg=="true") {
             bool Explain = (HasParameter("explain",Arg) && Arg == "true");
             APConfig    Device(SerialNumber,Existing.deviceType,Logger_, Explain);
 
-            Poco::JSON::Object       Answer;
             Poco::JSON::Object::Ptr  Configuration;
             if(Device.Get(Configuration)) {
                 Answer.set("config", Configuration);
@@ -57,8 +57,6 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
-            Poco::JSON::Object  Answer;
-
             std::string firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
             bool firmwareRCOnly = AutoDiscovery()->firmwareRCOnly();
 
@@ -69,8 +67,6 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
             APConfig    Device(SerialNumber,Existing.deviceType,Logger_, false);
-
-            Poco::JSON::Object       Answer;
             Poco::JSON::Object::Ptr  Configuration;
 
             Types::StringVec Errors, Warnings;
@@ -100,9 +96,55 @@ namespace OpenWifi{
             RESTAPI_utils::field_to_json(Answer,"errors", Errors);
             RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
             return ReturnObject(Answer);
+        }  else if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            Poco::JSON::Object  EI;
+            if(!Existing.entity.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Entity Entity;
+                if(Storage()->EntityDB().GetRecord("id",Existing.entity,Entity)) {
+                    EntObj.set( "name", Entity.info.name);
+                    EntObj.set( "description", Entity.info.description);
+                }
+                EI.set("entity",EntObj);
+            }
+            if(!Existing.managementPolicy.empty()) {
+                Poco::JSON::Object  PolObj;
+                ProvObjects::ManagementPolicy Policy;
+                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
+                    PolObj.set( "name", Policy.info.name);
+                    PolObj.set( "description", Policy.info.description);
+                }
+                EI.set("managementPolicy",PolObj);
+            }
+            if(!Existing.venue.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Venue Venue;
+                if(Storage()->VenueDB().GetRecord("id",Existing.venue,Venue)) {
+                    EntObj.set( "name", Venue.info.name);
+                    EntObj.set( "description", Venue.info.description);
+                }
+                EI.set("venue",EntObj);
+            }
+            if(!Existing.contact.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Contact Contact;
+                if(Storage()->ContactDB().GetRecord("id",Existing.contact,Contact)) {
+                    EntObj.set( "name", Contact.info.name);
+                    EntObj.set( "description", Contact.info.description);
+                }
+                EI.set("contact",EntObj);
+            }
+            if(!Existing.location.empty()) {
+                Poco::JSON::Object  EntObj;
+                ProvObjects::Location Location;
+                if(Storage()->LocationDB().GetRecord("id",Existing.location,Location)) {
+                    EntObj.set( "name", Location.info.name);
+                    EntObj.set( "description", Location.info.description);
+                }
+                EI.set("location",EntObj);
+            }
+            Answer.set("extendedInfo", EI);
         }
-
-        Poco::JSON::Object  Answer;
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }

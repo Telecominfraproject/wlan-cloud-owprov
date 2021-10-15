@@ -110,21 +110,55 @@ namespace OpenWifi{
             for(const auto &i:Tags) {
                 Poco::JSON::Object  O;
                 i.to_json(O);
+
                 if(AddAdditionalInfo) {
+                    Poco::JSON::Object  EI;
                     if(!i.entity.empty()) {
-                        Poco::JSON::Object  EO;
-                        ProvObjects::Entity EI;
-                        Storage()->EntityDB().GetRecord("id",i.entity,EI);
-                        EI.to_json(EO);
-                        O.set("entity_info",EO);
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::Entity Entity;
+                        if(Storage()->EntityDB().GetRecord("id",i.entity,Entity)) {
+                            EntObj.set( "name", Entity.info.name);
+                            EntObj.set( "description", Entity.info.description);
+                        }
+                        EI.set("entity",EntObj);
+                    }
+                    if(!i.managementPolicy.empty()) {
+                        Poco::JSON::Object  PolObj;
+                        ProvObjects::ManagementPolicy Policy;
+                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
+                            PolObj.set( "name", Policy.info.name);
+                            PolObj.set( "description", Policy.info.description);
+                        }
+                        EI.set("managementPolicy",PolObj);
                     }
                     if(!i.venue.empty()) {
-                        Poco::JSON::Object VO;
-                        ProvObjects::Venue VI;
-                        Storage()->VenueDB().GetRecord("id",i.venue,VI);
-                        VI.to_json(VO);
-                        O.set("venue_info",VO);
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::Venue Venue;
+                        if(Storage()->VenueDB().GetRecord("id",i.venue,Venue)) {
+                            EntObj.set( "name", Venue.info.name);
+                            EntObj.set( "description", Venue.info.description);
+                        }
+                        EI.set("venue",EntObj);
                     }
+                    if(!i.contact.empty()) {
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::Contact Contact;
+                        if(Storage()->ContactDB().GetRecord("id",i.contact,Contact)) {
+                            EntObj.set( "name", Contact.info.name);
+                            EntObj.set( "description", Contact.info.description);
+                        }
+                        EI.set("contact",EntObj);
+                    }
+                    if(!i.location.empty()) {
+                        Poco::JSON::Object  EntObj;
+                        ProvObjects::Location Location;
+                        if(Storage()->LocationDB().GetRecord("id",i.location,Location)) {
+                            EntObj.set( "name", Location.info.name);
+                            EntObj.set( "description", Location.info.description);
+                        }
+                        EI.set("location",EntObj);
+                    }
+                    O.set("extendedInfo", EI);
                 }
                 Arr.add(O);
             }

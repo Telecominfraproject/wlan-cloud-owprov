@@ -12,7 +12,7 @@ namespace OpenWifi{
     void RESTAPI_venue_list_handler::DoGet() {
         try {
             std::string Arg;
-
+            bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
             if(!QB_.Select.empty()) {
                 auto UUIDs = Utils::Split(QB_.Select);
                 ProvObjects::VenueVec  Venues;
@@ -53,8 +53,57 @@ namespace OpenWifi{
             } else {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
-                ReturnObject("venues", Venues);
-                return;
+
+                if(AdditionalInfo) {
+                    Poco::JSON::Array   ObjArr;
+                    for(const auto &i:Venues) {
+                        Poco::JSON::Object  Obj;
+                        Poco::JSON::Object  EI;
+                        if(!i.entity.empty()) {
+                            Poco::JSON::Object  EntObj;
+                            ProvObjects::Entity Entity;
+                            if(Storage()->EntityDB().GetRecord("id",i.entity,Entity)) {
+                                EntObj.set( "name", Entity.info.name);
+                                EntObj.set( "description", Entity.info.description);
+                            }
+                            EI.set("entity",EntObj);
+                        }
+                        if(!i.managementPolicy.empty()) {
+                            Poco::JSON::Object  PolObj;
+                            ProvObjects::ManagementPolicy Policy;
+                            if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
+                                PolObj.set( "name", Policy.info.name);
+                                PolObj.set( "description", Policy.info.description);
+                            }
+                            EI.set("managementPolicy",PolObj);
+                        }
+                        if(!i.contact.empty()) {
+                            Poco::JSON::Object  EntObj;
+                            ProvObjects::Contact Contact;
+                            if(Storage()->ContactDB().GetRecord("id",i.contact,Contact)) {
+                                EntObj.set( "name", Contact.info.name);
+                                EntObj.set( "description", Contact.info.description);
+                            }
+                            EI.set("contact",EntObj);
+                        }
+                        if(!i.location.empty()) {
+                            Poco::JSON::Object  EntObj;
+                            ProvObjects::Location Location;
+                            if(Storage()->LocationDB().GetRecord("id",i.location,Location)) {
+                                EntObj.set( "name", Location.info.name);
+                                EntObj.set( "description", Location.info.description);
+                            }
+                            EI.set("location",EntObj);
+                        }
+                        Obj.set("extendedInfo", EI);
+                        i.to_json(Obj);
+                        ObjArr.add(Obj);
+                    }
+                    Poco::JSON::Object  Answer;
+                    Answer.set("venues", ObjArr);
+                    return ReturnObject(Answer);
+                }
+                return ReturnObject("venues", Venues);
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);

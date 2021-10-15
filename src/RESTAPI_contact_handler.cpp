@@ -172,13 +172,13 @@ namespace OpenWifi{
         }
 
         std::string MoveToEntity,MoveFromEntity;
-        bool        Movingentity=false;
-        if(AssignIfPresent(RawObject,"entity",MoveToEntity) && MoveToEntity!=Existing.entity) {
+        bool MovingEntity=false;
+        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
             if(!MoveToEntity.empty() || !Storage()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MoveFromEntity = Existing.entity;
-            Movingentity = true ;
+            MovingEntity = MoveToEntity != Existing.entity ;
         }
 
         AssignIfPresent(RawObject,"name",Existing.info.name);
@@ -213,7 +213,7 @@ namespace OpenWifi{
                     Storage()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
             }
 
-            if(Movingentity) {
+            if(MovingEntity) {
                 if(!MoveFromEntity.empty()) {
                     Storage()->EntityDB().DeleteContact("id", MoveFromEntity, DB_.Prefix(), Existing.info.id);
                 }
