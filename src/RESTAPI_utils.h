@@ -1,11 +1,6 @@
 //
-//	License type: BSD 3-Clause License
-//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+// Created by stephane bourque on 2021-07-05.
 //
-//	Created by Stephane Bourque on 2021-03-04.
-//	Arilia Wireless Inc.
-//
-
 
 #ifndef UCENTRALGW_RESTAPI_UTILS_H
 #define UCENTRALGW_RESTAPI_UTILS_H
@@ -148,6 +143,12 @@ namespace OpenWifi::RESTAPI_utils {
 		Obj.set(Field, Arr);
 	}
 
+	template<class T> void field_to_json(Poco::JSON::Object &Obj, const char *Field, const T &Value) {
+	    Poco::JSON::Object  Answer;
+        Value.to_json(Answer);
+	    Obj.set(Field, Answer);
+	}
+
 	template<class T> void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, std::vector<T> &Value) {
 		if(Obj->isArray(Field)) {
 			Poco::JSON::Array::Ptr	Arr = Obj->getArray(Field);
@@ -187,7 +188,7 @@ namespace OpenWifi::RESTAPI_utils {
 			OutputArr.add(i);
 		}
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::stringify(OutputArr,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
+		Poco::JSON::Stringifier::condense(OutputArr,OS);
 		return OS.str();
 	}
 
@@ -201,7 +202,7 @@ namespace OpenWifi::RESTAPI_utils {
 			OutputArr.add(O);
 		}
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::stringify(OutputArr,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
+		Poco::JSON::Stringifier::condense(OutputArr,OS);
 		return OS.str();
 	}
 
@@ -209,7 +210,7 @@ namespace OpenWifi::RESTAPI_utils {
 		Poco::JSON::Object OutputObj;
 		Object.to_json(OutputObj);
 		std::ostringstream OS;
-		Poco::JSON::Stringifier::stringify(OutputObj,OS, 0,0, Poco::JSON_PRESERVE_KEY_ORDER );
+		Poco::JSON::Stringifier::condense(OutputObj,OS);
 		return OS.str();
 	}
 
@@ -222,7 +223,7 @@ namespace OpenWifi::RESTAPI_utils {
         try {
             Poco::JSON::Parser P;
             auto Object = P.parse(ObjectString).template extract<Poco::JSON::Array::Ptr>();
-            for (auto const i : *Object) {
+            for (auto const &i : *Object) {
                 Result.push_back(i.toString());
             }
         } catch (...) {
@@ -257,7 +258,7 @@ namespace OpenWifi::RESTAPI_utils {
 		try {
 			Poco::JSON::Parser P;
 			auto Object = P.parse(ObjectString).template extract<Poco::JSON::Array::Ptr>();
-			for (auto const &i : *Object) {
+			for (auto const i : *Object) {
 				auto InnerObject = i.template extract<Poco::JSON::Object::Ptr>();
 				T Obj;
 				Obj.from_json(InnerObject);
