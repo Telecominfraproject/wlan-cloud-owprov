@@ -31,8 +31,7 @@ namespace OpenWifi{
             ProvObjects::LocationVec Locations;
             Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
 
-            std::string Arg;
-            if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            if(QB_.AdditionalInfo) {
                 Poco::JSON::Array   ObjArray;
                 for(const auto &i:Locations) {
                     Poco::JSON::Object  Obj;

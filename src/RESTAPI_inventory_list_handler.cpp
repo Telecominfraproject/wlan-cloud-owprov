@@ -36,10 +36,6 @@ namespace OpenWifi{
         std::string UUID;
         std::string Arg;
 
-        bool AddAdditionalInfo=false;
-        if(HasParameter("withExtendedInfo",Arg) && Arg=="true")
-            AddAdditionalInfo = true;
-
         bool SerialOnly=false;
         if(HasParameter("serialOnly",Arg) && Arg=="true")
             SerialOnly=true;
@@ -103,7 +99,7 @@ namespace OpenWifi{
                 Poco::JSON::Object  O;
                 i.to_json(O);
 
-                if(AddAdditionalInfo) {
+                if(QB_.AdditionalInfo) {
                     Poco::JSON::Object  EI;
                     if(!i.entity.empty()) {
                         Poco::JSON::Object  EntObj;

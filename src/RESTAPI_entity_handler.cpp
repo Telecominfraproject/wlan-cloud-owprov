@@ -21,16 +21,14 @@
 namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoGet() {
-        std::string UUID = GetBinding("uuid", ""), Arg;
-        bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
-
+        std::string UUID = GetBinding("uuid", "");
         ProvObjects::Entity Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             return NotFound();
         }
 
         Poco::JSON::Object Answer;
-        if(AdditionalInfo) {
+        if(QB_.AdditionalInfo) {
             Poco::JSON::Object  EI;
             if(!Existing.managementPolicy.empty()) {
                 Poco::JSON::Object  PolObj;

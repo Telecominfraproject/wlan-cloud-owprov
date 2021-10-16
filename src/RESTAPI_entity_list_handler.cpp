@@ -17,7 +17,6 @@ namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
         std::string Arg;
-        bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
         if(!QB_.Select.empty()) {
             auto EntityUIDs = Utils::Split(QB_.Select);
             ProvObjects::EntityVec Entities;
@@ -40,7 +39,7 @@ namespace OpenWifi{
         } else {
             ProvObjects::EntityVec Entities;
             Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-            if(AdditionalInfo) {
+            if(QB_.AdditionalInfo) {
                 Poco::JSON::Array   ObjArray;
                 for(const auto &i:Entities) {
                     Poco::JSON::Object  O;

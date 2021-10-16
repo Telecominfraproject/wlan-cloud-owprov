@@ -12,7 +12,6 @@ namespace OpenWifi{
     void RESTAPI_venue_list_handler::DoGet() {
         try {
             std::string Arg;
-            bool AdditionalInfo = HasParameter("withExtendedInfo",Arg) && Arg=="true";
             if(!QB_.Select.empty()) {
                 auto UUIDs = Utils::Split(QB_.Select);
                 ProvObjects::VenueVec  Venues;
@@ -49,7 +48,7 @@ namespace OpenWifi{
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
 
-                if(AdditionalInfo) {
+                if(QB_.AdditionalInfo) {
                     Poco::JSON::Array   ObjArr;
                     for(const auto &i:Venues) {
                         Poco::JSON::Object  Obj;

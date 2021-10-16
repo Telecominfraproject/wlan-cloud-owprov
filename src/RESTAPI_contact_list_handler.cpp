@@ -33,7 +33,7 @@ namespace OpenWifi{
             ProvObjects::ContactVec Contacts;
             Storage()->ContactDB().GetRecords(QB_.Offset,QB_.Limit,Contacts);
             std::string Arg;
-            if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            if(QB_.AdditionalInfo) {
                 Poco::JSON::Array   ObjArray;
                 for(const auto &i:Contacts) {
                     Poco::JSON::Object  Obj;

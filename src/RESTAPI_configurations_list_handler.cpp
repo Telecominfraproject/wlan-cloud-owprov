@@ -31,8 +31,7 @@ namespace OpenWifi{
             ProvObjects::DeviceConfigurationVec Configs;
             Storage()->ConfigurationDB().GetRecords(QB_.Offset,QB_.Limit,Configs);
 
-            std::string Arg;
-            if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+            if(QB_.AdditionalInfo) {
                 Poco::JSON::Array   ObjArray;
                 for(const auto &i:Configs) {
                     Poco::JSON::Object  Obj;

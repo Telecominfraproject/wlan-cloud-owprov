@@ -43,7 +43,7 @@ namespace OpenWifi{
             }
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
-        } else if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+        } else if(QB_.AdditionalInfo) {
             Poco::JSON::Object  EI;
             if(!Existing.entity.empty()) {
                 Poco::JSON::Object  EntObj;

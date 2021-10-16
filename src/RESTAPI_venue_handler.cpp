@@ -25,8 +25,7 @@ namespace OpenWifi{
         }
 
         Poco::JSON::Object Answer;
-        std::string Arg;
-        if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+        if(QB_.AdditionalInfo) {
             Poco::JSON::Object  EI;
             if(!Existing.entity.empty()) {
                 Poco::JSON::Object  EntObj;

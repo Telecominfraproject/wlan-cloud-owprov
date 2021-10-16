@@ -41,7 +41,7 @@ namespace OpenWifi{
         }
 
         Poco::JSON::Object  Answer;
-         std::string Arg;
+        std::string Arg;
         if(HasParameter("config",Arg) && Arg=="true") {
             bool Explain = (HasParameter("explain",Arg) && Arg == "true");
             APConfig    Device(SerialNumber,Existing.deviceType,Logger_, Explain);
@@ -95,7 +95,7 @@ namespace OpenWifi{
             RESTAPI_utils::field_to_json(Answer,"errors", Errors);
             RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
             return ReturnObject(Answer);
-        }  else if(HasParameter("withExtendedInfo",Arg) && Arg=="true") {
+        }  else if(QB_.AdditionalInfo) {
             Poco::JSON::Object  EI;
             if(!Existing.entity.empty()) {
                 Poco::JSON::Object  EntObj;
