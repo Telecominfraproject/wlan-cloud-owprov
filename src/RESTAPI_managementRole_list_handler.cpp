@@ -19,22 +19,18 @@ namespace OpenWifi{
                 if(Storage()->RolesDB().GetRecord("id",i,E)) {
                     Roles.push_back(E);
                 } else {
-                    BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                    return;
+                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
                 }
             }
-            ReturnObject("roles", Roles);
-            return;
+            return ReturnObject("roles", Roles);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->RolesDB().Count();
-            ReturnCountOnly(C);
-            return;
+            return ReturnCountOnly(C);
         } else {
             ProvObjects::ManagementRoleVec Roles;
             Storage()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
-            ReturnObject("roles", Roles);
-            return;
+            return ReturnObject("roles", Roles);
         }
     }
 }

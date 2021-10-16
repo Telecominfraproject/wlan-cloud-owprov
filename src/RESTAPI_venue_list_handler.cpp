@@ -21,35 +21,30 @@ namespace OpenWifi{
                     if(Storage()->VenueDB().GetRecord("id",i,E)) {
                         Venues.push_back(E);
                     } else {
-                        BadRequest("Unknown UUID:" + i);
-                        return;
+                        return BadRequest("Unknown UUID:" + i);
                     }
                 }
-                ReturnObject("venues", Venues);
-                return;
+                return ReturnObject("venues", Venues);
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues, Storage()->VenueDB().OP("entity",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
-                    ReturnCountOnly(Venues.size());
+                    return ReturnCountOnly(Venues.size());
                 } else {
-                    ReturnObject("venues", Venues);
+                    return ReturnObject("venues", Venues);
                 }
-                return;
             } else if(HasParameter("venue",Arg)) {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().OP("venue",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
-                    ReturnCountOnly(Venues.size());
+                    return ReturnCountOnly(Venues.size());
                 } else {
-                    ReturnObject("venues", Venues);
+                    return ReturnObject("venues", Venues);
                 }
-                return;
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = Storage()->VenueDB().Count();
-                ReturnCountOnly(C);
-                return;
+                return ReturnCountOnly(C);
             } else {
                 ProvObjects::VenueVec Venues;
                 Storage()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);

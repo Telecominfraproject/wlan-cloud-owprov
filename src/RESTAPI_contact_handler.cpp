@@ -76,8 +76,7 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::Contact   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         bool Force=false;
@@ -86,13 +85,11 @@ namespace OpenWifi{
             Force=true;
 
         if(!Force && !Existing.inUse.empty()) {
-            BadRequest(RESTAPI::Errors::StillInUse);
-            return;
+            return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(DB_.DeleteRecord("id",UUID)) {
-            OK();
-            return;
+            return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
@@ -101,25 +98,21 @@ namespace OpenWifi{
         std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
 
         if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         auto Obj = ParseStream();
         ProvObjects::Contact NewObject;
         if (!NewObject.from_json(Obj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         if(NewObject.entity.empty() || !Storage()->EntityDB().Exists("id",NewObject.entity)) {
-            BadRequest(RESTAPI::Errors::EntityMustExist);
-            return;
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
         if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
         NewObject.info.id = Daemon()->CreateUUID();

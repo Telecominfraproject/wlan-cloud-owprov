@@ -26,8 +26,7 @@ namespace OpenWifi{
 
         ProvObjects::Entity Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         Poco::JSON::Object Answer;
@@ -61,18 +60,15 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid", "");
         ProvObjects::Entity Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(UUID == EntityDB::RootUUID()) {
-            BadRequest(RESTAPI::Errors::CannotDeleteRoot);
-            return;
+            return BadRequest(RESTAPI::Errors::CannotDeleteRoot);
         }
 
         if(!Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty()) {
-            BadRequest(RESTAPI::Errors::StillInUse);
-            return;
+            return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(!Existing.deviceConfiguration.empty())
@@ -88,8 +84,7 @@ namespace OpenWifi{
 
         if(DB_.DeleteRecord("id",UUID)) {
             DB_.DeleteChild("id",Existing.parent,UUID);
-            OK();
-            return;
+            return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
@@ -97,20 +92,17 @@ namespace OpenWifi{
     void RESTAPI_entity_handler::DoPost() {
         std::string UUID = GetBinding("uuid", "");
         if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         if(!DB_.RootExists() && UUID != EntityDB::RootUUID()) {
-            BadRequest(RESTAPI::Errors::MustCreateRootFirst);
-            return;
+            return BadRequest(RESTAPI::Errors::MustCreateRootFirst);
         }
 
         auto Obj = ParseStream();
         ProvObjects::Entity NewEntity;
         if (!NewEntity.from_json(Obj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
         NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
 
@@ -123,23 +115,19 @@ namespace OpenWifi{
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";
         } else if(NewEntity.parent.empty() || !DB_.Exists("id",NewEntity.parent)) {
-            BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
-            return;
+            return BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
         }
 
         if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
-            BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-            return;
+            return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
         }
 
         if(!NewEntity.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id", NewEntity.managementPolicy)){
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
         if(!NewEntity.sourceIP.empty() && !CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
-            BadRequest(RESTAPI::Errors::InvalidIPRanges);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidIPRanges);
         }
 
         NewEntity.venues.clear();
@@ -156,8 +144,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             NewEntity.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
@@ -175,15 +162,13 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid", "");
         ProvObjects::Entity Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         auto RawObject = ParseStream();
         ProvObjects::Entity NewEntity;
         if(!NewEntity.from_json(RawObject)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         std::string NewConfiguration, NewManagementPolicy;
@@ -191,23 +176,20 @@ namespace OpenWifi{
                     MovingManagementPolicy=false;
         if(AssignIfPresent(RawObject,"deviceConfiguration",NewConfiguration)) {
             if(!NewConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
-                BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-                return;
+                return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
             }
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
         if(AssignIfPresent(RawObject,"managementPolicy",NewManagementPolicy)) {
             if(!NewManagementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewManagementPolicy)) {
-                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-                return;
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MovingManagementPolicy = Existing.managementPolicy != NewManagementPolicy;
         }
 
         if(RawObject->has("sourceIP")) {
             if(!NewEntity.sourceIP.empty() && !CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
-                BadRequest(RESTAPI::Errors::InvalidIPRanges);
-                return;
+                return BadRequest(RESTAPI::Errors::InvalidIPRanges);
             }
             Existing.sourceIP = NewEntity.sourceIP;
         }
@@ -219,8 +201,7 @@ namespace OpenWifi{
 
         std::string Error;
         if(!Storage()->Validate(Parameters_,Error)) {
-            BadRequest(Error);
-            return;
+            return BadRequest(Error);
         }
 
         AssignIfPresent(RawObject, "rrm", Existing.rrm);
@@ -269,8 +250,7 @@ namespace OpenWifi{
             ProvObjects::Entity NewRecord;
             Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
             NewRecord.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
     }

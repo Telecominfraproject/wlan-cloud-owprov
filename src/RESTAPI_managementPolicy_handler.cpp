@@ -20,8 +20,7 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::ManagementPolicy   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         std::string Arg;
@@ -42,8 +41,7 @@ namespace OpenWifi{
             }
             Poco::JSON::Object  Answer;
             Answer.set("entries", Inner);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
 
         Poco::JSON::Object  Answer;
@@ -55,18 +53,15 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::ManagementPolicy   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(!Existing.inUse.empty()) {
-            BadRequest(RESTAPI::Errors::StillInUse);
-            return;
+            return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(Storage()->PolicyDB().DeleteRecord("id", UUID)) {
-            OK();
-            return;
+            return OK();
         }
 
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
@@ -75,20 +70,17 @@ namespace OpenWifi{
     void RESTAPI_managementPolicy_handler::DoPost() {
         std::string UUID = GetBinding("uuid","");
         if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
         auto NewObj = ParseStream();
         if(!NewPolicy.from_json(NewObj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         if(NewPolicy.info.name.empty()) {
-            BadRequest(RESTAPI::Errors::NameMustBeSet);
-            return;
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
         NewPolicy.inUse.clear();
@@ -99,8 +91,7 @@ namespace OpenWifi{
             DB_.GetRecord("id",NewPolicy.info.id,Policy);
             Poco::JSON::Object  Answer;
             Policy.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
@@ -109,15 +100,13 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::ManagementPolicy   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
         auto NewObj = ParseStream();
         if(!NewPolicy.from_json(NewObj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         AssignIfPresent(NewObj, "name", Existing.info.name);
@@ -132,8 +121,7 @@ namespace OpenWifi{
             DB_.GetRecord("id",Existing.info.id,P);
             Poco::JSON::Object  Answer;
             P.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
     }

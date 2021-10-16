@@ -19,17 +19,14 @@ namespace OpenWifi{
                 if(Storage()->LocationDB().GetRecord("id",i,E)) {
                     Locations.push_back(E);
                 } else {
-                    BadRequest(RESTAPI::Errors::UnknownId + " ("+i+")");
-                    return;
+                    return BadRequest(RESTAPI::Errors::UnknownId + " ("+i+")");
                 }
             }
-            ReturnObject("locations", Locations);
-            return;
+            return ReturnObject("locations", Locations);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->LocationDB().Count();
-            ReturnCountOnly(C);
-            return;
+            return ReturnCountOnly(C);
         } else {
             ProvObjects::LocationVec Locations;
             Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);

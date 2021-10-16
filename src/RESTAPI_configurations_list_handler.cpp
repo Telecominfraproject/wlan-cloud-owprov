@@ -19,17 +19,14 @@ namespace OpenWifi{
                 if(Storage()->ConfigurationDB().GetRecord("id",i,E)) {
                     Configs.push_back(E);
                 } else {
-                    BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                    return;
+                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
                 }
             }
-            ReturnObject("configurations", Configs);
-            return;
+            return ReturnObject("configurations", Configs);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->ConfigurationDB().Count();
-            ReturnCountOnly(C);
-            return;
+            return ReturnCountOnly(C);
         } else {
             ProvObjects::DeviceConfigurationVec Configs;
             Storage()->ConfigurationDB().GetRecords(QB_.Offset,QB_.Limit,Configs);

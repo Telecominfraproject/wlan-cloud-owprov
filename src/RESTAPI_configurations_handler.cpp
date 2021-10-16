@@ -20,8 +20,7 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::DeviceConfiguration   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         Poco::JSON::Object  Answer;
@@ -64,18 +63,15 @@ namespace OpenWifi{
         std::string UUID = GetBinding("uuid","");
         ProvObjects::DeviceConfiguration   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(!Existing.inUse.empty()) {
-            BadRequest(RESTAPI::Errors::StillInUse);
-            return;
+            return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(DB_.DeleteRecord("id", UUID)) {
-            OK();
-            return;
+            return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
@@ -118,16 +114,14 @@ namespace OpenWifi{
     void RESTAPI_configurations_handler::DoPost() {
         auto UUID = GetBinding("uuid","");
         if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         std::string Arg;
         if(HasParameter("validateOnly",Arg) && Arg=="true") {
             auto Body = ParseStream();
             if(!Body->has("configuration")) {
-                BadRequest("Must have 'configuration' element.");
-                return;
+                return BadRequest("Must have 'configuration' element.");
             }
             auto Config=Body->get("configuration").toString();
             Poco::JSON::Object  Answer;
@@ -135,25 +129,21 @@ namespace OpenWifi{
             auto Res = ValidateUCentralConfiguration(Config,Error);
             Answer.set("valid",Res);
             Answer.set("error", Error);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
 
         ProvObjects::DeviceConfiguration C;
         Poco::JSON::Object::Ptr Obj = ParseStream();
         if (!C.from_json(Obj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         if(C.info.name.empty()) {
-            BadRequest(RESTAPI::Errors::NameMustBeSet);
-            return;
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
         if(!C.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownId);
-            return;
+            return BadRequest(RESTAPI::Errors::UnknownId);
         }
 
         C.info.modified = C.info.created = std::time(nullptr);
@@ -163,8 +153,7 @@ namespace OpenWifi{
 
         C.inUse.clear();
         if(C.deviceTypes.empty() || !Storage()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
-            BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
         std::string Error;
@@ -179,8 +168,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             C.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
@@ -220,8 +208,7 @@ namespace OpenWifi{
         bool        MovingPolicy=false;
         if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
             if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
-                BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-                return;
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MovingPolicy = NewConfig.managementPolicy != Existing.managementPolicy;
         }
@@ -253,8 +240,7 @@ namespace OpenWifi{
             DB_.GetRecord("id",UUID,D);
             Poco::JSON::Object  Answer;
             D.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
     }

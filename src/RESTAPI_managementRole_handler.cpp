@@ -18,8 +18,7 @@ namespace OpenWifi{
         ProvObjects::ManagementRole   Existing;
         std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         std::string Arg;
@@ -40,8 +39,7 @@ namespace OpenWifi{
             }
             Poco::JSON::Object  Answer;
             Answer.set("entries", Inner);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
 
         Poco::JSON::Object  Answer;
@@ -53,8 +51,7 @@ namespace OpenWifi{
         ProvObjects::ManagementRole   Existing;
         std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         bool Force=false;
@@ -63,16 +60,14 @@ namespace OpenWifi{
             Force=true;
 
         if(!Force && !Existing.inUse.empty()) {
-            BadRequest(RESTAPI::Errors::StillInUse);
-            return;
+            return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(!Existing.managementPolicy.empty())
             Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
 
         if(Storage()->RolesDB().DeleteRecord("id", Existing.info.id)) {
-            OK();
-            return;
+            return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
@@ -80,20 +75,17 @@ namespace OpenWifi{
     void RESTAPI_managementRole_handler::DoPost() {
         std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
         if(UUID.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         auto Obj = ParseStream();
         ProvObjects::ManagementRole NewObject;
         if (!NewObject.from_json(Obj)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
         NewObject.info.id = Daemon()->CreateUUID();
         NewObject.info.created = NewObject.info.modified = std::time(nullptr);
@@ -107,8 +99,7 @@ namespace OpenWifi{
             ProvObjects::ManagementRole Role;
             DB_.GetRecord("id", NewObject.info.id,Role);
             Role.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
@@ -117,15 +108,13 @@ namespace OpenWifi{
         ProvObjects::ManagementRole   Existing;
         std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         auto RawObject = ParseStream();
         ProvObjects::ManagementRole NewObject;
         if(!NewObject.from_json(RawObject)) {
-            BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         for(auto &i:NewObject.info.notes) {
@@ -139,8 +128,7 @@ namespace OpenWifi{
         std::string NewPolicy,OldPolicy = Existing.managementPolicy;
         AssignIfPresent(RawObject, "managementPolicy", NewPolicy);
         if(!NewPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewPolicy)) {
-            BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            return;
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
         if(!NewPolicy.empty())
@@ -157,8 +145,7 @@ namespace OpenWifi{
             DB_.GetRecord("id", UUID, NewRecord);
             Poco::JSON::Object  Answer;
             NewRecord.to_json(Answer);
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
     }

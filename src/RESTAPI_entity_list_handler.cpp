@@ -80,8 +80,7 @@ namespace OpenWifi{
         if (HasParameter("setTree",Arg) && Arg=="true") {
             auto FullTree = ParseStream();
             Storage()->EntityDB().ImportTree(FullTree);
-            OK();
-            return;
+            return OK();
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }

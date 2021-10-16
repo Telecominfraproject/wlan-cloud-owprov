@@ -19,23 +19,18 @@ namespace OpenWifi{
                 if(Storage()->PolicyDB().GetRecord("id",i,E)) {
                     Policies.push_back(E);
                 } else {
-                    BadRequest(RESTAPI::Errors::UnknownId + "(" + i + ")");
-                    return;
+                    return BadRequest(RESTAPI::Errors::UnknownId + "(" + i + ")");
                 }
             }
-            ReturnObject("managementPolicies", Policies);
-            return;
+            return ReturnObject("managementPolicies", Policies);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->ContactDB().Count();
-            ReturnCountOnly(C);
-            return;
+            return ReturnCountOnly(C);
         } else {
             ProvObjects::ManagementPolicyVec Policies;
             Storage()->PolicyDB().GetRecords(QB_.Offset,QB_.Limit,Policies);
-            ReturnObject("managementPolicies", Policies);
-            return;
+            return ReturnObject("managementPolicies", Policies);
         }
     }
-
 }
