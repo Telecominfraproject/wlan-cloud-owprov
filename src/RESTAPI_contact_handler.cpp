@@ -128,7 +128,7 @@ namespace OpenWifi{
 
         if(DB_.CreateRecord(NewObject)) {
 
-            Storage()->EntityDB().AddContact("id",NewObject.entity,DB_.Prefix(),NewObject.info.id);
+            Storage()->EntityDB().AddContact("id",NewObject.entity,NewObject.info.id);
             if(!NewObject.managementPolicy.empty())
                 Storage()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
 
@@ -214,10 +214,10 @@ namespace OpenWifi{
 
             if(MovingEntity) {
                 if(!MoveFromEntity.empty()) {
-                    Storage()->EntityDB().DeleteContact("id", MoveFromEntity, DB_.Prefix(), Existing.info.id);
+                    Storage()->EntityDB().DeleteContact("id", MoveFromEntity, Existing.info.id);
                 }
                 if(!MoveToEntity.empty()) {
-                    Storage()->EntityDB().AddContact("id", MoveToEntity, DB_.Prefix(), Existing.info.id);
+                    Storage()->EntityDB().AddContact("id", MoveToEntity, Existing.info.id);
                 }
             }
 

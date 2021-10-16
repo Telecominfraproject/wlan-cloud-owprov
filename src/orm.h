@@ -699,24 +699,20 @@ namespace ORM {
             return ManipulateVectorMember(&RecordType::inUse,FieldName, ParentUUID, FakeUUID, false);
         }
 
-        inline bool DeleteContact(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
-            std::string FakeUUID{ Prefix + ":" + ChildUUID};
-            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, FakeUUID, false);
+        inline bool DeleteContact(const char *FieldName, std::string & ParentUUID, const std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, ChildUUID, false);
         }
 
-        inline bool AddContact(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
-            std::string FakeUUID{ Prefix + ":" + ChildUUID};
-            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, FakeUUID, true);
+        inline bool AddContact(const char *FieldName, std::string & ParentUUID, const std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::contacts,FieldName, ParentUUID, ChildUUID, true);
         }
 
-        inline bool DeleteLocation(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
-            std::string FakeUUID{ Prefix + ":" + ChildUUID};
-            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, FakeUUID, false);
+        inline bool DeleteLocation(const char *FieldName, std::string & ParentUUID, const std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, ChildUUID, false);
         }
 
-        inline bool AddLocation(const char *FieldName, std::string & ParentUUID, const std::string & Prefix, const std::string & ChildUUID) {
-            std::string FakeUUID{ Prefix + ":" + ChildUUID};
-            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, FakeUUID, true);
+        inline bool AddLocation(const char *FieldName, std::string & ParentUUID, const std::string & ChildUUID) {
+            return ManipulateVectorMember(&RecordType::locations,FieldName, ParentUUID, ChildUUID, true);
         }
 
         inline bool GetInUse(const char *FieldName, std::string & UUID, std::vector<std::string> & UUIDs ) {

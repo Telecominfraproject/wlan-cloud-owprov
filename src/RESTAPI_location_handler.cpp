@@ -121,7 +121,7 @@ namespace OpenWifi{
             if(!NewObject.managementPolicy.empty())
                 Storage()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
 
-            Storage()->EntityDB().AddLocation("id",NewObject.entity,DB_.Prefix(),NewObject.info.id);
+            Storage()->EntityDB().AddLocation("id",NewObject.entity,NewObject.info.id);
 
             Poco::JSON::Object Answer;
             NewObject.to_json(Answer);
@@ -197,9 +197,9 @@ namespace OpenWifi{
             }
             if(MovingEntity) {
                 if(!MoveFromEntity.empty())
-                    Storage()->EntityDB().DeleteLocation("id",MoveFromEntity,DB_.Prefix(),Existing.info.id);
+                    Storage()->EntityDB().DeleteLocation("id",MoveFromEntity,Existing.info.id);
                 if(!MoveToEntity.empty())
-                    Storage()->EntityDB().AddLocation("id", MoveToEntity, DB_.Prefix(), Existing.info.id);
+                    Storage()->EntityDB().AddLocation("id", MoveToEntity, Existing.info.id);
             }
 
             ProvObjects::Location    NewObjectAdded;
