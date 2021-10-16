@@ -174,6 +174,7 @@ namespace OpenWifi{
         std::string MoveToEntity,MoveFromEntity;
         bool MovingEntity=false;
         if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
+            std::cout << "Entity move to: " << MoveToEntity << std::endl;
             if(!MoveToEntity.empty() || !Storage()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
