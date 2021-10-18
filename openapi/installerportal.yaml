@@ -1,0 +1,68 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi Portal Model
+  description: API describing User Self Care interaction with OpenWifi.
+  version: 2.1.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Unauthorized:
+      description: The requested does not have sufficient rights to perform the operation.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Success:
+      description: The requested operation was performed.
+      content:
+        application/json:
+          schema:
+            properties:
+              Operation:
+                type: string
+              Details:
+                type: string
+              Code:
+                type: integer
+
+  schemas:

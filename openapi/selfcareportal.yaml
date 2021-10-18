@@ -1,0 +1,150 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi Portal Model
+  description: API describing User Self Care interaction with OpenWifi.
+  version: 2.1.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Unauthorized:
+      description: The requested does not have sufficient rights to perform the operation.
+      content:
+        application/json:
+          schema:
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
+
+    Success:
+      description: The requested operation was performed.
+      content:
+        application/json:
+          schema:
+            properties:
+              Operation:
+                type: string
+              Details:
+                type: string
+              Code:
+                type: integer
+
+  schemas:
+    AccessTime:
+      type: object
+      properties:
+        day:
+          type: string
+        rangeList:
+          type: array
+          items:
+            type: string
+
+    AccessTimes:
+      type: object
+      properties:
+        type: array
+        items:
+          $ref: '#/components/schemas/AccessTime'
+
+    SubscriberDevice:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        macAddress:
+          type: string
+        firstContact:
+          type: integer
+          format: int64
+        lastContact:
+          type: integer
+          format: int64
+        group:
+          type: string
+        icon:
+          type: string
+          format: uuid
+        schedule:
+          $ref: '#/components/schemas/AccessTimes'
+
+    SubscriberDeviceList:
+      type: object
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriberDevice'
+
+    Association:
+      type: object
+      properties:
+        macAddress:
+          type: string
+        rssi:
+          type: integer
+        power:
+          type: integer
+        ipv4:
+          type: string
+        ipv6:
+          type: integer
+        tx:
+          type: integer
+        rx:
+          type: integer
+
+    Client:
+      macAddress:
+        type: string
+      speed:
+        type: string
+      ipv4:
+        type: string
+      ipv6:
+        type: integer
+      tx:
+        type: integer
+      rx:
+        type: integer
+
+paths:
+  /
