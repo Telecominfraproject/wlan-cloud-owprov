@@ -8,6 +8,7 @@
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
     void RESTAPI_managementPolicy_list_handler::DoGet() {
