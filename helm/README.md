@@ -20,7 +20,7 @@ Currently this chart is not assembled in charts archives, so [helm-git](https://
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install --name my-release git+https://github.com/Telecominfraproject/wlan-cloud-owprov@helm?ref=main
+$ helm install --name my-release git+https://github.com/Telecominfraproject/wlan-cloud-owprov@helm/owprov-0.1.0.tgz?ref=main
 ```
 
 The command deploys the Provisioning on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
