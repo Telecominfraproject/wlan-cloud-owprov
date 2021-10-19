@@ -7,22 +7,29 @@
 #include "RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
 
     void RESTAPI_location_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
             auto DevUUIDS = Utils::Split(QB_.Select);
-            ProvObjects::LocationVec Locations;
+            Poco::JSON::Array   ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::Location E;
                 if(Storage()->LocationDB().GetRecord("id",i,E)) {
-                    Locations.push_back(E);
+                    Poco::JSON::Object  Obj;
+                    E.to_json(Obj);
+                    if(QB_.AdditionalInfo)
+                        AddLocationExtendedInfo(E, Obj);
+                    ObjArr.add(Obj);
                 } else {
                     return BadRequest(RESTAPI::Errors::UnknownId + " ("+i+")");
                 }
             }
-            return ReturnObject("locations", Locations);
+            Poco::JSON::Object  Answer;
+            Answer.set("locations", ObjArr);
+            return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->LocationDB().Count();
@@ -31,39 +38,17 @@ namespace OpenWifi{
             ProvObjects::LocationVec Locations;
             Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
 
-            if(QB_.AdditionalInfo) {
-                Poco::JSON::Array   ObjArray;
-                for(const auto &i:Locations) {
-                    Poco::JSON::Object  Obj;
-                    i.to_json(Obj);
-                    Poco::JSON::Object  EI;
-                    if(!i.entity.empty()) {
-                        Poco::JSON::Object  EntObj;
-                        ProvObjects::Entity Entity;
-                        if(Storage()->EntityDB().GetRecord("id",i.entity,Entity)) {
-                            EntObj.set( "name", Entity.info.name);
-                            EntObj.set( "description", Entity.info.description);
-                        }
-                        EI.set("entity",EntObj);
-                    }
-
-                    if(!i.managementPolicy.empty()) {
-                        Poco::JSON::Object  PolObj;
-                        ProvObjects::ManagementPolicy Policy;
-                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
-                            PolObj.set( "name", Policy.info.name);
-                            PolObj.set( "description", Policy.info.description);
-                        }
-                        EI.set("managementPolicy",PolObj);
-                    }
-                    Obj.set("extendedInfo", EI);
-                    ObjArray.add(Obj);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("locations",ObjArray);
-                return ReturnObject(Answer);
+            Poco::JSON::Array   ObjArray;
+            for(const auto &i:Locations) {
+                Poco::JSON::Object  Obj;
+                i.to_json(Obj);
+                if(QB_.AdditionalInfo)
+                    AddLocationExtendedInfo(i, Obj);
+                ObjArray.add(Obj);
             }
-            return ReturnObject("locations", Locations);
+            Poco::JSON::Object  Answer;
+            Answer.set("locations",ObjArray);
+            return ReturnObject(Answer);
         }
     }
 }

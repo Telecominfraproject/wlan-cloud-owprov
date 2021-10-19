@@ -11,6 +11,7 @@
 #include "Daemon.h"
 #include "Poco/StringTokenizer.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
 
@@ -21,6 +22,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
+        Poco::JSON::Object  Answer;
         std::string Arg;
         if(HasParameter("expandInUse",Arg) && Arg=="true") {
             Storage::ExpandedListMap    M;
@@ -37,12 +39,12 @@ namespace OpenWifi{
                     Inner.set(type,ObjList);
                 }
             }
-            Poco::JSON::Object  Answer;
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
         }
 
-        Poco::JSON::Object  Answer;
+        if(QB_.AdditionalInfo)
+            AddManagementRoleExtendedInfo(Existing,Answer);
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }

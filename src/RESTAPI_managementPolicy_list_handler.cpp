@@ -13,16 +13,22 @@ namespace OpenWifi{
     void RESTAPI_managementPolicy_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
             auto DevUUIDS = Utils::Split(QB_.Select);
-            ProvObjects::ManagementPolicyVec Policies;
+            Poco::JSON::Array  ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::ManagementPolicy E;
                 if(Storage()->PolicyDB().GetRecord("id",i,E)) {
-                    Policies.push_back(E);
+                    Poco::JSON::Object  Obj;
+                    E.to_json(Obj);
+                    if(QB_.AdditionalInfo)
+                        AddManagementPolicyExtendedInfo(E, Obj);
+                    ObjArr.add(Obj);
                 } else {
                     return BadRequest(RESTAPI::Errors::UnknownId + "(" + i + ")");
                 }
             }
-            return ReturnObject("managementPolicies", Policies);
+            Poco::JSON::Object  Answer;
+            Answer.set("managementPolicies", ObjArr);
+            return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = Storage()->ContactDB().Count();

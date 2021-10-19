@@ -13,6 +13,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
 
@@ -45,6 +46,9 @@ namespace OpenWifi{
         }
 
         Poco::JSON::Object  Answer;
+        if(QB_.AdditionalInfo)
+            AddManagementPolicyExtendedInfo(Existing,Answer);
+
         Existing.to_json(Answer);
         ReturnObject(Answer);
     }

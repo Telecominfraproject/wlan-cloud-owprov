@@ -12,6 +12,7 @@
 #include "StorageService.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
 
@@ -39,38 +40,17 @@ namespace OpenWifi{
         } else {
             ProvObjects::EntityVec Entities;
             Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-            if(QB_.AdditionalInfo) {
-                Poco::JSON::Array   ObjArray;
-                for(const auto &i:Entities) {
-                    Poco::JSON::Object  O;
-                    i.to_json(O);
-                    Poco::JSON::Object  EI;
-                    if(!i.managementPolicy.empty()) {
-                        Poco::JSON::Object  PolObj;
-                        ProvObjects::ManagementPolicy Policy;
-                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
-                            PolObj.set( "name", Policy.info.name);
-                            PolObj.set( "description", Policy.info.description);
-                        }
-                        EI.set("managementPolicy",PolObj);
-                    }
-                    if(!i.deviceConfiguration.empty()) {
-                        Poco::JSON::Object  EntObj;
-                        ProvObjects::DeviceConfiguration DevConf;
-                        if(Storage()->ConfigurationDB().GetRecord("id",i.deviceConfiguration,DevConf)) {
-                            EntObj.set( "name", DevConf.info.name);
-                            EntObj.set( "description", DevConf.info.description);
-                        }
-                        EI.set("deviceConfiguration",EntObj);
-                    }
-                    O.set("extendedInfo", EI);
-                    ObjArray.add(O);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("entities",ObjArray);
-                return ReturnObject(Answer);
+            Poco::JSON::Array   ObjArray;
+            for(const auto &i:Entities) {
+                Poco::JSON::Object  O;
+                i.to_json(O);
+                if(QB_.AdditionalInfo)
+                    AddEntityExtendedInfo( i, O);
+                ObjArray.add(O);
             }
-            return ReturnObject("entities",Entities);
+            Poco::JSON::Object  Answer;
+            Answer.set("entities",ObjArray);
+            return ReturnObject(Answer);
         }
     }
 

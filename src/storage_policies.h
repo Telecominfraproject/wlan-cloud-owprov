@@ -23,6 +23,7 @@ namespace OpenWifi {
         uint64_t,
         std::string,
         std::string,
+        std::string,
         std::string
     > PolicyDBRecordType;
 

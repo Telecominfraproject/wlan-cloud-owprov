@@ -13,6 +13,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
 #include "RESTAPI_errors.h"
+#include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
     void RESTAPI_contact_handler::DoGet() {
@@ -44,27 +45,7 @@ namespace OpenWifi{
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
         } else if(QB_.AdditionalInfo) {
-            Poco::JSON::Object  EI;
-            if(!Existing.entity.empty()) {
-                Poco::JSON::Object  EntObj;
-                ProvObjects::Entity Entity;
-                if(Storage()->EntityDB().GetRecord("id",Existing.entity,Entity)) {
-                    EntObj.set( "name", Entity.info.name);
-                    EntObj.set( "description", Entity.info.description);
-                }
-                EI.set("entity",EntObj);
-            }
-
-            if(!Existing.managementPolicy.empty()) {
-                Poco::JSON::Object  PolObj;
-                ProvObjects::ManagementPolicy Policy;
-                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
-                    PolObj.set( "name", Policy.info.name);
-                    PolObj.set( "description", Policy.info.description);
-                }
-                EI.set("managementPolicy",PolObj);
-            }
-            Answer.set("extendedInfo", EI);
+            AddContactExtendedInfo(Existing, Answer);
         }
 
         Existing.to_json(Answer);

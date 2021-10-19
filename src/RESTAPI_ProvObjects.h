@@ -39,9 +39,10 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct ManagementPolicy {
-        ObjectInfo  info;
+        ObjectInfo          info;
         std::vector<ManagementPolicyEntry>  entries;
-        Types::StringVec inUse;
+        Types::StringVec    inUse;
+        Types::UUID_t       entity;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -110,6 +111,7 @@ namespace OpenWifi::ProvObjects {
         Types::UUID_t       managementPolicy;
         Types::UUIDvec_t    users;
         Types::StringVec    inUse;
+        Types::UUID_t       entity;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

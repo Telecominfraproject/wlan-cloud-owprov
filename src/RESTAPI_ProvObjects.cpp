@@ -62,6 +62,7 @@ namespace OpenWifi::ProvObjects {
         info.to_json(Obj);
         RESTAPI_utils::field_to_json(Obj, "entries", entries);
         RESTAPI_utils::field_to_json(Obj, "inUse", inUse);
+        RESTAPI_utils::field_to_json(Obj, "entity", entity);
     }
 
     bool ManagementPolicy::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -69,6 +70,7 @@ namespace OpenWifi::ProvObjects {
             info.from_json(Obj);
             RESTAPI_utils::field_from_json(Obj, "entries", entries);
             RESTAPI_utils::field_from_json(Obj, "inUse", inUse);
+            RESTAPI_utils::field_from_json(Obj, "entity", entity);
             return true;
         } catch(...) {
 
@@ -187,6 +189,7 @@ namespace OpenWifi::ProvObjects {
         info.to_json(Obj);
         RESTAPI_utils::field_to_json( Obj,"managementPolicy",managementPolicy);
         RESTAPI_utils::field_to_json( Obj,"users",users);
+        RESTAPI_utils::field_to_json( Obj,"entity",entity);
     }
 
     bool ManagementRole::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -194,6 +197,7 @@ namespace OpenWifi::ProvObjects {
             info.from_json(Obj);
             RESTAPI_utils::field_from_json( Obj,"managementPolicy",managementPolicy);
             RESTAPI_utils::field_from_json( Obj,"users",users);
+            RESTAPI_utils::field_from_json( Obj,"entity",entity);
             return true;
         } catch(...) {
         }
