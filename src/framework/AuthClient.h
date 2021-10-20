@@ -6,9 +6,9 @@
 #define UCENTRALGW_AUTHCLIENT_H
 
 #include "Poco/JSON/Object.h"
+#include "Poco/JWT/Signer.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/JWT/Signer.h"
 #include "Poco/SHA2Engine.h"
 #include "RESTAPI/RESTAPI_SecurityObjects.h"
 #include "SubSystemServer.h"
