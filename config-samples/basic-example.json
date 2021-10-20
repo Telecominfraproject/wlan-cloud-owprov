@@ -1,0 +1,46 @@
+{
+	"interfaces": [{
+			"ethernet": [{
+				"select-ports": [
+					"WAN*"
+				]
+			}],
+			"ipv4": {
+				"addressing": "dynamic"
+			},
+			"name": "WAN",
+			"role": "upstream",
+			"services": [
+				"lldp"
+			]
+		},
+		{
+			"ethernet": [{
+				"select-ports": [
+					"LAN*"
+				]
+			}],
+			"ipv4": {
+				"addressing": "dynamic"
+			},
+			"name": "LAN",
+			"role": "upstream",
+			"services": [
+				"ssh",
+				"lldp"
+			],
+			"ssids": [{
+				"bss-mode": "wds-ap",
+				"encryption": {
+					"ieee80211w": "optional",
+					"key": "ViaSat!s3cretWifi",
+					"proto": "psk2"
+				},
+				"name": "ViaSat_WDS_AP",
+				"wifi-bands": [
+					"5G"
+				]
+			}]
+		}
+	]
+}

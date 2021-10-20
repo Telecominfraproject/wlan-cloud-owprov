@@ -3,10 +3,10 @@
 //
 
 #include "SecurityDBProxy.h"
-#include "OpenAPIRequest.h"
-#include "MicroService.h"
+#include "framework/OpenAPIRequest.h"
+#include "framework/MicroService.h"
 #include "Poco/Net/HTTPResponse.h"
-#include "RESTAPI_SecurityObjects.h"
+#include "RESTAPI/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
     class SecurityDBProxy *SecurityDBProxy::instance_ = nullptr;

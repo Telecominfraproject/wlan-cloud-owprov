@@ -5,8 +5,8 @@
 #ifndef OWPROV_AUTODISCOVERY_H
 #define OWPROV_AUTODISCOVERY_H
 
-#include "SubSystemServer.h"
-#include "OpenWifiTypes.h"
+#include "framework/SubSystemServer.h"
+#include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi {
     class AutoDiscovery : public SubSystemServer, Poco::Runnable {

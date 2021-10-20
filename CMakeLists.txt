@@ -54,44 +54,44 @@ add_executable(owprov
         build
         src/Daemon.cpp src/Daemon.h
         src/Dashboard.h src/Dashboard.cpp
-        src/MicroService.cpp src/MicroService.h
-        src/Utils.h src/Utils.cpp
-        src/RESTAPI_utils.cpp src/RESTAPI_utils.h
-        src/RESTAPI_SecurityObjects.h src/RESTAPI_SecurityObjects.h
-        src/ALBHealthCheckServer.h
-        src/AuthClient.cpp src/AuthClient.h
-        src/KafkaManager.cpp src/KafkaManager.h
-        src/Kafka_topics.h
-        src/OpenAPIRequest.cpp src/OpenAPIRequest.h
-        src/RESTAPI_SecurityObjects.h src/RESTAPI_SecurityObjects.cpp
-        src/RESTAPI_handler.cpp src/RESTAPI_handler.h
-        src/RESTAPI_server.h src/RESTAPI_server.cpp
-        src/RESTAPI_system_command.h src/RESTAPI_system_command.cpp
-        src/RESTAPI_InternalServer.h src/RESTAPI_InternalServer.cpp
+        src/framework/MicroService.cpp src/framework/MicroService.h
+        src/framework/Utils.h src/framework/Utils.cpp
+        src/framework/RESTAPI_utils.cpp src/framework/RESTAPI_utils.h
+        src/RESTAPI/RESTAPI_SecurityObjects.h src/RESTAPI/RESTAPI_SecurityObjects.h
+        src/framework/ALBHealthCheckServer.h
+        src/framework/AuthClient.cpp src/framework/AuthClient.h
+        src/framework/KafkaManager.cpp src/framework/KafkaManager.h
+        src/framework/Kafka_topics.h
+        src/framework/OpenAPIRequest.cpp src/framework/OpenAPIRequest.h
+        src/RESTAPI/RESTAPI_SecurityObjects.h src/RESTAPI/RESTAPI_SecurityObjects.cpp
+        src/framework/RESTAPI_handler.cpp src/framework/RESTAPI_handler.h
+        src/RESTAPI/RESTAPI_server.h src/RESTAPI/RESTAPI_server.cpp
+        src/framework/RESTAPI_system_command.h src/framework/RESTAPI_system_command.cpp
+        src/RESTAPI/RESTAPI_InternalServer.h src/RESTAPI/RESTAPI_InternalServer.cpp
         src/StorageService.cpp src/StorageService.h
-        src/SubSystemServer.cpp src/SubSystemServer.h
-        src/RESTAPI_ProvObjects.cpp src/RESTAPI_ProvObjects.h
-        src/storage_entity.cpp src/storage_entity.h
-        src/storage_policies.cpp src/storage_policies.h
-        src/OpenWifiTypes.h
-        src/storage_venue.cpp src/storage_venue.h
-        src/storage_location.cpp src/storage_location.h
-        src/storage_contact.cpp src/storage_contact.h
-        src/RESTAPI_entity_handler.cpp src/RESTAPI_entity_handler.h
-        src/storage_inventory.cpp src/storage_inventory.h
-        src/RESTAPI_contact_handler.cpp src/RESTAPI_contact_handler.h
-        src/RESTAPI_location_handler.cpp src/RESTAPI_location_handler.h
-        src/RESTAPI_venue_handler.cpp src/RESTAPI_venue_handler.h
-        src/RESTAPI_inventory_handler.cpp src/RESTAPI_inventory_handler.h
-        src/RESTAPI_managementPolicy_handler.cpp src/RESTAPI_managementPolicy_handler.h
-        src/RESTAPI_inventory_list_handler.cpp src/RESTAPI_inventory_list_handler.h
-        src/RESTAPI_entity_list_handler.cpp src/RESTAPI_entity_list_handler.h
-        src/storage_management_roles.cpp src/storage_management_roles.h
-        src/storage_setup.cpp
-        src/storage_configurations.cpp src/storage_configurations.h
-        src/RESTAPI_configurations_handler.cpp src/RESTAPI_configurations_handler.h
-        src/RESTAPI_webSocketServer.h src/RESTAPI_webSocketServer.cpp src/RESTAPI_contact_list_handler.cpp src/RESTAPI_contact_list_handler.h src/RESTAPI_location_list_handler.cpp src/RESTAPI_location_list_handler.h src/RESTAPI_venue_list_handler.cpp src/RESTAPI_venue_list_handler.h src/RESTAPI_managementPolicy_list_handler.cpp src/RESTAPI_managementPolicy_list_handler.h src/RESTAPI_managementRole_handler.cpp src/RESTAPI_managementRole_handler.h src/RESTAPI_managementRole_list_handler.cpp src/RESTAPI_managementRole_list_handler.h src/RESTAPI_configurations_list_handler.cpp src/RESTAPI_configurations_list_handler.h src/SecurityDBProxy.cpp src/SecurityDBProxy.h src/APConfig.cpp src/APConfig.h src/RESTAPI_errors.h src/ConfigurationValidator.cpp src/ConfigurationValidator.h src/RESTAPI_GenericServer.cpp src/RESTAPI_GenericServer.h src/AutoDiscovery.cpp src/AutoDiscovery.h src/CIDRUtils.cpp src/CIDRUtils.h src/SDK_stubs.cpp src/SDK_stubs.h src/ConfigSanityChecker.cpp src/ConfigSanityChecker.h src/storage_tags.cpp src/storage_tags.h src/TagServer.cpp src/TagServer.h src/Storage.h
-        src/CountryCodes.h src/RESTAPI_db_helpers.cpp src/RESTAPI_db_helpers.h)
+        src/framework/SubSystemServer.cpp src/framework/SubSystemServer.h
+        src/RESTAPI/RESTAPI_ProvObjects.cpp src/RESTAPI/RESTAPI_ProvObjects.h
+        src/storage/storage_entity.cpp src/storage/storage_entity.h
+        src/storage/storage_policies.cpp src/storage/storage_policies.h
+        src/framework/OpenWifiTypes.h
+        src/storage/storage_venue.cpp src/storage/storage_venue.h
+        src/storage/storage_location.cpp src/storage/storage_location.h
+        src/storage/storage_contact.cpp src/storage/storage_contact.h
+        src/RESTAPI/RESTAPI_entity_handler.cpp src/RESTAPI/RESTAPI_entity_handler.h
+        src/storage/storage_inventory.cpp src/storage/storage_inventory.h
+        src/RESTAPI/RESTAPI_contact_handler.cpp src/RESTAPI/RESTAPI_contact_handler.h
+        src/RESTAPI/RESTAPI_location_handler.cpp src/RESTAPI/RESTAPI_location_handler.h
+        src/RESTAPI/RESTAPI_venue_handler.cpp src/RESTAPI/RESTAPI_venue_handler.h
+        src/RESTAPI/RESTAPI_inventory_handler.cpp src/RESTAPI/RESTAPI_inventory_handler.h
+        src/RESTAPI/RESTAPI_managementPolicy_handler.cpp src/RESTAPI/RESTAPI_managementPolicy_handler.h
+        src/RESTAPI/RESTAPI_inventory_list_handler.cpp src/RESTAPI/RESTAPI_inventory_list_handler.h
+        src/RESTAPI/RESTAPI_entity_list_handler.cpp src/RESTAPI/RESTAPI_entity_list_handler.h
+        src/storage/storage_management_roles.cpp src/storage/storage_management_roles.h
+        src/framework/storage_setup.cpp
+        src/storage/storage_configurations.cpp src/storage/storage_configurations.h
+        src/RESTAPI/RESTAPI_configurations_handler.cpp src/RESTAPI/RESTAPI_configurations_handler.h
+        src/RESTAPI/RESTAPI_webSocketServer.h src/RESTAPI/RESTAPI_webSocketServer.cpp src/RESTAPI/RESTAPI_contact_list_handler.cpp src/RESTAPI/RESTAPI_contact_list_handler.h src/RESTAPI/RESTAPI_location_list_handler.cpp src/RESTAPI/RESTAPI_location_list_handler.h src/RESTAPI/RESTAPI_venue_list_handler.cpp src/RESTAPI/RESTAPI_venue_list_handler.h src/RESTAPI/RESTAPI_managementPolicy_list_handler.cpp src/RESTAPI/RESTAPI_managementPolicy_list_handler.h src/RESTAPI/RESTAPI_managementRole_handler.cpp src/RESTAPI/RESTAPI_managementRole_handler.h src/RESTAPI/RESTAPI_managementRole_list_handler.cpp src/RESTAPI/RESTAPI_managementRole_list_handler.h src/RESTAPI/RESTAPI_configurations_list_handler.cpp src/RESTAPI/RESTAPI_configurations_list_handler.h src/SecurityDBProxy.cpp src/SecurityDBProxy.h src/APConfig.cpp src/APConfig.h src/framework/RESTAPI_errors.h src/ConfigurationValidator.cpp src/ConfigurationValidator.h src/framework/RESTAPI_GenericServer.cpp src/framework/RESTAPI_GenericServer.h src/AutoDiscovery.cpp src/AutoDiscovery.h src/framework/CIDRUtils.cpp src/framework/CIDRUtils.h src/SDK_stubs.cpp src/SDK_stubs.h src/ConfigSanityChecker.cpp src/ConfigSanityChecker.h src/storage/storage_tags.cpp src/storage/storage_tags.h src/TagServer.cpp src/TagServer.h src/framework/Storage.h
+        src/framework/CountryCodes.h src/RESTAPI/RESTAPI_db_helpers.cpp src/RESTAPI/RESTAPI_db_helpers.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

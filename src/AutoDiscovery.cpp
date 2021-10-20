@@ -3,10 +3,10 @@
 //
 
 #include "AutoDiscovery.h"
-#include "uCentralProtocol.h"
-#include "KafkaManager.h"
-#include "Kafka_topics.h"
-#include "storage_inventory.h"
+#include "framework/uCentralProtocol.h"
+#include "framework/KafkaManager.h"
+#include "framework/Kafka_topics.h"
+#include "storage/storage_inventory.h"
 #include "StorageService.h"
 #include "Daemon.h"
 

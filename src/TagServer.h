@@ -5,7 +5,7 @@
 #ifndef OWPROV_TAGSERVER_H
 #define OWPROV_TAGSERVER_H
 
-#include "SubSystemServer.h"
+#include "framework/SubSystemServer.h"
 
 namespace OpenWifi {
 

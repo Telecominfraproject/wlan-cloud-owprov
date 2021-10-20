@@ -7,7 +7,7 @@
 
 #include <nlohmann/json-schema.hpp>
 #include "Poco/Logger.h"
-#include "SubSystemServer.h"
+#include "framework/SubSystemServer.h"
 
 using nlohmann::json;
 using nlohmann::json_schema::json_validator;

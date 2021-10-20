@@ -12,9 +12,9 @@
 
 #include "StorageService.h"
 #include "Daemon.h"
-#include "Utils.h"
-#include "OpenAPIRequest.h"
-#include "RESTAPI_ProvObjects.h"
+#include "framework/Utils.h"
+#include "framework/OpenAPIRequest.h"
+#include "RESTAPI/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 

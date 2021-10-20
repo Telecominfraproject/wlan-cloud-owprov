@@ -5,9 +5,9 @@
 #ifndef OWPROV_SECURITYDBPROXY_H
 #define OWPROV_SECURITYDBPROXY_H
 
-#include "OpenWifiTypes.h"
-#include "RESTAPI_SecurityObjects.h"
-#include "SubSystemServer.h"
+#include "framework/OpenWifiTypes.h"
+#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "framework/SubSystemServer.h"
 
 namespace OpenWifi {
     class SecurityDBProxy : public SubSystemServer {
