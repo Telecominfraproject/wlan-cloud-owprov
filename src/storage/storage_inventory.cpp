@@ -15,6 +15,7 @@
 #include "StorageService.h"
 #include "SDK_stubs.h"
 #include "AutoDiscovery.h"
+#include "SerialNumberCache.h"
 
 namespace OpenWifi {
 
@@ -82,6 +83,7 @@ namespace OpenWifi {
             }
 
             if(CreateRecord(NewDevice)) {
+                SerialNumberCache()->AddSerialNumber(SerialNumber);
                 std::string FullUUID;
                 if(!NewDevice.entity.empty()) {
                     Storage()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
@@ -216,6 +218,11 @@ namespace OpenWifi {
             return false;
         }
         return false;
+    }
+
+    void InventoryDB::InitializeSerialCache() {
+        auto F = []( const ProvObjects::InventoryTag & T) ->bool { SerialNumberCache()->AddSerialNumber(T.serialNumber); return true;};
+        Iterate(F);
     }
 
 }

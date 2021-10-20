@@ -9,16 +9,15 @@
 
 #include "Poco/URI.h"
 
-#include "RESTAPI_server.h"
 #include "framework/Utils.h"
 #include "framework/RESTAPI_handler.h"
-
 #include "framework/RESTAPI_system_command.h"
 
+#include "RESTAPI/RESTAPI_server.h"
 #include "RESTAPI/RESTAPI_entity_handler.h"
 #include "RESTAPI/RESTAPI_contact_handler.h"
 #include "RESTAPI/RESTAPI_location_handler.h"
-#include "RESTAPI_venue_handler.h"
+#include "RESTAPI/RESTAPI_venue_handler.h"
 #include "RESTAPI/RESTAPI_inventory_handler.h"
 #include "RESTAPI/RESTAPI_managementPolicy_handler.h"
 #include "RESTAPI/RESTAPI_managementPolicy_list_handler.h"
@@ -26,10 +25,10 @@
 #include "RESTAPI/RESTAPI_entity_list_handler.h"
 #include "RESTAPI/RESTAPI_configurations_handler.h"
 #include "RESTAPI/RESTAPI_configurations_list_handler.h"
-#include "RESTAPI_webSocketServer.h"
+#include "RESTAPI/RESTAPI_webSocketServer.h"
 #include "RESTAPI/RESTAPI_contact_list_handler.h"
 #include "RESTAPI/RESTAPI_location_list_handler.h"
-#include "RESTAPI_venue_list_handler.h"
+#include "RESTAPI/RESTAPI_venue_list_handler.h"
 #include "RESTAPI/RESTAPI_managementRole_list_handler.h"
 
 namespace OpenWifi {

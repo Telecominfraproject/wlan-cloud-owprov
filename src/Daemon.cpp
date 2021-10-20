@@ -21,6 +21,7 @@
 #include "SecurityDBProxy.h"
 #include "AutoDiscovery.h"
 #include "ConfigurationValidator.h"
+#include "SerialNumberCache.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -36,6 +37,7 @@ namespace OpenWifi {
 									   OpenWifi::Storage(),
 									   ConfigurationValidator(),
 									   AuthClient(),
+									   SerialNumberCache(),
 									   RESTAPI_server(),
 									   RESTAPI_InternalServer(),
 									   SecurityDBProxy(),

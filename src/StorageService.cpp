@@ -82,6 +82,8 @@ namespace OpenWifi {
         ExpandFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsObjectDB_->Exists(F,V);; };
 
         EntityDB_->CheckForRoot();
+        InventoryDB_->InitializeSerialCache();
+
         Updater_.start(*this);
 
         return 0;

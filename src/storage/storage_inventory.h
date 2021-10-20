@@ -43,6 +43,7 @@ namespace OpenWifi {
             bool FindFirmwareOptions(std::string  & SerialNumber, std::string &firmwareUpgrade, bool &firmwareRCOnly);
             static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
             static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
+            void InitializeSerialCache();
         private:
     };
 }

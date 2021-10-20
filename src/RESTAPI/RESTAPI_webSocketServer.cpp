@@ -9,9 +9,11 @@
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Stringifier.h"
 
-#include "framework/Utils.h"
+#include "SerialNumberCache.h"
+
 #include "framework/AuthClient.h"
-#include "framework/RESTAPI_errors.h"
+#include "framework/Utils.h"
+#include "Poco/Net/HTTPSClientSession.h"
 
 namespace OpenWifi {
 
@@ -27,6 +29,9 @@ namespace OpenWifi {
 				int n;
 				bool Authenticated=false;
 				bool Done=false;
+				GoogleApiKey_ = Daemon()->ConfigGetString("google.apikey","");
+				GeoCodeEnabled_ = !GoogleApiKey_.empty();
+
 				do
 				{
 					Poco::Buffer<char>			IncomingFrame(0);
@@ -104,8 +109,6 @@ namespace OpenWifi {
 			catch (const Poco::Exception &E) {
 				Logger_.log(E);
 			}
-		} else {
-		    BadRequest(RESTAPI::Errors::OnlyWSSupported);
 		}
 	}
 
@@ -113,12 +116,61 @@ namespace OpenWifi {
 		try {
 			if (O->has("command")) {
 				auto Command = O->get("command").toString();
-				auto It = CommandProcessors_.find(Command);
-				if(It!=CommandProcessors_.end())
-				    It->second(O,Answer,UserInfo_);
+				if (Command == "serial_number_search" && O->has("serial_prefix")) {
+					auto Prefix = O->get("serial_prefix").toString();
+					uint64_t HowMany = 32;
+					if (O->has("howMany"))
+						HowMany = O->get("howMany");
+					Logger_.information(Poco::format("serial_number_search: %s", Prefix));
+					if (!Prefix.empty() && Prefix.length() < 13) {
+						std::vector<uint64_t> Numbers;
+						SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
+						Poco::JSON::Array A;
+						for (const auto &i : Numbers)
+							A.add(Utils::int_to_hex(i));
+						Poco::JSON::Object AO;
+						AO.set("serialNumbers", A);
+						AO.set("command","serial_number_search");
+						std::ostringstream SS;
+						Poco::JSON::Stringifier::stringify(AO, SS);
+						Answer = SS.str();
+					}
+				} else if(GeoCodeEnabled_ && Command == "address_completion" && O->has("address")) {
+				    auto Address = O->get("address").toString();
+				    Answer = GoogleGeoCodeCall(Address);
+				}
 			}
 		} catch (const Poco::Exception &E) {
 			Logger_.log(E);
 		}
+	}
+
+    std::string RESTAPI_webSocketServer::GoogleGeoCodeCall(const std::string &A) {
+	    try {
+	        std::string URI = { "https://maps.googleapis.com/maps/api/geocode/json"};
+	        Poco::URI   uri(URI);
+
+	        uri.addQueryParameter("address",A);
+	        uri.addQueryParameter("key", GoogleApiKey_);
+
+	        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
+	        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPath(), Poco::Net::HTTPMessage::HTTP_1_1);
+	        session.sendRequest(req);
+	        Poco::Net::HTTPResponse res;
+	        std::istream& rs = session.receiveResponse(res);
+
+	        if(res.getStatus()==Poco::Net::HTTPResponse::HTTP_OK) {
+	            std::ostringstream os;
+	            Poco::StreamCopier::copyStream(rs,os);
+	            return os.str();
+	        } else {
+	            std::ostringstream os;
+	            Poco::StreamCopier::copyStream(rs,os);
+	            return "{ \"error\" : " + os.str() + " }";
+	        }
+	    } catch(...) {
+
+	    }
+	    return "{ \"error\" : \"No call made\" }";
 	}
 }

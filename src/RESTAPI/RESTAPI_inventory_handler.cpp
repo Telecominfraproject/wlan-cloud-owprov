@@ -18,6 +18,7 @@
 #include "AutoDiscovery.h"
 #include "SDK_stubs.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
+#include "SerialNumberCache.h"
 
 namespace OpenWifi{
 
@@ -127,7 +128,8 @@ namespace OpenWifi{
 
         if(DB_.DeleteRecord("id", Existing.info.id)) {
             DB_.DeleteRecord(RESTAPI::Protocol::ID, Existing.info.id);
-            OK();
+            SerialNumberCache()->DeleteSerialNumber(SerialNumber);
+            return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
@@ -193,6 +195,7 @@ namespace OpenWifi{
         NewObject.info.id = Daemon()->CreateUUID();
 
         if(DB_.CreateRecord(NewObject)) {
+            SerialNumberCache()->AddSerialNumber(SerialNumber);
             if (!NewObject.venue.empty())
                 Storage()->VenueDB().AddDevice("id",NewObject.venue,NewObject.info.id);
             if (!NewObject.entity.empty())
