@@ -23,7 +23,7 @@ namespace OpenWifi{
                         AddContactExtendedInfo(E, Obj);
                     ObjArr.add(Obj);
                 } else {
-                    return BadRequest(RESTAPI::Errors::UnknownId + " ("+i+")");
+                    return BadRequest(RESTAPI::Errors::ContactMustExist + " ("+i+")");
                 }
             }
             Poco::JSON::Object  Answer;

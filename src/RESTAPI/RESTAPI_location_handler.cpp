@@ -68,6 +68,9 @@ namespace OpenWifi{
         }
 
         if(DB_.DeleteRecord("id",UUID)) {
+            if(!Existing.entity.empty())
+                Storage()->EntityDB().DeleteLocation("id",Existing.entity,UUID);
+
             return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);

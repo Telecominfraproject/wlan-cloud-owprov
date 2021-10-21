@@ -24,7 +24,7 @@ namespace OpenWifi{
                         AddLocationExtendedInfo(E, Obj);
                     ObjArr.add(Obj);
                 } else {
-                    return BadRequest(RESTAPI::Errors::UnknownId + " ("+i+")");
+                    return BadRequest(RESTAPI::Errors::LocationMustExist + " ("+i+")");
                 }
             }
             Poco::JSON::Object  Answer;
