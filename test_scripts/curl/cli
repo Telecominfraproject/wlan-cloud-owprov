@@ -444,6 +444,11 @@ reloadsubsystem() {
             -d "$payload"
 }
 
+addresscheck() {
+    echo "Token:${token}"
+    wscat -c wss://${OWPROV}/api/v1/ws
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;
@@ -485,6 +490,7 @@ case "$1" in
     "getsubsystemnames") login; getsubsystemnames; logout ;;
     "reloadsubsystem") login; reloadsubsystem "$2"; logout ;;
     "systeminfo") login; systeminfo ; logout;;
+    "addresscheck") login; addresscheck; logout ;;
     *) help ;;
 esac
 

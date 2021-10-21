@@ -153,6 +153,8 @@ namespace OpenWifi {
 	        uri.addQueryParameter("address",A);
 	        uri.addQueryParameter("key", GoogleApiKey_);
 
+	        std::cout << "URI=>" << uri.toString() << std::endl;
+
 	        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
 	        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPath(), Poco::Net::HTTPMessage::HTTP_1_1);
 	        session.sendRequest(req);
