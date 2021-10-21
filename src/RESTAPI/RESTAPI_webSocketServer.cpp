@@ -156,7 +156,7 @@ namespace OpenWifi {
 	        std::cout << "URI=>" << uri.toString() << std::endl;
 
 	        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-	        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPath(), Poco::Net::HTTPMessage::HTTP_1_1);
+	        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPathAndQuery(), Poco::Net::HTTPMessage::HTTP_1_1);
 	        session.sendRequest(req);
 	        Poco::Net::HTTPResponse res;
 	        std::istream& rs = session.receiveResponse(res);
