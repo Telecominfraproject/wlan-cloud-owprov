@@ -21,7 +21,7 @@ namespace OpenWifi {
 		void DoPost() final {};
 		void DoPut() final {};
 	  private:
-		void Process(const Poco::JSON::Object::Ptr &O, std::string &Answer);
+		void Process(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done);
 		std::string GoogleGeoCodeCall(const std::string &A);
 		bool        GeoCodeEnabled_=false;
 		std::string GoogleApiKey_;

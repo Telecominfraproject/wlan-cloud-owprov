@@ -68,7 +68,7 @@ namespace OpenWifi {
 										auto Obj = P.parse(IncomingFrame.begin())
 													   .extract<Poco::JSON::Object::Ptr>();
 										std::string Answer;
-										Process(Obj, Answer);
+										Process(Obj, Answer, Done );
 										if (!Answer.empty())
 											WS.sendFrame(Answer.c_str(), Answer.size());
 										else {
@@ -112,33 +112,38 @@ namespace OpenWifi {
 		}
 	}
 
-	void RESTAPI_webSocketServer::Process(const Poco::JSON::Object::Ptr &O, std::string &Answer ) {
-		try {
-			if (O->has("command")) {
-				auto Command = O->get("command").toString();
-				if (Command == "serial_number_search" && O->has("serial_prefix")) {
-					auto Prefix = O->get("serial_prefix").toString();
-					uint64_t HowMany = 32;
-					if (O->has("howMany"))
-						HowMany = O->get("howMany");
-					Logger_.information(Poco::format("serial_number_search: %s", Prefix));
-					if (!Prefix.empty() && Prefix.length() < 13) {
-						std::vector<uint64_t> Numbers;
-						SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
-						Poco::JSON::Array A;
-						for (const auto &i : Numbers)
-							A.add(Utils::int_to_hex(i));
-						Poco::JSON::Object AO;
-						AO.set("serialNumbers", A);
-						AO.set("command","serial_number_search");
-						std::ostringstream SS;
-						Poco::JSON::Stringifier::stringify(AO, SS);
-						Answer = SS.str();
-					}
-				} else if(GeoCodeEnabled_ && Command == "address_completion" && O->has("address")) {
-				    auto Address = O->get("address").toString();
-				    Answer = GoogleGeoCodeCall(Address);
-				}
+	void RESTAPI_webSocketServer::Process(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done ) {
+	    try {
+	        if (O->has("command")) {
+	            auto Command = O->get("command").toString();
+	            if (Command == "serial_number_search" && O->has("serial_prefix")) {
+	                auto Prefix = O->get("serial_prefix").toString();
+	                uint64_t HowMany = 32;
+	                if (O->has("howMany"))
+	                    HowMany = O->get("howMany");
+	                Logger_.information(Poco::format("serial_number_search: %s", Prefix));
+	                if (!Prefix.empty() && Prefix.length() < 13) {
+	                    std::vector<uint64_t> Numbers;
+	                    SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
+	                    Poco::JSON::Array A;
+	                    for (const auto &i : Numbers)
+	                        A.add(Utils::int_to_hex(i));
+	                    Poco::JSON::Object AO;
+	                    AO.set("serialNumbers", A);
+	                    AO.set("command","serial_number_search");
+	                    std::ostringstream SS;
+	                    Poco::JSON::Stringifier::stringify(AO, SS);
+	                    Answer = SS.str();
+	                }
+	            } else if(GeoCodeEnabled_ && Command == "address_completion" && O->has("address")) {
+	                auto Address = O->get("address").toString();
+	                Answer = GoogleGeoCodeCall(Address);
+	            } else if (Command=="exit") {
+	                Answer = R"lit({ "closing" : "Goodbye! Aurevoir! Hasta la vista!" })lit";
+                    Done = true;
+                } else {
+    	            Answer = std::string{R"lit({ "error" : "invalid command" })lit"};
+	            }
 			}
 		} catch (const Poco::Exception &E) {
 			Logger_.log(E);
@@ -153,8 +158,6 @@ namespace OpenWifi {
 	        uri.addQueryParameter("address",A);
 	        uri.addQueryParameter("key", GoogleApiKey_);
 
-	        std::cout << "URI=>" << uri.toString() << std::endl;
-
 	        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
 	        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPathAndQuery(), Poco::Net::HTTPMessage::HTTP_1_1);
 	        session.sendRequest(req);
@@ -168,7 +171,7 @@ namespace OpenWifi {
 	        } else {
 	            std::ostringstream os;
 	            Poco::StreamCopier::copyStream(rs,os);
-	            return "{ \"error\" : " + os.str() + " }";
+	            return R"lit({ "error: )lit" + os.str() + R"lit( })lit";
 	        }
 	    } catch(...) {
 
