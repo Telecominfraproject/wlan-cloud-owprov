@@ -12,7 +12,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -21,7 +21,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy Policy;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
                 PolObj.set( "name", Policy.info.name);
                 PolObj.set( "description", Policy.info.description);
             }
@@ -30,7 +30,7 @@ namespace OpenWifi {
         if(!T.venue.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Venue Venue;
-            if(Storage()->VenueDB().GetRecord("id",T.venue,Venue)) {
+            if(StorageService()->VenueDB().GetRecord("id",T.venue,Venue)) {
                 EntObj.set( "name", Venue.info.name);
                 EntObj.set( "description", Venue.info.description);
             }
@@ -39,7 +39,7 @@ namespace OpenWifi {
         if(!T.contact.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Contact Contact;
-            if(Storage()->ContactDB().GetRecord("id",T.contact,Contact)) {
+            if(StorageService()->ContactDB().GetRecord("id",T.contact,Contact)) {
                 EntObj.set( "name", Contact.info.name);
                 EntObj.set( "description", Contact.info.description);
             }
@@ -48,7 +48,7 @@ namespace OpenWifi {
         if(!T.location.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Location Location;
-            if(Storage()->LocationDB().GetRecord("id",T.location,Location)) {
+            if(StorageService()->LocationDB().GetRecord("id",T.location,Location)) {
                 EntObj.set( "name", Location.info.name);
                 EntObj.set( "description", Location.info.description);
             }
@@ -57,7 +57,7 @@ namespace OpenWifi {
         if(!T.deviceConfiguration.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::DeviceConfiguration DevConf;
-            if(Storage()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
+            if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
                 EntObj.set( "name", DevConf.info.name);
                 EntObj.set( "description", DevConf.info.description);
             }
@@ -72,7 +72,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -82,7 +82,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy Policy;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
                 PolObj.set( "name", Policy.info.name);
                 PolObj.set( "description", Policy.info.description);
             }
@@ -97,7 +97,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -107,7 +107,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy Policy;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
                 PolObj.set( "name", Policy.info.name);
                 PolObj.set( "description", Policy.info.description);
             }
@@ -122,7 +122,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy Policy;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
                 PolObj.set( "name", Policy.info.name);
                 PolObj.set( "description", Policy.info.description);
             }
@@ -131,7 +131,7 @@ namespace OpenWifi {
         if(!T.deviceConfiguration.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::DeviceConfiguration DevConf;
-            if(Storage()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
+            if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
                 EntObj.set( "name", DevConf.info.name);
                 EntObj.set( "description", DevConf.info.description);
             }
@@ -146,7 +146,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -155,7 +155,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy Policy;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
                 PolObj.set( "name", Policy.info.name);
                 PolObj.set( "description", Policy.info.description);
             }
@@ -164,7 +164,7 @@ namespace OpenWifi {
         if(!T.contact.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Contact Contact;
-            if(Storage()->ContactDB().GetRecord("id",T.contact,Contact)) {
+            if(StorageService()->ContactDB().GetRecord("id",T.contact,Contact)) {
                 EntObj.set( "name", Contact.info.name);
                 EntObj.set( "description", Contact.info.description);
             }
@@ -173,7 +173,7 @@ namespace OpenWifi {
         if(!T.location.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Location Location;
-            if(Storage()->LocationDB().GetRecord("id",T.location,Location)) {
+            if(StorageService()->LocationDB().GetRecord("id",T.location,Location)) {
                 EntObj.set( "name", Location.info.name);
                 EntObj.set( "description", Location.info.description);
             }
@@ -182,7 +182,7 @@ namespace OpenWifi {
         if(!T.deviceConfiguration.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::DeviceConfiguration DevConf;
-            if(Storage()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
+            if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
                 EntObj.set( "name", DevConf.info.name);
                 EntObj.set( "description", DevConf.info.description);
             }
@@ -197,7 +197,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -212,7 +212,7 @@ namespace OpenWifi {
         if(!T.entity.empty()) {
             Poco::JSON::Object  EntObj;
             ProvObjects::Entity Entity;
-            if(Storage()->EntityDB().GetRecord("id",T.entity,Entity)) {
+            if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
                 EntObj.set( "name", Entity.info.name);
                 EntObj.set( "description", Entity.info.description);
             }
@@ -221,7 +221,7 @@ namespace OpenWifi {
         if(!T.managementPolicy.empty()) {
             Poco::JSON::Object  PolObj;
             ProvObjects::ManagementPolicy P;
-            if(Storage()->PolicyDB().GetRecord("id",T.managementPolicy,P)) {
+            if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,P)) {
                 PolObj.set( "name", P.info.name);
                 PolObj.set( "description", P.info.description);
             }

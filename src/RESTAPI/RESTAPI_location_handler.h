@@ -10,9 +10,7 @@
 #ifndef OWPROV_RESTAPI_LOCATION_HANDLER_H
 #define OWPROV_RESTAPI_LOCATION_HANDLER_H
 
-#include "framework/RESTAPI_handler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
 
 namespace OpenWifi {
@@ -26,7 +24,7 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             Internal),
-            DB_(Storage()->LocationDB()){}
+            DB_(StorageService()->LocationDB()){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/location/{uuid}"}; };
 
         void DoGet() final ;

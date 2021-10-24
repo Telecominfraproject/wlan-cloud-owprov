@@ -9,11 +9,8 @@
 #ifndef OWPROV_RESTAPI_CONTACT_HANDLER_H
 #define OWPROV_RESTAPI_CONTACT_HANDLER_H
 
-#include "framework/RESTAPI_handler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
     class RESTAPI_contact_handler : public RESTAPIHandler {
@@ -26,7 +23,7 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             Internal),
-            DB_(Storage()->ContactDB()){}
+            DB_(StorageService()->ContactDB()){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/contact/{uuid}"}; };
 
     private:

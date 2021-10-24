@@ -6,15 +6,13 @@
 //	Arilia Wireless Inc.
 //
 
+#include <functional>
 
 #include "storage_venue.h"
+#include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/RESTAPI_utils.h"
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
-
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
-#include "framework/CIDRUtils.h"
-#include <functional>
 
 namespace OpenWifi {
 
@@ -52,21 +50,21 @@ namespace OpenWifi {
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
 
     bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {
-        if(Storage()->VenueDB().CreateRecord(V)) {
+        if(StorageService()->VenueDB().CreateRecord(V)) {
             if(!V.parent.empty())
-                Storage()->VenueDB().AddChild("id", V.parent, V.info.id);
+                StorageService()->VenueDB().AddChild("id", V.parent, V.info.id);
             if(!V.entity.empty())
-                Storage()->EntityDB().AddVenue("id", V.entity, V.info.id);
+                StorageService()->EntityDB().AddVenue("id", V.entity, V.info.id);
             if(!V.location.empty())
-                Storage()->LocationDB().AddInUse("id",V.location, Storage()->VenueDB().Prefix(), V.info.id);
+                StorageService()->LocationDB().AddInUse("id",V.location, StorageService()->VenueDB().Prefix(), V.info.id);
             if(!V.contact.empty())
-                Storage()->ContactDB().AddInUse("id",V.contact, Storage()->VenueDB().Prefix(), V.info.id);
+                StorageService()->ContactDB().AddInUse("id",V.contact, StorageService()->VenueDB().Prefix(), V.info.id);
             if(!V.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id",V.managementPolicy, Storage()->VenueDB().Prefix(), V.info.id);
+                StorageService()->PolicyDB().AddInUse("id",V.managementPolicy, StorageService()->VenueDB().Prefix(), V.info.id);
             if(!V.deviceConfiguration.empty())
-                Storage()->ConfigurationDB().AddInUse("id", V.deviceConfiguration, Storage()->ConfigurationDB().Prefix(), V.info.id);
+                StorageService()->ConfigurationDB().AddInUse("id", V.deviceConfiguration, StorageService()->ConfigurationDB().Prefix(), V.info.id);
             ProvObjects::Venue  NV;
-            Storage()->VenueDB().GetRecord("id",V.info.id,NV);
+            StorageService()->VenueDB().GetRecord("id",V.info.id,NV);
             V = NV;
             return true;
         }

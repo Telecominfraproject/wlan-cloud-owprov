@@ -10,10 +10,7 @@
 #ifndef OWPROV_RESTAPI_ENTITY_HANDLER_H
 #define OWPROV_RESTAPI_ENTITY_HANDLER_H
 
-#include "framework/RESTAPI_handler.h"
-
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
 
 namespace OpenWifi {
@@ -22,12 +19,14 @@ namespace OpenWifi {
         RESTAPI_entity_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, bool Internal)
         : RESTAPIHandler(bindings, L,
                          std::vector<std::string>{
-                                Poco::Net::HTTPRequest::HTTP_GET, Poco::Net::HTTPRequest::HTTP_POST,
-                                Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
+                                Poco::Net::HTTPRequest::HTTP_GET,
+                                Poco::Net::HTTPRequest::HTTP_POST,
+                                Poco::Net::HTTPRequest::HTTP_PUT,
+                                Poco::Net::HTTPRequest::HTTP_DELETE,
                                 Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                 Server,
                                 Internal),
-                                DB_(Storage()->EntityDB()){}
+                                DB_(StorageService()->EntityDB()){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/entity/{uuid}"}; };
 
     private:

@@ -6,8 +6,7 @@
 #define OWPROV_CONFIGURATIONVALIDATOR_H
 
 #include <nlohmann/json-schema.hpp>
-#include "Poco/Logger.h"
-#include "framework/SubSystemServer.h"
+#include "framework/MicroService.h"
 
 using nlohmann::json;
 using nlohmann::json_schema::json_validator;

@@ -3,8 +3,9 @@
 //
 
 #include "RESTAPI_contact_list_handler.h"
-#include "framework/Utils.h"
-#include "RESTAPI_ProvObjects.h"
+#include "framework/MicroService.h"
+
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI_db_helpers.h"
@@ -17,7 +18,7 @@ namespace OpenWifi{
             for(const auto &i:DevUUIDS) {
                 ProvObjects::Contact E;
                 Poco::JSON::Object  Obj;
-                if(Storage()->ContactDB().GetRecord("id",i,E)) {
+                if(StorageService()->ContactDB().GetRecord("id",i,E)) {
                     E.to_json(Obj);
                     if(QB_.AdditionalInfo)
                         AddContactExtendedInfo(E, Obj);
@@ -31,12 +32,12 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = Storage()->ContactDB().Count();
+            auto C = StorageService()->ContactDB().Count();
             ReturnCountOnly(C);
             return;
         } else {
             ProvObjects::ContactVec Contacts;
-            Storage()->ContactDB().GetRecords(QB_.Offset,QB_.Limit,Contacts);
+            StorageService()->ContactDB().GetRecords(QB_.Offset,QB_.Limit,Contacts);
             Poco::JSON::Array   ObjArray;
             for(const auto &i:Contacts) {
                 Poco::JSON::Object  Obj;

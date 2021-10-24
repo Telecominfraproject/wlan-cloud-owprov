@@ -12,7 +12,7 @@ namespace OpenWifi {
 
         //  we need to get the entire dictionary in memory...
         // std::function<bool(const TagsDictionary &)> Function = [](const TagsDictionary &D) -> bool { return  true; };
-        Storage()->TagsDictionaryDB().Iterate([](const TagsDictionary &D) -> bool { return  true; });
+        StorageService()->TagsDictionaryDB().Iterate([](const TagsDictionary &D) -> bool { return  true; });
 
 
         return 0;

@@ -3,8 +3,8 @@
 //
 
 #include "RESTAPI_location_list_handler.h"
-#include "framework/Utils.h"
-#include "RESTAPI_ProvObjects.h"
+
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
@@ -17,7 +17,7 @@ namespace OpenWifi{
             Poco::JSON::Array   ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::Location E;
-                if(Storage()->LocationDB().GetRecord("id",i,E)) {
+                if(StorageService()->LocationDB().GetRecord("id",i,E)) {
                     Poco::JSON::Object  Obj;
                     E.to_json(Obj);
                     if(QB_.AdditionalInfo)
@@ -32,11 +32,11 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = Storage()->LocationDB().Count();
+            auto C = StorageService()->LocationDB().Count();
             return ReturnCountOnly(C);
         } else {
             ProvObjects::LocationVec Locations;
-            Storage()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
+            StorageService()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
 
             Poco::JSON::Array   ObjArray;
             for(const auto &i:Locations) {

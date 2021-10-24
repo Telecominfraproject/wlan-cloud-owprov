@@ -4,8 +4,7 @@
 
 #include "RESTAPI_configurations_list_handler.h"
 
-#include "framework/Utils.h"
-#include "RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 
@@ -16,7 +15,7 @@ namespace OpenWifi{
             ProvObjects::DeviceConfigurationVec Configs;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::DeviceConfiguration E;
-                if(Storage()->ConfigurationDB().GetRecord("id",i,E)) {
+                if(StorageService()->ConfigurationDB().GetRecord("id",i,E)) {
                     Configs.push_back(E);
                 } else {
                     return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
@@ -25,11 +24,11 @@ namespace OpenWifi{
             return ReturnObject("configurations", Configs);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = Storage()->ConfigurationDB().Count();
+            auto C = StorageService()->ConfigurationDB().Count();
             return ReturnCountOnly(C);
         } else {
             ProvObjects::DeviceConfigurationVec Configs;
-            Storage()->ConfigurationDB().GetRecords(QB_.Offset,QB_.Limit,Configs);
+            StorageService()->ConfigurationDB().GetRecords(QB_.Offset,QB_.Limit,Configs);
 
             if(QB_.AdditionalInfo) {
                 Poco::JSON::Array   ObjArray;
@@ -41,7 +40,7 @@ namespace OpenWifi{
                     if(!i.managementPolicy.empty()) {
                         Poco::JSON::Object  PolObj;
                         ProvObjects::ManagementPolicy Policy;
-                        if(Storage()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
+                        if(StorageService()->PolicyDB().GetRecord("id",i.managementPolicy,Policy)) {
                             PolObj.set( "name", Policy.info.name);
                             PolObj.set( "description", Policy.info.description);
                         }

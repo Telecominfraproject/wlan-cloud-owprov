@@ -10,9 +10,7 @@
 #ifndef OWPROV_RESTAPI_VENUE_HANDLER_H
 #define OWPROV_RESTAPI_VENUE_HANDLER_H
 
-#include "framework/RESTAPI_handler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
 
 namespace OpenWifi {
@@ -25,7 +23,7 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE,
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
-            Internal), DB_(Storage()->VenueDB()) {}
+            Internal), DB_(StorageService()->VenueDB()) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/venue/{uuid}"}; };
     private:
         VenueDB     &DB_;

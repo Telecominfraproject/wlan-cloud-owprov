@@ -5,7 +5,7 @@
 #ifndef OWPROV_RESTAPI_DB_HELPERS_H
 #define OWPROV_RESTAPI_DB_HELPERS_H
 
-#include "RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 

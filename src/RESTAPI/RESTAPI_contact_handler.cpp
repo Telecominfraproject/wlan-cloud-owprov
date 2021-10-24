@@ -7,12 +7,10 @@
 //
 
 #include "RESTAPI_contact_handler.h"
+
 #include "framework/RESTAPI_protocol.h"
-#include "RESTAPI_ProvObjects.h"
-#include "StorageService.h"
-#include "Poco/JSON/Parser.h"
-#include "Daemon.h"
 #include "framework/RESTAPI_errors.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
@@ -31,7 +29,7 @@ namespace OpenWifi{
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
             Poco::JSON::Object  Inner;
-            if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
+            if(StorageService()->ExpandInUse(Existing.inUse,M,Errors)) {
                 for(const auto &[type,list]:M) {
                     Poco::JSON::Array   ObjList;
                     for(const auto &i:list.entries) {
@@ -71,7 +69,7 @@ namespace OpenWifi{
 
         if(DB_.DeleteRecord("id",UUID)) {
             if(!Existing.entity.empty())
-                Storage()->EntityDB().DeleteLocation("id",Existing.entity,UUID);
+                StorageService()->EntityDB().DeleteLocation("id",Existing.entity,UUID);
             return OK();
         }
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
@@ -90,26 +88,26 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(NewObject.entity.empty() || !Storage()->EntityDB().Exists("id",NewObject.entity)) {
+        if(NewObject.entity.empty() || !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        if(!NewObject.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+        if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
-        NewObject.info.id = Daemon()->CreateUUID();
+        NewObject.info.id = MicroService::instance().CreateUUID();
         NewObject.info.created = NewObject.info.modified = std::time(nullptr);
         NewObject.inUse.clear();
 
         if(DB_.CreateRecord(NewObject)) {
 
-            Storage()->EntityDB().AddContact("id",NewObject.entity,NewObject.info.id);
+            StorageService()->EntityDB().AddContact("id",NewObject.entity,NewObject.info.id);
             if(!NewObject.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
+                StorageService()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
 
             ProvObjects::Contact    NewContact;
-            Storage()->ContactDB().GetRecord("id", NewObject.info.id, NewContact);
+            StorageService()->ContactDB().GetRecord("id", NewObject.info.id, NewContact);
 
             Poco::JSON::Object Answer;
             NewContact.to_json(Answer);
@@ -140,7 +138,7 @@ namespace OpenWifi{
         std::string MoveToPolicy, MoveFromPolicy;
         bool MovingPolicy=false;
         if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
-            if(!MoveToPolicy.empty() && !Storage()->PolicyDB().Exists("id",MoveToPolicy)) {
+            if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MoveFromPolicy = Existing.managementPolicy;
@@ -150,7 +148,7 @@ namespace OpenWifi{
         std::string MoveToEntity,MoveFromEntity;
         bool MovingEntity=false;
         if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
-            if(!MoveToEntity.empty() && !Storage()->EntityDB().Exists("id",MoveToEntity)) {
+            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MoveFromEntity = Existing.entity;
@@ -183,17 +181,17 @@ namespace OpenWifi{
 
             if(MovingPolicy) {
                 if(!MoveFromPolicy.empty())
-                    Storage()->PolicyDB().DeleteInUse("id",MoveFromPolicy,DB_.Prefix(),Existing.info.id);
+                    StorageService()->PolicyDB().DeleteInUse("id",MoveFromPolicy,DB_.Prefix(),Existing.info.id);
                 if(!MoveToPolicy.empty())
-                    Storage()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
+                    StorageService()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
             }
 
             if(MovingEntity) {
                 if(!MoveFromEntity.empty()) {
-                    Storage()->EntityDB().DeleteContact("id", MoveFromEntity, Existing.info.id);
+                    StorageService()->EntityDB().DeleteContact("id", MoveFromEntity, Existing.info.id);
                 }
                 if(!MoveToEntity.empty()) {
-                    Storage()->EntityDB().AddContact("id", MoveToEntity, Existing.info.id);
+                    StorageService()->EntityDB().AddContact("id", MoveToEntity, Existing.info.id);
                 }
             }
 

@@ -6,11 +6,8 @@
 #include <fstream>
 #include <regex>
 
+#include "framework/MicroService.h"
 #include "ConfigurationValidator.h"
-#include "framework/Utils.h"
-#include "Daemon.h"
-#include "Poco/Logger.h"
-#include "Poco/URI.h"
 #include "framework/CountryCodes.h"
 #include "Poco/StringTokenizer.h"
 
@@ -2172,7 +2169,7 @@ namespace OpenWifi {
             Validator_->set_root_schema(schema);
             Logger_.information("Using uCentral validation schema from GIT.");
         } else {
-            std::string FileName{ Daemon()->DataDir() + "/ucentral.schema.json" };
+            std::string FileName{ MicroService::instance().DataDir() + "/ucentral.schema.json" };
             try {
                 std::ifstream       input(FileName);
                 std::stringstream   schema_file;

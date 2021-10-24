@@ -10,11 +10,8 @@
 #ifndef OWPROV_RESTAPI_INVENTORY_LIST_HANDLER_H
 #define OWPROV_RESTAPI_INVENTORY_LIST_HANDLER_H
 
-
-#include "framework/RESTAPI_handler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "RESTAPI_ProvObjects.h"
+#include "framework/MicroService.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 

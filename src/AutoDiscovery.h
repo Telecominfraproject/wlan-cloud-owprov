@@ -5,7 +5,7 @@
 #ifndef OWPROV_AUTODISCOVERY_H
 #define OWPROV_AUTODISCOVERY_H
 
-#include "framework/SubSystemServer.h"
+#include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi {

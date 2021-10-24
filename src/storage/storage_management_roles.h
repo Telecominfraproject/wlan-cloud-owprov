@@ -11,7 +11,7 @@
 #define OWPROV_STORAGE_MANAGEMENT_ROLES_H
 
 #include "framework/orm.h"
-#include "RESTAPI/RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
     typedef Poco::Tuple<

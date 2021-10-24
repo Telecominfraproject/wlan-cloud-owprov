@@ -3,9 +3,7 @@
 //
 
 #include "RESTAPI_venue_list_handler.h"
-#include "framework/Utils.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_utils.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
@@ -18,7 +16,7 @@ namespace OpenWifi{
                 Poco::JSON::Array   ObjArr;
                 for(const auto &i:UUIDs) {
                     ProvObjects::Venue E;
-                    if(Storage()->VenueDB().GetRecord("id",i,E)) {
+                    if(StorageService()->VenueDB().GetRecord("id",i,E)) {
                         Poco::JSON::Object  Obj;
                         E.to_json(Obj);
                         if(QB_.AdditionalInfo)
@@ -33,7 +31,7 @@ namespace OpenWifi{
                 return ReturnObject(Answer);
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
-                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues, Storage()->VenueDB().OP("entity",ORM::EQ,Arg));
+                StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues, StorageService()->VenueDB().OP("entity",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
                 } else {
@@ -41,7 +39,7 @@ namespace OpenWifi{
                 }
             } else if(HasParameter("venue",Arg)) {
                 ProvObjects::VenueVec Venues;
-                Storage()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,Storage()->VenueDB().OP("venue",ORM::EQ,Arg));
+                StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,StorageService()->VenueDB().OP("venue",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
                 } else {
@@ -49,11 +47,11 @@ namespace OpenWifi{
                 }
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
-                auto C = Storage()->VenueDB().Count();
+                auto C = StorageService()->VenueDB().Count();
                 return ReturnCountOnly(C);
             } else {
                 ProvObjects::VenueVec Venues;
-                Storage()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
+                StorageService()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
 
                 Poco::JSON::Array   ObjArr;
                 for(const auto &i:Venues) {

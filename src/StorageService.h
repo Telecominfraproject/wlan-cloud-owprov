@@ -9,18 +9,9 @@
 #ifndef UCENTRAL_USTORAGESERVICE_H
 #define UCENTRAL_USTORAGESERVICE_H
 
-#include <map>
+#include "framework/MicroService.h"
+#include "framework/StorageClass.h"
 
-#include "Poco/Data/Session.h"
-#include "Poco/Data/SessionPool.h"
-#include "Poco/Data/SQLite/Connector.h"
-
-#include "Poco/Data/PostgreSQL/Connector.h"
-#include "Poco/Data/MySQL/Connector.h"
-#include "Poco/URI.h"
-#include "framework/SubSystemServer.h"
-
-#include "framework/Storage.h"
 #include "storage/storage_entity.h"
 #include "storage/storage_policies.h"
 #include "storage/storage_venue.h"
@@ -35,7 +26,7 @@
 
 namespace OpenWifi {
 
-    class Storage : public SubSystemServer, Poco::Runnable {
+    class Storage : public StorageClass, Poco::Runnable {
         public:
             static Storage *instance() {
                 if (instance_ == nullptr) {
@@ -85,11 +76,6 @@ namespace OpenWifi {
 
           private:
             static Storage      								*instance_;
-            std::unique_ptr<Poco::Data::SessionPool>        	Pool_;
-            std::unique_ptr<Poco::Data::SQLite::Connector>  	SQLiteConn_;
-            std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_;
-            std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_;
-            DBType                                              dbType_ = sqlite;
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
             std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;
             std::unique_ptr<OpenWifi::VenueDB>                  VenueDB_;
@@ -111,17 +97,10 @@ namespace OpenWifi {
             std::atomic_bool                                    Running_=false;
 
             bool UpdateDeviceTypes();
-            Storage() noexcept:
-                SubSystemServer("Storage", "STORAGE-SVR", "storage")
-                {
-                }
 
-            int 	Setup_SQLite();
-            int 	Setup_MySQL();
-            int 	Setup_PostgreSQL();
    };
 
-   inline Storage * Storage() { return Storage::instance(); }
+   inline Storage * StorageService() { return Storage::instance(); }
 
 }  // namespace
 

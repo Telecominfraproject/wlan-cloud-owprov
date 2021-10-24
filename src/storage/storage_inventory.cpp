@@ -9,9 +9,8 @@
 
 #include "storage_inventory.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/RESTAPI_utils.h"
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
-#include "Daemon.h"
+#include "framework/MicroService.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
 #include "SDK_stubs.h"
 #include "AutoDiscovery.h"
@@ -69,16 +68,16 @@ namespace OpenWifi {
                 IP = Tokens[1];
             }
 
-            NewDevice.info.id = Daemon()->CreateUUID();
+            NewDevice.info.id = MicroService::instance().CreateUUID();
             NewDevice.info.name = SerialNumber;
             NewDevice.info.created = NewDevice.info.modified = Now;
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
             NewDevice.serialNumber = SerialNumber;
             NewDevice.deviceType = DeviceType;
             if(!IP.empty()) {
-                Storage()->VenueDB().GetByIP(IP,NewDevice.venue);
+                StorageService()->VenueDB().GetByIP(IP,NewDevice.venue);
                 if(NewDevice.venue.empty()) {
-                    Storage()->EntityDB().GetByIP(IP,NewDevice.entity);
+                    StorageService()->EntityDB().GetByIP(IP,NewDevice.entity);
                 }
             }
 
@@ -86,12 +85,12 @@ namespace OpenWifi {
                 SerialNumberCache()->AddSerialNumber(SerialNumber);
                 std::string FullUUID;
                 if(!NewDevice.entity.empty()) {
-                    Storage()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
-                    FullUUID = Storage()->EntityDB().Prefix() + ":" + NewDevice.entity;
+                    StorageService()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
+                    FullUUID = StorageService()->EntityDB().Prefix() + ":" + NewDevice.entity;
                 }
                 else if(!NewDevice.venue.empty()) {
-                    Storage()->VenueDB().AddDevice("id",NewDevice.venue,NewDevice.info.id);
-                    FullUUID = Storage()->VenueDB().Prefix() + ":" + NewDevice.venue;
+                    StorageService()->VenueDB().AddDevice("id",NewDevice.venue,NewDevice.info.id);
+                    FullUUID = StorageService()->VenueDB().Prefix() + ":" + NewDevice.venue;
                 }
 
                 if(!FullUUID.empty()) {
@@ -118,10 +117,10 @@ namespace OpenWifi {
         std::string UUID = EntityUUID;
         while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
             ProvObjects::Entity                 E;
-            if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
+            if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
                 if(!E.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
-                    if(Storage()->ConfigurationDB().GetRecord("id",E.deviceConfiguration,C)) {
+                    if(StorageService()->ConfigurationDB().GetRecord("id",E.deviceConfiguration,C)) {
                         if(C.firmwareUpgrade=="no") {
                             firmwareUpgrade="no";
                             return false;
@@ -152,10 +151,10 @@ namespace OpenWifi {
         std::string UUID = VenueUUID;
         while(!UUID.empty()) {
             ProvObjects::Venue                 V;
-            if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
+            if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
                 if(!V.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
-                    if(Storage()->ConfigurationDB().GetRecord("id",V.deviceConfiguration,C)) {
+                    if(StorageService()->ConfigurationDB().GetRecord("id",V.deviceConfiguration,C)) {
                         if(C.firmwareUpgrade=="no") {
                             firmwareUpgrade="no";
                             return false;
@@ -194,7 +193,7 @@ namespace OpenWifi {
             firmwareUpgrade.clear();
             if(!T.deviceConfiguration.empty()) {
                 ProvObjects::DeviceConfiguration    C;
-                if(Storage()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
+                if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
                     if(C.firmwareUpgrade=="no") {
                         firmwareUpgrade="no";
                         return false;

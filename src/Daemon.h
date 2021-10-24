@@ -15,6 +15,7 @@
 #include <vector>
 #include <set>
 
+/*
 #include "Poco/Util/Application.h"
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
@@ -24,7 +25,7 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
-
+*/
 #include "Dashboard.h"
 #include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
@@ -44,10 +45,10 @@ namespace OpenWifi {
 							const std::string & ConfigEnv,
 							const std::string & AppName,
 						  	uint64_t 	BusTimer,
-							const Types::SubSystemVec & SubSystems) :
+							const SubSystemVec & SubSystems) :
 				MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
-			void initialize(Poco::Util::Application &self);
+			void initialize();
 			static Daemon *instance();
 			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
 			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }

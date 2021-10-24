@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Poco/Logger.h"
-#include "RESTAPI/RESTAPI_ProvObjects.h"
+#include "RESTObjects//RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 

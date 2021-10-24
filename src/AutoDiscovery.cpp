@@ -3,12 +3,11 @@
 //
 
 #include "AutoDiscovery.h"
-#include "framework/uCentralProtocol.h"
-#include "framework/KafkaManager.h"
-#include "framework/Kafka_topics.h"
+#include "framework/uCentral_Protocol.h"
+#include "framework/KafkaTopics.h"
 #include "storage/storage_inventory.h"
 #include "StorageService.h"
-#include "Daemon.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -60,7 +59,7 @@ namespace OpenWifi {
                         }
                         if(!SerialNumber.empty()) {
                             // std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
-                            Storage()->InventoryDB().CreateFromConnection(SerialNumber,ConnectedIP,DeviceType);
+                            StorageService()->InventoryDB().CreateFromConnection(SerialNumber,ConnectedIP,DeviceType);
                         }
                     }
                 } catch (const Poco::Exception &E) {
@@ -71,8 +70,8 @@ namespace OpenWifi {
     };
 
     int AutoDiscovery::Start() {
-        firmwareUpgrade_ = Daemon()->ConfigGetString("firmware.updater.upgrade","no");
-        firmwareRCOnly_ = Daemon()->ConfigGetBool("firmware.updater.rconly",false);
+        firmwareUpgrade_ = MicroService::instance().ConfigGetString("firmware.updater.upgrade","no");
+        firmwareRCOnly_ = MicroService::instance().ConfigGetBool("firmware.updater.rconly",false);
         Types::TopicNotifyFunction F = [this](std::string s1,std::string s2) { this->ConnectionReceived(s1,s2); };
         ConnectionWatcherId_ = KafkaManager()->RegisterTopicWatcher(KafkaTopics::CONNECTION, F);
         Worker_.start(*this);

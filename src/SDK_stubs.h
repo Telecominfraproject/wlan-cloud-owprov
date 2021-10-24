@@ -5,7 +5,7 @@
 #ifndef OWPROV_SDK_STUBS_H
 #define OWPROV_SDK_STUBS_H
 
-#include "framework/OpenAPIRequest.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi::SDK {
 

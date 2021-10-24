@@ -6,12 +6,11 @@
 //	Arilia Wireless Inc.
 //
 
+#include "framework/MicroService.h" 
 #include "RESTAPI_configurations_handler.h"
-#include "RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
-#include "Daemon.h"
 #include "framework/RESTAPI_errors.h"
-
 #include "ConfigurationValidator.h"
 
 namespace OpenWifi{
@@ -29,7 +28,7 @@ namespace OpenWifi{
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
             Poco::JSON::Object          Inner;
-            if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
+            if(StorageService()->ExpandInUse(Existing.inUse,M,Errors)) {
                 for(const auto &[type,list]:M) {
                     Poco::JSON::Array   ObjList;
                     for(const auto &i:list.entries) {
@@ -47,7 +46,7 @@ namespace OpenWifi{
             if(!Existing.managementPolicy.empty()) {
                 Poco::JSON::Object  PolObj;
                 ProvObjects::ManagementPolicy Policy;
-                if(Storage()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
+                if(StorageService()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
                     PolObj.set( "name", Policy.info.name);
                     PolObj.set( "description", Policy.info.description);
                 }
@@ -142,17 +141,17 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!C.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id",C.managementPolicy)) {
+        if(!C.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",C.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownId);
         }
 
         C.info.modified = C.info.created = std::time(nullptr);
-        C.info.id = Daemon()->CreateUUID();
+        C.info.id = MicroService::instance().CreateUUID();
         for(auto &i:C.info.notes)
             i.createdBy = UserInfo_.userinfo.email;
 
         C.inUse.clear();
-        if(C.deviceTypes.empty() || !Storage()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
+        if(C.deviceTypes.empty() || !StorageService()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
@@ -164,7 +163,7 @@ namespace OpenWifi{
         if(DB_.CreateRecord(C)) {
             DB_.GetRecord("id", C.info.id, C);
             if(!C.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id",C.managementPolicy,DB_.Prefix(), C.info.id);
+                StorageService()->PolicyDB().AddInUse("id",C.managementPolicy,DB_.Prefix(), C.info.id);
 
             Poco::JSON::Object  Answer;
             C.to_json(Answer);
@@ -186,7 +185,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!NewConfig.deviceTypes.empty() && !Storage()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
+        if(!NewConfig.deviceTypes.empty() && !StorageService()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
@@ -207,7 +206,7 @@ namespace OpenWifi{
         std::string MovePolicy;
         bool        MovingPolicy=false;
         if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
-            if(!MovePolicy.empty() && !Storage()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
+            if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MovingPolicy = NewConfig.managementPolicy != Existing.managementPolicy;
@@ -229,9 +228,9 @@ namespace OpenWifi{
         if(DB_.UpdateRecord("id",UUID,Existing)) {
             if(MovingPolicy) {
                 if(!Existing.managementPolicy.empty())
-                    Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
+                    StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
                 if(!MovePolicy.empty())
-                    Storage()->PolicyDB().AddInUse("id",MovePolicy,DB_.Prefix(),Existing.info.id);
+                    StorageService()->PolicyDB().AddInUse("id",MovePolicy,DB_.Prefix(),Existing.info.id);
                 Existing.managementPolicy = MovePolicy;
             }
             DB_.UpdateRecord("id", UUID, Existing);

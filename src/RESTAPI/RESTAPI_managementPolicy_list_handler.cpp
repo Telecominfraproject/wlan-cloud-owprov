@@ -4,8 +4,7 @@
 
 #include "RESTAPI_managementPolicy_list_handler.h"
 
-#include "framework/Utils.h"
-#include "RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
@@ -17,7 +16,7 @@ namespace OpenWifi{
             Poco::JSON::Array  ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::ManagementPolicy E;
-                if(Storage()->PolicyDB().GetRecord("id",i,E)) {
+                if(StorageService()->PolicyDB().GetRecord("id",i,E)) {
                     Poco::JSON::Object  Obj;
                     E.to_json(Obj);
                     if(QB_.AdditionalInfo)
@@ -32,11 +31,11 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = Storage()->ContactDB().Count();
+            auto C = StorageService()->ContactDB().Count();
             return ReturnCountOnly(C);
         } else {
             ProvObjects::ManagementPolicyVec Policies;
-            Storage()->PolicyDB().GetRecords(QB_.Offset,QB_.Limit,Policies);
+            StorageService()->PolicyDB().GetRecords(QB_.Offset,QB_.Limit,Policies);
             return ReturnObject("managementPolicies", Policies);
         }
     }

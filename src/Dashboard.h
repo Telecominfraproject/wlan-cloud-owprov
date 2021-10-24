@@ -9,7 +9,7 @@
 #define UCENTRALGW_DASHBOARD_H
 
 #include "framework/OpenWifiTypes.h"
-#include "RESTAPI/RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 	class TopoDashboard {

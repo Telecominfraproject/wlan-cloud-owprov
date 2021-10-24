@@ -8,7 +8,7 @@
 
 
 #include "RESTAPI_managementPolicy_handler.h"
-#include "RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
@@ -29,7 +29,7 @@ namespace OpenWifi{
             Storage::ExpandedListMap    M;
             std::vector<std::string>    Errors;
             Poco::JSON::Object  Inner;
-            if(Storage()->ExpandInUse(Existing.inUse,M,Errors)) {
+            if(StorageService()->ExpandInUse(Existing.inUse,M,Errors)) {
                 for(const auto &[type,list]:M) {
                     Poco::JSON::Array   ObjList;
                     for(const auto &i:list.entries) {
@@ -64,7 +64,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(Storage()->PolicyDB().DeleteRecord("id", UUID)) {
+        if(StorageService()->PolicyDB().DeleteRecord("id", UUID)) {
             return OK();
         }
 
@@ -88,7 +88,7 @@ namespace OpenWifi{
         }
 
         NewPolicy.inUse.clear();
-        NewPolicy.info.id = Daemon()->CreateUUID();
+        NewPolicy.info.id = MicroService::instance().CreateUUID();
         NewPolicy.info.created = NewPolicy.info.modified = std::time(nullptr);
         if(DB_.CreateRecord(NewPolicy)) {
             ProvObjects::ManagementPolicy   Policy;

@@ -12,12 +12,7 @@
 #include "Poco/Environment.h"
 
 #include "Daemon.h"
-
 #include "StorageService.h"
-#include "framework/Utils.h"
-#include "framework/AuthClient.h"
-#include "RESTAPI/RESTAPI_server.h"
-#include "RESTAPI/RESTAPI_InternalServer.h"
 #include "SecurityDBProxy.h"
 #include "AutoDiscovery.h"
 #include "ConfigurationValidator.h"
@@ -33,13 +28,10 @@ namespace OpenWifi {
 								   vDAEMON_CONFIG_ENV_VAR,
 								   vDAEMON_APP_NAME,
 								   vDAEMON_BUS_TIMER,
-								   Types::SubSystemVec{
-									   OpenWifi::Storage(),
+								   SubSystemVec{
+									   OpenWifi::StorageService(),
 									   ConfigurationValidator(),
-									   AuthClient(),
 									   SerialNumberCache(),
-									   RESTAPI_server(),
-									   RESTAPI_InternalServer(),
 									   SecurityDBProxy(),
 									   AutoDiscovery()
 								   });
@@ -47,9 +39,12 @@ namespace OpenWifi {
 		return instance_;
 	}
 
-	void Daemon::initialize(Poco::Util::Application &self) {
-		MicroService::initialize(*this);
+	void Daemon::initialize() {
     }
+
+    void MicroServicePostInitialization() {
+        Daemon()->initialize();
+	}
 }
 
 int main(int argc, char **argv) {

@@ -8,15 +8,10 @@
 
 
 #include "RESTAPI_entity_handler.h"
-#include "RESTAPI_ProvObjects.h"
-#include "StorageService.h"
 
-#include "Poco/JSON/Parser.h"
-#include "Daemon.h"
-#include "RESTAPI_SecurityObjects.h"
-#include "framework/RESTAPI_utils.h"
-#include "framework/RESTAPI_errors.h"
-#include "framework/CIDRUtils.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "StorageService.h"
 #include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
@@ -51,14 +46,14 @@ namespace OpenWifi{
         }
 
         if(!Existing.deviceConfiguration.empty())
-            Storage()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
+            StorageService()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
 
         for(auto &i:Existing.locations) {
-            Storage()->LocationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
+            StorageService()->LocationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
         }
 
         for(auto &i:Existing.contacts) {
-            Storage()->ContactDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
+            StorageService()->ContactDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
         }
 
         if(DB_.DeleteRecord("id",UUID)) {
@@ -90,18 +85,18 @@ namespace OpenWifi{
 
         //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
         //  must be conveyed through PUT.
-        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : Daemon()->CreateUUID() ;
+        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::instance().CreateUUID() ;
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";
         } else if(NewEntity.parent.empty() || !DB_.Exists("id",NewEntity.parent)) {
             return BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
         }
 
-        if(!NewEntity.deviceConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
+        if(!NewEntity.deviceConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewEntity.deviceConfiguration)) {
             return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
         }
 
-        if(!NewEntity.managementPolicy.empty() && !Storage()->PolicyDB().Exists("id", NewEntity.managementPolicy)){
+        if(!NewEntity.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id", NewEntity.managementPolicy)){
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
@@ -154,13 +149,13 @@ namespace OpenWifi{
         bool        MovingConfiguration=false,
                     MovingManagementPolicy=false;
         if(AssignIfPresent(RawObject,"deviceConfiguration",NewConfiguration)) {
-            if(!NewConfiguration.empty() && !Storage()->ConfigurationDB().Exists("id",NewConfiguration)) {
+            if(!NewConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewConfiguration)) {
                 return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
             }
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
         if(AssignIfPresent(RawObject,"managementPolicy",NewManagementPolicy)) {
-            if(!NewManagementPolicy.empty() && !Storage()->PolicyDB().Exists("id",NewManagementPolicy)) {
+            if(!NewManagementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewManagementPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MovingManagementPolicy = Existing.managementPolicy != NewManagementPolicy;
@@ -179,7 +174,7 @@ namespace OpenWifi{
         }
 
         std::string Error;
-        if(!Storage()->Validate(Parameters_,Error)) {
+        if(!StorageService()->Validate(Parameters_,Error)) {
             return BadRequest(Error);
         }
 
@@ -194,32 +189,32 @@ namespace OpenWifi{
                 auto UUID_parts = Utils::Split(Child,':');
                 if(i.first=="add" && UUID_parts[0] == "con") {
                     DB_.AddContact("id", UUID, UUID_parts[1]);
-                    Storage()->ContactDB().AddInUse("id",UUID_parts[1],DB_.Prefix(), UUID);
+                    StorageService()->ContactDB().AddInUse("id",UUID_parts[1],DB_.Prefix(), UUID);
                 } else if (i.first == "del" && UUID_parts[0] == "con") {
                     DB_.DeleteContact("id", UUID, UUID_parts[1]);
-                    Storage()->ContactDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
+                    StorageService()->ContactDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 } else if (i.first == "add" && UUID_parts[0] == "loc") {
                     DB_.AddLocation("id", UUID, UUID_parts[1]);
-                    Storage()->LocationDB().AddInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
+                    StorageService()->LocationDB().AddInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 } else if (i.first == "del" && UUID_parts[0] == "loc") {
                     DB_.DeleteLocation("id", UUID, UUID_parts[1]);
-                    Storage()->LocationDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
+                    StorageService()->LocationDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
                 }
             }
 
             if(MovingConfiguration) {
                 if(!Existing.deviceConfiguration.empty())
-                    Storage()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
+                    StorageService()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
                 if(!NewConfiguration.empty())
-                    Storage()->ConfigurationDB().AddInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
+                    StorageService()->ConfigurationDB().AddInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
                 Existing.deviceConfiguration = NewConfiguration;
             }
 
             if(MovingManagementPolicy) {
                 if(!Existing.managementPolicy.empty())
-                    Storage()->PolicyDB().DeleteInUse("id",Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
+                    StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
                 if(!NewManagementPolicy.empty())
-                    Storage()->PolicyDB().AddInUse("id", NewManagementPolicy, DB_.Prefix(), Existing.info.id);
+                    StorageService()->PolicyDB().AddInUse("id", NewManagementPolicy, DB_.Prefix(), Existing.info.id);
                 Existing.managementPolicy = NewManagementPolicy;
             }
 
@@ -227,7 +222,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             ProvObjects::Entity NewRecord;
-            Storage()->EntityDB().GetRecord("id",UUID, NewRecord);
+            StorageService()->EntityDB().GetRecord("id",UUID, NewRecord);
             NewRecord.to_json(Answer);
             return ReturnObject(Answer);
         }

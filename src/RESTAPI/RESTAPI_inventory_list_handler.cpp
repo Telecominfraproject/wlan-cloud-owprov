@@ -9,7 +9,6 @@
 
 #include "RESTAPI_inventory_list_handler.h"
 #include "StorageService.h"
-#include "framework/Utils.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
@@ -45,7 +44,7 @@ namespace OpenWifi{
 
         std::string OrderBy{" ORDER BY serialNumber ASC "};
         if(HasParameter("orderBy",Arg)) {
-            if(!Storage()->InventoryDB().PrepareOrderBy(Arg,OrderBy)) {
+            if(!StorageService()->InventoryDB().PrepareOrderBy(Arg,OrderBy)) {
                 return BadRequest(RESTAPI::Errors::InvalidLOrderBy);
             }
         }
@@ -56,7 +55,7 @@ namespace OpenWifi{
             Poco::JSON::Array   ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::InventoryTag E;
-                if(Storage()->InventoryDB().GetRecord("id",i,E)) {
+                if(StorageService()->InventoryDB().GetRecord("id",i,E)) {
                     Poco::JSON::Object  O;
                     E.to_json(O);
                     if(QB_.AdditionalInfo)
@@ -71,38 +70,38 @@ namespace OpenWifi{
             return ReturnObject( Answer);
         } else if(HasParameter("entity",UUID)) {
             if(QB_.CountOnly) {
-                auto C = Storage()->InventoryDB().Count( Storage()->InventoryDB().OP("entity",ORM::EQ,UUID));
+                auto C = StorageService()->InventoryDB().Count( StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID));
                 return ReturnCountOnly( C);
             }
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("entity",ORM::EQ,UUID), OrderBy);
+            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID), OrderBy);
             return SendList(Tags, SerialOnly);
         } else if(HasParameter("venue",UUID)) {
             if(QB_.CountOnly) {
-                auto C = Storage()->InventoryDB().Count(Storage()->InventoryDB().OP("venue",ORM::EQ,UUID));
+                auto C = StorageService()->InventoryDB().Count(StorageService()->InventoryDB().OP("venue",ORM::EQ,UUID));
                 return ReturnCountOnly( C);
             }
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, Storage()->InventoryDB().OP("venue",ORM::EQ,UUID), OrderBy);
+            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, StorageService()->InventoryDB().OP("venue",ORM::EQ,UUID), OrderBy);
             return SendList( Tags, SerialOnly);
         } else if(HasParameter("unassigned",Arg) && Arg=="true") {
             if(QB_.CountOnly) {
                 std::string Empty;
-                auto C = Storage()->InventoryDB().Count( InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
-                                                                          ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ));
+                auto C = StorageService()->InventoryDB().Count( InventoryDB::OP( StorageService()->InventoryDB().OP("venue",ORM::EQ,Empty),
+                                                                          ORM::AND, StorageService()->InventoryDB().OP("entity",ORM::EQ,Empty) ));
                 return ReturnCountOnly(C);
             }
             ProvObjects::InventoryTagVec Tags;
             std::string Empty;
-            Storage()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( Storage()->InventoryDB().OP("venue",ORM::EQ,Empty),
-                                                                                              ORM::AND, Storage()->InventoryDB().OP("entity",ORM::EQ,Empty) ) , OrderBy );
+            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( StorageService()->InventoryDB().OP("venue",ORM::EQ,Empty),
+                                                                                              ORM::AND, StorageService()->InventoryDB().OP("entity",ORM::EQ,Empty) ) , OrderBy );
             return SendList(Tags, SerialOnly);
         } else if(QB_.CountOnly) {
-            auto C = Storage()->InventoryDB().Count();
+            auto C = StorageService()->InventoryDB().Count();
             return ReturnCountOnly(C);
         } else {
             ProvObjects::InventoryTagVec Tags;
-            Storage()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
+            StorageService()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
             Poco::JSON::Array   Arr;
 
             for(const auto &i:Tags) {

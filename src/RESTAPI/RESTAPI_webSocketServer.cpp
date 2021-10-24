@@ -3,17 +3,18 @@
 //
 
 #include "RESTAPI_webSocketServer.h"
+
+#include "framework/MicroService.h"
+
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Stringifier.h"
+#include "Poco/Net/HTTPSClientSession.h"
 
 #include "SerialNumberCache.h"
-
-#include "framework/AuthClient.h"
-#include "framework/Utils.h"
-#include "Poco/Net/HTTPSClientSession.h"
 
 namespace OpenWifi {
 
@@ -29,7 +30,7 @@ namespace OpenWifi {
 				int n;
 				bool Authenticated=false;
 				bool Done=false;
-				GoogleApiKey_ = Daemon()->ConfigGetString("google.apikey","");
+				GoogleApiKey_ = MicroService::instance().ConfigGetString("google.apikey","");
 				GeoCodeEnabled_ = !GoogleApiKey_.empty();
 
 				do

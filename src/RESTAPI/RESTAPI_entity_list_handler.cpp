@@ -6,12 +6,9 @@
 //	Arilia Wireless Inc.
 //
 
-
+#include "framework/MicroService.h"
 #include "RESTAPI_entity_list_handler.h"
-#include "framework/Utils.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_utils.h"
-#include "framework/RESTAPI_errors.h"
 #include "RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
@@ -23,7 +20,7 @@ namespace OpenWifi{
             ProvObjects::EntityVec Entities;
             for(const auto &i:EntityUIDs) {
                 ProvObjects::Entity E;
-                if(Storage()->EntityDB().GetRecord("id",i,E)) {
+                if(StorageService()->EntityDB().GetRecord("id",i,E)) {
                     Entities.push_back(E);
                 } else {
                     return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
@@ -31,15 +28,15 @@ namespace OpenWifi{
             }
             return ReturnObject("entities", Entities);
         } else if(QB_.CountOnly) {
-            auto C = Storage()->EntityDB().Count();
+            auto C = StorageService()->EntityDB().Count();
             return ReturnCountOnly(C);
         } if (HasParameter("getTree",Arg) && Arg=="true") {
             Poco::JSON::Object  FullTree;
-            Storage()->EntityDB().BuildTree(FullTree);
+            StorageService()->EntityDB().BuildTree(FullTree);
             return ReturnObject(FullTree);
         } else {
             ProvObjects::EntityVec Entities;
-            Storage()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
+            StorageService()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
             Poco::JSON::Array   ObjArray;
             for(const auto &i:Entities) {
                 Poco::JSON::Object  O;
@@ -58,7 +55,7 @@ namespace OpenWifi{
         std::string Arg;
         if (HasParameter("setTree",Arg) && Arg=="true") {
             auto FullTree = ParseStream();
-            Storage()->EntityDB().ImportTree(FullTree);
+            StorageService()->EntityDB().ImportTree(FullTree);
             return OK();
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);

@@ -2,10 +2,10 @@
 // Created by stephane bourque on 2021-08-26.
 //
 
-#include "RESTAPI_managementRole_list_handler.h"
+#include "framework/MicroService.h"
 
-#include "framework/Utils.h"
-#include "RESTAPI_ProvObjects.h"
+#include "RESTAPI_managementRole_list_handler.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
@@ -17,7 +17,7 @@ namespace OpenWifi{
             Poco::JSON::Array   ObjArr;
             for(const auto &i:DevUUIDS) {
                 ProvObjects::ManagementRole E;
-                if(Storage()->RolesDB().GetRecord("id",i,E)) {
+                if(StorageService()->RolesDB().GetRecord("id",i,E)) {
                     Poco::JSON::Object  Obj;
                     E.to_json(Obj);
                     if(QB_.AdditionalInfo)
@@ -32,11 +32,11 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = Storage()->RolesDB().Count();
+            auto C = StorageService()->RolesDB().Count();
             return ReturnCountOnly(C);
         } else {
             ProvObjects::ManagementRoleVec Roles;
-            Storage()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
+            StorageService()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
             Poco::JSON::Array   ObjArr;
             for(const auto &i:Roles) {
                 Poco::JSON::Object  Obj;

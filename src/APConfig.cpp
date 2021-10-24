@@ -130,7 +130,7 @@ namespace OpenWifi {
             Explanation_.clear();
             try {
                 ProvObjects::InventoryTag   D;
-                if(Storage()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
+                if(StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
                     if(!D.deviceConfiguration.empty()) {
                         AddConfiguration(D.deviceConfiguration);
                     }
@@ -202,7 +202,7 @@ namespace OpenWifi {
         if(UUID.empty())
             return;
 
-        if(Storage()->ConfigurationDB().GetRecord("id", UUID,Config)) {
+        if(StorageService()->ConfigurationDB().GetRecord("id", UUID,Config)) {
             //  find where to insert into this list using the weight.
             if(!Config.configuration.empty()) {
                 if(DeviceTypeMatch(DeviceType_,Config.deviceTypes)) {
@@ -232,7 +232,7 @@ namespace OpenWifi {
 
     void APConfig::AddEntityConfig(const std::string &UUID) {
         ProvObjects::Entity E;
-        if(Storage()->EntityDB().GetRecord("id",UUID,E)) {
+        if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
             AddConfiguration(E.deviceConfiguration);
             if(!E.parent.empty())
                 AddEntityConfig(E.parent);
@@ -241,7 +241,7 @@ namespace OpenWifi {
 
     void APConfig::AddVenueConfig(const std::string &UUID) {
         ProvObjects::Venue V;
-        if(Storage()->VenueDB().GetRecord("id",UUID,V)) {
+        if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
             AddConfiguration(V.deviceConfiguration);
             if(!V.entity.empty()) {
                 AddEntityConfig(V.entity);

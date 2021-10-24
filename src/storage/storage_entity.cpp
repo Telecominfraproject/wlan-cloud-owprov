@@ -8,13 +8,10 @@
 
 
 #include "storage_entity.h"
-#include "framework/Utils.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/RESTAPI_utils.h"
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
-#include "Daemon.h"
-#include "framework/CIDRUtils.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -85,7 +82,7 @@ namespace OpenWifi {
     void EntityDB::AddVenues(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Venue E;
         // std::cout << "Adding venue:" << Node << std::endl;
-        Storage()->VenueDB().GetRecord("id",Node,E);
+        StorageService()->VenueDB().GetRecord("id",Node,E);
         Poco::JSON::Array   Venues;
         for(const auto &i:E.children) {
             Poco::JSON::Object Venue;
@@ -101,7 +98,7 @@ namespace OpenWifi {
     void EntityDB::BuildTree(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Entity E;
         // std::cout << "Adding node:" << Node << std::endl;
-        Storage()->EntityDB().GetRecord("id",Node,E);
+        StorageService()->EntityDB().GetRecord("id",Node,E);
         Poco::JSON::Array   Children;
         for(const auto &i:E.children) {
             Poco::JSON::Object  Child;
@@ -134,10 +131,10 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = Daemon()->CreateUUID();
+            V.info.id = MicroService::instance().CreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
-            Storage()->VenueDB().CreateShortCut(V);
+            StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
     }
@@ -154,7 +151,7 @@ namespace OpenWifi {
             E.info.name = Name;
             E.info.id = EntityDB::RootUUID();
             E.info.created = E.info.modified = std::time(nullptr);
-            Storage()->EntityDB().CreateShortCut(E);
+            StorageService()->EntityDB().CreateShortCut(E);
         }
 
         auto Children = O->getArray("children");
@@ -163,10 +160,10 @@ namespace OpenWifi {
             ProvObjects::Entity E;
 
             E.info.name = Child->get("name").toString();
-            E.info.id = Daemon()->CreateUUID();
+            E.info.id = MicroService::instance().CreateUUID();
             E.parent = Parent;
             E.info.created = E.info.modified = std::time(nullptr);
-            Storage()->EntityDB().CreateShortCut(E);
+            StorageService()->EntityDB().CreateShortCut(E);
             ImportTree( Child, E.info.id );
         }
 
@@ -175,27 +172,27 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = Daemon()->CreateUUID();
+            V.info.id = MicroService::instance().CreateUUID();
             V.entity = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
-            Storage()->VenueDB().CreateShortCut(V);
+            StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
     }
 
     bool EntityDB::CreateShortCut( ProvObjects::Entity & E) {
-        if(Storage()->EntityDB().CreateRecord(E)) {
+        if(StorageService()->EntityDB().CreateRecord(E)) {
             if(E.info.id==EntityDB::RootUUID())
-                Storage()->EntityDB().CheckForRoot();
+                StorageService()->EntityDB().CheckForRoot();
             else {
-                Storage()->EntityDB().AddChild("id",E.parent,E.info.id);
+                StorageService()->EntityDB().AddChild("id",E.parent,E.info.id);
             }
             if(!E.managementPolicy.empty())
-                Storage()->PolicyDB().AddInUse("id",E.managementPolicy, Prefix(), E.info.id);
+                StorageService()->PolicyDB().AddInUse("id",E.managementPolicy, Prefix(), E.info.id);
             if(!E.deviceConfiguration.empty())
-                Storage()->ConfigurationDB().AddInUse("id", E.deviceConfiguration, Prefix(), E.info.id);
+                StorageService()->ConfigurationDB().AddInUse("id", E.deviceConfiguration, Prefix(), E.info.id);
             ProvObjects::Entity NE;
-            Storage()->EntityDB().GetRecord("id",E.info.id,NE);
+            StorageService()->EntityDB().GetRecord("id",E.info.id,NE);
             E = NE;
             return true;
         }
