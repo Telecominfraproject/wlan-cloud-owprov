@@ -64,7 +64,7 @@ RUN addgroup -S "$OWPROV_USER" && \
 RUN mkdir /openwifi
 RUN mkdir -p "$OWPROV_ROOT" "$OWPROV_CONFIG" && \
     chown "$OWPROV_USER": "$OWPROV_ROOT" "$OWPROV_CONFIG"
-RUN apk add --update --no-cache librdkafka curl-dev mariadb-connector-c libpq su-exec gettext ca-certificates
+RUN apk add --update --no-cache librdkafka curl-dev mariadb-connector-c libpq su-exec gettext ca-certificates bash jq curl
 
 COPY --from=builder /owprov/cmake-build/owprov /openwifi/owprov
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
@@ -76,6 +76,8 @@ COPY owprov.properties.tmpl /
 COPY docker-entrypoint.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
+
+COPY readiness_check /readiness_check
 
 EXPOSE 16005 17005 16105
 
