@@ -25,7 +25,7 @@ namespace OpenWifi{
 
         Poco::JSON::Object Answer;
         Existing.to_json(Answer);
-        if(QB_.AdditionalInfo)
+        if(NeedAdditionalInfo())
             AddExtendedInfo( Existing, Answer);
         ReturnObject(Answer);
     }
@@ -41,20 +41,13 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::CannotDeleteRoot);
         }
 
-        if(!Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty()) {
+        if( !Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty() || !Existing.locations.empty()
+            || !Existing.contacts.empty()) {
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
         if(!Existing.deviceConfiguration.empty())
             StorageService()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
-
-        for(auto &i:Existing.locations) {
-            StorageService()->LocationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
-        }
-
-        for(auto &i:Existing.contacts) {
-            StorageService()->ContactDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
-        }
 
         if(DB_.DeleteRecord("id",UUID)) {
             DB_.DeleteChild("id",Existing.parent,UUID);
