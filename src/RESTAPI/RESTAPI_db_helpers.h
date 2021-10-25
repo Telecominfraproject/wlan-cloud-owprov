@@ -11,14 +11,19 @@
 
 namespace OpenWifi {
 
+    static void AddInfoBlock(const ProvObjects::ObjectInfo & O, Poco::JSON::Object &J) {
+        J.set("name", O.name);
+        J.set("description", O.description);
+        J.set("id", O.id);
+    }
+
     template <typename R, typename Q = decltype(R{}.entity)> void Extend_entity(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.entity.empty()) {
                 Poco::JSON::Object  EntObj;
                 ProvObjects::Entity Entity;
                 if(StorageService()->EntityDB().GetRecord("id",T.entity,Entity)) {
-                    EntObj.set( "name", Entity.info.name);
-                    EntObj.set( "description", Entity.info.description);
+                    AddInfoBlock(Entity.info, EntObj);
                 }
                 EI.set("entity",EntObj);
             }
@@ -34,8 +39,7 @@ namespace OpenWifi {
                 Poco::JSON::Object  PolObj;
                 ProvObjects::ManagementPolicy Policy;
                 if(StorageService()->PolicyDB().GetRecord("id",T.managementPolicy,Policy)) {
-                    PolObj.set( "name", Policy.info.name);
-                    PolObj.set( "description", Policy.info.description);
+                    AddInfoBlock(Policy.info, PolObj);
                 }
                 EI.set("managementPolicy",PolObj);
             }
@@ -48,13 +52,12 @@ namespace OpenWifi {
     template <typename R, typename Q = decltype(R{}.venue)> void Extend_venue(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.venue.empty()) {
-                Poco::JSON::Object  EntObj;
+                Poco::JSON::Object  VenObj;
                 ProvObjects::Venue Venue;
                 if(StorageService()->VenueDB().GetRecord("id",T.venue,Venue)) {
-                    EntObj.set( "name", Venue.info.name);
-                    EntObj.set( "description", Venue.info.description);
+                    AddInfoBlock(Venue.info, VenObj);
                 }
-                EI.set("venue",EntObj);
+                EI.set("venue",VenObj);
             }
         }
     }
@@ -65,13 +68,12 @@ namespace OpenWifi {
     template <typename R, typename Q = decltype(R{}.contact)> void Extend_contact(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.contact.empty()) {
-                Poco::JSON::Object  EntObj;
+                Poco::JSON::Object  ConObj;
                 ProvObjects::Contact Contact;
                 if(StorageService()->ContactDB().GetRecord("id",T.contact,Contact)) {
-                    EntObj.set( "name", Contact.info.name);
-                    EntObj.set( "description", Contact.info.description);
+                    AddInfoBlock(Contact.info, ConObj);
                 }
-                EI.set("contact",EntObj);
+                EI.set("contact",ConObj);
             }
         }
     }
@@ -82,13 +84,12 @@ namespace OpenWifi {
     template <typename R, typename Q = decltype(R{}.location)> void Extend_location(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.location.empty()) {
-                Poco::JSON::Object  EntObj;
+                Poco::JSON::Object  LocObj;
                 ProvObjects::Location Location;
                 if(StorageService()->LocationDB().GetRecord("id",T.location,Location)) {
-                    EntObj.set( "name", Location.info.name);
-                    EntObj.set( "description", Location.info.description);
+                    AddInfoBlock(Location.info, LocObj);
                 }
-                EI.set("location",EntObj);
+                EI.set("location",LocObj);
             }
         }
     }
@@ -99,13 +100,12 @@ namespace OpenWifi {
     template <typename R, typename Q = decltype(R{}.deviceConfiguration)> void Extend_deviceConfiguration(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.deviceConfiguration.empty()) {
-                Poco::JSON::Object  EntObj;
+                Poco::JSON::Object  DevObj;
                 ProvObjects::DeviceConfiguration DevConf;
                 if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,DevConf)) {
-                    EntObj.set( "name", DevConf.info.name);
-                    EntObj.set( "description", DevConf.info.description);
+                    AddInfoBlock(DevConf.info, DevObj);
                 }
-                EI.set("deviceConfiguration",EntObj);
+                EI.set("deviceConfiguration",DevObj);
             }
         }
         if constexpr(std::is_same_v<Q,Types::UUIDvec_t>) {
@@ -115,8 +115,7 @@ namespace OpenWifi {
                 for(const auto &i:T.deviceConfiguration) {
                     if(StorageService()->ConfigurationDB().GetRecord("id",i,DevConf)) {
                         Poco::JSON::Object  InnerObj;
-                        InnerObj.set( "name", DevConf.info.name);
-                        InnerObj.set( "description", DevConf.info.description);
+                        AddInfoBlock(DevConf.info, InnerObj);
                         ObjArr.add(InnerObj);
                     }
                 }
