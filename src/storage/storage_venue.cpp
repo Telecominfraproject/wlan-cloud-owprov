@@ -29,7 +29,6 @@ namespace OpenWifi {
         ORM::Field{"children",ORM::FieldType::FT_TEXT},
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
-        ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
         ORM::Field{"design",ORM::FieldType::FT_TEXT},
         ORM::Field{"contact",ORM::FieldType::FT_TEXT},
@@ -105,14 +104,15 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.parent = In.get<7>();
     OpenWifi::Types::from_string(In.get<8>(), Out.children);
     OpenWifi::Types::from_string(In.get<9>(), Out.devices);
-    Out.topology = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<10>());
-    Out.design = In.get<11>();
-    Out.contact = In.get<12>();
-    Out.location = In.get<13>();
-    Out.rrm = In.get<14>();
-    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
-    Out.deviceConfiguration = In.get<16>();
-    OpenWifi::Types::from_string(In.get<17>(), Out.sourceIP);
+    Out.managementPolicy = In.get<10>();
+    Out.topology = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<11>());
+    Out.design = In.get<12>();
+    Out.contact = In.get<13>();
+    Out.location = In.get<14>();
+    Out.rrm = In.get<15>();
+    Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
+    Out.deviceConfiguration = In.get<17>();
+    OpenWifi::Types::from_string(In.get<18>(), Out.sourceIP);
 
 }
 
@@ -127,12 +127,13 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<7>(In.parent);
     Out.set<8>(OpenWifi::Types::to_string(In.children));
     Out.set<9>(OpenWifi::Types::to_string(In.devices));
-    Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.topology));
-    Out.set<11>(In.design);
-    Out.set<12>(In.contact);
-    Out.set<13>(In.location);
-    Out.set<14>(In.rrm);
-    Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
-    Out.set<16>(In.deviceConfiguration);
-    Out.set<17>(OpenWifi::Types::to_string(In.sourceIP));
+    Out.set<10>(In.managementPolicy);
+    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.topology));
+    Out.set<12>(In.design);
+    Out.set<13>(In.contact);
+    Out.set<14>(In.location);
+    Out.set<15>(In.rrm);
+    Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
+    Out.set<17>(In.deviceConfiguration);
+    Out.set<18>(OpenWifi::Types::to_string(In.sourceIP));
 }
