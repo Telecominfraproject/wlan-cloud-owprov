@@ -8,6 +8,7 @@
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/MicroService.h"
+#include "framework/RESTAPI_errors.h"
 
 namespace OpenWifi {
 
@@ -166,7 +167,7 @@ namespace OpenWifi {
                     AddExtendedInfo(E,Obj);
                 ObjArr.add(Obj);
             } else {
-                return R.BadRequest("Unknown UUID:" + i);
+                return R.BadRequest(RESTAPI::Errors::UnknownId + i);
             }
         }
         Poco::JSON::Object  Answer;

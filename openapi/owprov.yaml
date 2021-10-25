@@ -817,7 +817,7 @@ paths:
       tags:
         - Entities
       operationId: getEntities
-      summary: Retrieve a list of entities
+      summary: Retrieve a list of entities.
       parameters:
         - in: query
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
@@ -871,7 +871,7 @@ paths:
       tags:
         - Entities
       operationId: getEntity
-      summary: Retrieve a specific entity
+      summary: Retrieve a specific entity.
       parameters:
         - in: path
           name: uuid
@@ -893,7 +893,7 @@ paths:
       tags:
         - Entities
       operationId: createEntity
-      summary: Create a specific entity
+      summary: Create a specific entity.
       parameters:
         - in: path
           name: uuid
@@ -921,7 +921,7 @@ paths:
       tags:
         - Entities
       operationId: modifyEntity
-      summary: Modify a specific entity
+      summary: Modify a specific entity.
       parameters:
         - in: path
           name: uuid
@@ -949,7 +949,7 @@ paths:
       tags:
         - Entities
       operationId: deleteEntity
-      summary: Retrieve the list of entities
+      summary: Delete a specific entity.
       parameters:
         - in: path
           name: uuid
@@ -972,7 +972,7 @@ paths:
       tags:
         - Contacts
       operationId: getContacts
-      summary: Retrieve a list of contacts
+      summary: Retrieve a list of contacts.
       parameters:
         - in: query
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
@@ -1031,7 +1031,7 @@ paths:
       tags:
         - Contacts
       operationId: getContact
-      summary: Retrieve a specific contact
+      summary: Retrieve a specific contact.
       parameters:
         - in: path
           name: uuid
@@ -1063,7 +1063,7 @@ paths:
       tags:
         - Contacts
       operationId: createContact
-      summary: Create a specific entity
+      summary: Create a specific entity.
       parameters:
         - in: path
           name: uuid
@@ -1090,7 +1090,7 @@ paths:
       tags:
         - Contacts
       operationId: modifyContact
-      summary: Modify a specific contact
+      summary: Modify a specific contact.
       parameters:
         - in: path
           name: uuid
@@ -1117,7 +1117,7 @@ paths:
       tags:
         - Contacts
       operationId: deleteContact
-      summary: Delete a contact
+      summary: Delete a specific contact.
       parameters:
         - in: path
           name: uuid
@@ -1144,7 +1144,7 @@ paths:
       tags:
         - Locations
       operationId: getLocations
-      summary: Retrieve a list of Locations
+      summary: Retrieve a list of locations.
       parameters:
         - in: query
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
@@ -1203,7 +1203,7 @@ paths:
       tags:
         - Locations
       operationId: getLocation
-      summary: Retrieve a specific location
+      summary: Retrieve a specific location.
       parameters:
         - in: path
           name: uuid
@@ -1235,7 +1235,7 @@ paths:
       tags:
         - Locations
       operationId: createLocation
-      summary: Create a specific location
+      summary: Create a specific location.
       parameters:
         - in: path
           name: uuid
@@ -1262,7 +1262,7 @@ paths:
       tags:
         - Locations
       operationId: modifyLocation
-      summary: Modify a specific location
+      summary: Modify a specific location.
       parameters:
         - in: path
           name: uuid
@@ -1289,7 +1289,7 @@ paths:
       tags:
         - Locations
       operationId: deleteLocation
-      summary: Delete a location
+      summary: Delete a specific location.
       parameters:
         - in: path
           name: uuid
@@ -1316,7 +1316,7 @@ paths:
       tags:
         - Inventory
       operationId: getInventoryTags
-      summary: Retrieve a specific inventory tag
+      summary: Retrieve a list of inventory.
       parameters:
         - in: query
           name: entity
@@ -1410,7 +1410,7 @@ paths:
       tags:
         - Inventory
       operationId: getInventory
-      summary: Retrieve a specific inventory tag
+      summary: Retrieve a specific inventory tag.
       parameters:
         - in: path
           name: serialNumber
@@ -1456,7 +1456,7 @@ paths:
       tags:
         - Inventory
       operationId: createInventory
-      summary: Create a specific Inventory
+      summary: Create a specific Inventory.
       parameters:
         - in: path
           name: serialNumber
@@ -1482,7 +1482,7 @@ paths:
       tags:
         - Inventory
       operationId: modifyInventory
-      summary: Modify a specific Inventory
+      summary: Modify a specific inventory.
       parameters:
         - in: path
           name: serialNumber
@@ -1514,7 +1514,7 @@ paths:
       tags:
         - Inventory
       operationId: deleteInventory
-      summary: Delete a specific Inventory
+      summary: Delete a specific inventory.
       parameters:
         - in: path
           name: serialNumber
@@ -1536,7 +1536,7 @@ paths:
       tags:
         - Venues
       operationId: getVenues
-      summary: Retrieve a specific Venues tag
+      summary: Retrieve a list of venues.
       parameters:
         - in: query
           name: entity
@@ -1600,7 +1600,7 @@ paths:
 
       responses:
         200:
-          description: Return a list of Venues
+          description: Return a list of venues.
           content:
             application/json:
               schema:
@@ -1617,7 +1617,7 @@ paths:
       tags:
         - Venues
       operationId: getVenue
-      summary: Retrieve a specific venue
+      summary: Retrieve a specific venue.
       parameters:
         - in: path
           name: uuid
@@ -1638,7 +1638,7 @@ paths:
       tags:
         - Venues
       operationId: createVenue
-      summary: Create a specific entity
+      summary: Create a specific venue.
       parameters:
         - in: path
           name: uuid
@@ -1647,7 +1647,7 @@ paths:
             format: uuid
           required: true
       requestBody:
-        description: Information used to create the new entity
+        description: Information used to create the new venue
         content:
           application/json:
             schema:
@@ -1665,7 +1665,7 @@ paths:
       tags:
         - Venues
       operationId: modifyVenue
-      summary: Modify a specific venue
+      summary: Modify a specific venue.
       parameters:
         - in: path
           name: uuid
@@ -1692,7 +1692,7 @@ paths:
       tags:
         - Venues
       operationId: deleteVenue
-      summary: Delete a venue
+      summary: Delete a specific venue.
       parameters:
         - in: path
           name: uuid
@@ -1715,7 +1715,7 @@ paths:
       tags:
         - Management Policies
       operationId: getPolicies
-      summary: Get a list of policies
+      summary: Get a list of policies.
       parameters:
         - in: query
           name: entity
@@ -1785,7 +1785,7 @@ paths:
       tags:
         - Management Policies
       operationId: getManagementPolicy
-      summary: Retrieve a specific entity
+      summary: Retrieve a specific policy.
       parameters:
         - in: path
           name: uuid
@@ -1817,7 +1817,7 @@ paths:
       tags:
         - Management Policies
       operationId: createManagementPolicy
-      summary: Create a specific entity
+      summary: Create a specific policy.
       parameters:
         - in: path
           name: uuid
@@ -1826,7 +1826,7 @@ paths:
             format: uuid
           required: true
       requestBody:
-        description: Information used to create the new entity
+        description: Information used to create the new policy
         content:
           application/json:
             schema:
@@ -1844,7 +1844,7 @@ paths:
       tags:
         - Management Policies
       operationId: modifyManagementPolicy
-      summary: Modify a specific entity
+      summary: Modify a specific policy.
       parameters:
         - in: path
           name: uuid
@@ -1853,7 +1853,7 @@ paths:
             format: uuid
           required: true
       requestBody:
-        description: Information used to modify the new entity
+        description: Information used to modify the new policy.
         content:
           application/json:
             schema:
@@ -1871,7 +1871,7 @@ paths:
       tags:
         - Management Policies
       operationId: deleteManagementPolicy
-      summary: Retrieve the list of entities
+      summary: Delete a specific policy.
       parameters:
         - in: path
           name: uuid
@@ -1894,7 +1894,7 @@ paths:
       tags:
         - Management Roles
       operationId: getManagementRoles
-      summary: Retrieve a list of managementRoles
+      summary: Retrieve a list of management roles.
       parameters:
         - in: query
           name: entity
@@ -1953,6 +1953,7 @@ paths:
       tags:
         - Management Roles
       operationId: getManagementRole
+      summary: Retrieve a specific management role.
       parameters:
         - in: path
           name: uuid
@@ -1978,28 +1979,11 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-    delete:
-      tags:
-        - Management Roles
-      operationId: deleteManagementRole
-      parameters:
-        - in: path
-          name: uuid
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        204:
-          $ref: '#/components/responses/Success'
-        403:
-          $ref: '#/components/responses/Unauthorized'
-        404:
-          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Management Roles
       operationId: createManagementRole
+      summary: Create a specific management role.
       parameters:
         - in: path
           name: uuid
@@ -2027,6 +2011,7 @@ paths:
       tags:
         - Management Roles
       operationId: modifyManagementRole
+      summary: Modify a specific management role.
       parameters:
         - in: path
           name: uuid
@@ -2048,13 +2033,32 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Management Roles
+      operationId: deleteManagementRole
+      summary: Delete a specific management role.
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /configurations:
     get:
       tags:
         - Configurations
       operationId: getConfigurations
-      summary: Retrieve a list of entities
+      summary: Retrieve a list of configurations.
       parameters:
         - in: query
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
@@ -2108,7 +2112,7 @@ paths:
       tags:
         - Configurations
       operationId: geConfiguration
-      summary: Retrieve a specific Configuration
+      summary: Retrieve a specific configuration.
       parameters:
         - in: path
           name: uuid
@@ -2141,7 +2145,7 @@ paths:
       tags:
         - Configurations
       operationId: createConfiguration
-      summary: Create a specific configuration
+      summary: Create a specific configuration.
       parameters:
         - in: path
           name: uuid
@@ -2174,7 +2178,7 @@ paths:
       tags:
         - Configurations
       operationId: modifyConfiguration
-      summary: Modify a specific configuration
+      summary: Modify a specific configuration.
       parameters:
         - in: path
           name: uuid
@@ -2202,7 +2206,7 @@ paths:
       tags:
         - Configurations
       operationId: deleteConfiguration
-      summary: Retrieve the list of entities
+      summary: Delete a specific configuration.
       parameters:
         - in: path
           name: uuid
@@ -2232,7 +2236,7 @@ paths:
     get:
       tags:
         - Dashboards
-      summary: Get the last version of the dashboard
+      summary: Get the last version of the dashboard.
       operationId: getDeviceDashboard
       responses:
         200:
@@ -2246,7 +2250,7 @@ paths:
     post:
       tags:
         - System Commands
-      summary: Perform some system wide commands
+      summary: Perform some system wide commands.
       operationId: systemCommand
       requestBody:
         description: Command details
@@ -2261,7 +2265,7 @@ paths:
                 - $ref: '#/components/schemas/SystemCommandGetSubsystemNames'
       responses:
         200:
-          description: Successfull command execution
+          description: Successful command execution
           content:
             application/json:
               schema:
@@ -2290,7 +2294,7 @@ paths:
 
       responses:
         200:
-          description: Successfull command execution
+          description: Successful command execution
           content:
             application/json:
               schema:
