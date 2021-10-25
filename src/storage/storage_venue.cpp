@@ -27,6 +27,7 @@ namespace OpenWifi {
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"parent",ORM::FieldType::FT_TEXT},
         ORM::Field{"children",ORM::FieldType::FT_TEXT},
+        ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
