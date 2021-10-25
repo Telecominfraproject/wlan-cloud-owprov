@@ -12,6 +12,7 @@
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
 #include "ConfigurationValidator.h"
+#include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
 
@@ -42,17 +43,7 @@ namespace OpenWifi{
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
         } else if(QB_.AdditionalInfo) {
-            Poco::JSON::Object  EI;
-            if(!Existing.managementPolicy.empty()) {
-                Poco::JSON::Object  PolObj;
-                ProvObjects::ManagementPolicy Policy;
-                if(StorageService()->PolicyDB().GetRecord("id",Existing.managementPolicy,Policy)) {
-                    PolObj.set( "name", Policy.info.name);
-                    PolObj.set( "description", Policy.info.description);
-                }
-                EI.set("managementPolicy",PolObj);
-            }
-            Answer.set("extendedInfo", EI);
+            AddExtendedInfo(Existing,Answer);
         }
         Existing.to_json(Answer);
         ReturnObject(Answer);

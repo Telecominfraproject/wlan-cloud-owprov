@@ -43,7 +43,7 @@ namespace OpenWifi{
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
         } else if(QB_.AdditionalInfo) {
-            AddContactExtendedInfo(Existing, Answer);
+            AddExtendedInfo(Existing, Answer);
         }
 
         Existing.to_json(Answer);

@@ -13,23 +13,8 @@
 namespace OpenWifi{
     void RESTAPI_managementRole_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
-            auto DevUUIDS = Utils::Split(QB_.Select);
-            Poco::JSON::Array   ObjArr;
-            for(const auto &i:DevUUIDS) {
-                ProvObjects::ManagementRole E;
-                if(StorageService()->RolesDB().GetRecord("id",i,E)) {
-                    Poco::JSON::Object  Obj;
-                    E.to_json(Obj);
-                    if(QB_.AdditionalInfo)
-                        AddManagementRoleExtendedInfo(E, Obj);
-                    ObjArr.add(Obj);
-                } else {
-                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                }
-            }
-            Poco::JSON::Object  Answer;
-            Answer.set("roles", ObjArr);
-            return ReturnObject(Answer);
+            return ReturnRecordList<decltype(StorageService()->RolesDB()),
+            ProvObjects::ManagementRole>("roles",StorageService()->RolesDB(),*this );
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
             auto C = StorageService()->RolesDB().Count();
@@ -37,17 +22,7 @@ namespace OpenWifi{
         } else {
             ProvObjects::ManagementRoleVec Roles;
             StorageService()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
-            Poco::JSON::Array   ObjArr;
-            for(const auto &i:Roles) {
-                Poco::JSON::Object  Obj;
-                i.to_json(Obj);
-                if(QB_.AdditionalInfo)
-                    AddManagementRoleExtendedInfo(i, Obj);
-                ObjArr.add(Obj);
-            }
-            Poco::JSON::Object  Answer;
-            Answer.set("roles", ObjArr);
-            return ReturnObject(Answer);
+            return MakeJSONObjectArray("roles", Roles, *this);
         }
     }
 }

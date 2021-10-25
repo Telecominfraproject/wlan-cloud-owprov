@@ -96,7 +96,7 @@ namespace OpenWifi{
             RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
             return ReturnObject(Answer);
         }  else if(QB_.AdditionalInfo) {
-            AddInventoryExtendedInfo(Existing,Answer);
+            AddExtendedInfo(Existing,Answer);
         }
         Existing.to_json(Answer);
         ReturnObject(Answer);

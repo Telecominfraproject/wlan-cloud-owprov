@@ -26,7 +26,7 @@ namespace OpenWifi{
         Poco::JSON::Object Answer;
         Existing.to_json(Answer);
         if(QB_.AdditionalInfo)
-            AddEntityExtendedInfo( Existing, Answer);
+            AddExtendedInfo( Existing, Answer);
         ReturnObject(Answer);
     }
 

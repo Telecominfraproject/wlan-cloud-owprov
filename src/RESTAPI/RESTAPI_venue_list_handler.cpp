@@ -4,7 +4,6 @@
 
 #include "RESTAPI_venue_list_handler.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
@@ -12,39 +11,22 @@ namespace OpenWifi{
         try {
             std::string Arg;
             if(!QB_.Select.empty()) {
-                auto UUIDs = Utils::Split(QB_.Select);
-                Poco::JSON::Array   ObjArr;
-                for(const auto &i:UUIDs) {
-                    ProvObjects::Venue E;
-                    if(StorageService()->VenueDB().GetRecord("id",i,E)) {
-                        Poco::JSON::Object  Obj;
-                        E.to_json(Obj);
-                        if(QB_.AdditionalInfo)
-                            AddVenueExtendedInfo(E,Obj);
-                        ObjArr.add(Obj);
-                    } else {
-                        return BadRequest("Unknown UUID:" + i);
-                    }
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("venues", ObjArr);
-                return ReturnObject(Answer);
+                return ReturnRecordList<decltype(StorageService()->VenueDB()),
+                ProvObjects::Venue>("venues",StorageService()->VenueDB(),*this );
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
                 StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues, StorageService()->VenueDB().OP("entity",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
-                } else {
-                    return ReturnObject("venues", Venues);
                 }
+                return MakeJSONObjectArray("venues", Venues, *this);
             } else if(HasParameter("venue",Arg)) {
                 ProvObjects::VenueVec Venues;
                 StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,StorageService()->VenueDB().OP("venue",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
-                } else {
-                    return ReturnObject("venues", Venues);
                 }
+                return MakeJSONObjectArray("venues", Venues, *this);
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
                 auto C = StorageService()->VenueDB().Count();
@@ -52,18 +34,7 @@ namespace OpenWifi{
             } else {
                 ProvObjects::VenueVec Venues;
                 StorageService()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
-
-                Poco::JSON::Array   ObjArr;
-                for(const auto &i:Venues) {
-                    Poco::JSON::Object  Obj;
-                    i.to_json(Obj);
-                    if(QB_.AdditionalInfo)
-                        AddVenueExtendedInfo(i, Obj);
-                    ObjArr.add(Obj);
-                }
-                Poco::JSON::Object  Answer;
-                Answer.set("venues", ObjArr);
-                return ReturnObject(Answer);
+                return MakeJSONObjectArray("venues", Venues, *this);
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);

@@ -16,17 +16,8 @@ namespace OpenWifi{
     void RESTAPI_entity_list_handler::DoGet() {
         std::string Arg;
         if(!QB_.Select.empty()) {
-            auto EntityUIDs = Utils::Split(QB_.Select);
-            ProvObjects::EntityVec Entities;
-            for(const auto &i:EntityUIDs) {
-                ProvObjects::Entity E;
-                if(StorageService()->EntityDB().GetRecord("id",i,E)) {
-                    Entities.push_back(E);
-                } else {
-                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                }
-            }
-            return ReturnObject("entities", Entities);
+            return ReturnRecordList<decltype(StorageService()->EntityDB()),
+            ProvObjects::Entity>("entities",StorageService()->EntityDB(),*this );
         } else if(QB_.CountOnly) {
             auto C = StorageService()->EntityDB().Count();
             return ReturnCountOnly(C);
@@ -37,17 +28,7 @@ namespace OpenWifi{
         } else {
             ProvObjects::EntityVec Entities;
             StorageService()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
-            Poco::JSON::Array   ObjArray;
-            for(const auto &i:Entities) {
-                Poco::JSON::Object  O;
-                i.to_json(O);
-                if(QB_.AdditionalInfo)
-                    AddEntityExtendedInfo( i, O);
-                ObjArray.add(O);
-            }
-            Poco::JSON::Object  Answer;
-            Answer.set("entities",ObjArray);
-            return ReturnObject(Answer);
+            return MakeJSONObjectArray("entities", Entities, *this);
         }
     }
 

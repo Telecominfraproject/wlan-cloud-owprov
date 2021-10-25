@@ -103,7 +103,7 @@ add_executable(owprov
         src/SDK_stubs.cpp src/SDK_stubs.h
         src/ConfigSanityChecker.cpp src/ConfigSanityChecker.h
         src/TagServer.cpp src/TagServer.h
-        src/RESTAPI/RESTAPI_db_helpers.cpp src/RESTAPI/RESTAPI_db_helpers.h)
+        src/RESTAPI/RESTAPI_db_helpers.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

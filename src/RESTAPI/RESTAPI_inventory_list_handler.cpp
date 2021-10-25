@@ -22,7 +22,7 @@ namespace OpenWifi{
                 Poco::JSON::Object  O;
                 i.to_json(O);
                 if(QB_.AdditionalInfo)
-                    AddInventoryExtendedInfo(i,O);
+                    AddExtendedInfo(i,O);
                 Array.add(O);
             }
         }
@@ -50,24 +50,8 @@ namespace OpenWifi{
         }
 
         if(!QB_.Select.empty()) {
-            auto DevUUIDS = Utils::Split(QB_.Select);
-            ProvObjects::InventoryTagVec Tags;
-            Poco::JSON::Array   ObjArr;
-            for(const auto &i:DevUUIDS) {
-                ProvObjects::InventoryTag E;
-                if(StorageService()->InventoryDB().GetRecord("id",i,E)) {
-                    Poco::JSON::Object  O;
-                    E.to_json(O);
-                    if(QB_.AdditionalInfo)
-                        AddInventoryExtendedInfo(E,O);
-                    ObjArr.add(O);
-                } else {
-                    return BadRequest(RESTAPI::Errors::UnknownId + " (" + i + ")");
-                }
-            }
-            Poco::JSON::Object  Answer;
-            Answer.set("taglist",ObjArr);
-            return ReturnObject( Answer);
+            return ReturnRecordList<decltype(StorageService()->InventoryDB()),
+            ProvObjects::InventoryTag>("taglist",StorageService()->InventoryDB(),*this );
         } else if(HasParameter("entity",UUID)) {
             if(QB_.CountOnly) {
                 auto C = StorageService()->InventoryDB().Count( StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID));
@@ -102,19 +86,7 @@ namespace OpenWifi{
         } else {
             ProvObjects::InventoryTagVec Tags;
             StorageService()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
-            Poco::JSON::Array   Arr;
-
-            for(const auto &i:Tags) {
-                Poco::JSON::Object  O;
-                i.to_json(O);
-
-                if(QB_.AdditionalInfo)
-                    AddInventoryExtendedInfo(i,O);
-                Arr.add(O);
-            }
-            Poco::JSON::Object  Answer;
-            Answer.set("taglist",Arr);
-            return ReturnObject(Answer);
+            return MakeJSONObjectArray("taglist", Tags, *this);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace OpenWifi{
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
         } else if(QB_.AdditionalInfo) {
-            AddLocationExtendedInfo(Existing, Answer);
+            AddExtendedInfo(Existing, Answer);
         }
         Existing.to_json(Answer);
         ReturnObject(Answer);
