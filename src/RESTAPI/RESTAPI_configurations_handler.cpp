@@ -6,7 +6,8 @@
 //	Arilia Wireless Inc.
 //
 
-#include "framework/MicroService.h" 
+#include "framework/MicroService.h"
+
 #include "RESTAPI_configurations_handler.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
@@ -66,12 +67,6 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
-    //      interfaces
-    //      metrics
-    //      radios
-    //      services
-    //      globals
-    //      unit
     bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
         static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
 

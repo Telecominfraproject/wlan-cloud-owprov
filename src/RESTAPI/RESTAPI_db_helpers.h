@@ -11,8 +11,6 @@
 
 namespace OpenWifi {
 
-
-
     template <typename R, typename Q = decltype(R{}.entity)> void Extend_entity(const R &T, Poco::JSON::Object &EI ) {
         if constexpr(std::is_same_v<Q,std::string>) {
             if(!T.entity.empty()) {
@@ -160,7 +158,6 @@ namespace OpenWifi {
         Answer.set(ArrayName, ObjArr);
         return R.ReturnObject(Answer);
     }
-
 
 }
 
