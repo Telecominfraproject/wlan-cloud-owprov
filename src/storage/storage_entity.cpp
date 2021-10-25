@@ -189,8 +189,10 @@ namespace OpenWifi {
             }
             if(!E.managementPolicy.empty())
                 StorageService()->PolicyDB().AddInUse("id",E.managementPolicy, Prefix(), E.info.id);
-            if(!E.deviceConfiguration.empty())
-                StorageService()->ConfigurationDB().AddInUse("id", E.deviceConfiguration, Prefix(), E.info.id);
+            if(!E.deviceConfiguration.empty()) {
+                for(auto &i:E.deviceConfiguration)
+                    StorageService()->ConfigurationDB().AddInUse("id", i, Prefix(), E.info.id);
+            }
             ProvObjects::Entity NE;
             StorageService()->EntityDB().GetRecord("id",E.info.id,NE);
             E = NE;
@@ -214,7 +216,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     OpenWifi::Types::from_string(In.get<9>(), Out.locations);
     Out.managementPolicy = In.get<10>();
     OpenWifi::Types::from_string(In.get<11>(), Out.venues);
-    Out.deviceConfiguration = In.get<12>();
+    OpenWifi::Types::from_string(In.get<12>(), Out.deviceConfiguration);
     OpenWifi::Types::from_string(In.get<13>(), Out.devices);
     Out.rrm = In.get<14>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
@@ -234,7 +236,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<9>(OpenWifi::Types::to_string(In.locations));
     Out.set<10>(In.managementPolicy);
     Out.set<11>(OpenWifi::Types::to_string(In.venues));
-    Out.set<12>(In.deviceConfiguration);
+    Out.set<12>(OpenWifi::Types::to_string(In.deviceConfiguration));
     Out.set<13>(OpenWifi::Types::to_string(In.devices));
     Out.set<14>(In.rrm);
     Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));

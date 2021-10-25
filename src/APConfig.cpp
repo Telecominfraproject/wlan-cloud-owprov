@@ -196,6 +196,11 @@ namespace OpenWifi {
         return false;
     }
 
+    void APConfig::AddConfiguration(const Types::UUIDvec_t &UUIDs) {
+        for(const auto &i:UUIDs)
+            AddConfiguration(i);
+    }
+
     void APConfig::AddConfiguration(const std::string &UUID) {
 
         ProvObjects::DeviceConfiguration    Config;

@@ -61,8 +61,10 @@ namespace OpenWifi {
                 StorageService()->ContactDB().AddInUse("id",V.contact, StorageService()->VenueDB().Prefix(), V.info.id);
             if(!V.managementPolicy.empty())
                 StorageService()->PolicyDB().AddInUse("id",V.managementPolicy, StorageService()->VenueDB().Prefix(), V.info.id);
-            if(!V.deviceConfiguration.empty())
-                StorageService()->ConfigurationDB().AddInUse("id", V.deviceConfiguration, StorageService()->ConfigurationDB().Prefix(), V.info.id);
+            if(!V.deviceConfiguration.empty()) {
+                for(auto &i:V.deviceConfiguration)
+                    StorageService()->ConfigurationDB().AddInUse("id", i, StorageService()->ConfigurationDB().Prefix(), V.info.id);
+            }
             ProvObjects::Venue  NV;
             StorageService()->VenueDB().GetRecord("id",V.info.id,NV);
             V = NV;
@@ -111,7 +113,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.location = In.get<14>();
     Out.rrm = In.get<15>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
-    Out.deviceConfiguration = In.get<17>();
+    OpenWifi::Types::from_string(In.get<17>(), Out.deviceConfiguration);
     OpenWifi::Types::from_string(In.get<18>(), Out.sourceIP);
 
 }
@@ -134,6 +136,6 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<14>(In.location);
     Out.set<15>(In.rrm);
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
-    Out.set<17>(In.deviceConfiguration);
+    Out.set<17>(OpenWifi::Types::to_string(In.deviceConfiguration));
     Out.set<18>(OpenWifi::Types::to_string(In.sourceIP));
 }

@@ -25,6 +25,7 @@ namespace OpenWifi {
             [[nodiscard]] bool Get(Poco::JSON::Object::Ptr &Configuration);
 
             void AddConfiguration(const std::string &UUID);
+            void AddConfiguration(const Types::UUIDvec_t &UUID);
             void AddVenueConfig(const std::string &UUID);
             void AddEntityConfig(const std::string &UUID);
             const Poco::JSON::Array & Explanation() { return Explanation_; };
