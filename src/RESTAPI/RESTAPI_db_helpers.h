@@ -108,7 +108,23 @@ namespace OpenWifi {
                 EI.set("deviceConfiguration",EntObj);
             }
         }
+        if constexpr(std::is_same_v<Q,Types::UUIDvec_t>) {
+            if(!T.deviceConfiguration.empty()) {
+                Poco::JSON::Array  ObjArr;
+                ProvObjects::DeviceConfiguration DevConf;
+                for(const auto &i:T.deviceConfiguration) {
+                    if(StorageService()->ConfigurationDB().GetRecord("id",i,DevConf)) {
+                        Poco::JSON::Object  InnerObj;
+                        InnerObj.set( "name", DevConf.info.name);
+                        InnerObj.set( "description", DevConf.info.description);
+                        ObjArr.add(InnerObj);
+                    }
+                }
+                EI.set("deviceConfiguration",ObjArr);
+            }
+        }
     }
+
     template <typename... Ts> void Extend_deviceConfiguration(Ts... args) {
         static_assert( sizeof...(args) == 2);
     }
