@@ -118,13 +118,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        for(auto &i:NewObject.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
-
-        AssignIfPresent(RawObject, "name", Existing.info.name);
-        AssignIfPresent(RawObject, "description", Existing.info.description);
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
         std::string NewPolicy,OldPolicy = Existing.managementPolicy;
         AssignIfPresent(RawObject, "managementPolicy", NewPolicy);

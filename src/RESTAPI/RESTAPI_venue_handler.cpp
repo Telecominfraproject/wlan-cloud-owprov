@@ -11,7 +11,6 @@
 
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
-#include "Poco/JSON/Parser.h"
 #include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
@@ -140,13 +139,8 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        for(auto &i:NewObject.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
-        AssignIfPresent(RawObject, "name", Existing.info.name);
-        AssignIfPresent(RawObject, "description", Existing.info.description);
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         if(RawObject->has("sourceIP")) {
@@ -210,7 +204,6 @@ namespace OpenWifi{
             MovingConfiguration = MoveConfiguration != Existing.deviceConfiguration;
         }
 
-        Existing.info.modified = std::time(nullptr);
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
             if(MovingContact) {
                 if(!Existing.contact.empty())

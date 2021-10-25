@@ -108,14 +108,12 @@ namespace OpenWifi{
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
-        auto NewObj = ParseStream();
-        if(!NewPolicy.from_json(NewObj)) {
+        auto NewObject = ParseStream();
+        if(!NewPolicy.from_json(NewObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        AssignIfPresent(NewObj, "name", Existing.info.name);
-        AssignIfPresent(NewObj, "description", Existing.info.description);
-        Existing.info.modified = std::time(nullptr);
+        UpdateObjectInfo(NewObject, UserInfo_.userinfo, Existing.info);
 
         if(!NewPolicy.entries.empty())
             Existing.entries = NewPolicy.entries;

@@ -130,10 +130,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        for(auto &i:NewObject.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
         std::string MoveToPolicy, MoveFromPolicy;
         bool MovingPolicy=false;
@@ -155,8 +152,6 @@ namespace OpenWifi{
             MovingEntity = MoveToEntity != Existing.entity ;
         }
 
-        AssignIfPresent(RawObject,"name",Existing.info.name);
-        AssignIfPresent(RawObject,"description",Existing.info.description);
         AssignIfPresent(RawObject, "title", Existing.title);
         AssignIfPresent(RawObject, "salutation", Existing.salutation);
         AssignIfPresent(RawObject, "firstname", Existing.firstname);
@@ -174,7 +169,6 @@ namespace OpenWifi{
             Existing.phones = NewObject.phones;
 
         Existing.entity = MoveToEntity;
-        Existing.info.modified = std::time(nullptr);
         Existing.managementPolicy = MoveToPolicy;
 
         if(DB_.UpdateRecord("id", UUID, Existing)) {

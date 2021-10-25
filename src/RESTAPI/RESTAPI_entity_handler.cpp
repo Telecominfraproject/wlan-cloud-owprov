@@ -161,10 +161,7 @@ namespace OpenWifi{
             Existing.sourceIP = NewEntity.sourceIP;
         }
 
-        for(auto &i:NewEntity.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
         std::string Error;
         if(!StorageService()->Validate(Parameters_,Error)) {
@@ -172,10 +169,7 @@ namespace OpenWifi{
         }
 
         AssignIfPresent(RawObject, "rrm", Existing.rrm);
-        AssignIfPresent(RawObject, "name", Existing.info.name);
-        AssignIfPresent(RawObject, "description", Existing.info.description);
 
-        Existing.info.modified = std::time(nullptr);
         if(DB_.UpdateRecord("id",UUID,Existing)) {
             for(const auto &i:*Request) {
                 std::string Child{i.second};

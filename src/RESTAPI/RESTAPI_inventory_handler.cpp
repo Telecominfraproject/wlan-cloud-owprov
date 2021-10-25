@@ -235,10 +235,7 @@ namespace OpenWifi{
             }
         }
 
-        for(auto &i:NewObject.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
         std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration, NewPolicy;
         bool    MovingVenue=false,
@@ -320,10 +317,6 @@ namespace OpenWifi{
             Existing.location.clear();
             Existing.managementPolicy.clear();
         }
-
-        AssignIfPresent(RawObject, "name", Existing.info.name);
-        AssignIfPresent(RawObject, "description", Existing.info.description);
-        Existing.info.modified = std::time(nullptr);
 
         if(StorageService()->InventoryDB().UpdateRecord("id", Existing.info.id, Existing)) {
             if(!UnAssign) {

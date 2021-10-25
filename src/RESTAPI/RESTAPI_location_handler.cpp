@@ -148,13 +148,8 @@ namespace OpenWifi{
             Existing.entity = MoveToEntity;
         }
 
-        for(auto &i:NewObject.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
-        AssignIfPresent(RawObject,"name",Existing.info.name);
-        AssignIfPresent(RawObject,"description",Existing.info.description);
         AssignIfPresent(RawObject, "buildingName", Existing.buildingName);
         AssignIfPresent(RawObject, "city", Existing.city);
         AssignIfPresent(RawObject, "state", Existing.state);

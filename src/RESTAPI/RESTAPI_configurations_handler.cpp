@@ -184,10 +184,7 @@ namespace OpenWifi{
             Existing.configuration = NewConfig.configuration;
         }
 
-        for(auto &i:NewConfig.info.notes) {
-            i.createdBy = UserInfo_.userinfo.email;
-            Existing.info.notes.insert(Existing.info.notes.begin(),i);
-        }
+        UpdateObjectInfo(ParsedObj, UserInfo_.userinfo, Existing.info);
 
         std::string MovePolicy;
         bool        MovingPolicy=false;
@@ -201,10 +198,7 @@ namespace OpenWifi{
         if(!NewConfig.deviceTypes.empty())
             Existing.deviceTypes = NewConfig.deviceTypes;
 
-        AssignIfPresent(ParsedObj, "name", Existing.info.name);
-        AssignIfPresent(ParsedObj,"description", Existing.info.description);
         AssignIfPresent(ParsedObj, "rrm", Existing.rrm);
-        Existing.info.modified = std::time(nullptr);
         AssignIfPresent(ParsedObj,"firmwareUpgrade",Existing.firmwareUpgrade);
         AssignIfPresent(ParsedObj,"firmwareRCOnly", Existing.firmwareRCOnly);
 
