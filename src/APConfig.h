@@ -13,7 +13,7 @@ namespace OpenWifi {
 
     struct VerboseElement {
         ProvObjects::DeviceConfigurationElement     element;
-        std::string                                 uuid;
+        ProvObjects::ObjectInfo                     info;
     };
     typedef std::vector<VerboseElement> ConfigVec;
 

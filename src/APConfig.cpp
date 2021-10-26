@@ -165,8 +165,9 @@ namespace OpenWifi {
             if(InsertInfo.second) {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
-                    ExObj.set("from", i.uuid);
-                    ExObj.set("added", true);
+                    ExObj.set("from-uuid", i.info.id);
+                    ExObj.set("from-uuid", i.info.name);
+                    ExObj.set("action", "added");
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
@@ -174,8 +175,10 @@ namespace OpenWifi {
             } else {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
-                    ExObj.set("from", i.uuid);
-                    ExObj.set("added", false);
+                    ExObj.set("from-uuid", i.info.id);
+                    ExObj.set("from-name", i.info.name);
+                    ExObj.set("action", "rejected");
+                    ExObj.set("reason","weight insufficient");
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
@@ -213,21 +216,22 @@ namespace OpenWifi {
                 if(DeviceTypeMatch(DeviceType_,Config.deviceTypes)) {
                     for(const auto &i:Config.configuration) {
                         if(i.weight==0) {
-                            VerboseElement  VE{ .element = i, .uuid = UUID};
+                            VerboseElement  VE{ .element = i, .info = Config.info};
                             Config_.push_back(VE);
                         } else {
                             // we need to insert after everything bigger or equal
                             auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
                                                          [](const VerboseElement &Elem, int Value) {
                                 return Elem.element.weight>=Value; });
-                            VerboseElement  VE{ .element = i, .uuid = UUID};
+                            VerboseElement  VE{ .element = i, .info = Config.info};
                             Config_.insert(Hint,VE);
                         }
                     }
                 } else {
                     Poco::JSON::Object  ExObj;
-                    ExObj.set("from", UUID);
-                    ExObj.set("added", false);
+                    ExObj.set("from-uuid", Config.info.id);
+                    ExObj.set("from-name",Config.info.name);
+                    ExObj.set("action", "rejected");
                     ExObj.set("reason", "deviceType mismatch");
                     Explanation_.add(ExObj);
                 }
