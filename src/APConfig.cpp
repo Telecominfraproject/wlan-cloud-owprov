@@ -166,7 +166,7 @@ namespace OpenWifi {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from-uuid", i.info.id);
-                    ExObj.set("from-uuid", i.info.name);
+                    ExObj.set("from-name", i.info.name);
                     ExObj.set("action", "added");
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
