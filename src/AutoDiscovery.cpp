@@ -70,8 +70,6 @@ namespace OpenWifi {
     };
 
     int AutoDiscovery::Start() {
-        firmwareUpgrade_ = MicroService::instance().ConfigGetString("firmware.updater.upgrade","no");
-        firmwareRCOnly_ = MicroService::instance().ConfigGetBool("firmware.updater.rconly",false);
         Types::TopicNotifyFunction F = [this](std::string s1,std::string s2) { this->ConnectionReceived(s1,s2); };
         ConnectionWatcherId_ = KafkaManager()->RegisterTopicWatcher(KafkaTopics::CONNECTION, F);
         Worker_.start(*this);

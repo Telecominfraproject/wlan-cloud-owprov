@@ -15,6 +15,13 @@
 
 namespace OpenWifi::ProvObjects {
 
+    enum FIRMWARE_UPGRADE_RULES {
+        dont_upgrade,
+        upgrade_inherit,
+        upgrade_release_only,
+        upgrade_latest
+    };
+
     struct ObjectInfo {
         Types::UUID_t   id;
         std::string     name;

@@ -15,20 +15,10 @@
 #include <vector>
 #include <set>
 
-/*
-#include "Poco/Util/Application.h"
-#include "Poco/Util/ServerApplication.h"
-#include "Poco/Util/Option.h"
-#include "Poco/Util/OptionSet.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/ErrorHandler.h"
-#include "Poco/Crypto/RSAKey.h"
-#include "Poco/Crypto/CipherFactory.h"
-#include "Poco/Crypto/Cipher.h"
-*/
 #include "Dashboard.h"
 #include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 
@@ -52,9 +42,11 @@ namespace OpenWifi {
 			static Daemon *instance();
 			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
 			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }
+			ProvObjects::FIRMWARE_UPGRADE_RULES FirmwareRules() const { return FWRules_; }
 	  	private:
 			static Daemon 				*instance_;
 			OpenWifi::TopoDashboard		DB_{};
+			ProvObjects::FIRMWARE_UPGRADE_RULES FWRules_{ProvObjects::dont_upgrade};
 
     };
 

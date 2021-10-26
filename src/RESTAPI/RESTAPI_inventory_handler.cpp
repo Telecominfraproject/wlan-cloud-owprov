@@ -56,13 +56,17 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
-            std::string firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
-            bool firmwareRCOnly = AutoDiscovery()->firmwareRCOnly();
+            ProvObjects::FIRMWARE_UPGRADE_RULES Rules;
 
-            StorageService()->InventoryDB().FindFirmwareOptions(SerialNumber,firmwareUpgrade, firmwareRCOnly);
+            StorageService()->InventoryDB().FindFirmwareOptions(SerialNumber,Rules);
 
-            Answer.set("firmwareUpgrade",firmwareUpgrade);
-            Answer.set("firmwareRCOnly", firmwareRCOnly);
+            if(Rules == ProvObjects::dont_upgrade) {
+                Answer.set("firmwareUpgrade","no");
+            } else {
+                Answer.set("firmwareUpgrade","no");
+                if(Rules == ProvObjects::upgrade_release_only)
+                    Answer.set("firmwareRCOnly", Rules == ProvObjects::upgrade_release_only );
+            }
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
             APConfig    Device(SerialNumber,Existing.deviceType,Logger_, false);

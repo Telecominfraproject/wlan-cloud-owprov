@@ -40,9 +40,9 @@ namespace OpenWifi {
         public:
             InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
             bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo, const std::string & DeviceType);
-            bool FindFirmwareOptions(std::string  & SerialNumber, std::string &firmwareUpgrade, bool &firmwareRCOnly);
-            static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
-            static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, std::string &firmwareUpgrade, bool &firmwareRCOnly);
+            bool FindFirmwareOptions(std::string  & SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
+            static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
+            static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
             void InitializeSerialCache();
         private:
     };

@@ -40,6 +40,15 @@ namespace OpenWifi {
 	}
 
 	void Daemon::initialize() {
+	    if(MicroService::instance().ConfigGetBool("firmware.updater.upgrade",false)) {
+	        if(MicroService::instance().ConfigGetBool("firmware.updater.releaseonly",false)) {
+	            FWRules_ = ProvObjects::upgrade_release_only;
+	        } else {
+	            FWRules_ = ProvObjects::upgrade_latest;
+	        }
+	    } else {
+	        FWRules_ = ProvObjects::dont_upgrade;
+	    }
     }
 
     void MicroServicePostInitialization() {

@@ -15,6 +15,7 @@
 #include "SDK_stubs.h"
 #include "AutoDiscovery.h"
 #include "SerialNumberCache.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 
@@ -112,8 +113,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForEntity(const std::string &EntityUUID, std::string &firmwareUpgrade,
-                                                   bool &firmwareRCOnly) {
+    bool InventoryDB::FindFirmwareOptionsForEntity(const std::string &EntityUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
         std::string UUID = EntityUUID;
         while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
             ProvObjects::Entity                 E;
@@ -122,12 +122,14 @@ namespace OpenWifi {
                     ProvObjects::DeviceConfiguration    C;
                     if(StorageService()->ConfigurationDB().GetRecord("id",E.deviceConfiguration,C)) {
                         if(C.firmwareUpgrade=="no") {
-                            firmwareUpgrade="no";
+                            Rules = ProvObjects::dont_upgrade;
                             return false;
                         }
                         if(C.firmwareUpgrade=="yes") {
-                            firmwareUpgrade="yes";
-                            firmwareRCOnly=C.firmwareRCOnly;
+                            if(C.firmwareRCOnly)
+                                Rules = ProvObjects::upgrade_release_only;
+                            else
+                                Rules = ProvObjects::upgrade_latest;
                             return true;
                         }
                         if(C.firmwareUpgrade.empty() || C.firmwareUpgrade=="inherit") {
@@ -141,13 +143,11 @@ namespace OpenWifi {
                 break;
             }
         }
-        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
-        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
+        Rules = Daemon()->FirmwareRules();
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForVenue(const std::string &VenueUUID, std::string &firmwareUpgrade,
-                                                   bool &firmwareRCOnly) {
+    bool InventoryDB::FindFirmwareOptionsForVenue(const std::string &VenueUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
         std::string UUID = VenueUUID;
         while(!UUID.empty()) {
             ProvObjects::Venue                 V;
@@ -156,19 +156,21 @@ namespace OpenWifi {
                     ProvObjects::DeviceConfiguration    C;
                     if(StorageService()->ConfigurationDB().GetRecord("id",V.deviceConfiguration,C)) {
                         if(C.firmwareUpgrade=="no") {
-                            firmwareUpgrade="no";
+                            Rules = ProvObjects::dont_upgrade;
                             return false;
                         }
                         if(C.firmwareUpgrade=="yes") {
-                            firmwareUpgrade="yes";
-                            firmwareRCOnly=C.firmwareRCOnly;
+                            if(C.firmwareRCOnly)
+                                Rules = ProvObjects::upgrade_release_only;
+                            else
+                                Rules = ProvObjects::upgrade_latest;
                             return true;
                         }
                     }
                 }
                 //  must be inherit...
                 if(!V.entity.empty()) {
-                    return FindFirmwareOptionsForEntity(V.entity,firmwareUpgrade,firmwareRCOnly);
+                    return FindFirmwareOptionsForEntity(V.entity,Rules);
                 } else {
                     UUID=V.parent;
                 }
@@ -176,31 +178,26 @@ namespace OpenWifi {
                 break;
             }
         }
-        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
-        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
+        Rules = Daemon()->FirmwareRules();
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptions(std::string &SerialNumber, std::string &firmwareUpgrade,
-                                          bool &firmwareRCOnly) {
-
+    bool InventoryDB::FindFirmwareOptions(std::string &SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
         ProvObjects::InventoryTag   T;
-        firmwareUpgrade = AutoDiscovery()->firmwareUpgrade();
-        firmwareRCOnly= AutoDiscovery()->firmwareRCOnly();
         if(GetRecord("serialNumber",SerialNumber,T)) {
             //  if there is a local configuration, use this
-            firmwareRCOnly = false;
-            firmwareUpgrade.clear();
             if(!T.deviceConfiguration.empty()) {
                 ProvObjects::DeviceConfiguration    C;
                 if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
                     if(C.firmwareUpgrade=="no") {
-                        firmwareUpgrade="no";
+                        Rules = ProvObjects::dont_upgrade;
                         return false;
                     }
                     if(C.firmwareUpgrade=="yes") {
-                        firmwareUpgrade="yes";
-                        firmwareRCOnly = C.firmwareRCOnly;
+                        if(C.firmwareRCOnly)
+                            Rules = ProvObjects::upgrade_release_only;
+                        else
+                            Rules = ProvObjects::upgrade_latest;
                         return true;
                     }
                 }
@@ -208,14 +205,16 @@ namespace OpenWifi {
 
             //  look at entity...
             if(!T.entity.empty()) {
-                return FindFirmwareOptionsForEntity(T.entity,firmwareUpgrade,firmwareRCOnly);
+                return FindFirmwareOptionsForEntity(T.entity,Rules);
             }
 
             if(!T.venue.empty()) {
-                return FindFirmwareOptionsForVenue(T.venue,firmwareUpgrade,firmwareRCOnly);
+                return FindFirmwareOptionsForVenue(T.venue,Rules);
             }
+            Rules = Daemon()->FirmwareRules();
             return false;
         }
+        Rules = ProvObjects::dont_upgrade;
         return false;
     }
 
