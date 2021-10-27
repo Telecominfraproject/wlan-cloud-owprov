@@ -118,31 +118,31 @@ namespace OpenWifi {
         while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
             ProvObjects::Entity                 E;
             if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
+                std::cout << "Looking for firmware in Entity " << E.info.name << std::endl;
                 if(!E.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
-                    if(StorageService()->ConfigurationDB().GetRecord("id",E.deviceConfiguration,C)) {
-                        if(C.firmwareUpgrade=="no") {
-                            Rules = ProvObjects::dont_upgrade;
-                            return false;
-                        }
-                        if(C.firmwareUpgrade=="yes") {
-                            if(C.firmwareRCOnly)
-                                Rules = ProvObjects::upgrade_release_only;
-                            else
-                                Rules = ProvObjects::upgrade_latest;
-                            return true;
-                        }
-                        if(C.firmwareUpgrade.empty() || C.firmwareUpgrade=="inherit") {
-                            UUID = E.parent;
+                    for(const auto &i:E.deviceConfiguration) {
+                        if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
+                            if(C.firmwareUpgrade=="no") {
+                                Rules = ProvObjects::dont_upgrade;
+                                return false;
+                            }
+                            if(C.firmwareUpgrade=="yes") {
+                                if(C.firmwareRCOnly)
+                                    Rules = ProvObjects::upgrade_release_only;
+                                else
+                                    Rules = ProvObjects::upgrade_latest;
+                                return true;
+                            }
                         }
                     }
-                } else {
-                    UUID = E.parent;
                 }
+                UUID = E.parent;
             } else {
                 break;
             }
         }
+        std::cout << "No entity config found, returning default" << std::endl;
         Rules = Daemon()->FirmwareRules();
         return false;
     }
@@ -152,32 +152,35 @@ namespace OpenWifi {
         while(!UUID.empty()) {
             ProvObjects::Venue                 V;
             if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
+                std::cout << "Looking for firmware in Venue " << V.info.name << std::endl;
                 if(!V.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
-                    if(StorageService()->ConfigurationDB().GetRecord("id",V.deviceConfiguration,C)) {
-                        if(C.firmwareUpgrade=="no") {
-                            Rules = ProvObjects::dont_upgrade;
-                            return false;
-                        }
-                        if(C.firmwareUpgrade=="yes") {
-                            if(C.firmwareRCOnly)
-                                Rules = ProvObjects::upgrade_release_only;
-                            else
-                                Rules = ProvObjects::upgrade_latest;
-                            return true;
+                    for(const auto &i:V.deviceConfiguration) {
+                        if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
+                            if(C.firmwareUpgrade=="no") {
+                                Rules = ProvObjects::dont_upgrade;
+                                return false;
+                            }
+                            if(C.firmwareUpgrade=="yes") {
+                                if(C.firmwareRCOnly)
+                                    Rules = ProvObjects::upgrade_release_only;
+                                else
+                                    Rules = ProvObjects::upgrade_latest;
+                                return true;
+                            }
                         }
                     }
                 }
-                //  must be inherit...
                 if(!V.entity.empty()) {
                     return FindFirmwareOptionsForEntity(V.entity,Rules);
                 } else {
-                    UUID=V.parent;
+                    UUID = V.parent;
                 }
             } else {
                 break;
             }
         }
+        std::cout << "No venue config found, returning default" << std::endl;
         Rules = Daemon()->FirmwareRules();
         return false;
     }
@@ -185,6 +188,7 @@ namespace OpenWifi {
     bool InventoryDB::FindFirmwareOptions(std::string &SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
         ProvObjects::InventoryTag   T;
         if(GetRecord("serialNumber",SerialNumber,T)) {
+            std::cout << "SerialNumber: " << SerialNumber << " found device." << std::endl;
             //  if there is a local configuration, use this
             if(!T.deviceConfiguration.empty()) {
                 ProvObjects::DeviceConfiguration    C;
