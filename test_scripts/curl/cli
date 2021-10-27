@@ -450,7 +450,6 @@ addresscheck() {
 }
 
 affecteddevices() {
-    computedAffected
     curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/configurations/${1}?computedAffected=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
@@ -500,6 +499,7 @@ case "$1" in
     "reloadsubsystem") login; reloadsubsystem "$2"; logout ;;
     "systeminfo") login; systeminfo ; logout;;
     "addresscheck") login; addresscheck; logout ;;
+    "affecteddevices") login; affecteddevices "$2"; logout;;
     *) help ;;
 esac
 

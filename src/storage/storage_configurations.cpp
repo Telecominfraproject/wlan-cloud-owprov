@@ -79,8 +79,8 @@ namespace OpenWifi {
             }
         }
 
-        std::for_each(cbegin(SerialNumbers),cend(SerialNumbers),
-                      [&DeviceSerialNumbers](const std::string &S){ DeviceSerialNumbers.push_back(S); });
+        for(const auto &i:SerialNumbers)
+            DeviceSerialNumbers.push_back(i);
 
         return true;
     }
