@@ -63,14 +63,22 @@ namespace OpenWifi {
                 ProvObjects::Entity E;
                 if(!StorageService()->EntityDB().GetRecord("id",Tokens[1],E))
                     continue;
-                for(const auto &j:E.devices)
-                    SerialNumbers.insert(j);
+                for(const auto &j:E.devices) {
+                    ProvObjects::InventoryTag   T;
+                    if(!StorageService()->InventoryDB().GetRecord("id",j,T))
+                        continue;
+                    SerialNumbers.insert(T.serialNumber);
+                }
             } else if (Tokens[0] == "ven") {
                 ProvObjects::Venue V;
                 if(!StorageService()->VenueDB().GetRecord("id",Tokens[1],V))
                     continue;
-                for(const auto &j:V.devices)
-                    SerialNumbers.insert(j);
+                for(const auto &j:V.devices) {
+                    ProvObjects::InventoryTag   T;
+                    if(!StorageService()->InventoryDB().GetRecord("id",j,T))
+                        continue;
+                    SerialNumbers.insert(T.serialNumber);
+                }
             } else if (Tokens[0] == "inv") {
                 ProvObjects::InventoryTag   T;
                 if(!StorageService()->InventoryDB().GetRecord("id",Tokens[1],T))
