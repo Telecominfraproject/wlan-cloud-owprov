@@ -449,6 +449,15 @@ addresscheck() {
     wscat -c wss://${OWPROV}/api/v1/ws
 }
 
+affecteddevices() {
+    computedAffected
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/configurations/${1}?computedAffected=true" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -H "accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; help  ; logout ;;

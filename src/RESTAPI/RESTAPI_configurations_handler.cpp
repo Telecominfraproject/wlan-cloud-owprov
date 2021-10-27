@@ -43,6 +43,10 @@ namespace OpenWifi{
             }
             Answer.set("entries", Inner);
             return ReturnObject(Answer);
+        } else if(HasParameter("computedAffected",Arg) && Arg=="true") {
+            Types::UUIDvec_t DeviceSerialNumbers;
+            DB_.GetListOfAffectedDevices(UUID,DeviceSerialNumbers);
+            return ReturnObject("affectedDevices", DeviceSerialNumbers);
         } else if(QB_.AdditionalInfo) {
             AddExtendedInfo(Existing,Answer);
         }

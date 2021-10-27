@@ -11,6 +11,7 @@
 #include "framework/OpenWifiTypes.h"
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -42,6 +43,48 @@ namespace OpenWifi {
 
     ConfigurationDB::ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L, "cfg") {}
+
+    bool ConfigurationDB::GetListOfAffectedDevices(const Types::UUID_t & ConfigUUID, Types::UUIDvec_t & DeviceSerialNumbers ) {
+        //  find all the places where this configuration is used
+        //  for each of them get the devices they oversee
+        ProvObjects::DeviceConfiguration    Config;
+        if(!GetRecord("id",ConfigUUID,Config))
+            return false;
+
+        if(Config.inUse.empty())
+            return true;
+
+        std::set<std::string>   SerialNumbers;
+        for(const auto &i:Config.inUse) {
+            auto Tokens = Poco::StringTokenizer(i,":");
+            if(Tokens.count()!=2)
+                continue;
+            if(Tokens[0] == "ent") {
+                ProvObjects::Entity E;
+                if(!StorageService()->EntityDB().GetRecord("id",Tokens[1],E))
+                    continue;
+                for(const auto &j:E.devices)
+                    SerialNumbers.insert(j);
+            } else if (Tokens[0] == "ven") {
+                ProvObjects::Venue V;
+                if(!StorageService()->VenueDB().GetRecord("id",Tokens[1],V))
+                    continue;
+                for(const auto &j:V.devices)
+                    SerialNumbers.insert(j);
+            } else if (Tokens[0] == "inv") {
+                ProvObjects::InventoryTag   T;
+                if(!StorageService()->InventoryDB().GetRecord("id",Tokens[1],T))
+                    continue;
+                SerialNumbers.insert(T.serialNumber);
+            }
+        }
+
+        std::for_each(cbegin(SerialNumbers),cend(SerialNumbers),
+                      [&DeviceSerialNumbers](const std::string &S){ DeviceSerialNumbers.push_back(S); });
+
+        return true;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(OpenWifi::ConfigurationDBRecordType &In, OpenWifi::ProvObjects::DeviceConfiguration &Out) {
