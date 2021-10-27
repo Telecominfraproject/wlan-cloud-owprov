@@ -63,7 +63,7 @@ namespace OpenWifi{
             if(Rules == ProvObjects::dont_upgrade) {
                 Answer.set("firmwareUpgrade","no");
             } else {
-                Answer.set("firmwareUpgrade","no");
+                Answer.set("firmwareUpgrade","yes");
                 if(Rules == ProvObjects::upgrade_release_only)
                     Answer.set("firmwareRCOnly", Rules == ProvObjects::upgrade_release_only );
             }
