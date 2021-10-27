@@ -118,7 +118,6 @@ namespace OpenWifi {
         while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
             ProvObjects::Entity                 E;
             if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
-                std::cout << "Looking for firmware in Entity " << E.info.name << std::endl;
                 if(!E.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
                     for(const auto &i:E.deviceConfiguration) {
@@ -142,7 +141,6 @@ namespace OpenWifi {
                 break;
             }
         }
-        std::cout << "No entity config found, returning default" << std::endl;
         Rules = Daemon()->FirmwareRules();
         return false;
     }
@@ -152,7 +150,6 @@ namespace OpenWifi {
         while(!UUID.empty()) {
             ProvObjects::Venue                 V;
             if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
-                std::cout << "Looking for firmware in Venue " << V.info.name << std::endl;
                 if(!V.deviceConfiguration.empty()) {
                     ProvObjects::DeviceConfiguration    C;
                     for(const auto &i:V.deviceConfiguration) {
@@ -180,7 +177,6 @@ namespace OpenWifi {
                 break;
             }
         }
-        std::cout << "No venue config found, returning default" << std::endl;
         Rules = Daemon()->FirmwareRules();
         return false;
     }
