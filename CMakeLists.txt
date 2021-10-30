@@ -61,6 +61,8 @@ add_executable(owprov
         src/framework/RESTAPI_protocol.h
         src/framework/StorageClass.h
         src/framework/uCentral_Protocol.h
+        src/framework/ConfigurationValidator.cpp
+        src/framework/ConfigurationValidator.h
         src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
         src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
         src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
@@ -98,12 +100,14 @@ add_executable(owprov
         src/SerialNumberCache.h src/SerialNumberCache.cpp
         src/SecurityDBProxy.cpp src/SecurityDBProxy.h
         src/APConfig.cpp src/APConfig.h
-        src/ConfigurationValidator.cpp src/ConfigurationValidator.h
         src/AutoDiscovery.cpp src/AutoDiscovery.h
         src/SDK_stubs.cpp src/SDK_stubs.h
         src/ConfigSanityChecker.cpp src/ConfigSanityChecker.h
         src/TagServer.cpp src/TagServer.h
-        src/RESTAPI/RESTAPI_db_helpers.h)
+        src/RESTAPI/RESTAPI_db_helpers.h
+        src/JobController.cpp src/JobController.h
+        src/JobRegistrations.cpp
+        src/storage/storage_jobs.cpp src/storage/storage_jobs.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

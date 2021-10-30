@@ -72,6 +72,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
         if(NewObject.parent.empty() && NewObject.entity.empty()) {
             return BadRequest(RESTAPI::Errors::ParentOrEntityMustBeSet);
         }
@@ -117,10 +121,6 @@ namespace OpenWifi{
         }
 
         NewObject.children.clear();
-        NewObject.info.modified = NewObject.info.created = std::time(nullptr);
-        NewObject.info.id = MicroService::instance().CreateUUID() ;
-        for(auto &i:NewObject.info.notes)
-            i.createdBy = UserInfo_.userinfo.email;
 
         if(DB_.CreateShortCut(NewObject)) {
             ProvObjects::Venue  NewRecord;
@@ -145,7 +145,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
 
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 

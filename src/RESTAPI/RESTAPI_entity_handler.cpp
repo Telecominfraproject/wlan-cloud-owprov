@@ -73,14 +73,15 @@ namespace OpenWifi{
         if (!NewEntity.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
-        NewEntity.info.modified = NewEntity.info.created = std::time(nullptr);
 
-        for(auto &i:NewEntity.info.notes)
-            i.createdBy = UserInfo_.userinfo.email;
+        if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,NewEntity.info)) {
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
+        }
 
         //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
         //  must be conveyed through PUT.
-        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::instance().CreateUUID() ;
+        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::instance().CreateUUID();
+
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";
         } else if(NewEntity.parent.empty() || !DB_.Exists("id",NewEntity.parent)) {
@@ -143,6 +144,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
+        }
+
         std::string NewManagementPolicy;
         Types::UUIDvec_t NewConfiguration;
         bool        MovingConfiguration=false,
@@ -171,8 +176,6 @@ namespace OpenWifi{
             }
             Existing.sourceIP = NewEntity.sourceIP;
         }
-
-        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
 
         std::string Error;
         if(!StorageService()->Validate(Parameters_,Error)) {

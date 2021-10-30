@@ -85,13 +85,13 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
-        NewObject.info.id = MicroService::instance().CreateUUID();
-        NewObject.info.created = NewObject.info.modified = std::time(nullptr);
-
-        std::string f{RESTAPI::Protocol::ID};
 
         if(DB_.CreateRecord(NewObject)) {
             if(!NewObject.managementPolicy.empty())
@@ -118,7 +118,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
 
         std::string NewPolicy,OldPolicy = Existing.managementPolicy;
         AssignIfPresent(RawObject, "managementPolicy", NewPolicy);

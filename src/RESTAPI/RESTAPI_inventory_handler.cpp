@@ -157,7 +157,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(NewObject.info.name.empty()) {
+        if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
@@ -192,9 +192,6 @@ namespace OpenWifi{
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
-
-        NewObject.info.modified = NewObject.info.created = std::time(nullptr);
-        NewObject.info.id = MicroService::instance().CreateUUID();
 
         if(DB_.CreateRecord(NewObject)) {
             SerialNumberCache()->AddSerialNumber(SerialNumber);
@@ -239,7 +236,9 @@ namespace OpenWifi{
             }
         }
 
-        UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
+        }
 
         std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration, NewPolicy;
         bool    MovingVenue=false,

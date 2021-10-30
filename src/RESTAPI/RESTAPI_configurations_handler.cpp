@@ -12,7 +12,7 @@
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_errors.h"
-#include "ConfigurationValidator.h"
+#include "framework/ConfigurationValidator.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi{
@@ -127,18 +127,13 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(C.info.name.empty()) {
+        if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,C.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
         if(!C.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",C.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownId);
         }
-
-        C.info.modified = C.info.created = std::time(nullptr);
-        C.info.id = MicroService::instance().CreateUUID();
-        for(auto &i:C.info.notes)
-            i.createdBy = UserInfo_.userinfo.email;
 
         C.inUse.clear();
         if(C.deviceTypes.empty() || !StorageService()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
@@ -175,6 +170,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if(!UpdateObjectInfo(ParsedObj, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
+        }
+
         if(!NewConfig.deviceTypes.empty() && !StorageService()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
@@ -187,8 +186,6 @@ namespace OpenWifi{
         if(ParsedObj->has("configuration")) {
             Existing.configuration = NewConfig.configuration;
         }
-
-        UpdateObjectInfo(ParsedObj, UserInfo_.userinfo, Existing.info);
 
         std::string MovePolicy;
         bool        MovingPolicy=false;

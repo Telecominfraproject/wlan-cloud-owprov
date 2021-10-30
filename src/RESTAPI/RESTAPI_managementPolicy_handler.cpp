@@ -78,18 +78,17 @@ namespace OpenWifi{
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
-        auto NewObj = ParseStream();
-        if(!NewPolicy.from_json(NewObj)) {
+        auto NewObject = ParseStream();
+        if(!NewPolicy.from_json(NewObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(NewPolicy.info.name.empty()) {
-            return BadRequest(RESTAPI::Errors::NameMustBeSet);
+        if(!CreateObjectInfo(NewObject, UserInfo_.userinfo, NewPolicy.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
         NewPolicy.inUse.clear();
-        NewPolicy.info.id = MicroService::instance().CreateUUID();
-        NewPolicy.info.created = NewPolicy.info.modified = std::time(nullptr);
+
         if(DB_.CreateRecord(NewPolicy)) {
             ProvObjects::ManagementPolicy   Policy;
             DB_.GetRecord("id",NewPolicy.info.id,Policy);
@@ -113,7 +112,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        UpdateObjectInfo(NewObject, UserInfo_.userinfo, Existing.info);
+        if(!UpdateObjectInfo(NewObject, UserInfo_.userinfo, Existing.info)) {
+            return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
 
         if(!NewPolicy.entries.empty())
             Existing.entries = NewPolicy.entries;
