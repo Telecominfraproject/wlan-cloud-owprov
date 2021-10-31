@@ -194,7 +194,7 @@ namespace OpenWifi{
         }
 
         if(DB_.CreateRecord(NewObject)) {
-            SerialNumberCache()->AddSerialNumber(SerialNumber);
+            SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
             if (!NewObject.venue.empty())
                 StorageService()->VenueDB().AddDevice("id",NewObject.venue,NewObject.info.id);
             if (!NewObject.entity.empty())

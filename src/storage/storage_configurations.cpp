@@ -44,36 +44,43 @@ namespace OpenWifi {
     ConfigurationDB::ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L, "cfg") {}
 
-        static bool AddDevicesFromVenue( const std::string & UUID, std::set<std::string> & Devices) {
+    static bool AddIfAffected( const std::string & UUID,const std::vector<std::string> & DeviceTypes, std::set<std::string> & Devices ) {
+        ProvObjects::InventoryTag   T;
+        if(!StorageService()->InventoryDB().GetRecord("id",UUID,T))
+            return false;
+
+        for(const auto &i:DeviceTypes) {
+            if(i=="*" || i==T.deviceType) {
+                Devices.insert(T.serialNumber);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static bool AddDevicesFromVenue( const std::string & UUID, const std::vector<std::string> & DeviceTypes, std::set<std::string> & Devices) {
         ProvObjects::Venue V;
         if(!StorageService()->VenueDB().GetRecord("id",UUID,V))
             return false;
         for(const auto &j:V.devices) {
-            ProvObjects::InventoryTag   T;
-            if(!StorageService()->InventoryDB().GetRecord("id",j,T))
-                continue;
-            Devices.insert(T.serialNumber);
+            AddIfAffected(j, DeviceTypes, Devices);
         }
-
         for(const auto &j:V.children)
-            AddDevicesFromVenue(j,Devices);
+            AddDevicesFromVenue(j,DeviceTypes,Devices);
         return true;
     }
 
-    static bool AddDevicesFromEntity( const std::string & UUID, std::set<std::string> & Devices) {
+    static bool AddDevicesFromEntity( const std::string & UUID, const std::vector<std::string> & DeviceTypes, std::set<std::string> & Devices) {
         ProvObjects::Entity E;
         if(!StorageService()->EntityDB().GetRecord("id",UUID,E))
             return false;
         for(const auto &j:E.devices) {
-            ProvObjects::InventoryTag   T;
-            if(!StorageService()->InventoryDB().GetRecord("id",j,T))
-                continue;
-            Devices.insert(T.serialNumber);
+            AddIfAffected(j, DeviceTypes, Devices);
         }
         for(const auto &j:E.children)
-            AddDevicesFromEntity(j, Devices);
+            AddDevicesFromEntity(j,DeviceTypes, Devices);
         for(const auto &j:E.venues)
-            AddDevicesFromVenue(j, Devices);
+            AddDevicesFromVenue(j,DeviceTypes, Devices);
         return true;
     }
 
@@ -89,14 +96,15 @@ namespace OpenWifi {
             return true;
 
         std::set<std::string>   SerialNumbers;
+        auto DeviceTypes = Config.deviceTypes;
         for(const auto &i:Config.inUse) {
             auto Tokens = Poco::StringTokenizer(i,":");
             if(Tokens.count()!=2)
                 continue;
             if(Tokens[0] == "ent") {
-                AddDevicesFromEntity(Tokens[1], SerialNumbers);
+                AddDevicesFromEntity(Tokens[1], DeviceTypes, SerialNumbers);
             } else if (Tokens[0] == "ven") {
-                AddDevicesFromVenue(Tokens[1], SerialNumbers);
+                AddDevicesFromVenue(Tokens[1], DeviceTypes, SerialNumbers);
             } else if (Tokens[0] == "inv") {
                 ProvObjects::InventoryTag   T;
                 if(!StorageService()->InventoryDB().GetRecord("id",Tokens[1],T))

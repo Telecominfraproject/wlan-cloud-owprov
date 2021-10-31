@@ -83,7 +83,7 @@ namespace OpenWifi {
             }
 
             if(CreateRecord(NewDevice)) {
-                SerialNumberCache()->AddSerialNumber(SerialNumber);
+                SerialNumberCache()->AddSerialNumber(SerialNumber, DeviceType);
                 std::string FullUUID;
                 if(!NewDevice.entity.empty()) {
                     StorageService()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
@@ -219,7 +219,7 @@ namespace OpenWifi {
     }
 
     void InventoryDB::InitializeSerialCache() {
-        auto F = []( const ProvObjects::InventoryTag & T) ->bool { SerialNumberCache()->AddSerialNumber(T.serialNumber); return true;};
+        auto F = []( const ProvObjects::InventoryTag & T) ->bool { SerialNumberCache()->AddSerialNumber(T.serialNumber, T.deviceType); return true;};
         Iterate(F);
     }
 
