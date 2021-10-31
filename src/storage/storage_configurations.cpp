@@ -44,12 +44,46 @@ namespace OpenWifi {
     ConfigurationDB::ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "configurations", ConfigurationDB_Fields, ConfigurationDB_Indexes, P, L, "cfg") {}
 
+        static bool AddDevicesFromVenue( const std::string & UUID, std::set<std::string> & Devices) {
+        ProvObjects::Venue V;
+        if(!StorageService()->VenueDB().GetRecord("id",UUID,V))
+            return false;
+        for(const auto &j:V.devices) {
+            ProvObjects::InventoryTag   T;
+            if(!StorageService()->InventoryDB().GetRecord("id",j,T))
+                continue;
+            Devices.insert(T.serialNumber);
+        }
+
+        for(const auto &j:V.children)
+            AddDevicesFromVenue(j,Devices);
+        return true;
+    }
+
+    static bool AddDevicesFromEntity( const std::string & UUID, std::set<std::string> & Devices) {
+        ProvObjects::Entity E;
+        if(!StorageService()->EntityDB().GetRecord("id",UUID,E))
+            return false;
+        for(const auto &j:E.devices) {
+            ProvObjects::InventoryTag   T;
+            if(!StorageService()->InventoryDB().GetRecord("id",j,T))
+                continue;
+            Devices.insert(T.serialNumber);
+        }
+        for(const auto &j:E.children)
+            AddDevicesFromEntity(j, Devices);
+        for(const auto &j:E.venues)
+            AddDevicesFromVenue(j, Devices);
+        return true;
+    }
+
     bool ConfigurationDB::GetListOfAffectedDevices(const Types::UUID_t & ConfigUUID, Types::UUIDvec_t & DeviceSerialNumbers ) {
         //  find all the places where this configuration is used
         //  for each of them get the devices they oversee
         ProvObjects::DeviceConfiguration    Config;
-        if(!GetRecord("id",ConfigUUID,Config))
+        if(!GetRecord("id",ConfigUUID,Config)) {
             return false;
+        }
 
         if(Config.inUse.empty())
             return true;
@@ -60,25 +94,9 @@ namespace OpenWifi {
             if(Tokens.count()!=2)
                 continue;
             if(Tokens[0] == "ent") {
-                ProvObjects::Entity E;
-                if(!StorageService()->EntityDB().GetRecord("id",Tokens[1],E))
-                    continue;
-                for(const auto &j:E.devices) {
-                    ProvObjects::InventoryTag   T;
-                    if(!StorageService()->InventoryDB().GetRecord("id",j,T))
-                        continue;
-                    SerialNumbers.insert(T.serialNumber);
-                }
+                AddDevicesFromEntity(Tokens[1], SerialNumbers);
             } else if (Tokens[0] == "ven") {
-                ProvObjects::Venue V;
-                if(!StorageService()->VenueDB().GetRecord("id",Tokens[1],V))
-                    continue;
-                for(const auto &j:V.devices) {
-                    ProvObjects::InventoryTag   T;
-                    if(!StorageService()->InventoryDB().GetRecord("id",j,T))
-                        continue;
-                    SerialNumbers.insert(T.serialNumber);
-                }
+                AddDevicesFromVenue(Tokens[1], SerialNumbers);
             } else if (Tokens[0] == "inv") {
                 ProvObjects::InventoryTag   T;
                 if(!StorageService()->InventoryDB().GetRecord("id",Tokens[1],T))
