@@ -17,10 +17,15 @@ namespace OpenWifi {
     };
 
     int WebSocketClientServer::Start() {
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         GoogleApiKey_ = MicroService::instance().ConfigGetString("google.apikey","");
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         GeoCodeEnabled_ = !GoogleApiKey_.empty();
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         ReactorPool_ = std::make_unique<MyParallelSocketReactor>(Poco::Environment::processorCount());
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         Thr_.start(*this);
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         return 0;
     };
 
