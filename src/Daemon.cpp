@@ -18,6 +18,7 @@
 #include "framework/ConfigurationValidator.h"
 #include "SerialNumberCache.h"
 #include "JobController.h"
+#include "WebSocketClientServer.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -35,7 +36,8 @@ namespace OpenWifi {
 									   SerialNumberCache(),
 									   SecurityDBProxy(),
 									   AutoDiscovery(),
-									   JobController()
+									   JobController(),
+									   WebSocketClientServer()
 								   });
 		}
 		return instance_;

@@ -15,9 +15,31 @@
 #include "Poco/Net/HTTPSClientSession.h"
 
 #include "SerialNumberCache.h"
+#include "WebSocketClientServer.h"
 
 namespace OpenWifi {
 
+    void RESTAPI_webSocketServer::DoGet() {
+        try
+        {
+            if(Request->find("Upgrade") != Request->end() && Poco::icompare((*Request)["Upgrade"], "websocket") == 0) {
+                try
+                {
+                    Poco::Net::WebSocket WS(*Request, *Response);
+                    Logger_.information("WebSocket connection established.");
+                    auto Id = MicroService::instance().CreateUUID();
+                    new WebSocketClient(WS,Id,Logger_);
+                }
+                catch (...) {
+                    std::cout << "Cannot create websocket client..." << std::endl;
+                }
+            }
+        } catch(...) {
+            std::cout << "Cannot upgrade connection..." << std::endl;
+        }
+    }
+
+/*
 	void RESTAPI_webSocketServer::DoGet() {
 
 		//	try and upgrade this session to websocket...
@@ -112,7 +134,7 @@ namespace OpenWifi {
 			}
 		}
 	}
-
+*/
 	void RESTAPI_webSocketServer::Process(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done ) {
 	    try {
 	        if (O->has("command")) {
@@ -136,7 +158,7 @@ namespace OpenWifi {
 	                    Poco::JSON::Stringifier::stringify(AO, SS);
 	                    Answer = SS.str();
 	                }
-	            } else if(GeoCodeEnabled_ && Command == "address_completion" && O->has("address")) {
+	            } else if (GeoCodeEnabled_ && Command == "address_completion" && O->has("address")) {
 	                auto Address = O->get("address").toString();
 	                Answer = GoogleGeoCodeCall(Address);
 	            } else if (Command=="exit") {
