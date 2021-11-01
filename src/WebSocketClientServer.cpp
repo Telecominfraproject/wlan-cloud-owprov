@@ -38,6 +38,7 @@ namespace OpenWifi {
     };
 
     void WebSocketClient::OnSocketError(const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         delete this;
     }
 
@@ -97,11 +98,14 @@ namespace OpenWifi {
             }
         }
 
-        if(Done)
+        if(Done) {
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             delete this;
+        }
     }
 
     void WebSocketClient::OnSocketShutdown(const Poco::AutoPtr<Poco::Net::ShutdownNotification> &pNf) {
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
         delete this;
     }
 
