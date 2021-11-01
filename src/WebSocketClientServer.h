@@ -27,7 +27,7 @@ namespace OpenWifi {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
                 Reactors_.push_back(std::move(std::make_unique<Poco::Net::SocketReactor>()));
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Reactors_[i]->run();
+                (*Reactors_[i]).run();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
             }
         }
