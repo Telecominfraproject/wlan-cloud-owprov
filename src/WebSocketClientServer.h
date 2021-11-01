@@ -22,11 +22,10 @@ namespace OpenWifi {
             NumReactors_(NumReactors) {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
 
-            Reactors_.reserve(NumReactors_);
             std::cout << __func__ << ":" << __LINE__ << std::endl;
             for(int i=0;i<NumReactors_;i++) {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Reactors_[i] = std::make_unique<Poco::Net::SocketReactor>();
+                Reactors_.push_back(std::move(std::make_unique<Poco::Net::SocketReactor>()));
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
                 Reactors_[i]->run();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
