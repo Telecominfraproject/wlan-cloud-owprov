@@ -21,13 +21,13 @@ namespace OpenWifi {
         explicit MyParallelSocketReactor(unsigned NumReactors = Poco::Environment::processorCount()) :
             NumReactors_(NumReactors) {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
-
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             for(int i=0;i<NumReactors_;i++) {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Reactors_.push_back(std::move(std::make_unique<Poco::Net::SocketReactor>()));
+                Poco::Net::SocketReactor    R;
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                (*Reactors_[i]).run();
+                Reactors_.push_back(std::move(R));
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
+                Reactors_[i].run();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
             }
         }
@@ -43,7 +43,7 @@ namespace OpenWifi {
 
     private:
         unsigned    NumReactors_;
-        std::vector<std::unique_ptr<Poco::Net::SocketReactor>>  Reactors_;
+        std::vector<Poco::Net::SocketReactor>  Reactors_;
     };
 
     class WebSocketClient;
