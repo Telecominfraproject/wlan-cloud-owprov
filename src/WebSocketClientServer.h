@@ -23,27 +23,23 @@ namespace OpenWifi {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
             for(int i=0;i<NumReactors_;i++) {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Poco::Net::SocketReactor    R;
-                std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Reactors_.push_back(std::move(R));
-                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 Reactors_[i].run();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
             }
         }
 
         ~MyParallelSocketReactor() {
-            for(const auto &i:Reactors_)
-                i->stop();
+            for(auto &i:Reactors_)
+                i.stop();
         }
 
         Poco::Net::SocketReactor & Reactor() {
-            return *Reactors_[ rand() % NumReactors_ ];
+            return Reactors_[ rand() % NumReactors_ ];
         }
 
     private:
         unsigned    NumReactors_;
-        std::vector<Poco::Net::SocketReactor>  Reactors_;
+        std::array<Poco::Net::SocketReactor,16>  Reactors_;
     };
 
     class WebSocketClient;
