@@ -54,11 +54,16 @@ namespace OpenWifi {
                 WS_->sendFrame("", 0,
                              (int)Poco::Net::WebSocket::FRAME_OP_PONG |
                              (int)Poco::Net::WebSocket::FRAME_FLAG_FIN);
-            }
-            break;
+                }
+                break;
             case Poco::Net::WebSocket::FRAME_OP_PONG: {
-            }
-            break;
+                }
+                break;
+            case Poco::Net::WebSocket::FRAME_OP_CLOSE: {
+                    Logger_.warning(Poco::format("CLOSE(%s): Client is closing its connection.",Id_));
+                    Done=true;
+                }
+                break;
             case Poco::Net::WebSocket::FRAME_OP_TEXT: {
                 IncomingFrame.append(0);
                 if(!Authenticated_) {
