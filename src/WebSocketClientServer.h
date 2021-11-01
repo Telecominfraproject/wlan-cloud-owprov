@@ -19,11 +19,8 @@ namespace OpenWifi {
     class MyParallelSocketReactor {
     public:
         MyParallelSocketReactor() {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             for(int i=0;i<NumReactors_;i++) {
-                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 Threads_[i].start(Reactors_[i]);
-                std::cout << __func__ << ":" << __LINE__ << std::endl;
             }
         }
 
@@ -69,8 +66,10 @@ namespace OpenWifi {
                 Clients_.erase(Id);
 
             }
+
             inline bool GeoCodeEnabled() const { return GeoCodeEnabled_; }
-            [[nodiscard]] inline const std::string GoogleApiKey() { return GoogleApiKey_; }
+            [[nodiscard]] inline std::string GoogleApiKey() const { return GoogleApiKey_; }
+            [[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
 
         private:
             static WebSocketClientServer *              instance_;
@@ -96,37 +95,54 @@ namespace OpenWifi {
             Reactor_(WebSocketClientServer()->ReactorPool().Reactor()),
             Id_(std::move(Id)),
             Logger_(L) {
-            WS_ = std::make_unique<Poco::Net::WebSocket>(WS);
-            Reactor_.addEventHandler(*WS_,
-                                     Poco::NObserver<WebSocketClient, Poco::Net::ReadableNotification>(
-                                             *this, &WebSocketClient::OnSocketReadable));
-            Reactor_.addEventHandler(*WS_,
-                                     Poco::NObserver<WebSocketClient, Poco::Net::ShutdownNotification>(
-                                             *this, &WebSocketClient::OnSocketShutdown));
-            Reactor_.addEventHandler(*WS_,
-                                     Poco::NObserver<WebSocketClient, Poco::Net::ErrorNotification>(
-                                             *this, &WebSocketClient::OnSocketError));
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
+            try {
+                WS_ = std::make_unique<Poco::Net::WebSocket>(WS);
+                Reactor_.addEventHandler(*WS_,
+                                         Poco::NObserver<WebSocketClient, Poco::Net::ReadableNotification>(
+                                                 *this, &WebSocketClient::OnSocketReadable));
+                Reactor_.addEventHandler(*WS_,
+                                         Poco::NObserver<WebSocketClient, Poco::Net::ShutdownNotification>(
+                                                 *this, &WebSocketClient::OnSocketShutdown));
+                Reactor_.addEventHandler(*WS_,
+                                         Poco::NObserver<WebSocketClient, Poco::Net::ErrorNotification>(
+                                                 *this, &WebSocketClient::OnSocketError));
+                WebSocketClientServer()->Register(this, Id_);
+            } catch (...) {
+                delete this;
+            }
         }
 
         ~WebSocketClient() {
-            Reactor_.removeEventHandler(*WS_,
-                                        Poco::NObserver<WebSocketClient,
-                                        Poco::Net::ReadableNotification>(*this,&WebSocketClient::OnSocketReadable));
-            Reactor_.removeEventHandler(*WS_,
-                                        Poco::NObserver<WebSocketClient,
-                                        Poco::Net::ShutdownNotification>(*this,&WebSocketClient::OnSocketShutdown));
-            Reactor_.removeEventHandler(*WS_,
-                                        Poco::NObserver<WebSocketClient,
-                                        Poco::Net::ErrorNotification>(*this,&WebSocketClient::OnSocketError));
-            (*WS_).shutdown();
-            (*WS_).close();
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
+            try {
+                WebSocketClientServer()->UnRegister(Id_);
+                Reactor_.removeEventHandler(*WS_,
+                                            Poco::NObserver<WebSocketClient,
+                                            Poco::Net::ReadableNotification>(*this,&WebSocketClient::OnSocketReadable));
+                Reactor_.removeEventHandler(*WS_,
+                                            Poco::NObserver<WebSocketClient,
+                                            Poco::Net::ShutdownNotification>(*this,&WebSocketClient::OnSocketShutdown));
+                Reactor_.removeEventHandler(*WS_,
+                                            Poco::NObserver<WebSocketClient,
+                                            Poco::Net::ErrorNotification>(*this,&WebSocketClient::OnSocketError));
+                (*WS_).shutdown();
+                (*WS_).close();
+            } catch(...) {
+
+            }
         }
 
         [[nodiscard]] inline const std::string & Id() { return Id_; };
 
         std::string GoogleGeoCodeCall(const std::string &A);
+        [[nodiscard]] inline bool Send(const std::string &Payload) {
+            try {
+                WS_->sendFrame(Payload.c_str(),Payload.size());
+                return true;
+            } catch (...) {
+
+            }
+            return false;
+        }
 
         private:
             std::unique_ptr<Poco::Net::WebSocket>     WS_;

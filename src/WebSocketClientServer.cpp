@@ -17,15 +17,10 @@ namespace OpenWifi {
     };
 
     int WebSocketClientServer::Start() {
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         GoogleApiKey_ = MicroService::instance().ConfigGetString("google.apikey","");
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         GeoCodeEnabled_ = !GoogleApiKey_.empty();
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         ReactorPool_ = std::make_unique<MyParallelSocketReactor>();
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         Thr_.start(*this);
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         return 0;
     };
 
@@ -38,8 +33,16 @@ namespace OpenWifi {
     };
 
     void WebSocketClient::OnSocketError(const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         delete this;
+    }
+
+    bool WebSocketClientServer::Send(const std::string &Id, const std::string &Payload) {
+        std::lock_guard G(Mutex_);
+
+        auto It = Clients_.find(Id);
+        if(It!=Clients_.end())
+            return It->second->Send(Payload);
+        return false;
     }
 
     void WebSocketClient::OnSocketReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification> &pNf) {
@@ -104,13 +107,11 @@ namespace OpenWifi {
         }
 
         if(Done) {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             delete this;
         }
     }
 
     void WebSocketClient::OnSocketShutdown(const Poco::AutoPtr<Poco::Net::ShutdownNotification> &pNf) {
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         delete this;
     }
 
