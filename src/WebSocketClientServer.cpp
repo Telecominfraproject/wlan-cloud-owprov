@@ -52,6 +52,11 @@ namespace OpenWifi {
         Poco::Buffer<char>			IncomingFrame(0);
         n = WS_->receiveFrame(IncomingFrame, flags);
         auto Op = flags & Poco::Net::WebSocket::FRAME_OP_BITMASK;
+
+        if(n==0) {
+            return delete this;
+        }
+
         switch(Op) {
             case Poco::Net::WebSocket::FRAME_OP_PING: {
                 WS_->sendFrame("", 0,
