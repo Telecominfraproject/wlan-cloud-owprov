@@ -22,7 +22,7 @@ namespace OpenWifi {
         std::cout << __func__ << ":" << __LINE__ << std::endl;
         GeoCodeEnabled_ = !GoogleApiKey_.empty();
         std::cout << __func__ << ":" << __LINE__ << std::endl;
-        ReactorPool_ = std::make_unique<MyParallelSocketReactor>(Poco::Environment::processorCount());
+        ReactorPool_ = std::make_unique<MyParallelSocketReactor>();
         std::cout << __func__ << ":" << __LINE__ << std::endl;
         Thr_.start(*this);
         std::cout << __func__ << ":" << __LINE__ << std::endl;
