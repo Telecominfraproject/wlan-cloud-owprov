@@ -106,6 +106,7 @@ namespace OpenWifi {
             Reactor_.addEventHandler(*WS_,
                                      Poco::NObserver<WebSocketClient, Poco::Net::ErrorNotification>(
                                              *this, &WebSocketClient::OnSocketError));
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
         }
 
         ~WebSocketClient() {
@@ -120,6 +121,7 @@ namespace OpenWifi {
                                         Poco::Net::ErrorNotification>(*this,&WebSocketClient::OnSocketError));
             (*WS_).shutdown();
             (*WS_).close();
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
         }
 
         [[nodiscard]] inline const std::string & Id() { return Id_; };
