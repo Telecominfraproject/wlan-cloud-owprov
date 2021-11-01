@@ -26,7 +26,7 @@ namespace OpenWifi {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
             for(int i=0;i<NumReactors_;i++) {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
-                Reactors_[i] = std::make_shared<Poco::Net::SocketReactor>();
+                Reactors_[i] = std::make_unique<Poco::Net::SocketReactor>();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
                 Reactors_[i]->run();
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
@@ -44,7 +44,7 @@ namespace OpenWifi {
 
     private:
         unsigned    NumReactors_;
-        std::vector<std::shared_ptr<Poco::Net::SocketReactor>>  Reactors_;
+        std::vector<std::unique_ptr<Poco::Net::SocketReactor>>  Reactors_;
     };
 
     class WebSocketClient;
