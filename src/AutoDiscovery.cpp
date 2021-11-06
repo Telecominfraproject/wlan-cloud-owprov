@@ -85,6 +85,7 @@ namespace OpenWifi {
 
     void AutoDiscovery::ConnectionReceived( const std::string & Key, const std::string & Message) {
         std::lock_guard G(Mutex_);
+        Logger_.information(Poco::format("Connection(%s): New connection notification.", Key));
         NewConnections_.push(std::make_pair(Key,Message));
     }
 
