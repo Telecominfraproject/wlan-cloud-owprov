@@ -20,6 +20,8 @@
 #include "RESTAPI/RESTAPI_location_list_handler.h"
 #include "RESTAPI/RESTAPI_venue_list_handler.h"
 #include "RESTAPI/RESTAPI_managementRole_list_handler.h"
+#include "RESTAPI/RESTAPI_map_handler.h"
+#include "RESTAPI/RESTAPI_map_list_handler.h"
 
 namespace OpenWifi {
 
@@ -42,6 +44,8 @@ namespace OpenWifi {
                     RESTAPI_managementRole_list_handler,
                     RESTAPI_configurations_handler,
                     RESTAPI_configurations_list_handler,
+                    RESTAPI_map_handler,
+                    RESTAPI_map_list_handler,
                     RESTAPI_webSocketServer
                 >(Path,Bindings,L, S);
     }

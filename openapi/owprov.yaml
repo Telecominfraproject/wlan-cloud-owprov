@@ -616,6 +616,66 @@ components:
         errorCode:
           type: integer
 
+    UserList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ObjectACL:
+      type: object
+      properties:
+        users:
+          $ref: '#/components/schemas/UserList'
+        access:
+          type: string
+          enum:
+            - none
+            - read
+            - readwrite
+            - readwritedelete
+
+    ObjectACLList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectACL'
+
+    Map:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        entity:
+          type: string
+          format: uuid
+        data:
+          type: string
+        visibility:
+          type: string
+          enum:
+            - private
+            - public
+            - select
+        creator:
+          type: string
+          format: uuid
+        access:
+          $ref: '#/components/schemas/ObjectACLList'
+
+    MapList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Map'
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -1702,6 +1762,144 @@ paths:
             example: The root entity cannot be deleted.
           required: true
 
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /map:
+    get:
+      tags:
+        - Maps
+      operationId: getMapList
+      summary: Retrieve the list of maps
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+
+      responses:
+        200:
+          description: Return a list of Venues
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapList'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /map/{uuid}:
+    get:
+      tags:
+        - Maps
+      operationId: getMap
+      summary: Retrieve a specific map.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          description: Successfull retrieval of a map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Maps
+      operationId: createMap
+      summary: Create a specific map.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new policy
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Map'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/Map'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Maps
+      operationId: modifyMap
+      summary: Modify a specific map.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify a map
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Map'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ManagementPolicy'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Maps
+      operationId: deleteMap
+      summary: Delete a specific map.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
       responses:
         204:
           $ref: '#/components/responses/Success'

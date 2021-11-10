@@ -28,6 +28,7 @@ namespace OpenWifi {
         ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(dbType_, *Pool_, Logger_);
         TagsDictionaryDB_ = std::make_unique<OpenWifi::TagsDictionaryDB>(dbType_, *Pool_, Logger_);
         TagsObjectDB_ = std::make_unique<OpenWifi::TagsObjectDB>(dbType_, *Pool_, Logger_);
+        MapDB_ = std::make_unique<OpenWifi::MapDB>(dbType_, *Pool_, Logger_);
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -39,6 +40,7 @@ namespace OpenWifi {
         ConfigurationDB_->Create();
         TagsDictionaryDB_->Create();
         TagsObjectDB_->Create();
+        MapDB_->Create();
 
         ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
         ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
@@ -51,6 +53,7 @@ namespace OpenWifi {
         ExistFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V) ->bool { return SecurityDBProxy()->Exists(F,V); };
         ExistFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return TagsDictionaryDB_->Exists(F,V); };
         ExistFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return TagsObjectDB_->Exists(F,V); };
+        ExistFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return MapDB_->Exists(F,V); };
 
         ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
@@ -63,6 +66,7 @@ namespace OpenWifi {
         ExpandFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SecurityDBProxy()->Exists(F,V); };
         ExpandFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsDictionaryDB_->Exists(F,V); };
         ExpandFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsObjectDB_->Exists(F,V);; };
+        ExpandFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return MapDB_->Exists(F,V);; };
 
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();

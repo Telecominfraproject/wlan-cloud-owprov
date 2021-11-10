@@ -21,7 +21,7 @@
 #include "storage/storage_management_roles.h"
 #include "storage/storage_configurations.h"
 #include "storage/storage_tags.h"
-
+#include "storage/storage_maps.h"
 #include "SecurityDBProxy.h"
 
 namespace OpenWifi {
@@ -51,6 +51,7 @@ namespace OpenWifi {
             OpenWifi::ConfigurationDB & ConfigurationDB() { return *ConfigurationDB_; };
             OpenWifi::TagsDictionaryDB & TagsDictionaryDB() { return *TagsDictionaryDB_; };
             OpenWifi::TagsObjectDB & TagsObjectDB() { return *TagsObjectDB_; };
+            OpenWifi::MapDB & MapDB() { return *MapDB_; };
 
             bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
             bool Validate(const Types::StringVec &P, std::string &Error);
@@ -86,6 +87,8 @@ namespace OpenWifi {
             std::unique_ptr<OpenWifi::ConfigurationDB>          ConfigurationDB_;
             std::unique_ptr<OpenWifi::TagsDictionaryDB>         TagsDictionaryDB_;
             std::unique_ptr<OpenWifi::TagsObjectDB>             TagsObjectDB_;
+            std::unique_ptr<OpenWifi::MapDB>                    MapDB_;
+
 
             typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
             typedef std::function<bool(const char *FieldName, std::string &Value, std::string &Name, std::string &Description)>   expand_func;
