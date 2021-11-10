@@ -79,11 +79,9 @@ namespace OpenWifi {
 
     class JobRegistry {
         public:
-                static JobRegistry *instance() {
-                if (instance_ == nullptr) {
-                    instance_ = new JobRegistry;
-                }
-                return instance_;
+            static JobRegistry *instance() {
+                static JobRegistry instance;
+                return &instance;
             }
 
             inline void RegisterJobType( const std::string & JobType, Job::WorkerFunction Function) {
@@ -100,20 +98,16 @@ namespace OpenWifi {
             }
 
         private:
-            static JobRegistry  *instance_;
             std::map<std::string,Job::WorkerFunction>  JobTypes_;
     };
 
     inline JobRegistry * JobRegistry() { return JobRegistry::instance(); }
-    inline class JobRegistry * JobRegistry::instance_ = nullptr;
 
     class JobController : public SubSystemServer, Poco::Runnable {
         public:
             static JobController *instance() {
-                if (instance_ == nullptr) {
-                    instance_ = new JobController;
-                }
-                return instance_;
+                static JobController instance;
+                return &instance;
             }
 
             int Start() override;
@@ -124,7 +118,6 @@ namespace OpenWifi {
             bool JobList(Job::Statuses & Statuses);
 
         private:
-            static JobController    *instance_;
             Poco::Thread            Thr_;
             std::atomic_bool        Running_=false;
 
@@ -133,9 +126,7 @@ namespace OpenWifi {
             {
             }
     };
-
     inline JobController * JobController() { return JobController::instance(); }
-    inline class JobController * JobController::instance_ = nullptr;
 
 }
 

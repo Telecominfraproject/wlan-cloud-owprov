@@ -177,7 +177,7 @@ namespace OpenWifi {
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from-uuid", i.info.id);
                     ExObj.set("from-name", i.info.name);
-                    ExObj.set("action", "rejected");
+                    ExObj.set("action", "ignored");
                     ExObj.set("reason","weight insufficient");
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
@@ -230,8 +230,8 @@ namespace OpenWifi {
                 } else {
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from-uuid", Config.info.id);
-                    ExObj.set("from-name",Config.info.name);
-                    ExObj.set("action", "rejected");
+                    ExObj.set("from-name",Config.info.name );
+                    ExObj.set("action", "ignored");
                     ExObj.set("reason", "deviceType mismatch");
                     Explanation_.add(ExObj);
                 }

@@ -16,10 +16,8 @@ namespace OpenWifi {
 	        int             DeviceType;
 	    };
 		static SerialNumberCache *instance() {
-			if (instance_ == nullptr) {
-				instance_ = new SerialNumberCache;
-			}
-			return instance_;
+		    static SerialNumberCache instance;
+		    return &instance;
 		}
 
 		int Start() override;
@@ -30,7 +28,6 @@ namespace OpenWifi {
 		bool FindDevice(const std::string &SerialNumber, std::string & DeviceType);
 
 	  private:
-		static SerialNumberCache 	* instance_;
 		int                         DeviceTypeIndex_=0;
 		uint64_t 					LastUpdate_ = 0 ;
 		std::vector<DeviceTypeCacheEntry>	SNs_;

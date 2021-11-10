@@ -16,9 +16,8 @@ namespace OpenWifi {
         typedef std::map<std::string,DictMap>   EntityToDict;
 
         static TagServer *instance() {
-            if(instance_== nullptr)
-                instance_ = new TagServer;
-            return instance_;
+            static TagServer instance;
+            return &instance;
         }
 
         int Start() override;
@@ -26,7 +25,6 @@ namespace OpenWifi {
         void run() override;
 
     private:
-        static TagServer 		    *instance_;
         Poco::Thread                Worker_;
         std::atomic_bool            Running_ = false;
         EntityToDict                E2D_;

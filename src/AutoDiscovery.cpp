@@ -11,8 +11,6 @@
 
 namespace OpenWifi {
 
-    class AutoDiscovery *AutoDiscovery::instance_ = nullptr;
-
     void AutoDiscovery::run() {
         Running_ = true ;
         while(Running_) {

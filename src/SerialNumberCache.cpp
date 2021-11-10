@@ -10,14 +10,11 @@
 
 namespace OpenWifi {
 
-	class SerialNumberCache * SerialNumberCache::instance_ = nullptr;
-
 	int SerialNumberCache::Start() {
 		return 0;
 	}
 
 	void SerialNumberCache::Stop() {
-
 	}
 
 	void SerialNumberCache::AddSerialNumber(const std::string &S, const std::string &DeviceType) {

@@ -13,9 +13,8 @@ namespace OpenWifi {
     public:
 
         static AutoDiscovery *instance() {
-            if(instance_== nullptr)
-                instance_ = new AutoDiscovery;
-            return instance_;
+            static AutoDiscovery instance;
+            return &instance;
         }
 
         int Start() override;
@@ -24,7 +23,6 @@ namespace OpenWifi {
         void ConnectionReceived( const std::string & Key, const std::string & Message);
 
     private:
-        static AutoDiscovery 		*instance_;
         Poco::Thread                Worker_;
         std::atomic_bool            Running_ = false;
         int                         ConnectionWatcherId_=0;

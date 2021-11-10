@@ -46,9 +46,8 @@ namespace OpenWifi {
     class WebSocketClientServer : public SubSystemServer, Poco::Runnable {
         public:
             static WebSocketClientServer *instance() {
-                if(instance_== nullptr)
-                    instance_ = new WebSocketClientServer;
-                return instance_;
+                static WebSocketClientServer instance;
+                return &instance;
             }
 
             int Start() override;
@@ -72,7 +71,6 @@ namespace OpenWifi {
             [[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
 
         private:
-            static WebSocketClientServer *              instance_;
             std::atomic_bool                            Running_=false;
             Poco::Thread                                Thr_;
             std::unique_ptr<MyParallelSocketReactor>    ReactorPool_;
@@ -87,7 +85,6 @@ namespace OpenWifi {
         };
 
     inline WebSocketClientServer * WebSocketClientServer() { return WebSocketClientServer::instance(); }
-    inline class WebSocketClientServer *WebSocketClientServer::instance_ = nullptr;
 
     class WebSocketClient {
     public:

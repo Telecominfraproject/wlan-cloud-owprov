@@ -6,8 +6,6 @@
 #include "StorageService.h"
 
 namespace OpenWifi {
-    class TagServer *TagServer::instance_ = nullptr;
-
     int TagServer::Start() {
 
         //  we need to get the entire dictionary in memory...
