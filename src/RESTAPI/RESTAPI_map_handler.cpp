@@ -85,7 +85,7 @@ namespace OpenWifi{
 
     void RESTAPI_map_handler::DoPut() {
         ProvObjects::Map   Existing;
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             return NotFound();
         }
