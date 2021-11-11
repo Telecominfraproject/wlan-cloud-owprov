@@ -17,7 +17,7 @@ namespace OpenWifi{
     void RESTAPI_map_handler::DoGet() {
 
         ProvObjects::Map   Existing;
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             return NotFound();
         }
@@ -31,7 +31,7 @@ namespace OpenWifi{
 
     void RESTAPI_map_handler::DoDelete() {
         ProvObjects::Map   Existing;
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
         if(UUID.empty() || !DB_.GetRecord(RESTAPI::Protocol::ID,UUID,Existing)) {
             return NotFound();
         }
@@ -51,7 +51,7 @@ namespace OpenWifi{
     }
 
     void RESTAPI_map_handler::DoPost() {
-        std::string UUID = GetBinding(RESTAPI::Protocol::ID,"");
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
         if(UUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
