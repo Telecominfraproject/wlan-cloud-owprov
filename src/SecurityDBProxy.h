@@ -13,9 +13,7 @@ namespace OpenWifi {
     class SecurityDBProxy : public SubSystemServer {
     public:
         static SecurityDBProxy *instance() {
-            if (instance_ == nullptr) {
-                instance_ = new SecurityDBProxy;
-            }
+            static SecurityDBProxy *instance_ = new SecurityDBProxy;
             return instance_;
         }
 
@@ -28,7 +26,6 @@ namespace OpenWifi {
         const std::string Prefix() { return "usr"; };
 
     private:
-        static SecurityDBProxy * instance_;
         struct CachedUInfo {
             SecurityObjects::UserInfo   UI;
             uint64_t                    LastUpdate=0;

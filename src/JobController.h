@@ -80,8 +80,8 @@ namespace OpenWifi {
     class JobRegistry {
         public:
             static JobRegistry *instance() {
-                static JobRegistry instance;
-                return &instance;
+                static JobRegistry * instance_ = new JobRegistry;
+                return instance_;
             }
 
             inline void RegisterJobType( const std::string & JobType, Job::WorkerFunction Function) {
@@ -106,8 +106,8 @@ namespace OpenWifi {
     class JobController : public SubSystemServer, Poco::Runnable {
         public:
             static JobController *instance() {
-                static JobController instance;
-                return &instance;
+                static JobController * instance_ = new JobController;
+                return instance_;
             }
 
             int Start() override;

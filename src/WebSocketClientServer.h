@@ -46,8 +46,8 @@ namespace OpenWifi {
     class WebSocketClientServer : public SubSystemServer, Poco::Runnable {
         public:
             static WebSocketClientServer *instance() {
-                static WebSocketClientServer instance;
-                return &instance;
+                static WebSocketClientServer * instance_ = new WebSocketClientServer;
+                return instance_;
             }
 
             int Start() override;

@@ -13,8 +13,8 @@ namespace OpenWifi {
     public:
 
         static AutoDiscovery *instance() {
-            static AutoDiscovery instance;
-            return &instance;
+            static AutoDiscovery * instance_ = new AutoDiscovery;
+            return instance_;
         }
 
         int Start() override;

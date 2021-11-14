@@ -29,9 +29,7 @@ namespace OpenWifi {
     class Storage : public StorageClass, Poco::Runnable {
         public:
             static Storage *instance() {
-                if (instance_ == nullptr) {
-                    instance_ = new Storage;
-                }
+                static Storage * instance_ = new Storage;
                 return instance_;
             }
 
@@ -76,7 +74,6 @@ namespace OpenWifi {
             void run() final;
 
           private:
-            static Storage      								*instance_;
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
             std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;
             std::unique_ptr<OpenWifi::VenueDB>                  VenueDB_;

@@ -7,8 +7,6 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
-    class SecurityDBProxy *SecurityDBProxy::instance_ = nullptr;
-
     int SecurityDBProxy::Start() {
         return 0;
     }
