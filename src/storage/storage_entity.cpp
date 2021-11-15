@@ -131,7 +131,7 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = MicroService::instance().CreateUUID();
+            V.info.id = MicroService::CreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
             StorageService()->VenueDB().CreateShortCut(V);
@@ -160,7 +160,7 @@ namespace OpenWifi {
             ProvObjects::Entity E;
 
             E.info.name = Child->get("name").toString();
-            E.info.id = MicroService::instance().CreateUUID();
+            E.info.id = MicroService::CreateUUID();
             E.parent = Parent;
             E.info.created = E.info.modified = std::time(nullptr);
             StorageService()->EntityDB().CreateShortCut(E);
@@ -172,7 +172,7 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = MicroService::instance().CreateUUID();
+            V.info.id = MicroService::CreateUUID();
             V.entity = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
             StorageService()->VenueDB().CreateShortCut(V);

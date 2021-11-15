@@ -80,7 +80,7 @@ namespace OpenWifi{
 
         //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
         //  must be conveyed through PUT.
-        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::instance().CreateUUID();
+        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::CreateUUID();
 
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";

@@ -27,7 +27,7 @@ namespace OpenWifi {
                 {
                     Poco::Net::WebSocket WS(*Request, *Response);
                     Logger_.information("WebSocket connection established.");
-                    auto Id = MicroService::instance().CreateUUID();
+                    auto Id = MicroService::CreateUUID();
                     std::cout << __func__ << ":" << __LINE__ << std::endl;
                     new WebSocketClient(WS,Id,Logger_);
                     std::cout << __func__ << ":" << __LINE__ << std::endl;

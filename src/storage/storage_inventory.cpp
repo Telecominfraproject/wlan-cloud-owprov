@@ -69,7 +69,7 @@ namespace OpenWifi {
                 IP = Tokens[1];
             }
 
-            NewDevice.info.id = MicroService::instance().CreateUUID();
+            NewDevice.info.id = MicroService::CreateUUID();
             NewDevice.info.name = SerialNumber;
             NewDevice.info.created = NewDevice.info.modified = Now;
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
