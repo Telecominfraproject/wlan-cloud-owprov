@@ -66,11 +66,7 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!ValidateVisibility(NewObject.visibility)) {
-            return BadRequest("Invalid visibility parameter.");
-        }
-
-        NewObject.creator = UserInfo_.userinfo.email;
+        NewObject.creator = UserInfo_.userinfo.Id;
 
         if(DB_.CreateRecord(NewObject)) {
 
@@ -100,17 +96,28 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
+        if(Existing.creator != UserInfo_.userinfo.Id) {
+            if(Existing.visibility == ProvObjects::PRIVATE) {
+                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            }
+            if(Existing.visibility == ProvObjects::SELECT) {
+                for(const auto &i:Existing.access.list) {
+                    for(const auto &j:i.users.list) {
+                        if(j==UserInfo_.userinfo.Id) {
+                        }
+                    }
+                }
+            }
+        }
+
         if(RawObject->has("entity") && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
         AssignIfPresent(RawObject,"entity",Existing.entity);
         AssignIfPresent(RawObject,"data", Existing.data);
-        AssignIfPresent(RawObject,"visibility", Existing.visibility);
-
-        if(RawObject->has("visibility") && !ValidateVisibility(NewObject.visibility)) {
-            return BadRequest("Invalid visibility parameter.");
-        }
+        if(RawObject->has("visibility"))
+            Existing.visibility = NewObject.visibility;
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
 

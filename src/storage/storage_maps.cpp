@@ -44,7 +44,7 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<6>());
     Out.data = In.get<7>();
     Out.creator = In.get<8>();
-    Out.visibility = In.get<9>();
+    Out.visibility = OpenWifi::ProvObjects::visibility_from_string(In.get<9>());
     Out.access = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::ObjectACLList>(In.get<10>());
     Out.entity = In.get<11>();
 }
@@ -59,7 +59,7 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.set<6>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<7>(In.data);
     Out.set<8>(In.creator);
-    Out.set<9>(In.visibility);
+    Out.set<9>(OpenWifi::ProvObjects::to_string(In.visibility));
     Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.access));
     Out.set<11>(In.entity);
 }

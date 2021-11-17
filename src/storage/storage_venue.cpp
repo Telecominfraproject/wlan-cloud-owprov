@@ -104,8 +104,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.info.modified = In.get<5>();
     Out.entity = In.get<6>();
     Out.parent = In.get<7>();
-    OpenWifi::Types::from_string(In.get<8>(), Out.children);
-    OpenWifi::Types::from_string(In.get<9>(), Out.devices);
+    Out.children = OpenWifi::RESTAPI_utils::to_object_array(In.get<8>());
+    Out.devices = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
     Out.managementPolicy = In.get<10>();
     Out.topology = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<11>());
     Out.design = In.get<12>();
@@ -113,8 +113,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.location = In.get<14>();
     Out.rrm = In.get<15>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
-    OpenWifi::Types::from_string(In.get<17>(), Out.deviceConfiguration);
-    OpenWifi::Types::from_string(In.get<18>(), Out.sourceIP);
+    Out.deviceConfiguration = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
+    Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
 
 }
 
@@ -127,8 +127,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<5>(In.info.modified);
     Out.set<6>(In.entity);
     Out.set<7>(In.parent);
-    Out.set<8>(OpenWifi::Types::to_string(In.children));
-    Out.set<9>(OpenWifi::Types::to_string(In.devices));
+    Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.children));
+    Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.devices));
     Out.set<10>(In.managementPolicy);
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.topology));
     Out.set<12>(In.design);
@@ -136,6 +136,6 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<14>(In.location);
     Out.set<15>(In.rrm);
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
-    Out.set<17>(OpenWifi::Types::to_string(In.deviceConfiguration));
-    Out.set<18>(OpenWifi::Types::to_string(In.sourceIP));
+    Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.deviceConfiguration));
+    Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
 }

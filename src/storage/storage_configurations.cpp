@@ -129,10 +129,10 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
     Out.managementPolicy = In.get<6>();
-    OpenWifi::Types::from_string(In.get<7>(), Out.deviceTypes);
+    Out.deviceTypes = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<8>());
-    OpenWifi::Types::from_string(In.get<9>(), Out.inUse);
-    OpenWifi::Types::from_string(In.get<10>(), Out.variables);
+    Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
+    Out.variables = OpenWifi::RESTAPI_utils::to_stringpair_array(In.get<10>());
     Out.rrm = In.get<11>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<12>());
     Out.firmwareUpgrade = In.get<13>();
@@ -147,10 +147,10 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
     Out.set<6>(In.managementPolicy);
-    Out.set<7>(OpenWifi::Types::to_string(In.deviceTypes));
+    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.deviceTypes));
     Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.configuration));
-    Out.set<9>(OpenWifi::Types::to_string(In.inUse));
-    Out.set<10>(OpenWifi::Types::to_string(In.variables));
+    Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.inUse));
+    Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.variables));
     Out.set<11>(In.rrm);
     Out.set<12>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<13>(In.firmwareUpgrade);

@@ -626,7 +626,7 @@ components:
         errorCode:
           type: integer
 
-    UserList:
+    uuidList:
       type: object
       properties:
         list:
@@ -639,14 +639,17 @@ components:
       type: object
       properties:
         users:
-          $ref: '#/components/schemas/UserList'
+          $ref: '#/components/schemas/uuidList'
+        roles:
+          $ref: '#/components/schemas/uuidList'
         access:
           type: string
           enum:
             - none
             - read
-            - readwrite
-            - readwritedelete
+            - modify
+            - delete
+            - create
 
     ObjectACLList:
       type: object
@@ -1804,6 +1807,18 @@ paths:
           name: filter
           schema:
             type: string
+          required: false
+        - in: query
+          description: Return only maps I created
+          name: myMaps
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: Return only maps shared with Me
+          name: sharedWithMe
+          scmema:
+            type: boolean
           required: false
 
       responses:

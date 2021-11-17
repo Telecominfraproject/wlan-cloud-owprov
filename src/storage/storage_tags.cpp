@@ -55,11 +55,11 @@ template<> void ORM::DB<    OpenWifi::TagsDictionaryRecordType, OpenWifi::TagsDi
 template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(OpenWifi::TagsObjectRecordType &In, OpenWifi::TagsObject &Out) {
     Out.entity = In.get <0>();
     Out.arn= In.get<1>();
-    OpenWifi::Types::from_string(In.get<2>(), Out.entries);
+    Out.entries = OpenWifi::RESTAPI_utils::to_object_array(In.get<2>());
 }
 
 template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(OpenWifi::TagsObject &In, OpenWifi::TagsObjectRecordType &Out) {
     Out.set<0>(In.entity);
     Out.set<1>(In.arn);
-    Out.set<2>(OpenWifi::Types::to_string(In.entries));
+    Out.set<2>(OpenWifi::RESTAPI_utils::to_string(In.entries));
 }
