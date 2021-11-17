@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-08-30.
 //
 
-#ifndef OWPROV_SECURITYDBPROXY_H
-#define OWPROV_SECURITYDBPROXY_H
+#pragma once
 
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
@@ -43,4 +42,3 @@ namespace OpenWifi {
 
 }
 
-#endif //OWPROV_SECURITYDBPROXY_H

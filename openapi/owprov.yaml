@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: OpenWiFi Provisioning Model
   description: Definitions and APIs to manages an OpenWiFi network.
-  version: 2.1.0
+  version: 2.5.0
   license:
     name: BSD3
     url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
@@ -1462,6 +1462,13 @@ paths:
           schema:
             type: string
             example: serialNumber:a,created:d
+          required: false
+        - in: query
+          description: return the list of devices under RRM
+          name: rrmOnly
+          schema:
+            type: boolean
+            default: false
           required: false
       responses:
         200:

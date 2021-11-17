@@ -83,6 +83,14 @@ namespace OpenWifi{
         } else if(QB_.CountOnly) {
             auto C = StorageService()->InventoryDB().Count();
             return ReturnCountOnly(C);
+        } else if (GetBoolParameter("rrmOnly",false)) {
+            Types::UUIDvec_t   DeviceList;
+            StorageService()->InventoryDB().GetRRMDeviceList(DeviceList);
+            if(QB_.CountOnly)
+                return ReturnCountOnly(DeviceList.size());
+            else {
+                return ReturnObject("serialNumbers",DeviceList);
+            }
         } else {
             ProvObjects::InventoryTagVec Tags;
             StorageService()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);

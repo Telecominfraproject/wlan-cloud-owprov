@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-28.
 //
 
-#ifndef OWPROV_JOBCONTROLLER_H
-#define OWPROV_JOBCONTROLLER_H
+#pragma once
 
 #include <vector>
 #include <utility>
@@ -130,4 +129,3 @@ namespace OpenWifi {
 
 }
 
-#endif //OWPROV_JOBCONTROLLER_H

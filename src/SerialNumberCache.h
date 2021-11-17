@@ -15,6 +15,9 @@ namespace OpenWifi {
 	        uint64_t        SerialNumber;
 	        int             DeviceType;
 	    };
+
+	    typedef std::vector<DeviceTypeCacheEntry>   SerialCacheContent;
+
 		static SerialNumberCache *instance() {
 		    static SerialNumberCache * instance_ = new SerialNumberCache;
 		    return instance_;
@@ -27,10 +30,15 @@ namespace OpenWifi {
 		void FindNumbers(const std::string &S, uint HowMany, std::vector<uint64_t> &A);
 		bool FindDevice(const std::string &SerialNumber, std::string & DeviceType);
 
+		inline SerialCacheContent GetCacheCopy() {
+		    std::lock_guard     G(Mutex_);
+		    return SNs_;
+		}
+
 	  private:
 		int                         DeviceTypeIndex_=0;
 		uint64_t 					LastUpdate_ = 0 ;
-		std::vector<DeviceTypeCacheEntry>	SNs_;
+		SerialCacheContent	        SNs_;
 		std::map<std::string,int>   DeviceTypeDictionary_;
 		std::mutex					M_;
 

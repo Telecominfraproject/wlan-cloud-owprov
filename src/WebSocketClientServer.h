@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-01.
 //
 
-#ifndef OWPROV_WEBSOCKETCLIENTSERVER_H
-#define OWPROV_WEBSOCKETCLIENTSERVER_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "Poco/Net/SocketReactor.h"
@@ -157,4 +156,3 @@ namespace OpenWifi {
 
 }
 
-#endif //OWPROV_WEBSOCKETCLIENTSERVER_H

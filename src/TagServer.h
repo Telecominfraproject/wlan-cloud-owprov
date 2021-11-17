@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-02.
 //
 
-#ifndef OWPROV_TAGSERVER_H
-#define OWPROV_TAGSERVER_H
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -38,6 +37,3 @@ namespace OpenWifi {
     inline TagServer * TagServer() { return TagServer::instance(); }
 
 }
-
-
-#endif //OWPROV_TAGSERVER_H

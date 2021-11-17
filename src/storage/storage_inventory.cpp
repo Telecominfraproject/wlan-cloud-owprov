@@ -223,6 +223,32 @@ namespace OpenWifi {
         Iterate(F);
     }
 
+    bool InventoryDB::LookForRRM(const ProvObjects::InventoryTag &T) {
+
+        return false;
+    }
+
+    bool InventoryDB::GetRRMDeviceList(Types::UUIDvec_t &DeviceList) {
+        // get a local copy of the cache - this could be expensive.
+        auto C = SerialNumberCache()->GetCacheCopy();
+
+        for(const auto &i:C) {
+            std::string     SerialNumber = Utils::IntToSerialNumber(i.SerialNumber);
+            ProvObjects::InventoryTag   Tag;
+            if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,Tag)) {
+                if(Tag.rrm=="no")
+                    continue;
+                if(Tag.rrm=="inherit") {
+                    if(!LookForRRM(Tag))
+                        continue;
+                }
+                DeviceList.push_back(SerialNumber);
+            }
+        }
+
+        return true;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(OpenWifi::InventoryDBRecordType &In, OpenWifi::ProvObjects::InventoryTag &Out) {

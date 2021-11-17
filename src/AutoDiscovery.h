@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-09-29.
 //
 
-#ifndef OWPROV_AUTODISCOVERY_H
-#define OWPROV_AUTODISCOVERY_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
@@ -38,4 +37,3 @@ namespace OpenWifi {
 
 }
 
-#endif //OWPROV_AUTODISCOVERY_H

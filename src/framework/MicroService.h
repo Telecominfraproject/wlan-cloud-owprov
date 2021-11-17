@@ -803,6 +803,20 @@ namespace OpenWifi::Utils {
         return R;
     }
 
+    [[nodiscard]] inline std::string IntToSerialNumber(uint64_t S) {
+        char b[16];
+        for(int i=0;i<12;++i) {
+            int B = (S & 0x0f);
+            if(B<10)
+                b[11-i] = B+'0';
+            else
+                b[11-i] = B - 10 + 'a';
+            S >>= 4 ;
+        }
+        b[12]=0;
+        return b;
+    }
+
 
     [[nodiscard]] inline bool SerialNumberMatch(const std::string &S1, const std::string &S2, int Bits=2) {
         auto S1_i = SerialNumberToInt(S1);
@@ -1904,7 +1918,7 @@ namespace OpenWifi {
 	            QB_.SerialNumber = GetParameter(RESTAPI::Protocol::SERIALNUMBER, "");
 	            QB_.StartDate = GetParameter(RESTAPI::Protocol::STARTDATE, 0);
 	            QB_.EndDate = GetParameter(RESTAPI::Protocol::ENDDATE, 0);
-	            QB_.Offset = GetParameter(RESTAPI::Protocol::OFFSET, 1);
+	            QB_.Offset = GetParameter(RESTAPI::Protocol::OFFSET, 0);
 	            QB_.Limit = GetParameter(RESTAPI::Protocol::LIMIT, 100);
 	            QB_.Filter = GetParameter(RESTAPI::Protocol::FILTER, "");
 	            QB_.Select = GetParameter(RESTAPI::Protocol::SELECT, "");
@@ -1916,7 +1930,7 @@ namespace OpenWifi {
 	            QB_.AdditionalInfo = GetBoolParameter(RESTAPI::Protocol::WITHEXTENDEDINFO,false);
 
 	            if(QB_.Offset<1)
-	                QB_.Offset=1;
+	                QB_.Offset=0;
 	            return true;
 	        }
 

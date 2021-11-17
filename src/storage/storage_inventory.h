@@ -44,6 +44,8 @@ namespace OpenWifi {
             static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
             static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
             void InitializeSerialCache();
+            bool GetRRMDeviceList(Types::UUIDvec_t & DeviceList);
+            bool LookForRRM( const ProvObjects::InventoryTag &T);
         private:
     };
 }

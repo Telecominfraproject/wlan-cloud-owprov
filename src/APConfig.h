@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-09-07.
 //
 
-#ifndef OWPROV_APCONFIG_H
-#define OWPROV_APCONFIG_H
+#pragma once
 
 #include <string>
 #include "Poco/Logger.h"
@@ -45,6 +44,3 @@ namespace OpenWifi {
             bool RemoveBand(const std::string &Band, const Poco::JSON::Array::Ptr &A_in,Poco::JSON::Array::Ptr &A_Out);
     };
 }
-
-
-#endif //OWPROV_APCONFIG_H

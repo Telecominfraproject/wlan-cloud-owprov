@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-01.
 //
 
-#ifndef OWPROV_CONFIGSANITYCHECKER_H
-#define OWPROV_CONFIGSANITYCHECKER_H
+#pragma once
 
 #include <string>
 #include <list>
@@ -61,5 +60,3 @@ namespace OpenWifi {
                 };
     };
 }
-
-#endif //OWPROV_CONFIGSANITYCHECKER_H
