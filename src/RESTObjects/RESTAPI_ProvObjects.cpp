@@ -521,6 +521,7 @@ namespace OpenWifi::ProvObjects {
             case PUBLIC: return "public";
             case SELECT: return "select";
             case PRIVATE:
+            default:
                 return "private";
         }
     }
