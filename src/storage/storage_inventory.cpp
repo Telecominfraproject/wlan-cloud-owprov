@@ -223,8 +223,53 @@ namespace OpenWifi {
         Iterate(F);
     }
 
-    bool InventoryDB::LookForRRM(const ProvObjects::InventoryTag &T) {
+    bool InventoryDB::LookForRRMInEntity(const std::string &Entity) {
+        try {
+            ProvObjects::Entity  E;
+            if(StorageService()->EntityDB().GetRecord("id", Entity, E)) {
+                if(E.rrm == "inherit") {
+                    if(!E.parent.empty())
+                        return LookForRRMInEntity(E.parent);
+                    return false;
+                }
+                if(E.rrm=="no")
+                    return false;
+                return true;
+            }
+            return false;
+        } catch(...) {
 
+        }
+        return false;
+    }
+
+    bool InventoryDB::LookForRRMInVenue(const std::string &Venue) {
+        try {
+            ProvObjects::Venue  V;
+            if(StorageService()->VenueDB().GetRecord("id", Venue, V)) {
+                if(V.rrm == "inherit") {
+                    if(!V.parent.empty())
+                        return LookForRRMInVenue(V.parent);
+                    if(!V.entity.empty())
+                        return LookForRRMInEntity(V.entity);
+                    return false;
+                }
+                if(V.rrm=="no")
+                    return false;
+                return true;
+            }
+            return false;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    bool InventoryDB::LookForRRM(const ProvObjects::InventoryTag &T) {
+        if(!T.venue.empty())
+            return LookForRRMInVenue(T.venue);
+        if(!T.entity.empty())
+            return LookForRRMInEntity(T.entity);
         return false;
     }
 
@@ -245,7 +290,6 @@ namespace OpenWifi {
                 DeviceList.push_back(SerialNumber);
             }
         }
-
         return true;
     }
 

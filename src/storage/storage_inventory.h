@@ -46,6 +46,8 @@ namespace OpenWifi {
             void InitializeSerialCache();
             bool GetRRMDeviceList(Types::UUIDvec_t & DeviceList);
             bool LookForRRM( const ProvObjects::InventoryTag &T);
+            bool LookForRRMInVenue(const std::string &Venue);
+            bool LookForRRMInEntity(const std::string &Entity);
         private:
     };
 }
