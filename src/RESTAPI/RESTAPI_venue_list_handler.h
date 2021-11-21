@@ -2,9 +2,7 @@
 // Created by stephane bourque on 2021-08-23.
 //
 
-#ifndef OWPROV_RESTAPI_VENUE_LIST_HANDLER_H
-#define OWPROV_RESTAPI_VENUE_LIST_HANDLER_H
-
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -27,5 +25,3 @@ namespace OpenWifi {
         void DoDelete() final {};
     };
 }
-
-#endif //OWPROV_RESTAPI_VENUE_LIST_HANDLER_H

@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-28.
 //
 
-#ifndef OWPROV_STORAGE_JOBS_H
-#define OWPROV_STORAGE_JOBS_H
+#pragma once
 
 #include "framework/orm.h"
 #include "JobController.h"
@@ -38,6 +37,3 @@ namespace OpenWifi {
     private:
     };
 }
-
-
-#endif //OWPROV_STORAGE_JOBS_H

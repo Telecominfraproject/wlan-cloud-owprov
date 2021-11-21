@@ -6,8 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef OWPROV_RESTAPI_CONTACT_HANDLER_H
-#define OWPROV_RESTAPI_CONTACT_HANDLER_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "StorageService.h"
@@ -34,5 +33,3 @@ namespace OpenWifi {
         ContactDB       &DB_;
     };
 }
-
-#endif //OWPROV_RESTAPI_CONTACT_HANDLER_H

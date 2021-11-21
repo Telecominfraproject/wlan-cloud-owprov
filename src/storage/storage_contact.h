@@ -6,9 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-
-#ifndef OWPROV_STORAGE_CONTACT_H
-#define OWPROV_STORAGE_CONTACT_H
+#pragma once
 
 #include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
@@ -45,6 +43,3 @@ namespace OpenWifi {
         private:
     };
 }
-
-
-#endif //OWPROV_STORAGE_CONTACT_H

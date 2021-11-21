@@ -6,9 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-
-#ifndef OWPROV_RESTAPI_INVENTORY_LIST_HANDLER_H
-#define OWPROV_RESTAPI_INVENTORY_LIST_HANDLER_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
@@ -34,5 +32,3 @@ namespace OpenWifi {
         void SendList(const ProvObjects::InventoryTagVec & Tags, bool SerialOnly);
     };
 }
-
-#endif //OWPROV_RESTAPI_INVENTORY_LIST_HANDLER_H

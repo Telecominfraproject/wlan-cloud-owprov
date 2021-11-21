@@ -7,9 +7,6 @@
 //
 
 
-#ifndef OWPROV_RESTAPI_MANAGEMENTPOLICY_HANDLER_H
-#define OWPROV_RESTAPI_MANAGEMENTPOLICY_HANDLER_H
-
 #include "framework/MicroService.h"
 #include "StorageService.h"
 
@@ -35,5 +32,3 @@ namespace OpenWifi {
         void DoDelete() final ;
     };
 }
-
-#endif //OWPROV_RESTAPI_MANAGEMENTPOLICY_HANDLER_H

@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-18.
 //
 
-#ifndef OWPROV_RESTAPI_DB_HELPERS_H
-#define OWPROV_RESTAPI_DB_HELPERS_H
+#pragma once
 
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
@@ -176,5 +175,3 @@ namespace OpenWifi {
     }
 
 }
-
-#endif //OWPROV_RESTAPI_DB_HELPERS_H

@@ -6,9 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-
-#ifndef OWPROV_STORAGE_ENTITY_H
-#define OWPROV_STORAGE_ENTITY_H
+#pragma once
 
 #include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
@@ -53,6 +51,3 @@ namespace OpenWifi {
         bool RootExists_=false;
     };
 }
-
-
-#endif //OWPROV_STORAGE_ENTITY_H

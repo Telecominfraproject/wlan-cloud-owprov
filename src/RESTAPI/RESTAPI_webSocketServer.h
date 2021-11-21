@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-08-12.
 //
 
-#ifndef UCENTRALGW_RESTAPI_WEBSOCKETSERVER_H
-#define UCENTRALGW_RESTAPI_WEBSOCKETSERVER_H
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -28,5 +27,3 @@ namespace OpenWifi {
 
 	};
 }
-
-#endif // UCENTRALGW_RESTAPI_WEBSOCKETSERVER_H

@@ -2,9 +2,6 @@
 // Created by stephane bourque on 2021-08-26.
 //
 
-#ifndef OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H
-#define OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H
-
 #include "framework/MicroService.h"
 
 namespace OpenWifi {
@@ -26,6 +23,3 @@ namespace OpenWifi {
         void DoDelete() final {};
     };
 }
-
-
-#endif //OWPROV_RESTAPI_MANAGEMENTPOLICY_LIST_HANDLER_H

@@ -1,9 +1,7 @@
 //
 // Created by stephane bourque on 2021-11-09.
 //
-
-#ifndef OWPROV_RESTAPI_MAP_LIST_HANDLER_H
-#define OWPROV_RESTAPI_MAP_LIST_HANDLER_H
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -26,5 +24,3 @@ namespace OpenWifi {
         void DoDelete() final {};
     };
 }
-
-#endif //OWPROV_RESTAPI_MAP_LIST_HANDLER_H

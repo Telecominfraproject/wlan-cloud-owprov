@@ -5,8 +5,7 @@
 //	Created by Stephane Bourque on 2021-03-04.
 //	Arilia Wireless Inc.
 //
-#ifndef OWPROV_RESTAPI_CONFIGURATIONS_HANDLER_H
-#define OWPROV_RESTAPI_CONFIGURATIONS_HANDLER_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
@@ -36,5 +35,3 @@ namespace OpenWifi {
         ConfigurationDB     &DB_;
     };
 }
-
-#endif //OWPROV_RESTAPI_CONFIGURATIONS_HANDLER_H

@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-02.
 //
 
-#ifndef OWPROV_STORAGE_TAGS_H
-#define OWPROV_STORAGE_TAGS_H
+#pragma once
 
 #include "framework/orm.h"
 #include "framework/OpenWifiTypes.h"
@@ -45,5 +44,3 @@ namespace OpenWifi {
         private:
     };
 }
-
-#endif //OWPROV_STORAGE_TAGS_H

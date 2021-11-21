@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-09.
 //
 
-#ifndef OWPROV_STORAGE_MAPS_H
-#define OWPROV_STORAGE_MAPS_H
+#pragma once
 
 #include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
@@ -30,6 +29,3 @@ namespace OpenWifi {
     private:
     };
 }
-
-
-#endif //OWPROV_STORAGE_MAPS_H
