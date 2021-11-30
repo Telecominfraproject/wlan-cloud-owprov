@@ -28,7 +28,7 @@ namespace OpenWifi {
     class Storage : public StorageClass, Poco::Runnable {
         public:
             static Storage *instance() {
-                static Storage * instance_ = new Storage;
+                static auto * instance_ = new Storage;
                 return instance_;
             }
 

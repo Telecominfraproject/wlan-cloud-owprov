@@ -36,7 +36,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        if(UserInfo_.userinfo.email!=Existing.creator) {
+        if(UserInfo_.userinfo.Id!=Existing.creator) {
             return UnAuthorized("You must be the creator of the map to delete it");
         }
 
