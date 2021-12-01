@@ -2042,15 +2042,15 @@ namespace OpenWifi {
 
 	class OpenAPIRequestGet {
 	public:
-	    explicit OpenAPIRequestGet( std::string Type,
-                                    std::string EndPoint,
-                                    Types::StringPairVec & QueryData,
+	    explicit OpenAPIRequestGet( const std::string & Type,
+                                    const std::string & EndPoint,
+                                    const Types::StringPairVec & QueryData,
                                     uint64_t msTimeout):
-                                    Type_(std::move(Type)),
-                                    EndPoint_(std::move(EndPoint)),
+                                    Type_(Type),
+                                    EndPoint_(EndPoint),
                                     QueryData_(QueryData),
                                     msTimeout_(msTimeout) {};
-	    inline int Do(Poco::JSON::Object::Ptr &ResponseObject);
+	    inline Poco::Net::HTTPServerResponse::HTTPStatus Do(Poco::JSON::Object::Ptr &ResponseObject);
 	private:
 	    std::string 			Type_;
 	    std::string 			EndPoint_;
@@ -2060,18 +2060,18 @@ namespace OpenWifi {
 
 	class OpenAPIRequestPut {
 	public:
-	    explicit OpenAPIRequestPut( std::string Type,
-                                    std::string EndPoint,
-                                    Types::StringPairVec & QueryData,
-                                    Poco::JSON::Object Body,
+	    explicit OpenAPIRequestPut( const std::string & Type,
+                                    const std::string & EndPoint,
+                                    const Types::StringPairVec & QueryData,
+                                    const Poco::JSON::Object & Body,
                                     uint64_t msTimeout):
-                                    Type_(std::move(Type)),
-                                    EndPoint_(std::move(EndPoint)),
+                                    Type_(Type),
+                                    EndPoint_(EndPoint),
                                     QueryData_(QueryData),
                                     msTimeout_(msTimeout),
-                                    Body_(std::move(Body)){};
+                                    Body_(Body){};
 
-	    inline int Do(Poco::JSON::Object::Ptr &ResponseObject);
+	    inline Poco::Net::HTTPServerResponse::HTTPStatus Do(Poco::JSON::Object::Ptr &ResponseObject);
 
 	private:
 	    std::string 			Type_;
@@ -2083,17 +2083,17 @@ namespace OpenWifi {
 
 	class OpenAPIRequestPost {
 	public:
-	    explicit OpenAPIRequestPost( std::string Type,
-                                     std::string EndPoint,
-                                     Types::StringPairVec & QueryData,
-                                     Poco::JSON::Object Body,
+	    explicit OpenAPIRequestPost( const std::string & Type,
+                                     const std::string & EndPoint,
+                                     const Types::StringPairVec & QueryData,
+                                     const Poco::JSON::Object & Body,
                                      uint64_t msTimeout):
-                                     Type_(std::move(Type)),
-                                     EndPoint_(std::move(EndPoint)),
+                                     Type_(Type),
+                                     EndPoint_(EndPoint),
                                      QueryData_(QueryData),
                                      msTimeout_(msTimeout),
-                                     Body_(std::move(Body)){};
-	    inline int Do(Poco::JSON::Object::Ptr &ResponseObject);
+                                     Body_(Body){};
+	    inline Poco::Net::HTTPServerResponse::HTTPStatus Do(Poco::JSON::Object::Ptr &ResponseObject);
 	private:
 	    std::string 			Type_;
 	    std::string 			EndPoint_;
@@ -2293,7 +2293,7 @@ namespace OpenWifi {
                                              QueryData,
                                              5000);
 	            Poco::JSON::Object::Ptr Response;
-	            if(Req.Do(Response)==Poco::Net::HTTPResponse::HTTP_OK) {
+	            if(Req.Do(Response)==Poco::Net::HTTPServerResponse::HTTP_OK) {
 	                if(Response->has("tokenInfo") && Response->has("userInfo")) {
 	                    UInfo.from_json(Response);
 	                    if(IsTokenExpired(UInfo.webtoken)) {
@@ -3563,7 +3563,7 @@ namespace OpenWifi {
 	    void DoDelete() final {};
 	};
 
-    inline int OpenAPIRequestGet::Do(Poco::JSON::Object::Ptr &ResponseObject) {
+    inline Poco::Net::HTTPServerResponse::HTTPStatus OpenAPIRequestGet::Do(Poco::JSON::Object::Ptr &ResponseObject) {
         try {
             auto Services = MicroService::instance().GetServices(Type_);
             for(auto const &Svc:Services) {
@@ -3597,10 +3597,10 @@ namespace OpenWifi {
         {
             std::cerr << E.displayText() << std::endl;
         }
-        return -1;
+        return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
 
-    inline int OpenAPIRequestPut::Do(Poco::JSON::Object::Ptr &ResponseObject) {
+    inline Poco::Net::HTTPServerResponse::HTTPStatus OpenAPIRequestPut::Do(Poco::JSON::Object::Ptr &ResponseObject) {
         try {
             auto Services = MicroService::instance().GetServices(Type_);
             for(auto const &Svc:Services) {
@@ -3645,10 +3645,10 @@ namespace OpenWifi {
         {
             std::cerr << E.displayText() << std::endl;
         }
-        return -1;
+        return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
 
-    int OpenAPIRequestPost::Do(Poco::JSON::Object::Ptr &ResponseObject) {
+    inline Poco::Net::HTTPServerResponse::HTTPStatus OpenAPIRequestPost::Do(Poco::JSON::Object::Ptr &ResponseObject) {
         try {
             auto Services = MicroService::instance().GetServices(Type_);
             for(auto const &Svc:Services) {
@@ -3693,7 +3693,7 @@ namespace OpenWifi {
         {
             std::cerr << E.displayText() << std::endl;
         }
-        return -1;
+        return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
 
 
@@ -3713,7 +3713,7 @@ namespace OpenWifi {
     [[nodiscard]] bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired , bool Sub );
 #endif
     inline bool RESTAPIHandler::IsAuthorized( bool & Expired , bool Sub ) {
-        if(Internal_) {
+        if(Internal_ && Request->has("X-INTERNAL-NAME")) {
             auto Allowed = MicroService::instance().IsValidAPIKEY(*Request);
             if(!Allowed) {
                 if(Server_.LogBadTokens(false)) {
