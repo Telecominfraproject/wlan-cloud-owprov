@@ -162,8 +162,8 @@ namespace ORM {
             Poco::Data::SessionPool & Pool,
                 Poco::Logger &L,
                 const char *Prefix):
-                Type(dbtype),
-                DBName(TableName),
+                Type_(dbtype),
+                DBName_(TableName),
                 Pool_(Pool),
                 Logger_(L),
                 Prefix_(Prefix)
@@ -185,7 +185,7 @@ namespace ORM {
                     SelectList_ += "(";
                 }
 
-                CreateFields_ += i.Name + " " + FieldTypeToChar(Type, i.Type,i.Size) + (i.Index ? " unique primary key" : "");
+                CreateFields_ += i.Name + " " + FieldTypeToChar(Type_, i.Type,i.Size) + (i.Index ? " unique primary key" : "");
                 SelectFields_ += i.Name ;
                 UpdateFields_ += i.Name + "=?";
                 SelectList_ += "?";
@@ -195,11 +195,11 @@ namespace ORM {
             SelectList_ += ")";
 
             if(!Indexes.empty()) {
-                if(Type==OpenWifi::DBType::sqlite || Type==OpenWifi::DBType::pgsql) {
+                if(Type_==OpenWifi::DBType::sqlite || Type_==OpenWifi::DBType::pgsql) {
                     for(const auto &j:Indexes) {
                         std::string IndexLine;
 
-                        IndexLine = std::string("CREATE INDEX IF NOT EXISTS ") + j.Name + std::string(" ON ") + DBName + " (";
+                        IndexLine = std::string("CREATE INDEX IF NOT EXISTS ") + j.Name + std::string(" ON ") + DBName_+ " (";
                         bool first_entry=true;
                         for(const auto &k:j.Entries) {
                             assert(FieldNames_.find(k.FieldName) != FieldNames_.end());
@@ -209,10 +209,10 @@ namespace ORM {
                             first_entry = false;
                             IndexLine += k.FieldName + std::string(" ") + std::string(k.Type == Indextype::ASC ? "ASC" : "DESC") ;
                         }
-                        IndexLine += " );";
-                        IndexCreation += IndexLine;
+                        IndexLine += " )";
+                        IndexCreation_.template emplace_back(IndexLine);
                     }
-                } else if(Type==OpenWifi::DBType::mysql) {
+                } else if(Type_==OpenWifi::DBType::mysql) {
                     bool firstIndex = true;
                     std::string IndexLine;
                     for(const auto &j:Indexes) {
@@ -231,7 +231,7 @@ namespace ORM {
                         }
                         IndexLine += " ) ";
                     }
-                    IndexCreation = IndexLine;
+                    IndexCreation_.template emplace_back(IndexLine);
                 }
             }
         }
@@ -280,32 +280,59 @@ namespace ORM {
         inline bool  Create() {
             std::string S;
 
-            if(Type==OpenWifi::DBType::mysql) {
-                if(IndexCreation.empty())
-                    S = "create table if not exists " + DBName +" ( " + CreateFields_ + " )" ;
-                else
-                    S = "create table if not exists " + DBName +" ( " + CreateFields_ + " ), " + IndexCreation + " )";
-            } else if (Type==OpenWifi::DBType::pgsql || Type==OpenWifi::DBType::sqlite) {
-                S = "create table if not exists " + DBName + " ( " + CreateFields_ + " ); " + IndexCreation ;
-            }
+            switch(Type_) {
+                case OpenWifi::DBType::mysql: {
+                    try {
+                        Poco::Data::Session     Session = Pool_.get();
+                        std::string Statement = IndexCreation_.empty() ?    "create table if not exists " + DBName_ +" ( " + CreateFields_ + " )" :
+                                                                            "create table if not exists " + DBName_ +" ( " + CreateFields_ + " ), " + IndexCreation_[0] + " )";
+                        Session << Statement , Poco::Data::Keywords::now;
+                        return true;
+                    } catch (const Poco::Exception &E) {
+                        Logger_.error("Failure to create MySQL DB resources.");
+                        Logger_.log(E);
+                    }
+                    return false;
+                }
+                break;
 
-            // std::cout << "CREATE-DB: " << S << std::endl;
+                case OpenWifi::DBType::sqlite: {
+                    try {
+                        Poco::Data::Session     Session = Pool_.get();
+                        std::string Statement = "create table if not exists " + DBName_ + " ( " + CreateFields_ + " )";
+                        Session << Statement , Poco::Data::Keywords::now;
+                        for(const auto &i:IndexCreation_) {
+                            Session << i , Poco::Data::Keywords::now;
+                        }
+                        return true;
+                    } catch (const Poco::Exception &E) {
+                        Logger_.error("Failure to create SQLITE DB resources.");
+                        Logger_.log(E);
+                    }
+                }
+                break;
 
-            try {
-                Poco::Data::Session     Session = Pool_.get();
-                Poco::Data::Statement   CreateStatement(Session);
-
-                CreateStatement << S;
-                CreateStatement.execute();
-                return true;
-            } catch (const Poco::Exception &E) {
-                std::cout << "Exception while creating DB: " << E.name() << std::endl;
+                case OpenWifi::DBType::pgsql: {
+                    try {
+                        Poco::Data::Session     Session = Pool_.get();
+                        std::string Statement = "create table if not exists " + DBName_ + " ( " + CreateFields_ + " )";
+                        Session << Statement , Poco::Data::Keywords::now;
+                        for(const auto &i:IndexCreation_) {
+                            Session << i , Poco::Data::Keywords::now;
+                        }
+                        return true;
+                    } catch (const Poco::Exception &E) {
+                        Logger_.error("Failure to create POSTGRESQL DB resources.");
+                        Logger_.log(E);
+                    }
+                }
+                break;
             }
             return false;
         }
 
         [[nodiscard]] std::string ConvertParams(const std::string & S) const {
-            if(Type!=OpenWifi::DBType::pgsql)
+            if(Type_!=OpenWifi::DBType::pgsql)
                 return S;
 
             std::string R;
@@ -336,7 +363,7 @@ namespace ORM {
 
                 RecordTuple RT;
                 Convert(R, RT);
-                std::string St = "insert into  " + DBName + " ( " + SelectFields_ + " ) values " + SelectList_;
+                std::string St = "insert into  " + DBName_ + " ( " + SelectFields_ + " ) values " + SelectList_;
                 Insert  << ConvertParams(St) ,
                     Poco::Data::Keywords::use(RT);
                 Insert.execute();
@@ -356,7 +383,7 @@ namespace ORM {
                 Poco::Data::Statement   Select(Session);
                 RecordTuple             RT;
 
-                std::string St = "select " + SelectFields_ + " from " + DBName + " where " + FieldName + "=?" ;
+                std::string St = "select " + SelectFields_ + " from " + DBName_ + " where " + FieldName + "=?" ;
 
                 Select  << ConvertParams(St) ,
                     Poco::Data::Keywords::into(RT),
@@ -384,7 +411,7 @@ namespace ORM {
                 Poco::Data::Statement   Select(Session);
                 RecordTuple RT;
 
-                std::string St = "select " + SelectFields_ + " from " + DBName
+                std::string St = "select " + SelectFields_ + " from " + DBName_
                                 + " where " + FieldName[0] + "=? and " + FieldName[1] + "=?"  ;
                 Select  << ConvertParams(St) ,
                     Poco::Data::Keywords::into(RT),
@@ -409,7 +436,7 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
                 RecordList RL;
-                std::string St = "select " + SelectFields_ + " from " + DBName +
+                std::string St = "select " + SelectFields_ + " from " + DBName_ +
                         (Where.empty() ? "" : " where " + Where) + OrderBy +
                         ComputeRange(Offset, HowMany) ;
 
@@ -442,7 +469,7 @@ namespace ORM {
 
                 Convert(R, RT);
 
-                std::string St = "update " + DBName + " set " + UpdateFields_ + " where " + FieldName + "=?" ;
+                std::string St = "update " + DBName_ + " set " + UpdateFields_ + " where " + FieldName + "=?" ;
                 Update  << ConvertParams(St) ,
                     Poco::Data::Keywords::use(RT),
                     Poco::Data::Keywords::use(Value);
@@ -461,7 +488,7 @@ namespace ORM {
                 Poco::Data::Statement   Select(Session);
                 RecordTuple             RT;
 
-                std::string St = "select " + SelectFields_ + " from " + DBName + " where " + FieldName + "=?" ;
+                std::string St = "select " + SelectFields_ + " from " + DBName_ + " where " + FieldName + "=?" ;
                 RecordType R;
                 Select  << ConvertParams(St) ,
                 Poco::Data::Keywords::into(RT),
@@ -486,7 +513,7 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Delete(Session);
 
-                std::string St = "delete from " + DBName + " where " + FieldName + "=?" ;
+                std::string St = "delete from " + DBName_ + " where " + FieldName + "=?" ;
                 Delete  << ConvertParams(St) ,
                     Poco::Data::Keywords::use(Value);
                 Delete.execute();
@@ -503,7 +530,7 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Delete(Session);
 
-                std::string St = "delete from " + DBName + " where " + WhereClause;
+                std::string St = "delete from " + DBName_ + " where " + WhereClause;
                 Delete  << St;
                 Delete.execute();
                 return true;
@@ -591,7 +618,7 @@ namespace ORM {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
 
-                std::string st{"SELECT COUNT(*) FROM " + DBName + " " + (Where.empty() ? "" : (" where " + Where)) };
+                std::string st{"SELECT COUNT(*) FROM " + DBName_ + " " + (Where.empty() ? "" : (" where " + Where)) };
 
                 Select << st ,
                     Poco::Data::Keywords::into(Cnt);
@@ -724,29 +751,29 @@ namespace ORM {
         }
 
         [[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
-            if(From<1) From=1;
-            switch(Type) {
+            if(From<1) From=0;
+            switch(Type_) {
                 case OpenWifi::DBType::sqlite:
-                    return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) +  " ";
+                    return " LIMIT " + std::to_string(From) + ", " + std::to_string(HowMany) +  " ";
                 case OpenWifi::DBType::pgsql:
-                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From) + " ";
                 case OpenWifi::DBType::mysql:
-                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From) + " ";
                 default:
-                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
+                    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From) + " ";
             }
         }
 
         Poco::Logger & Logger() { return Logger_; }
 
     private:
-        OpenWifi::DBType            Type;
-        std::string                 DBName;
+        OpenWifi::DBType            Type_;
+        std::string                 DBName_;
         std::string                 CreateFields_;
         std::string                 SelectFields_;
         std::string                 SelectList_;
         std::string                 UpdateFields_;
-        std::string                 IndexCreation;
+        std::vector<std::string>    IndexCreation_;
         std::map<std::string,int>   FieldNames_;
         Poco::Data::SessionPool     &Pool_;
         Poco::Logger                &Logger_;

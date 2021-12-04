@@ -8,7 +8,7 @@
 #include "Poco/JSON/Parser.h"
 
 namespace OpenWifi {
-    void API_Proxy( Poco::Logger &Logger,
+    inline void API_Proxy( Poco::Logger &Logger,
                     Poco::Net::HTTPServerRequest *Request,
                     Poco::Net::HTTPServerResponse *Response,
                     const char * ServiceType,
