@@ -25,9 +25,20 @@ else()
     file(WRITE build ${BUILD_NUM})
 endif()
 
-set(BUILD_SHARED_LIBS 1)
-add_definitions(-DAPP_VERSION="${CMAKE_PROJECT_VERSION}" -DBUILD_NUMBER="${BUILD_NUM}" -DAWS_CUSTOM_MEMORY_MANAGEMENT)
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --tags
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE GIT_RESULT
+            OUTPUT_VARIABLE GIT_HASH)
+    if(NOT GIT_RESULT EQUAL "0")
+        message(FATAL_ERROR "git describe --always --tags failed with ${GIT_RESULT}")
+    endif()
+    string(REGEX REPLACE "\n$" "" GIT_HASH "${GIT_HASH}")
+endif()
+add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT)
 
+set(BUILD_SHARED_LIBS 1)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -50,8 +61,11 @@ endif()
 
 include_directories(/usr/local/include  /usr/local/opt/openssl/include src include/kafka /usr/local/opt/mysql-client/include)
 
+configure_file(src/ow_version.h.in ${PROJECT_SOURCE_DIR}/src/ow_version.h @ONLY)
+
 add_executable(owprov
         build
+        src/ow_version.h.in
         src/framework/CountryCodes.h
         src/framework/KafkaTopics.h
         src/framework/MicroService.h
@@ -107,7 +121,11 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_db_helpers.h
         src/JobController.cpp src/JobController.h
         src/JobRegistrations.cpp
-        src/storage/storage_jobs.cpp src/storage/storage_jobs.h src/WebSocketClientServer.cpp src/WebSocketClientServer.h src/storage/storage_maps.cpp src/storage/storage_maps.h src/RESTAPI/RESTAPI_map_handler.cpp src/RESTAPI/RESTAPI_map_handler.h src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h)
+        src/storage/storage_jobs.cpp src/storage/storage_jobs.h
+        src/WebSocketClientServer.cpp src/WebSocketClientServer.h
+        src/storage/storage_maps.cpp src/storage/storage_maps.h
+        src/RESTAPI/RESTAPI_map_handler.cpp src/RESTAPI/RESTAPI_map_handler.h
+        src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}
