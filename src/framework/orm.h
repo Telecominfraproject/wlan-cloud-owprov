@@ -32,7 +32,8 @@ namespace ORM {
         FT_BIGINT,
         FT_TEXT,
         FT_VARCHAR,
-        FT_BLOB
+        FT_BLOB,
+        FT_BOOLEAN
     };
 
     enum Indextype {
@@ -96,21 +97,22 @@ namespace ORM {
             case FT_INT:    return "INT";
             case FT_BIGINT: return "BIGINT";
             case FT_TEXT:   return "TEXT";
+            case FT_BOOLEAN:   return "BOOLEAN";
             case FT_VARCHAR:
                 if(Size)
                     return std::string("VARCHAR(") + std::to_string(Size) + std::string(")");
                 else
                     return "TEXT";
-                case FT_BLOB:
-                    if(Type==OpenWifi::DBType::mysql)
-                        return "LONGBLOB";
-                    else if(Type==OpenWifi::DBType::pgsql)
-                        return "BYTEA";
-                    else if(Type==OpenWifi::DBType::sqlite)
-                        return "BLOB";
-                    default:
-                        assert(false);
-                        return "";
+            case FT_BLOB:
+                if(Type==OpenWifi::DBType::mysql)
+                    return "LONGBLOB";
+                else if(Type==OpenWifi::DBType::pgsql)
+                    return "BYTEA";
+                else if(Type==OpenWifi::DBType::sqlite)
+                    return "BLOB";
+                default:
+                    assert(false);
+                    return "";
         }
         assert(false);
         return "";
@@ -240,6 +242,11 @@ namespace ORM {
         [[nodiscard]] const std::string & SelectFields() const { return SelectFields_; };
         [[nodiscard]] const std::string & SelectList() const { return SelectList_; };
         [[nodiscard]] const std::string & UpdateFields() const { return UpdateFields_; };
+
+        inline std::string OP(const char *F, SqlComparison O , bool V) {
+            assert( FieldNames_.find(F) != FieldNames_.end() );
+            return std::string{"("} + F + SQLCOMPS[O] + (V ? "true" : "false") + ")" ;
+        }
 
         inline std::string OP(const char *F, SqlComparison O , int V) {
             assert( FieldNames_.find(F) != FieldNames_.end() );
