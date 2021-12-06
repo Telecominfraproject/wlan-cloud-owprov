@@ -2696,7 +2696,7 @@ namespace OpenWifi {
 		std::string 				MyPrivateEndPoint_;
 		std::string 				MyPublicEndPoint_;
 		std::string                 UIURI_;
-		std::string 				Version_{ OW_VERSION::VERSION + "("+ OW_VERSION::BUILD + "-" + OW_VERSION::HASH + ")"};
+		std::string 				Version_{ OW_VERSION::VERSION + "("+ OW_VERSION::BUILD + ")" + "-" + OW_VERSION::HASH };
 		BusEventManager				BusEventManager_;
 		std::mutex 					InfraMutex_;
 		std::default_random_engine  RandomEngine_;
