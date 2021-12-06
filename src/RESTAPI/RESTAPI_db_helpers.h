@@ -155,7 +155,7 @@ namespace OpenWifi {
     }
 
     template <typename DB, typename Record> void ReturnRecordList(const char *ArrayName,DB & DBInstance, RESTAPIHandler & R) {
-        auto UUIDs = Utils::Split(R.SelectedRecords());
+        const auto UUIDs = Utils::Split(R.SelectedRecords());
         Poco::JSON::Array   ObjArr;
         for(const auto &i:UUIDs) {
             Record E;

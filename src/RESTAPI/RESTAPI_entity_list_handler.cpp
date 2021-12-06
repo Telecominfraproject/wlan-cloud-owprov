@@ -14,14 +14,13 @@
 namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
-        std::string Arg;
         if(!QB_.Select.empty()) {
             return ReturnRecordList<decltype(StorageService()->EntityDB()),
             ProvObjects::Entity>("entities",StorageService()->EntityDB(),*this );
         } else if(QB_.CountOnly) {
             auto C = StorageService()->EntityDB().Count();
             return ReturnCountOnly(C);
-        } if (HasParameter("getTree",Arg) && Arg=="true") {
+        } else if (GetBoolParameter("getTree",false)) {
             Poco::JSON::Object  FullTree;
             StorageService()->EntityDB().BuildTree(FullTree);
             return ReturnObject(FullTree);
@@ -33,8 +32,7 @@ namespace OpenWifi{
     }
 
     void RESTAPI_entity_list_handler::DoPost() {
-        std::string Arg;
-        if (HasParameter("setTree",Arg) && Arg=="true") {
+        if (GetBoolParameter("setTree",false)) {
             auto FullTree = ParseStream();
             StorageService()->EntityDB().ImportTree(FullTree);
             return OK();
