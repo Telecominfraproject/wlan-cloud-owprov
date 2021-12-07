@@ -45,6 +45,7 @@ RUN make install
 ADD CMakeLists.txt build /owprov/
 ADD cmake /owprov/cmake
 ADD src /owprov/src
+ADD .git /owgw/.git
 
 WORKDIR /owprov
 RUN mkdir cmake-build
