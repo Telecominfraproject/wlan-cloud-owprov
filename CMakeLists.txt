@@ -26,10 +26,8 @@ else()
 endif()
 
 find_package(Git QUIET)
-#if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-if(EXISTS "${PROJECT_SOURCE_DIR}/.git")
-#    execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --tags
-        execute_process(COMMAND git describe --always --tags
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --tags
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             RESULT_VARIABLE GIT_RESULT
             OUTPUT_VARIABLE GIT_HASH)
@@ -38,6 +36,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
     string(REGEX REPLACE "\n$" "" GIT_HASH "${GIT_HASH}")
 endif()
+
 add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT)
 
 set(BUILD_SHARED_LIBS 1)
