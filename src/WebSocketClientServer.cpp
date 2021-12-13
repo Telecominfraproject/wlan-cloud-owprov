@@ -68,7 +68,7 @@ namespace OpenWifi {
                 }
                 break;
             case Poco::Net::WebSocket::FRAME_OP_CLOSE: {
-                    Logger_.warning(Poco::format("CLOSE(%s): Client is closing its connection.",Id_));
+                    Logger().warning(Poco::format("CLOSE(%s): Client is closing its connection.",Id_));
                     Done=true;
                 }
                 break;
@@ -101,7 +101,7 @@ namespace OpenWifi {
                             WS_->sendFrame("{}", 2);
                         }
                     } catch (const Poco::JSON::JSONException & E) {
-                        Logger_.log(E);
+                        Logger().log(E);
                     }
                 }
             }
@@ -130,7 +130,7 @@ namespace OpenWifi {
                     uint64_t HowMany = 32;
                     if (O->has("howMany"))
                         HowMany = O->get("howMany");
-                    Logger_.information(Poco::format("serial_number_search: %s", Prefix));
+                    Logger().information(Poco::format("serial_number_search: %s", Prefix));
                     if (!Prefix.empty() && Prefix.length() < 13) {
                         std::vector<uint64_t> Numbers;
                         SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
@@ -155,7 +155,7 @@ namespace OpenWifi {
                 }
             }
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
     }
 

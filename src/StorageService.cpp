@@ -16,17 +16,17 @@ namespace OpenWifi {
 
 		StorageClass::Start();
 
-        EntityDB_ = std::make_unique<OpenWifi::EntityDB>(dbType_,*Pool_, Logger_);
-        PolicyDB_ = std::make_unique<OpenWifi::PolicyDB>(dbType_, *Pool_, Logger_);
-        VenueDB_ = std::make_unique<OpenWifi::VenueDB>(dbType_, *Pool_, Logger_);
-        LocationDB_ = std::make_unique<OpenWifi::LocationDB>(dbType_, *Pool_, Logger_);
-        ContactDB_ = std::make_unique<OpenWifi::ContactDB>(dbType_, *Pool_, Logger_);
-        InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(dbType_, *Pool_, Logger_);
-        RolesDB_ = std::make_unique<OpenWifi::ManagementRoleDB>(dbType_, *Pool_, Logger_);
-        ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(dbType_, *Pool_, Logger_);
-        TagsDictionaryDB_ = std::make_unique<OpenWifi::TagsDictionaryDB>(dbType_, *Pool_, Logger_);
-        TagsObjectDB_ = std::make_unique<OpenWifi::TagsObjectDB>(dbType_, *Pool_, Logger_);
-        MapDB_ = std::make_unique<OpenWifi::MapDB>(dbType_, *Pool_, Logger_);
+        EntityDB_ = std::make_unique<OpenWifi::EntityDB>(dbType_,*Pool_, Logger());
+        PolicyDB_ = std::make_unique<OpenWifi::PolicyDB>(dbType_, *Pool_, Logger());
+        VenueDB_ = std::make_unique<OpenWifi::VenueDB>(dbType_, *Pool_, Logger());
+        LocationDB_ = std::make_unique<OpenWifi::LocationDB>(dbType_, *Pool_, Logger());
+        ContactDB_ = std::make_unique<OpenWifi::ContactDB>(dbType_, *Pool_, Logger());
+        InventoryDB_ = std::make_unique<OpenWifi::InventoryDB>(dbType_, *Pool_, Logger());
+        RolesDB_ = std::make_unique<OpenWifi::ManagementRoleDB>(dbType_, *Pool_, Logger());
+        ConfigurationDB_ = std::make_unique<OpenWifi::ConfigurationDB>(dbType_, *Pool_, Logger());
+        TagsDictionaryDB_ = std::make_unique<OpenWifi::TagsDictionaryDB>(dbType_, *Pool_, Logger());
+        TagsObjectDB_ = std::make_unique<OpenWifi::TagsObjectDB>(dbType_, *Pool_, Logger());
+        MapDB_ = std::make_unique<OpenWifi::MapDB>(dbType_, *Pool_, Logger());
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -85,7 +85,7 @@ namespace OpenWifi {
 	            break;
 	        if(UpdateDeviceTypes()) {
 	            FirstRun = false;
-	            Logger_.information("Updated existing DeviceType list from FMS.");
+	            Logger().information("Updated existing DeviceType list from FMS.");
 	            Retry = 60 * 5 * 1000 ; // 5 minutes
 	        } else {
 	            Retry = 2000;
@@ -118,7 +118,7 @@ namespace OpenWifi {
 	        } else {
 	        }
 	    } catch (const Poco::Exception &E) {
-	        Logger_.log(E);
+	        Logger().log(E);
 	    }
 	    return false;
 	}
@@ -127,7 +127,7 @@ namespace OpenWifi {
 	    Running_=false;
 	    Updater_.wakeUp();
 	    Updater_.join();
-        Logger_.notice("Stopping.");
+        Logger().notice("Stopping.");
     }
 
     bool Storage::Validate(const Poco::URI::QueryParameters &P, std::string &Error) {

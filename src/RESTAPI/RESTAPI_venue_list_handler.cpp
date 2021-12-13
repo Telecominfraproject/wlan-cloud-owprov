@@ -37,7 +37,7 @@ namespace OpenWifi{
                 return MakeJSONObjectArray("venues", Venues, *this);
             }
         } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         InternalError("Internal error.");
     }

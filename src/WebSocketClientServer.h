@@ -139,7 +139,7 @@ namespace OpenWifi {
             }
             return false;
         }
-
+        Poco::Logger & Logger() { return Logger_;}
         private:
             std::unique_ptr<Poco::Net::WebSocket>     WS_;
             Poco::Net::SocketReactor                & Reactor_;

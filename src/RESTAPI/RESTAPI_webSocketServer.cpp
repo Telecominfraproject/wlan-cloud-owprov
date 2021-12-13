@@ -26,10 +26,10 @@ namespace OpenWifi {
                 try
                 {
                     Poco::Net::WebSocket WS(*Request, *Response);
-                    Logger_.information("WebSocket connection established.");
+                    Logger().information("WebSocket connection established.");
                     auto Id = MicroService::CreateUUID();
                     std::cout << __func__ << ":" << __LINE__ << std::endl;
-                    new WebSocketClient(WS,Id,Logger_);
+                    new WebSocketClient(WS,Id,Logger());
                     std::cout << __func__ << ":" << __LINE__ << std::endl;
                 }
                 catch (...) {
@@ -49,7 +49,7 @@ namespace OpenWifi {
 			try
 			{
 				Poco::Net::WebSocket WS(*Request, *Response);
-				Logger_.information("WebSocket connection established.");
+				Logger().information("WebSocket connection established.");
 				int flags;
 				int n;
 				bool Authenticated=false;
@@ -100,7 +100,7 @@ namespace OpenWifi {
 											WS.sendFrame("{}", 2);
 										}
 									} catch (const Poco::JSON::JSONException & E) {
-										Logger_.log(E);
+										Logger().log(E);
 									}
 								}
 							}
@@ -112,11 +112,11 @@ namespace OpenWifi {
 					}
 				}
 				while (!Done && (n > 0 && (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE));
-				Logger_.information("WebSocket connection closed.");
+				Logger().information("WebSocket connection closed.");
 			}
 			catch (const Poco::Net::WebSocketException & E)
 			{
-				Logger_.log(E);
+				Logger().log(E);
 				switch (E.code())
 				{
 				case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION:
@@ -132,7 +132,7 @@ namespace OpenWifi {
 				}
 			}
 			catch (const Poco::Exception &E) {
-				Logger_.log(E);
+				Logger().log(E);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ namespace OpenWifi {
 	                uint64_t HowMany = 32;
 	                if (O->has("howMany"))
 	                    HowMany = O->get("howMany");
-	                Logger_.information(Poco::format("serial_number_search: %s", Prefix));
+	                Logger().information(Poco::format("serial_number_search: %s", Prefix));
 	                if (!Prefix.empty() && Prefix.length() < 13) {
 	                    std::vector<uint64_t> Numbers;
 	                    SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
@@ -171,7 +171,7 @@ namespace OpenWifi {
 	            }
 			}
 		} catch (const Poco::Exception &E) {
-			Logger_.log(E);
+			Logger().log(E);
 		}
 	}
 

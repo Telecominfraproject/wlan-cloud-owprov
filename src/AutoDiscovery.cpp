@@ -61,7 +61,7 @@ namespace OpenWifi {
                         }
                     }
                 } catch (const Poco::Exception &E) {
-                    Logger_.log(E);
+                    Logger().log(E);
                 }
             }
         }
@@ -83,7 +83,7 @@ namespace OpenWifi {
 
     void AutoDiscovery::ConnectionReceived( const std::string & Key, const std::string & Message) {
         std::lock_guard G(Mutex_);
-        Logger_.information(Poco::format("Connection(%s): New connection notification.", Key));
+        Logger().information(Poco::format("Connection(%s): New connection notification.", Key));
         NewConnections_.push(std::make_pair(Key,Message));
     }
 

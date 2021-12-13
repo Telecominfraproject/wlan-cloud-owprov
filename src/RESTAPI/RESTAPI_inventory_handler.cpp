@@ -44,7 +44,7 @@ namespace OpenWifi{
         std::string Arg;
         if(HasParameter("config",Arg) && Arg=="true") {
             bool Explain = (HasParameter("explain",Arg) && Arg == "true");
-            APConfig    Device(SerialNumber,Existing.deviceType,Logger_, Explain);
+            APConfig    Device(SerialNumber,Existing.deviceType,Logger(), Explain);
 
             Poco::JSON::Object::Ptr  Configuration;
             if(Device.Get(Configuration)) {
@@ -69,7 +69,7 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
-            APConfig    Device(SerialNumber,Existing.deviceType,Logger_, false);
+            APConfig    Device(SerialNumber,Existing.deviceType,Logger(), false);
             Poco::JSON::Object::Ptr  Configuration;
 
             Types::StringVec Errors, Warnings;
