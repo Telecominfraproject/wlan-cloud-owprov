@@ -65,7 +65,7 @@ RUN addgroup -S "$OWPROV_USER" && \
 RUN mkdir /openwifi
 RUN mkdir -p "$OWPROV_ROOT" "$OWPROV_CONFIG" && \
     chown "$OWPROV_USER": "$OWPROV_ROOT" "$OWPROV_CONFIG"
-RUN apk add --update --no-cache librdkafka curl-dev mariadb-connector-c libpq su-exec gettext ca-certificates bash jq curl
+RUN apk add --update --no-cache librdkafka curl-dev mariadb-connector-c libpq su-exec gettext ca-certificates bash jq curl postgresql-client
 
 COPY --from=builder /owprov/cmake-build/owprov /openwifi/owprov
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
