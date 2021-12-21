@@ -78,8 +78,8 @@ namespace OpenWifi {
 
     class JobRegistry {
         public:
-            static JobRegistry *instance() {
-                static JobRegistry * instance_ = new JobRegistry;
+            static auto instance() {
+                static auto instance_ = new JobRegistry;
                 return instance_;
             }
 
@@ -100,12 +100,12 @@ namespace OpenWifi {
             std::map<std::string,Job::WorkerFunction>  JobTypes_;
     };
 
-    inline JobRegistry * JobRegistry() { return JobRegistry::instance(); }
+    inline auto JobRegistry() { return JobRegistry::instance(); }
 
     class JobController : public SubSystemServer, Poco::Runnable {
         public:
-            static JobController *instance() {
-                static JobController * instance_ = new JobController;
+            static auto instance() {
+                static auto instance_ = new JobController;
                 return instance_;
             }
 
@@ -125,7 +125,7 @@ namespace OpenWifi {
             {
             }
     };
-    inline JobController * JobController() { return JobController::instance(); }
+    inline auto JobController() { return JobController::instance(); }
 
 }
 

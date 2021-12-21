@@ -174,4 +174,17 @@ namespace OpenWifi {
         return R.ReturnObject(Answer);
     }
 
+    inline bool NormalizeMac(std::string & Mac) {
+        Poco::replaceInPlace(Mac,":","");
+        Poco::replaceInPlace(Mac,"-","");
+        if(Mac.size()!=12)
+            return false;
+        for(const auto &i:Mac) {
+            if(!std::isxdigit(i))
+                return false;
+        }
+        Poco::toLowerInPlace(Mac);
+        return true;
+    }
+
 }

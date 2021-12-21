@@ -142,11 +142,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingSerialNumber);
         }
 
-        if(!Utils::ValidSerialNumber(SerialNumber)) {
+        if(!NormalizeMac(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
 
-        Poco::toLowerInPlace(SerialNumber);
         if(DB_.Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
             return BadRequest(RESTAPI::Errors::SerialNumberExists + " (" + SerialNumber + ")");
         }

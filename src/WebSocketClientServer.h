@@ -44,8 +44,8 @@ namespace OpenWifi {
 
     class WebSocketClientServer : public SubSystemServer, Poco::Runnable {
         public:
-            static WebSocketClientServer *instance() {
-                static WebSocketClientServer * instance_ = new WebSocketClientServer;
+            static auto instance() {
+                static auto instance_ = new WebSocketClientServer;
                 return instance_;
             }
 
@@ -83,7 +83,7 @@ namespace OpenWifi {
                 }
         };
 
-    inline WebSocketClientServer * WebSocketClientServer() { return WebSocketClientServer::instance(); }
+    inline auto WebSocketClientServer() { return WebSocketClientServer::instance(); }
 
     class WebSocketClient {
     public:
@@ -153,6 +153,7 @@ namespace OpenWifi {
             void OnSocketShutdown(const Poco::AutoPtr<Poco::Net::ShutdownNotification>& pNf);
             void OnSocketError(const Poco::AutoPtr<Poco::Net::ErrorNotification>& pNf);
         };
+
 
 }
 

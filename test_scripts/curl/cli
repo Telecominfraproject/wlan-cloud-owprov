@@ -35,7 +35,7 @@ fi
 token=""
 result_file=result.json
 username="tip@ucentral.com"
-password="openwifi"
+password="Ninja650!!!"
 browser_list=(firefox sensible-browser xdg-open w3m links links2 lynx youtube-dl)
 browser=""
 
@@ -43,7 +43,7 @@ login() {
   payload="{ \"userId\" : \"$username\" , \"password\" : \"$password\" }"
   token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${OWSEC}/api/v1/oauth2" | jq -r '.access_token')
 
-  if [[ "${token}" == "" ]]
+  if [[ "${token}" == "null" ]]
   then
   	echo "Could not login. Please verify the host and username/password."
     exit 13
@@ -459,7 +459,7 @@ affecteddevices() {
 
 shopt -s nocasematch
 case "$1" in
-    "login") login; help  ; logout ;;
+    "login") login; echo "You are logged in..."  ; logout ;;
     "getroot") login; getroot; logout;;
     "setroot") login; setroot; logout;;
     "addentity") login; addentity "$2" ; logout;;

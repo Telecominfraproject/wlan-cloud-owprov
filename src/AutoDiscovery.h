@@ -11,8 +11,8 @@ namespace OpenWifi {
     class AutoDiscovery : public SubSystemServer, Poco::Runnable {
     public:
 
-        static AutoDiscovery *instance() {
-            static AutoDiscovery * instance_ = new AutoDiscovery;
+        static auto instance() {
+            static auto instance_ = new AutoDiscovery;
             return instance_;
         }
 
@@ -33,7 +33,7 @@ namespace OpenWifi {
             }
     };
 
-    inline AutoDiscovery * AutoDiscovery() { return AutoDiscovery::instance(); }
+    inline auto AutoDiscovery() { return AutoDiscovery::instance(); }
 
 }
 

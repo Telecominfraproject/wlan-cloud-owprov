@@ -14,8 +14,8 @@ namespace OpenWifi {
         typedef std::map<std::string,uint32_t>  DictMap;
         typedef std::map<std::string,DictMap>   EntityToDict;
 
-        static TagServer *instance() {
-            static TagServer * instance_ = new TagServer;
+        static auto instance() {
+            static auto instance_ = new TagServer;
             return instance_;
         }
 
@@ -34,6 +34,6 @@ namespace OpenWifi {
             }
     };
 
-    inline TagServer * TagServer() { return TagServer::instance(); }
+    inline auto TagServer() { return TagServer::instance(); }
 
 }
