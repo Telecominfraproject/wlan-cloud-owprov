@@ -36,7 +36,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        if(UserInfo_.userinfo.Id!=Existing.creator) {
+        if(UserInfo_.userinfo.id!=Existing.creator) {
             return UnAuthorized("You must be the creator of the map to delete it");
         }
 
@@ -66,7 +66,7 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        NewObject.creator = UserInfo_.userinfo.Id;
+        NewObject.creator = UserInfo_.userinfo.id;
 
         if(DB_.CreateRecord(NewObject)) {
 
@@ -96,14 +96,14 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(Existing.creator != UserInfo_.userinfo.Id) {
+        if(Existing.creator != UserInfo_.userinfo.id) {
             if(Existing.visibility == ProvObjects::PRIVATE) {
                 return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
             }
             if(Existing.visibility == ProvObjects::SELECT) {
                 for(const auto &i:Existing.access.list) {
                     for(const auto &j:i.users.list) {
-                        if(j==UserInfo_.userinfo.Id) {
+                        if(j==UserInfo_.userinfo.id) {
                         }
                     }
                 }

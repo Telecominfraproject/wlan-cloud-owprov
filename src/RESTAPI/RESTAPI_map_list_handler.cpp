@@ -10,7 +10,7 @@
 namespace OpenWifi{
     void RESTAPI_map_list_handler::DoGet() {
         if(GetBoolParameter("myMaps",false)) {
-            auto where = StorageService()->MapDB().OP("creator",ORM::EQ,UserInfo_.userinfo.Id);
+            auto where = StorageService()->MapDB().OP("creator",ORM::EQ,UserInfo_.userinfo.id);
             std::vector<ProvObjects::Map>   Maps;
             StorageService()->MapDB().GetRecords(QB_.Offset,QB_.Limit,Maps,where);
             return MakeJSONObjectArray("list", Maps, *this);
