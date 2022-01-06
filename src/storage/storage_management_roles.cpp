@@ -41,7 +41,7 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(OpenWifi::ManagementRoleDBRecordType &In, OpenWifi::ProvObjects::ManagementRole &Out) {
+template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(const OpenWifi::ManagementRoleDBRecordType &In, OpenWifi::ProvObjects::ManagementRole &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -55,7 +55,7 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.entity = In.get<10>();
 }
 
-template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(OpenWifi::ProvObjects::ManagementRole &In, OpenWifi::ManagementRoleDBRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(const OpenWifi::ProvObjects::ManagementRole &In, OpenWifi::ManagementRoleDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);

@@ -53,7 +53,7 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ContactDBRecordType &In, OpenWifi::ProvObjects::Contact &Out) {
+template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(const OpenWifi::ContactDBRecordType &In, OpenWifi::ProvObjects::Contact &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -78,7 +78,7 @@ template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Co
     Out.entity = In.get<21>();
 }
 
-template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
+template<> void ORM::DB<OpenWifi::ContactDBRecordType, OpenWifi::ProvObjects::Contact>::Convert(const OpenWifi::ProvObjects::Contact &In, OpenWifi::ContactDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);

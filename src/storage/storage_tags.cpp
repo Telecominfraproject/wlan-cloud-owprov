@@ -40,25 +40,25 @@ namespace OpenWifi {
         DB(T, "TagsObject", TagsObject_Fields, TagsObject_Indexes, P, L, "tag") {}
 }
 
-template<> void ORM::DB<    OpenWifi::TagsDictionaryRecordType, OpenWifi::TagsDictionary>::Convert(OpenWifi::TagsDictionaryRecordType &In, OpenWifi::TagsDictionary &Out) {
+template<> void ORM::DB<    OpenWifi::TagsDictionaryRecordType, OpenWifi::TagsDictionary>::Convert(const OpenWifi::TagsDictionaryRecordType &In, OpenWifi::TagsDictionary &Out) {
     Out.entity = In.get<0>();
     Out.id = In.get<1>();
     Out.name = In.get<2>();
 }
 
-template<> void ORM::DB<    OpenWifi::TagsDictionaryRecordType, OpenWifi::TagsDictionary>::Convert(OpenWifi::TagsDictionary &In, OpenWifi::TagsDictionaryRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::TagsDictionaryRecordType, OpenWifi::TagsDictionary>::Convert(const OpenWifi::TagsDictionary &In, OpenWifi::TagsDictionaryRecordType &Out) {
     Out.set<0>(In.entity);
     Out.set<1>(In.id);
     Out.set<2>(In.name);
 }
 
-template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(OpenWifi::TagsObjectRecordType &In, OpenWifi::TagsObject &Out) {
+template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(const OpenWifi::TagsObjectRecordType &In, OpenWifi::TagsObject &Out) {
     Out.entity = In.get <0>();
     Out.arn= In.get<1>();
     Out.entries = OpenWifi::RESTAPI_utils::to_object_array(In.get<2>());
 }
 
-template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(OpenWifi::TagsObject &In, OpenWifi::TagsObjectRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::TagsObjectRecordType, OpenWifi::TagsObject>::Convert(const OpenWifi::TagsObject &In, OpenWifi::TagsObjectRecordType &Out) {
     Out.set<0>(In.entity);
     Out.set<1>(In.arn);
     Out.set<2>(OpenWifi::RESTAPI_utils::to_string(In.entries));

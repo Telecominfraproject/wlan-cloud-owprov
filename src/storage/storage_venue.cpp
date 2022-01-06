@@ -95,7 +95,7 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::VenueDBRecordType &In, OpenWifi::ProvObjects::Venue &Out) {
+template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::VenueDBRecordType &In, OpenWifi::ProvObjects::Venue &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -118,7 +118,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
 
 }
 
-template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);

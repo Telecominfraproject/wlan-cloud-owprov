@@ -40,7 +40,7 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(OpenWifi::PolicyDBRecordType &In, OpenWifi::ProvObjects::ManagementPolicy &Out) {
+template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(const OpenWifi::PolicyDBRecordType &In, OpenWifi::ProvObjects::ManagementPolicy &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -53,7 +53,7 @@ template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects:
     Out.entity = In.get<9>();
 }
 
-template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(OpenWifi::ProvObjects::ManagementPolicy &In, OpenWifi::PolicyDBRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(const OpenWifi::ProvObjects::ManagementPolicy &In, OpenWifi::PolicyDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);

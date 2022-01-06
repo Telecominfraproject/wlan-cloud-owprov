@@ -203,7 +203,7 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::EntityDBRecordType &In, OpenWifi::ProvObjects::Entity &Out) {
+template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::EntityDBRecordType &In, OpenWifi::ProvObjects::Entity &Out) {
     Out.info.id = In.get<0>();
     Out.info.name = In.get<1>();
     Out.info.description = In.get<2>();
@@ -223,7 +223,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<16>());
 }
 
-template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
+template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
     Out.set<0>(In.info.id);
     Out.set<1>(In.info.name);
     Out.set<2>(In.info.description);

@@ -30,7 +30,7 @@ namespace OpenWifi {
     DB(T, "jobs", JobDB_Fields, JobDB_Indexes, P, L, "job") {}
 }
 
-template<> void ORM::DB<OpenWifi::JobDBRecordType, OpenWifi::JobRecord>::Convert(OpenWifi::JobDBRecordType &In, OpenWifi::JobRecord &Out) {
+template<> void ORM::DB<OpenWifi::JobDBRecordType, OpenWifi::JobRecord>::Convert(const OpenWifi::JobDBRecordType &In, OpenWifi::JobRecord &Out) {
     Out.id = In.get<0>();
     Out.name = In.get<1>();
     Out.description = In.get<2>();
@@ -40,7 +40,7 @@ template<> void ORM::DB<OpenWifi::JobDBRecordType, OpenWifi::JobRecord>::Convert
     Out.parameters = OpenWifi::RESTAPI_utils::to_array_of_array_of_object<OpenWifi::Job::Parameter>(In.get<3>());
 }
 
-template<> void ORM::DB<OpenWifi::JobDBRecordType, OpenWifi::JobRecord>::Convert(OpenWifi::JobRecord &In, OpenWifi::JobDBRecordType &Out) {
+template<> void ORM::DB<OpenWifi::JobDBRecordType, OpenWifi::JobRecord>::Convert(const OpenWifi::JobRecord &In, OpenWifi::JobDBRecordType &Out) {
     Out.set<0>(In.id);
     Out.set<1>(In.name);
     Out.set<2>(In.description);
