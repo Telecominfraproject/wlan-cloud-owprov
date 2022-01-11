@@ -60,5 +60,32 @@ namespace OpenWifi::SDK {
         return false;
     }
 
+    bool GetSubscriberInfo(const std::string &Id, SecurityObjects::UserInfo & User) {
+        Types::StringPairVec    QueryData;
+        Poco::JSON::Object      Body;
+
+        Poco::JSON::Parser P;
+        uint64_t Now = std::time(nullptr);
+
+        OpenWifi::OpenAPIRequestGet TheRequest(OpenWifi::uSERVICE_SECURITY,
+                                       "/api/v1/subuser/" + Id + "/configure",
+                                       QueryData,
+                                       10000);
+
+        Poco::JSON::Object::Ptr TheResponse;
+        auto StatusCode = TheRequest.Do(TheResponse,"");
+        if(StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+            try {
+                User.from_json(TheResponse);
+                return true;
+            } catch (...) {
+
+            }
+        }
+
+        return false;
+
+    }
+
 
 }

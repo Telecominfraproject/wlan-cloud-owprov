@@ -39,7 +39,8 @@ namespace OpenWifi {
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT}
+        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
+        ORM::Field{"state",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -52,6 +53,17 @@ namespace OpenWifi {
             {std::string("serialNumber"),
              ORM::Indextype::ASC} } }
     };
+
+    bool InventoryDB::Upgrade(uint32_t from, uint32_t &to) {
+        to = Version();
+        try {
+            auto Session = Pool_.get();
+            Session << "alter table " + TableName_ + " add column state text" , Poco::Data::Keywords::now;
+        } catch (...) {
+
+        }
+        return true;
+    }
 
     InventoryDB::InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
@@ -315,6 +327,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.rrm = In.get<16>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<17>());
     Out.managementPolicy = In.get<18>();
+    Out.state = In.get<19>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -337,4 +350,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<16>(In.rrm);
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<18>(In.managementPolicy);
+    Out.set<19>(In.state);
 }

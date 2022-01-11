@@ -69,37 +69,37 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
-            APConfig    Device(SerialNumber,Existing.deviceType,Logger(), false);
-            Poco::JSON::Object::Ptr  Configuration;
+            APConfig Device(SerialNumber, Existing.deviceType, Logger(), false);
+            Poco::JSON::Object::Ptr Configuration;
 
             Types::StringVec Errors, Warnings;
-            Poco::JSON::Object  ErrorsObj, WarningsObj;
+            Poco::JSON::Object ErrorsObj, WarningsObj;
             int ErrorCode;
-            if(Device.Get(Configuration)) {
+            if (Device.Get(Configuration)) {
                 Poco::JSON::Object::Ptr Response;
-                if(SDK::SendConfigureCommand(SerialNumber,Configuration,Response)) {
+                if (SDK::SendConfigureCommand(SerialNumber, Configuration, Response)) {
                     std::ostringstream os;
                     Response->stringify(os);
                     // std::cout << "Success: " << os.str() << std::endl;
                     GetRejectedLines(Response, Warnings);
-                    ErrorCode=0;
+                    ErrorCode = 0;
                 } else {
                     std::ostringstream os;
                     Response->stringify(os);
-                    ErrorCode=1;
+                    ErrorCode = 1;
                     // std::cout << "Failure: " << os.str() << std::endl;
                 }
                 Answer.set("appliedConfiguration", Configuration);
                 Answer.set("response", Response);
             } else {
                 Answer.set("appliedConfiguration", "");
-                ErrorCode=1;
+                ErrorCode = 1;
             }
-            Answer.set("errorCode",ErrorCode);
-            RESTAPI_utils::field_to_json(Answer,"errors", Errors);
-            RESTAPI_utils::field_to_json(Answer,"warnings", Warnings);
+            Answer.set("errorCode", ErrorCode);
+            RESTAPI_utils::field_to_json(Answer, "errors", Errors);
+            RESTAPI_utils::field_to_json(Answer, "warnings", Warnings);
             return ReturnObject(Answer);
-        }  else if(QB_.AdditionalInfo) {
+        }   else if(QB_.AdditionalInfo) {
             AddExtendedInfo(Existing,Answer);
         }
         Existing.to_json(Answer);
@@ -293,6 +293,22 @@ namespace OpenWifi{
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MovingPolicy = Existing.managementPolicy != NewPolicy;
+        }
+
+        std::string NewSubScriber;
+        if(AssignIfPresent(RawObject, "subscriber", NewSubScriber)) {
+            if(!NewSubScriber.empty()) {
+                if(NewSubScriber!=Existing.subscriber) {
+                    SecurityObjects::UserInfo   U;
+                    if(SDK::GetSubscriberInfo(NewSubScriber, U)) {
+                        Existing.subscriber = NewSubScriber;
+                    } else {
+                        return BadRequest(RESTAPI::Errors::SubscriberMustExist);
+                    }
+                }
+            } else {
+                Existing.subscriber = "";
+            }
         }
 
         std::string Arg;

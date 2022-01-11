@@ -31,6 +31,7 @@ namespace OpenWifi {
         std::string,
         std::string,
         std::string,
+        std::string,
         std::string
     > InventoryDBRecordType;
 
@@ -46,6 +47,11 @@ namespace OpenWifi {
             bool LookForRRM( const ProvObjects::InventoryTag &T);
             bool LookForRRMInVenue(const std::string &Venue);
             bool LookForRRMInEntity(const std::string &Entity);
+            inline uint32_t Version() override {
+                return 1;
+            }
+            bool Upgrade(uint32_t from, uint32_t &to) override;
+
         private:
     };
 }

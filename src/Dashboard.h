@@ -5,14 +5,14 @@
 //	Created by Stephane Bourque on 2021-03-04.
 //	Arilia Wireless Inc.
 //
-#ifndef UCENTRALGW_DASHBOARD_H
-#define UCENTRALGW_DASHBOARD_H
+
+#pragma once
 
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
-	class TopoDashboard {
+	class ProvisioningDashboard {
 	  public:
 			void Create();
 			[[nodiscard]] const ProvObjects::Report & Report() const { return DB_;}
@@ -22,5 +22,3 @@ namespace OpenWifi {
 			uint64_t 				LastRun_=0;
 	};
 }
-
-#endif // UCENTRALGW_DASHBOARD_H

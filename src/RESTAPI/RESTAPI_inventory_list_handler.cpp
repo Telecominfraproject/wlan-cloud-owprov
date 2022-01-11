@@ -80,7 +80,12 @@ namespace OpenWifi{
             StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( StorageService()->InventoryDB().OP("venue",ORM::EQ,Empty),
                                                                                               ORM::AND, StorageService()->InventoryDB().OP("entity",ORM::EQ,Empty) ) , OrderBy );
             return SendList(Tags, SerialOnly);
-        } else if(QB_.CountOnly) {
+        } else if (HasParameter("subscriber",Arg) && !Arg.empty()) {
+            // looking for device(s) for a specific subscriber...
+            ProvObjects::InventoryTagVec Devices;
+            StorageService()->InventoryDB().GetRecords(0,100,Devices," subscriber='" + Arg + "'");
+            return SendList(Devices,SerialOnly);
+        } else if (QB_.CountOnly) {
             auto C = StorageService()->InventoryDB().Count();
             return ReturnCountOnly(C);
         } else if (GetBoolParameter("rrmOnly",false)) {

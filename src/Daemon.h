@@ -39,12 +39,12 @@ namespace OpenWifi {
 
 			void initialize();
 			static Daemon *instance();
-			inline OpenWifi::TopoDashboard & GetDashboard() { return DB_; }
+			inline OpenWifi::ProvisioningDashboard & GetDashboard() { return DB_; }
 			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }
 			ProvObjects::FIRMWARE_UPGRADE_RULES FirmwareRules() const { return FWRules_; }
 	  	private:
-			static Daemon 				*instance_;
-			OpenWifi::TopoDashboard		DB_{};
+			static Daemon 				        *instance_;
+			OpenWifi::ProvisioningDashboard		DB_{};
 			ProvObjects::FIRMWARE_UPGRADE_RULES FWRules_{ProvObjects::dont_upgrade};
 
     };
