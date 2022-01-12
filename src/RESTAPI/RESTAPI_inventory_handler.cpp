@@ -14,7 +14,8 @@
 #include "APConfig.h"
 #include "framework/RESTAPI_errors.h"
 #include "AutoDiscovery.h"
-#include "SDK_stubs.h"
+#include "sdks/SDK_gw.h"
+#include "sdks/SDK_sec.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "SerialNumberCache.h"
 
@@ -77,7 +78,7 @@ namespace OpenWifi{
             int ErrorCode;
             if (Device.Get(Configuration)) {
                 Poco::JSON::Object::Ptr Response;
-                if (SDK::SendConfigureCommand(SerialNumber, Configuration, Response)) {
+                if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
                     std::ostringstream os;
                     Response->stringify(os);
                     // std::cout << "Success: " << os.str() << std::endl;
@@ -218,10 +219,28 @@ namespace OpenWifi{
 
     void RESTAPI_inventory_handler::DoPut() {
         ProvObjects::InventoryTag   Existing;
+
+        std::string Claimer;
+        if(HasParameter("claimer",Claimer) && !Claimer.empty()) {
+            if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
+                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            }
+
+            if(UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
+                if(!SDK::Sec::Subscriber::Exists(this, Claimer)) {
+                    return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+                }
+            }
+        }
+
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
-            return NotFound();
+            if(Claimer.empty())
+                return NotFound();
+
+            // try claiming this device.
         }
+
 
         auto RawObject = ParseStream();
         ProvObjects::InventoryTag   NewObject;
@@ -300,7 +319,7 @@ namespace OpenWifi{
             if(!NewSubScriber.empty()) {
                 if(NewSubScriber!=Existing.subscriber) {
                     SecurityObjects::UserInfo   U;
-                    if(SDK::GetSubscriberInfo(NewSubScriber, U)) {
+                    if(SDK::Sec::Subscriber::Get(this, NewSubScriber, U)) {
                         Existing.subscriber = NewSubScriber;
                     } else {
                         return BadRequest(RESTAPI::Errors::SubscriberMustExist);

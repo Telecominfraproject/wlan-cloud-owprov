@@ -48,7 +48,6 @@ namespace OpenWifi {
         ExistFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return ConfigurationDB_->Exists(F,V); };
         ExistFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return LocationDB_->Exists(F,V); };
         ExistFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return RolesDB_->Exists(F,V); };
-        ExistFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V) ->bool { return SecurityDBProxy()->Exists(F,V); };
         ExistFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return TagsDictionaryDB_->Exists(F,V); };
         ExistFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return TagsObjectDB_->Exists(F,V); };
         ExistFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return MapDB_->Exists(F,V); };
@@ -61,7 +60,6 @@ namespace OpenWifi {
         ExpandFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return ConfigurationDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return LocationDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return RolesDB_->GetNameAndDescription(F,V, Name, Description); };
-        ExpandFunc_[SecurityDBProxy()->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SecurityDBProxy()->Exists(F,V); };
         ExpandFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsDictionaryDB_->Exists(F,V); };
         ExpandFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsObjectDB_->Exists(F,V);; };
         ExpandFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return MapDB_->Exists(F,V);; };

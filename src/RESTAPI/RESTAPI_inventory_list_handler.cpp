@@ -82,9 +82,9 @@ namespace OpenWifi{
             return SendList(Tags, SerialOnly);
         } else if (HasParameter("subscriber",Arg) && !Arg.empty()) {
             // looking for device(s) for a specific subscriber...
-            ProvObjects::InventoryTagVec Devices;
-            StorageService()->InventoryDB().GetRecords(0,100,Devices," subscriber='" + Arg + "'");
-            return SendList(Devices,SerialOnly);
+            ProvObjects::InventoryTagVec Tags;
+            StorageService()->InventoryDB().GetRecords(0,100,Tags," subscriber='" + Arg + "'");
+            return MakeJSONObjectArray("taglist", Tags, *this);
         } else if (QB_.CountOnly) {
             auto C = StorageService()->InventoryDB().Count();
             return ReturnCountOnly(C);

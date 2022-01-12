@@ -112,11 +112,12 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_managementRole_handler.cpp src/RESTAPI/RESTAPI_managementRole_handler.h
         src/RESTAPI/RESTAPI_managementRole_list_handler.cpp src/RESTAPI/RESTAPI_managementRole_list_handler.h
         src/RESTAPI/RESTAPI_configurations_list_handler.cpp src/RESTAPI/RESTAPI_configurations_list_handler.h
+        src/sdks/SDK_gw.cpp src/sdks/SDK_gw.h
+        src/sdks/SDK_prov.cpp src/sdks/SDK_prov.h
+        src/sdks/SDK_sec.cpp src/sdks/SDK_sec.h
         src/SerialNumberCache.h src/SerialNumberCache.cpp
-        src/SecurityDBProxy.cpp src/SecurityDBProxy.h
         src/APConfig.cpp src/APConfig.h
         src/AutoDiscovery.cpp src/AutoDiscovery.h
-        src/SDK_stubs.cpp src/SDK_stubs.h
         src/ConfigSanityChecker.cpp src/ConfigSanityChecker.h
         src/TagServer.cpp src/TagServer.h
         src/RESTAPI/RESTAPI_db_helpers.h

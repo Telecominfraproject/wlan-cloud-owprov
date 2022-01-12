@@ -12,7 +12,7 @@
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
-#include "SDK_stubs.h"
+#include "sdks/SDK_gw.h"
 #include "AutoDiscovery.h"
 #include "SerialNumberCache.h"
 #include "Daemon.h"
@@ -107,8 +107,7 @@ namespace OpenWifi {
                 }
 
                 if(!FullUUID.empty()) {
-                    Poco::JSON::Object::Ptr Response;
-                    if(SDK::DeviceSetVenue(NewDevice.serialNumber,FullUUID,Response)) {
+                    if(SDK::GW::Device::SetVenue(nullptr,NewDevice.serialNumber,FullUUID)) {
                         // std::cout << "Set GW done " << SerialNumber << std::endl;
                         Logger().information(Poco::format("%s: GW set entity/venue property.", NewDevice.serialNumber));
                     } else {

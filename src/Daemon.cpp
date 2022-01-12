@@ -13,7 +13,6 @@
 
 #include "Daemon.h"
 #include "StorageService.h"
-#include "SecurityDBProxy.h"
 #include "AutoDiscovery.h"
 #include "framework/ConfigurationValidator.h"
 #include "SerialNumberCache.h"
@@ -34,7 +33,6 @@ namespace OpenWifi {
 									   OpenWifi::StorageService(),
 									   ConfigurationValidator(),
 									   SerialNumberCache(),
-									   SecurityDBProxy(),
 									   AutoDiscovery(),
 									   JobController(),
 									   WebSocketClientServer()
