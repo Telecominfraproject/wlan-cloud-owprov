@@ -6,7 +6,6 @@
 //	Arilia Wireless Inc.
 //
 
-
 #include "RESTAPI_inventory_handler.h"
 
 #include "framework/RESTAPI_protocol.h"
