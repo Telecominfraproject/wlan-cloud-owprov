@@ -154,6 +154,28 @@ namespace OpenWifi {
         return R.ReturnObject(Answer);
     }
 
+//    ReturnRecordList<decltype(StorageService()->InventoryDB()),
+//            ProvObjects::InventoryTag>("taglist",StorageService()->InventoryDB(),*this );
+
+    template <typename DB> void ReturnRecordList(const char *ArrayName,DB & DBInstance, RESTAPIHandler & R) {
+        Poco::JSON::Array   ObjArr;
+        for(const auto &i:R.SelectedRecords()) {
+            ProvObjects::InventoryTag E;
+            if(DBInstance.GetRecord("serialNumber",i,E)) {
+                Poco::JSON::Object  Obj;
+                E.to_json(Obj);
+                if(R.NeedAdditionalInfo())
+                    AddExtendedInfo(E,Obj);
+                ObjArr.add(Obj);
+            } else {
+                return R.BadRequest(RESTAPI::Errors::UnknownId + i);
+            }
+        }
+        Poco::JSON::Object  Answer;
+        Answer.set(ArrayName, ObjArr);
+        return R.ReturnObject(Answer);
+    }
+
     template <typename DB, typename Record> void ReturnRecordList(const char *ArrayName,DB & DBInstance, RESTAPIHandler & R) {
         Poco::JSON::Array   ObjArr;
         for(const auto &i:R.SelectedRecords()) {

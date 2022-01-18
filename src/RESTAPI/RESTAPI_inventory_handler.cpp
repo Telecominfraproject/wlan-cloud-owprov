@@ -216,30 +216,40 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
-    void RESTAPI_inventory_handler::DoPut() {
-        ProvObjects::InventoryTag   Existing;
+    void RESTAPI_inventory_handler::PerformClaim(const std::string &SerialNumber, const std::string &Claimer, const std::string & ClaimId) {
 
-        std::string Claimer;
-        if(HasParameter("claimer",Claimer) && !Claimer.empty()) {
-            if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
-                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-            }
+        if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+        }
 
-            if(UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
-                if(!SDK::Sec::Subscriber::Exists(this, Claimer)) {
-                    return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-                }
+        if(UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
+            if(!SDK::Sec::Subscriber::Exists(this, Claimer)) {
+                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
             }
         }
+
+        // if the device exists, check the status to see if we would follow this claim.
+
+
+    }
+
+    void RESTAPI_inventory_handler::DoPut() {
 
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-        if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
-            if(Claimer.empty())
-                return NotFound();
 
-            // try claiming this device.
+        std::string Claimer;
+        if(HasParameter("claimer",Claimer)) {
+            std::string ClaimId;
+            if(!HasParameter("claimId",ClaimId) || SerialNumber.empty() || Claimer.empty()) {
+                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+            }
+            return PerformClaim(SerialNumber, Claimer, ClaimId);
         }
 
+        ProvObjects::InventoryTag   Existing;
+        if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
+            return NotFound();
+        }
 
         auto RawObject = ParseStream();
         ProvObjects::InventoryTag   NewObject;

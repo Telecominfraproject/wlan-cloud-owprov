@@ -31,6 +31,7 @@ namespace OpenWifi {
         void DoPost() final;
         void DoPut() final;
         void DoDelete() final;
+        void PerformClaim(const std::string &SerialNumber, const std::string & Claimer , const std::string & ClaimId);
         InventoryDB     &DB_;
     };
 }

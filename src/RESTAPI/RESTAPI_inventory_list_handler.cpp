@@ -50,8 +50,7 @@ namespace OpenWifi{
         }
 
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->InventoryDB()),
-            ProvObjects::InventoryTag>("taglist",StorageService()->InventoryDB(),*this );
+            return ReturnRecordList<decltype(StorageService()->InventoryDB())>("taglist",StorageService()->InventoryDB(),*this );
         } else if(HasParameter("entity",UUID)) {
             if(QB_.CountOnly) {
                 auto C = StorageService()->InventoryDB().Count( StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID));
