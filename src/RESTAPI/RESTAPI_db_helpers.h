@@ -157,11 +157,15 @@ namespace OpenWifi {
 //    ReturnRecordList<decltype(StorageService()->InventoryDB()),
 //            ProvObjects::InventoryTag>("taglist",StorageService()->InventoryDB(),*this );
 
+    inline static bool is_uuid(const std::string &u) {
+        return u.find('-') != std::string::npos;
+    }
+
     template <typename DB> void ReturnRecordList(const char *ArrayName,DB & DBInstance, RESTAPIHandler & R) {
         Poco::JSON::Array   ObjArr;
         for(const auto &i:R.SelectedRecords()) {
             ProvObjects::InventoryTag E;
-            if(DBInstance.GetRecord("serialNumber",i,E)) {
+            if(DBInstance.GetRecord(is_uuid(i) ? "id" : "serialNumber",i,E)) {
                 Poco::JSON::Object  Obj;
                 E.to_json(Obj);
                 if(R.NeedAdditionalInfo())
