@@ -83,7 +83,14 @@ namespace OpenWifi{
             // looking for device(s) for a specific subscriber...
             ProvObjects::InventoryTagVec Tags;
             StorageService()->InventoryDB().GetRecords(0,100,Tags," subscriber='" + Arg + "'");
-            return MakeJSONObjectArray("taglist", Tags, *this);
+            if(SerialOnly) {
+                std::vector<std::string>    DeviceList;
+                for(const auto &i:Tags)
+                    DeviceList.push_back(i.serialNumber);
+                return ReturnObject("serialNumbers",DeviceList);
+            } else {
+                return MakeJSONObjectArray("taglist", Tags, *this);
+            }
         } else if (QB_.CountOnly) {
             auto C = StorageService()->InventoryDB().Count();
             return ReturnCountOnly(C);
