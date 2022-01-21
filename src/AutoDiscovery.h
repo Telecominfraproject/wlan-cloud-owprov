@@ -8,7 +8,7 @@
 #include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi {
-    class AutoDiscovery : public SubSystemServer, Poco::Runnable {
+    class AutoDiscovery : public SubSystemServer {
     public:
 
         static auto instance() {
@@ -18,13 +18,19 @@ namespace OpenWifi {
 
         int Start() override;
         void Stop() override;
-        void run() override;
         void ConnectionReceived( const std::string & Key, const std::string & Message);
 
+        struct DiscoveryMessage {
+            std::string     Key;
+            std::string     Payload;
+        };
+
+        void onConnection(bool& b);
+
     private:
-        Poco::Thread                Worker_;
-        std::atomic_bool            Running_ = false;
-        int                         ConnectionWatcherId_=0;
+        int                                     ConnectionWatcherId_=0;
+        std::unique_ptr<FIFO<DiscoveryMessage>>	Messages_=std::make_unique<FIFO<DiscoveryMessage>>(100);
+
         Types::StringPairQueue      NewConnections_;
 
         AutoDiscovery() noexcept:
