@@ -5,9 +5,7 @@
 #include "AutoDiscovery.h"
 #include "framework/uCentral_Protocol.h"
 #include "framework/KafkaTopics.h"
-#include "storage/storage_inventory.h"
 #include "StorageService.h"
-#include "framework/MicroService.h"
 
 namespace OpenWifi {
 

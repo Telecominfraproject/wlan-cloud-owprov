@@ -84,10 +84,9 @@ namespace OpenWifi{
             ProvObjects::InventoryTagVec Tags;
             StorageService()->InventoryDB().GetRecords(0,100,Tags," subscriber='" + Arg + "'");
             if(SerialOnly) {
-                std::vector<std::string>    DeviceList;
-                for(const auto &i:Tags)
-                    DeviceList.push_back(i.serialNumber);
-                return ReturnObject("serialNumbers",DeviceList);
+                std::vector<std::string>    SerialNumbers;
+                std::transform(cbegin(Tags), cend(Tags), std::back_inserter(SerialNumbers), [](const auto &T) { return T.serialNumber; });
+                return ReturnObject("serialNumbers",SerialNumbers);
             } else {
                 return MakeJSONObjectArray("taglist", Tags, *this);
             }

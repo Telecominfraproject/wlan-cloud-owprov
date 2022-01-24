@@ -17,17 +17,22 @@ namespace OpenWifi {
 
     class MyParallelSocketReactor {
     public:
-        MyParallelSocketReactor() {
+        explicit MyParallelSocketReactor(unsigned NumReactors=8) :
+            NumReactors_(NumReactors)
+        {
+            Reactors_ = new Poco::Net::SocketReactor[NumReactors_];
             for(int i=0;i<NumReactors_;i++) {
-                Threads_[i].start(Reactors_[i]);
+                ReactorPool_.start(Reactors_[i]);
             }
         }
 
         ~MyParallelSocketReactor() {
             for(int i=0;i<NumReactors_;i++) {
                 Reactors_[i].stop();
-                Threads_[i].join();
             }
+            ReactorPool_.stopAll();
+            ReactorPool_.joinAll();
+            delete [] Reactors_;
         }
 
         Poco::Net::SocketReactor & Reactor() {
@@ -35,9 +40,9 @@ namespace OpenWifi {
         }
 
     private:
-        unsigned    NumReactors_=8;
-        std::array<Poco::Net::SocketReactor,8> Reactors_;
-        std::array<Poco::Thread,8>             Threads_;
+        unsigned                   NumReactors_;
+        Poco::Net::SocketReactor   * Reactors_;
+        Poco::ThreadPool           ReactorPool_;
     };
 
     class WebSocketClient;
@@ -87,9 +92,9 @@ namespace OpenWifi {
 
     class WebSocketClient {
     public:
-        explicit WebSocketClient( Poco::Net::WebSocket & WS , const std::string Id, Poco::Logger & L) :
+        explicit WebSocketClient( Poco::Net::WebSocket & WS , const std::string &Id, Poco::Logger & L) :
             Reactor_(WebSocketClientServer()->ReactorPool().Reactor()),
-            Id_(std::move(Id)),
+            Id_(Id),
             Logger_(L) {
             try {
                 WS_ = std::make_unique<Poco::Net::WebSocket>(WS);
