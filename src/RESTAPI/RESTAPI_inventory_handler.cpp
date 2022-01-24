@@ -216,7 +216,7 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
-    void RESTAPI_inventory_handler::PerformClaim(const std::string &SerialNumber, const std::string &Claimer, const std::string & ClaimId) {
+    void RESTAPI_inventory_handler::PerformClaim(const std::string &SerialNumber, const std::string &Claimer, std::string & ClaimId, uint64_t &ErrorCode, Poco::JSON::Object &Answer ) {
 
         if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
@@ -228,8 +228,49 @@ namespace OpenWifi{
             }
         }
 
-        // if the device exists, check the status to see if we would follow this claim.
+        uint64_t Now = std::time(nullptr);
 
+        // if the device exists, check the status to see if we would follow this claim.
+        ProvObjects::InventoryTag   ExistingDevice;
+        if(DB_.GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
+            // Device is already in there... so we could have claimed that device before, or someone else uses it
+            // or it is free and clear: it connected but nobody has ever used it...
+            if(!ExistingDevice.state.empty()) {
+
+            } else {
+
+            }
+        } else {
+            //  Device does not exist, so claim it for now.
+            ProvObjects::InventoryTag   NewDevice;
+            NewDevice.info.created = NewDevice.info.modified = Now;
+            NewDevice.info.id = MicroService::instance().CreateUUID();
+            NewDevice.info.name = SerialNumber;
+            NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{ .created=Now,
+                                                                      .createdBy=UserInfo_.userinfo.email,
+                                                                      .note="Claim started for device"});
+            NewDevice.info.description = "Subscriber device";
+            NewDevice.subscriber = UserInfo_.userinfo.id;
+            NewDevice.deviceType = "unknown";
+            nlohmann::json StateDoc;
+
+            ClaimId = MicroService::instance().CreateUUID();
+
+            StateDoc["method"] = "claiming";
+            StateDoc["date"] = Now;
+            StateDoc["claimer"] = Claimer;
+            StateDoc["claimId"] = ClaimId;
+            NewDevice.state = StateDoc;
+            ErrorCode = 0 ;
+            DB_.CreateRecord(NewDevice);
+
+            Answer.set("claimer", Claimer);
+            Answer.set("claimId", ClaimId);
+            Answer.set("errorCode",0);
+            Answer.set("date", Now);
+            Answer.set("reason", "Success");
+            return;
+        }
 
     }
 
@@ -243,7 +284,10 @@ namespace OpenWifi{
             if(!HasParameter("claimId",ClaimId) || SerialNumber.empty() || Claimer.empty()) {
                 return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
             }
-            return PerformClaim(SerialNumber, Claimer, ClaimId);
+            uint64_t ErrorCode;
+            Poco::JSON::Object  Answer;
+            PerformClaim(SerialNumber, Claimer, ClaimId, ErrorCode, Answer);
+            return ReturnObject(Answer);
         }
 
         ProvObjects::InventoryTag   Existing;

@@ -31,7 +31,8 @@ namespace OpenWifi {
         void DoPost() final;
         void DoPut() final;
         void DoDelete() final;
-        void PerformClaim(const std::string &SerialNumber, const std::string & Claimer , const std::string & ClaimId);
+        void PerformClaim(const std::string &SerialNumber, const std::string & Claimer ,
+                          std::string & ClaimId, uint64_t &ErrorCode, Poco::JSON::Object &Answer);
         InventoryDB     &DB_;
     };
 }

@@ -68,10 +68,13 @@ namespace OpenWifi {
     InventoryDB::InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
 
-        bool InventoryDB::CreateFromConnection(const std::string &SerialNumber, const std::string &ConnectionInfo,
-                                          const std::string &DeviceType) {
+    bool InventoryDB::CreateFromConnection( const std::string &SerialNumber,
+                                            const std::string &ConnectionInfo,
+                                            const std::string &DeviceType) {
         std::string SNum{SerialNumber};
-        if(!Exists("serialNumber",SNum)) {
+        ProvObjects::InventoryTag   ExistingDevice;
+
+        if(!GetRecord("serialNumber",SNum,ExistingDevice)) {
             ProvObjects::InventoryTag   NewDevice;
             uint64_t Now = std::time(nullptr);
 
@@ -87,6 +90,10 @@ namespace OpenWifi {
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
             NewDevice.serialNumber = SerialNumber;
             NewDevice.deviceType = DeviceType;
+            nlohmann::json StateDoc;
+            StateDoc["method"] = "auto-discovery";
+            StateDoc["date"] = std::time(nullptr);
+            NewDevice.state = StateDoc;
             if(!IP.empty()) {
                 StorageService()->VenueDB().GetByIP(IP,NewDevice.venue);
                 if(NewDevice.venue.empty()) {
@@ -119,6 +126,36 @@ namespace OpenWifi {
                 return true;
             } else {
                 Logger().information(Poco::format("Could not add %s to inventory.",SerialNumber));
+            }
+        } else {
+            //  Device already exists, do we need to modify anything?
+            bool modified=false;
+            if(ExistingDevice.deviceType.empty() || ExistingDevice.state=="unknown") {
+                ExistingDevice.deviceType = DeviceType;
+                modified = true;
+            }
+
+            //  if this device is being claimed, not it is claimed.
+            if(!ExistingDevice.state.empty()) {
+                auto State = nlohmann::json::parse(ExistingDevice.state);
+                if(State["method"] == "claiming") {
+                    uint64_t Date = State["date"];
+                    uint64_t Now = std::time(nullptr);
+
+                    if((Now - Date)<(24*60*60)) {
+                        State["method"] = "claimed";
+                        State["date"] = std::time(nullptr);
+                        ExistingDevice.state = State;
+                        modified = true;
+                    } else {
+                        ExistingDevice.state = "";
+                        modified = true;
+                    }
+                }
+            }
+            if(modified) {
+                ExistingDevice.info.modified = std::time(nullptr);
+                StorageService()->InventoryDB().UpdateRecord("serialNumber", SNum, ExistingDevice);
             }
         }
         return false;

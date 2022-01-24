@@ -696,6 +696,24 @@ components:
           items:
             $ref: '#/components/schemas/Map'
 
+    ClaimResult:
+      type: object
+      properties:
+        claimer:
+          type: string
+          format: uuid
+        claimId:
+          type: string
+          format: uuid
+        date:
+          type: integer
+          format: int64
+        errorCode:
+          type: integer
+          format: int64
+        reason:
+          type: string
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -1609,7 +1627,12 @@ paths:
 
       responses:
         200:
-          $ref: '#/components/schemas/InventoryTag'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ClaimResult'
+                  - $ref: '#/components/schemas/InventoryTag'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
