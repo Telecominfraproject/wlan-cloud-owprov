@@ -12,26 +12,28 @@
 namespace OpenWifi {
 
     int AutoDiscovery::Start() {
-        Messages_->Readable_ += Poco::delegate(this,&AutoDiscovery::onConnection);
-        Types::TopicNotifyFunction F = [this](std::string s1,std::string s2) { this->ConnectionReceived(s1,s2); };
+        Running_ = true;
+        Types::TopicNotifyFunction F = [this](const std::string &Key, const std::string &Payload) { this->ConnectionReceived(Key,Payload); };
         ConnectionWatcherId_ = KafkaManager()->RegisterTopicWatcher(KafkaTopics::CONNECTION, F);
+        Worker_.start(*this);
         return 0;
     };
 
     void AutoDiscovery::Stop() {
-        Messages_->Readable_ -= Poco::delegate( this, &AutoDiscovery::onConnection);
+        Running_ = false;
         KafkaManager()->UnregisterTopicWatcher(KafkaTopics::CONNECTION, ConnectionWatcherId_);
+        Queue_.wakeUpAll();
+        Worker_.join();
     };
 
-    void AutoDiscovery::onConnection(bool &b) {
-        if (b) {
-            DiscoveryMessage    Msg;
-
-            auto ValidMessage = Messages_->Read(Msg);
-            if(ValidMessage) {
+    void AutoDiscovery::run() {
+        Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
+        while(Note && Running_) {
+            auto Msg = dynamic_cast<DiscoveryMessage*>(Note.get());
+            if(Msg!= nullptr) {
                 try {
                     Poco::JSON::Parser Parser;
-                    auto Object = Parser.parse(Msg.Payload).extract<Poco::JSON::Object::Ptr>();
+                    auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
 
                     if (Object->has(uCentralProtocol::PAYLOAD)) {
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
@@ -56,7 +58,6 @@ namespace OpenWifi {
                             }
                         }
                         if (!SerialNumber.empty()) {
-                            // std::cout << "SerialNUmber: " << SerialNumber << "  CID: " << ConnectedIP << " DeviceType: " << DeviceType << std::endl;
                             StorageService()->InventoryDB().CreateFromConnection(SerialNumber, ConnectedIP, DeviceType);
                         }
                     }
@@ -64,12 +65,8 @@ namespace OpenWifi {
                     Logger().log(E);
                 }
             }
+            Note = Queue_.waitDequeueNotification();
         }
     }
 
-    void AutoDiscovery::ConnectionReceived( const std::string & Key, const std::string & Message) {
-        std::lock_guard G(Mutex_);
-        Logger().information(Poco::format("Connection(%s): New connection notification.", Key));
-        Messages_->Write(DiscoveryMessage{Key,Message});
-    }
 }
