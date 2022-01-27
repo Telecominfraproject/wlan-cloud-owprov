@@ -1613,11 +1613,6 @@ paths:
             type: string
             format: uuid
           required: false
-        - in: query
-          name: claimId
-          schema:
-            type: string
-          required: false
       requestBody:
         description: Information used to modify the new entity
         content:

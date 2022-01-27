@@ -220,12 +220,10 @@ namespace OpenWifi{
 
         if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-        }
-
-        if(UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
-            if(!SDK::Sec::Subscriber::Exists(this, Claimer)) {
-                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-            }
+        } else if(UserInfo_.userinfo.userRole==SecurityObjects::ROOT && !SDK::Sec::Subscriber::Exists(this, Claimer)) {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+        } else if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights,ACCESS_DENIED);
         }
 
         uint64_t Now = std::time(nullptr);
@@ -234,9 +232,76 @@ namespace OpenWifi{
         ProvObjects::InventoryTag   ExistingDevice;
         if(DB_.GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
             // Device is already in there... so we could have claimed that device before, or someone else uses it
-            // or it is free and clear: it connected but nobody has ever used it...
+            // or, it is free and clear: it connected but nobody has ever used it...
             if(!ExistingDevice.state.empty()) {
+                try {
+                    Poco::JSON::Parser P;
+                    auto StateDoc = P.parse(ExistingDevice.state).extract<Poco::JSON::Object::Ptr>();
+                    if (StateDoc->has("method")) {
+                        auto Method = StateDoc->get("method").toString();
+                        if(Method=="claiming") {
+                            auto RecordedClaimer = StateDoc->get("claimer").toString();
+                            auto RecordedClaimId = StateDoc->get("claimId").toString();
+                            if(Claimer==RecordedClaimer) {
+                                ErrorCode = 3;
+                                ClaimId = RecordedClaimId;
+                                Answer.set("claimer", Claimer);
+                                Answer.set("claimId", RecordedClaimId);
+                                Answer.set("errorCode",ErrorCode);
+                                Answer.set("date", Now);
+                                Answer.set("reason", "Claim already in progress");
+                                return;
+                            }
+                            ErrorCode = 1;
+                            ClaimId = RecordedClaimId;
+                            Answer.set("claimer", Claimer);
+                            Answer.set("claimId", RecordedClaimId);
+                            Answer.set("errorCode",ErrorCode);
+                            Answer.set("date", Now);
+                            Answer.set("reason", "Claimed by another user: "+ RecordedClaimer);
+                            return;
+                        } else if(Method=="claimed") {
+                            //  We already own this one...
+                            if(Claimer==ExistingDevice.subscriber) {
+                                auto RecordedClaimer = StateDoc->get("claimer").toString();
+                                auto RecordedClaimId = StateDoc->get("claimId").toString();
+                                ErrorCode = 0;
+                                ClaimId = RecordedClaimId;
+                                Answer.set("claimer", Claimer);
+                                Answer.set("claimId", RecordedClaimId);
+                                Answer.set("errorCode",ErrorCode);
+                                Answer.set("date", Now);
+                                Answer.set("reason", "Success");
+                                return;
+                            } else {
+                            //  Someone else has claimed this device.
+                                ErrorCode = 1;
+                                ClaimId = "";
+                                Answer.set("claimer", Claimer);
+                                Answer.set("claimId", "");
+                                Answer.set("errorCode",ErrorCode);
+                                Answer.set("date", Now);
+                                Answer.set("reason", "Claimed by another user: "+ ExistingDevice.subscriber);
+                                return;
+                            }
+                       } else if(Method=="auto-discovery") {
+                            if(StateDoc->has("assignedTo")) {
+                                auto AssignedTo = StateDoc->get("assignedTo").toString();
+                                ErrorCode = 1;
+                                ClaimId = "";
+                                Answer.set("claimer", Claimer);
+                                Answer.set("claimId", "");
+                                Answer.set("errorCode",ErrorCode);
+                                Answer.set("date", Now);
+                                Answer.set("reason", "Claimed by venue: '" + ExistingDevice.venue + "' or entity: '" + ExistingDevice.entity + "'");
+                                return;
+                            }
 
+                        }
+                    }
+                } catch (...) {
+
+                }
             } else {
 
             }
@@ -278,14 +343,15 @@ namespace OpenWifi{
 
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
 
+        if(SerialNumber.empty() || !Utils::ValidSerialNumber(SerialNumber)) {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+        }
+
         std::string Claimer;
-        if(HasParameter("claimer",Claimer)) {
-            std::string ClaimId;
-            if(!HasParameter("claimId",ClaimId) || SerialNumber.empty() || Claimer.empty()) {
-                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-            }
+        if(HasParameter("claimer",Claimer) && !Claimer.empty()) {
             uint64_t ErrorCode;
             Poco::JSON::Object  Answer;
+            std::string ClaimId;
             PerformClaim(SerialNumber, Claimer, ClaimId, ErrorCode, Answer);
             return ReturnObject(Answer);
         }
