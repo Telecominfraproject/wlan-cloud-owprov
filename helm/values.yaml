@@ -22,7 +22,7 @@ images:
 
 services:
   owprov:
-    type: LoadBalancer
+    type: ClusterIP
     ports:
       restapi:
         servicePort: 16005
