@@ -46,39 +46,24 @@ You may modify the following fields in the POST
 - You may include an array of devices UUIDs
 - Topology and design cannot be set
 
-### Modification rules
-
-
-
-## Management policy
-
-```json
-{
-    "default" : [],
-    "acls" : [
-        {
-            "roles" : [ uuid1, uuid2, uuid3 ],
-            "access" : [ READ, WRITE, ... ]
-        } ,
-        {
-            "roles" : [ ... ],
-            "access" : [ ... ]
-        }
-  ]
-}
+## Geocoding
+To support geocoding help, you need to configuration the following in the configuration file. Geocoding is used
+when creating location and when reporting analytics.
+``` 
+geocodeapi = google
+google.apikey = **********************************
 ```
+Currently, only google Geocoding is supported. Additional methods may be added in the future.
 
-## Management roles
-Management roles can be created using UUIDs from the SEC service. SEC service may ask prov if deleting a user 
-is OK. PROV should answer with username in use or something like this. 
+## Default firmware management rules
+FMS is already integrated with OpenWifi. In order to allow it to upgrade devices automatically, you should 
+set the following values.
+``` 
+firmware.updater.upgrade = <true/false>
+firmware.updater.releaseonly = <true/false>
+```
+### firmware.updater.upgrade
+Should FMS attempt to upgrade devices by default.
 
-Management roles are created by adding UUIDs into a group. Then that UUID may be used in any management 
-policy.
-
-Management roles must have a quick way to evaluate all the roles a user has. This is important for 
-speed. Roles ddo not use subscribers.
-
-So read all the roles, cross ref all the users sp you can apply access rules against a resource very quickly.
-
-If a user is part of 2 roles, then the access will be agregate. if NONE is found, then NONE wins.
-
+### firmware.updater.releaseonly
+Should only RC software be used during upgrades.
