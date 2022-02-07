@@ -16,9 +16,9 @@ namespace OpenWifi {
 	        int             DeviceType;
 	    };
 
-	    typedef std::vector<DeviceTypeCacheEntry>   SerialCacheContent;
+        typedef std::vector<DeviceTypeCacheEntry>   SerialCacheContent;
 
-		static auto instance() {
+        static auto instance() {
 		    static auto instance_ = new SerialNumberCache;
 		    return instance_;
 		}
