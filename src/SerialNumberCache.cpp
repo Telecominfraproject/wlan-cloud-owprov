@@ -29,10 +29,13 @@ namespace OpenWifi {
 		    Index = Hint->second;
 		}
 
-		uint64_t SN = std::stoull(S, nullptr, 16);
-		if(std::find_if(SNs_.begin(),SNs_.end(),[SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; }) == SNs_.end()) {
+        uint64_t SN = std::stoull(S, nullptr, 16);
+        auto match_fun = [=](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; };
+        auto lower_fun = [=](const DeviceTypeCacheEntry &E1, const DeviceTypeCacheEntry &E2) { return E1.SerialNumber < E2.SerialNumber; };
+
+		if(std::find_if(SNs_.begin(),SNs_.end(),match_fun ) == SNs_.end()) {
             auto NewEntry = DeviceTypeCacheEntry{ .SerialNumber = SN, .DeviceType = Index };
-            auto insertion_point = std::lower_bound(begin(SNs_), end(SNs_), NewEntry, [=](const DeviceTypeCacheEntry &E1, const DeviceTypeCacheEntry &E2) { return E1.SerialNumber < E2.SerialNumber; });
+            auto insertion_point = std::lower_bound(begin(SNs_), end(SNs_), NewEntry, lower_fun);
             SNs_.insert( insertion_point, NewEntry );
 		}
 	}
