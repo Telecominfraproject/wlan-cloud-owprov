@@ -6,7 +6,6 @@
 //	Arilia Wireless Inc.
 //
 
-#include <boost/algorithm/string.hpp>
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Environment.h"
@@ -18,6 +17,7 @@
 #include "SerialNumberCache.h"
 #include "JobController.h"
 #include "WebSocketClientServer.h"
+#include "FindCountry.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -35,7 +35,8 @@ namespace OpenWifi {
 									   SerialNumberCache(),
 									   AutoDiscovery(),
 									   JobController(),
-									   WebSocketClientServer()
+									   WebSocketClientServer(),
+                                       FindCountryFromIP()
 								   });
 		}
 		return instance_;
