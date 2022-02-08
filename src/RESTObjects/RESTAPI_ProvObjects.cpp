@@ -297,19 +297,20 @@ namespace OpenWifi::ProvObjects {
 
     void InventoryTag::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        field_to_json(Obj, "serialNumber", serialNumber);
-        field_to_json(Obj, "venue", venue);
-        field_to_json(Obj, "entity", entity);
-        field_to_json(Obj, "subscriber", subscriber);
-        field_to_json(Obj, "deviceType", deviceType);
-        field_to_json(Obj, "qrCode", qrCode);
-        field_to_json(Obj, "geoCode", geoCode);
-        field_to_json(Obj, "location", location);
-        field_to_json(Obj, "contact", contact);
+        field_to_json( Obj, "serialNumber", serialNumber);
+        field_to_json( Obj, "venue", venue);
+        field_to_json( Obj, "entity", entity);
+        field_to_json( Obj, "subscriber", subscriber);
+        field_to_json( Obj, "deviceType", deviceType);
+        field_to_json( Obj, "qrCode", qrCode);
+        field_to_json( Obj, "geoCode", geoCode);
+        field_to_json( Obj, "location", location);
+        field_to_json( Obj, "contact", contact);
         field_to_json( Obj,"deviceConfiguration",deviceConfiguration);
         field_to_json( Obj,"rrm",rrm);
         field_to_json( Obj,"managementPolicy",managementPolicy);
         field_to_json( Obj,"state",state);
+        field_to_json( Obj,"devClass",devClass);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -320,7 +321,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"entity",entity);
             field_from_json( Obj,"subscriber",subscriber);
             field_from_json( Obj,"deviceType",deviceType);
-            field_from_json(Obj, "qrCode", qrCode);
+            field_from_json( Obj, "qrCode", qrCode);
             field_from_json( Obj,"geoCode",geoCode);
             field_from_json( Obj,"location",location);
             field_from_json( Obj,"contact",contact);
@@ -328,6 +329,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"rrm",rrm);
             field_from_json( Obj,"managementPolicy",managementPolicy);
             field_from_json( Obj,"state",state);
+            field_from_json( Obj,"devClass",devClass);
             return true;
         } catch(...) {
 

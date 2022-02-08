@@ -285,6 +285,7 @@ namespace OpenWifi::ProvObjects {
         std::string     rrm;
         Types::UUID_t   managementPolicy;
         std::string     state;
+        std::string     devClass;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

@@ -26,8 +26,9 @@ namespace OpenWifi{
                 auto Results = Response->get("results").extract<Poco::JSON::Object::Ptr>();
                 auto Status = Results->get("status").extract<Poco::JSON::Object::Ptr>();
                 auto Rejected = Status->getArray("rejected");
-                for(const auto &i:*Rejected)
-                    Warnings.push_back(i.toString());
+                std::transform(Rejected->begin(),Rejected->end(),std::back_inserter(Warnings), [](auto i) -> auto { return i.toString(); });
+//                for(const auto &i:*Rejected)
+  //                  Warnings.push_back(i.toString());
             }
         } catch (...) {
         }
@@ -136,6 +137,11 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
+    static bool ValidDevClass(const std::string &D) {
+        const static std::vector<std::string> Classes{ "any", "entity", "subscriber" , "venue" };
+        return std::find(cbegin(Classes), cend(Classes), D)!=cend(Classes);
+    }
+
     void RESTAPI_inventory_handler::DoPost() {
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty()) {
@@ -154,6 +160,10 @@ namespace OpenWifi{
         ProvObjects::InventoryTag NewObject;
         if (!NewObject.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if(!ValidDevClass(NewObject.devClass)) {
+            return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
         if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
@@ -190,6 +200,25 @@ namespace OpenWifi{
 
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+        }
+
+        if(!NewObject.venue.empty()) {
+            nlohmann::json state;
+            state["method"] = "assignedTo";
+            state["venue"] = NewObject.venue;
+            state["date"] = std::time(nullptr);
+            NewObject.state = to_string(state);
+        } else if (!NewObject.entity.empty()) {
+            nlohmann::json state;
+            state["method"] = "assignedTo";
+            state["entity"] = NewObject.entity;
+            state["date"] = std::time(nullptr);
+            NewObject.state = to_string(state);
+        } else {
+            nlohmann::json state;
+            state["method"] = "created";
+            state["date"] = std::time(nullptr);
+            NewObject.state = to_string(state);
         }
 
         if(DB_.CreateRecord(NewObject)) {

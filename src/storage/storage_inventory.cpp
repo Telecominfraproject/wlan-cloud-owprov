@@ -40,7 +40,8 @@ namespace OpenWifi {
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
-        ORM::Field{"state",ORM::FieldType::FT_TEXT}
+        ORM::Field{"state",ORM::FieldType::FT_TEXT},
+        ORM::Field{"devClass",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -59,6 +60,7 @@ namespace OpenWifi {
         try {
             auto Session = Pool_.get();
             Session << "alter table " + TableName_ + " add column state text" , Poco::Data::Keywords::now;
+            Session << "alter table " + TableName_ + " add column devClass text" , Poco::Data::Keywords::now;
         } catch (...) {
 
         }
@@ -71,10 +73,10 @@ namespace OpenWifi {
     bool InventoryDB::CreateFromConnection( const std::string &SerialNumber,
                                             const std::string &ConnectionInfo,
                                             const std::string &DeviceType) {
-        std::string SNum{SerialNumber};
+
         ProvObjects::InventoryTag   ExistingDevice;
 
-        if(!GetRecord("serialNumber",SNum,ExistingDevice)) {
+        if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
             ProvObjects::InventoryTag   NewDevice;
             uint64_t Now = std::time(nullptr);
 
@@ -130,7 +132,7 @@ namespace OpenWifi {
         } else {
             //  Device already exists, do we need to modify anything?
             bool modified=false;
-            if(ExistingDevice.deviceType.empty() || ExistingDevice.state=="unknown") {
+            if(ExistingDevice.deviceType != DeviceType) {
                 ExistingDevice.deviceType = DeviceType;
                 modified = true;
             }
@@ -155,7 +157,7 @@ namespace OpenWifi {
             }
             if(modified) {
                 ExistingDevice.info.modified = std::time(nullptr);
-                StorageService()->InventoryDB().UpdateRecord("serialNumber", SNum, ExistingDevice);
+                StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber, ExistingDevice);
             }
         }
         return false;
@@ -364,6 +366,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<17>());
     Out.managementPolicy = In.get<18>();
     Out.state = In.get<19>();
+    Out.devClass = In.get<20>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -387,4 +390,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<18>(In.managementPolicy);
     Out.set<19>(In.state);
+    Out.set<20>(In.devClass);
 }

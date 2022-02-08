@@ -553,6 +553,13 @@ components:
           format: uuid
         state:
           type: string
+        devClass:
+          type: string
+          enum:4
+            - any
+            - venue
+            - entity
+            - subscriber
 
     InventoryTagList:
       type: object
@@ -1622,6 +1629,7 @@ paths:
 
       responses:
         200:
+          description: success
           content:
             application/json:
               schema:
@@ -1867,7 +1875,7 @@ paths:
         - in: query
           description: Return only maps shared with Me
           name: sharedWithMe
-          scmema:
+          schema:
             type: boolean
           required: false
 

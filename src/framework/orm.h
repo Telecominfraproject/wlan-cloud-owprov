@@ -430,7 +430,6 @@ namespace ORM {
                         Cache_->UpdateCache(R);
                     return true;
                 }
-                return false;
             } catch (const Poco::Exception &E) {
                 Logger_.log(E);
             }
