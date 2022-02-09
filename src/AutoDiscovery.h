@@ -33,7 +33,7 @@ namespace OpenWifi {
             void Stop() override;
             void ConnectionReceived( const std::string & Key, const std::string & Payload) {
                 std::lock_guard G(Mutex_);
-                Logger().information(Poco::format("Connection(%s): New connection notification.", Key));
+                Logger().information(Poco::format("Device(%s): Connection/Ping message.", Key));
                 Queue_.enqueueNotification( new DiscoveryMessage(Key,Payload));
             }
             void run() override;

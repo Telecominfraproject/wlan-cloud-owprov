@@ -27,8 +27,10 @@ namespace OpenWifi {
     void AutoDiscovery::run() {
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
         while(Note && Running_) {
-            auto Msg = dynamic_cast<DiscoveryMessage*>(Note.get());
+            Logger().information("Waiting for device message...");
+            auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
             if(Msg!= nullptr) {
+                Logger().information("Message received...");
                 try {
                     Poco::JSON::Parser Parser;
                     auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
@@ -62,6 +64,8 @@ namespace OpenWifi {
                 } catch (const Poco::Exception &E) {
                     Logger().log(E);
                 }
+            } else {
+                Logger().information("No Message received...");
             }
             Note = Queue_.waitDequeueNotification();
         }
