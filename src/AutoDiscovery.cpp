@@ -25,7 +25,9 @@ namespace OpenWifi {
     };
 
     void AutoDiscovery::run() {
+        Logger().information("Starting...");
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
+        Logger().information("Entering loop...");
         while(Note && Running_) {
             Logger().information("Waiting for device message...");
             auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
@@ -69,6 +71,7 @@ namespace OpenWifi {
             }
             Note = Queue_.waitDequeueNotification();
         }
+        Logger().information("Exiting...");
     }
 
 }
