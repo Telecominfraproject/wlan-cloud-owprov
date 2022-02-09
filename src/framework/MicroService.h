@@ -3244,9 +3244,10 @@ namespace OpenWifi {
                         new Poco::FormattingChannel(Formatter, Console));
                 Poco::Logger::root().setChannel(FormattingChannel);
             } else if (LoggingDestination == "sql") {
+                //"CREATE TABLE T_POCO_LOG (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR, ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"
 
             } else if (LoggingDestination == "syslog") {
-                //"CREATE TABLE T_POCO_LOG (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR, ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"
+
             } else {
                 auto LoggingLocation =
                         MicroService::instance().ConfigPath("logging.path", "$OWCERT_ROOT/logs") + "/log";
@@ -3255,10 +3256,11 @@ namespace OpenWifi {
                 FileChannel->setProperty("rotation", "10 M");
                 FileChannel->setProperty("archive", "timestamp");
                 FileChannel->setProperty("path", LoggingLocation);
+                Poco::AutoPtr<Poco::AsyncChannel> Async(new Poco::AsyncChannel(FileChannel));
                 Poco::AutoPtr<Poco::PatternFormatter> Formatter(new Poco::PatternFormatter);
                 Formatter->setProperty("pattern", LoggingFormat);
                 Poco::AutoPtr<Poco::FormattingChannel> FormattingChannel(
-                        new Poco::FormattingChannel(Formatter, FileChannel));
+                        new Poco::FormattingChannel(Formatter, Async));
                 Poco::Logger::root().setChannel(FormattingChannel);
             }
             auto Level = Poco::Logger::parseLevel(MicroService::instance().ConfigGetString("logging.level", "debug"));
@@ -3294,8 +3296,6 @@ namespace OpenWifi {
 	    WWWAssetsDir_ = ConfigPath("openwifi.restapi.wwwassets","");
 	    if(WWWAssetsDir_.empty())
 	        WWWAssetsDir_ = DataDir_;
-
-
 
 	    LoadMyConfig();
 
