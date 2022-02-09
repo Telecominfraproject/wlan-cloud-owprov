@@ -103,7 +103,7 @@ namespace OpenWifi {
             nlohmann::json StateDoc;
             StateDoc["method"] = "auto-discovery";
             StateDoc["date"] = std::time(nullptr);
-            NewDevice.state = StateDoc;
+            NewDevice.state = to_string(StateDoc);
             __DBG__
             if(!IP.empty()) {
                 StorageService()->VenueDB().GetByIP(IP,NewDevice.venue);
