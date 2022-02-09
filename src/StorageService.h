@@ -24,7 +24,7 @@
 
 namespace OpenWifi {
 
-    class Storage : public StorageClass, Poco::Runnable {
+    class Storage : public StorageClass {
         public:
             static auto instance() {
                 static auto instance_ = new Storage;
@@ -67,9 +67,7 @@ namespace OpenWifi {
                 return true;
             }
 
-            bool DeleteContact(const std::string &P, const std::string &Prefix, const std::string &Id);
-
-            void run() final;
+            void onTimer(Poco::Timer & timer);
 
           private:
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
@@ -89,10 +87,9 @@ namespace OpenWifi {
             typedef std::function<bool(const char *FieldName, std::string &Value, std::string &Name, std::string &Description)>   expand_func;
             std::map<std::string, exist_func>                   ExistFunc_;
             std::map<std::string, expand_func>                  ExpandFunc_;
-
-            Poco::Thread                                        Updater_;
+            Poco::Timer                                         Timer_;
             std::set<std::string>                               DeviceTypes_;
-            std::atomic_bool                                    Running_=false;
+            std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
 
             bool UpdateDeviceTypes();
 

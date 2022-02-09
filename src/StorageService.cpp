@@ -67,29 +67,16 @@ namespace OpenWifi {
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
 
-        Updater_.start(*this);
-
+        TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
+        Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
+        Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
+        Timer_.start(*TimerCallback_);
         return 0;
     }
 
-    void Storage::run() {
-	    Running_ = true ;
-	    bool FirstRun=true;
-	    long Retry = 2000;
-	    while(Running_) {
-	        if(!FirstRun)
-	            Poco::Thread::trySleep(Retry);
-	        if(!Running_)
-	            break;
-	        if(UpdateDeviceTypes()) {
-	            FirstRun = false;
-	            Logger().information("Updated existing DeviceType list from FMS.");
-	            Retry = 60 * 5 * 1000 ; // 5 minutes
-	        } else {
-	            Retry = 2000;
-	        }
-	    }
-	}
+    void Storage::onTimer(Poco::Timer &timer) {
+        UpdateDeviceTypes();
+    }
 
 	bool Storage::UpdateDeviceTypes() {
 	    try {
@@ -122,9 +109,7 @@ namespace OpenWifi {
 	}
 
     void Storage::Stop() {
-	    Running_=false;
-	    Updater_.wakeUp();
-	    Updater_.join();
+        Timer_.stop();
         Logger().notice("Stopping.");
     }
 
@@ -179,19 +164,6 @@ namespace OpenWifi {
         std::string Error;
         return ValidateSingle(P,Error);
     }
-
-/*    bool Storage::DeleteContact(const std::string &P, const std::string &Prefix, const std::string &Id) {
-        auto uuid_parts = Utils::Split(P,':');
-        if(uuid_parts.size()!=2)
-            return false;
-        if(uuid_parts[0]=="ent") {
-            return EntityDB_->DeleteContact("id",uuid_parts[1],Prefix,Id);
-        } else if(uuid_parts[0]=="ven") {
-            return VenueDB_->DeleteContact("id",uuid_parts[1],Prefix,Id);
-        }
-        return false;
-    }
-*/
 
     bool Storage::ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap &Map, std::vector<std::string> & Errors) {
         for(const auto &i:UUIDs) {
