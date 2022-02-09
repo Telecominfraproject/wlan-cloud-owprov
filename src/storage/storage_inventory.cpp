@@ -80,9 +80,7 @@ namespace OpenWifi {
                                             const std::string &DeviceType) {
 
         ProvObjects::InventoryTag   ExistingDevice;
-        __DBG__
         if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
-            __DBG__
             ProvObjects::InventoryTag   NewDevice;
             uint64_t Now = std::time(nullptr);
 
@@ -91,33 +89,26 @@ namespace OpenWifi {
             if(Tokens.count()==3) {
                 IP = Tokens[1];
             }
-            __DBG__
-
             NewDevice.info.id = MicroService::CreateUUID();
             NewDevice.info.name = SerialNumber;
             NewDevice.info.created = NewDevice.info.modified = Now;
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
             NewDevice.serialNumber = SerialNumber;
             NewDevice.deviceType = DeviceType;
-            __DBG__
             nlohmann::json StateDoc;
             StateDoc["method"] = "auto-discovery";
             StateDoc["date"] = std::time(nullptr);
             NewDevice.state = to_string(StateDoc);
-            __DBG__
             if(!IP.empty()) {
                 StorageService()->VenueDB().GetByIP(IP,NewDevice.venue);
                 if(NewDevice.venue.empty()) {
                     StorageService()->EntityDB().GetByIP(IP,NewDevice.entity);
                 }
             }
-            __DBG__
 
             if(CreateRecord(NewDevice)) {
-                __DBG__
                 SerialNumberCache()->AddSerialNumber(SerialNumber, DeviceType);
                 std::string FullUUID;
-                __DBG__
                 if(!NewDevice.entity.empty()) {
                     StorageService()->EntityDB().AddDevice("id",NewDevice.entity,NewDevice.info.id);
                     FullUUID = StorageService()->EntityDB().Prefix() + ":" + NewDevice.entity;
@@ -127,7 +118,6 @@ namespace OpenWifi {
                     FullUUID = StorageService()->VenueDB().Prefix() + ":" + NewDevice.venue;
                 }
 
-                __DBG__
                 if(!FullUUID.empty()) {
                     if(SDK::GW::Device::SetVenue(nullptr,NewDevice.serialNumber,FullUUID)) {
                         // std::cout << "Set GW done " << SerialNumber << std::endl;
@@ -136,23 +126,19 @@ namespace OpenWifi {
                         // std::cout << "Could not set GW " << SerialNumber << std::endl;
                         Logger().information(Poco::format("%s: could not set GW entity/venue property.", NewDevice.serialNumber));
                     }
-                    __DBG__
                 }
                 Logger().information(Poco::format("Adding %s to inventory.",SerialNumber));
                 return true;
             } else {
-                __DBG__
                 Logger().information(Poco::format("Could not add %s to inventory.",SerialNumber));
             }
         } else {
-            __DBG__
             //  Device already exists, do we need to modify anything?
             bool modified=false;
             if(ExistingDevice.deviceType != DeviceType) {
                 ExistingDevice.deviceType = DeviceType;
                 modified = true;
             }
-            __DBG__
 
             //  if this device is being claimed, not it is claimed.
             if(!ExistingDevice.state.empty()) {
@@ -161,7 +147,6 @@ namespace OpenWifi {
                     uint64_t Date = State["date"];
                     uint64_t Now = std::time(nullptr);
 
-                    __DBG__
                     if((Now - Date)<(24*60*60)) {
                         State["method"] = "claimed";
                         State["date"] = std::time(nullptr);
