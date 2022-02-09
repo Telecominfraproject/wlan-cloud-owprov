@@ -29,15 +29,23 @@ namespace OpenWifi {
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
         Logger().information("Entering loop...");
         while(Note && Running_) {
+            _OWDEBUG_
             Logger().information("Waiting for device message...");
+            _OWDEBUG_
             auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
+            _OWDEBUG_
             if(Msg!= nullptr) {
+                _OWDEBUG_
                 Logger().information("Message received...");
+                _OWDEBUG_
                 try {
+                    _OWDEBUG_
                     Poco::JSON::Parser Parser;
                     auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
+                    _OWDEBUG_
 
                     if (Object->has(uCentralProtocol::PAYLOAD)) {
+                        _OWDEBUG_
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
                         std::string ConnectedIP, SerialNumber, DeviceType;
                         if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
@@ -59,19 +67,31 @@ namespace OpenWifi {
                                 DeviceType = PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
                             }
                         }
+                        _OWDEBUG_
                         if (!SerialNumber.empty()) {
+                            _OWDEBUG_
                             StorageService()->InventoryDB().CreateFromConnection(SerialNumber, ConnectedIP, DeviceType);
+                            _OWDEBUG_
                         }
+                        _OWDEBUG_
                     }
                 } catch (const Poco::Exception &E) {
+                    _OWDEBUG_
                     Logger().log(E);
+                    _OWDEBUG_
                 }
             } else {
+                _OWDEBUG_
                 Logger().information("No Message received...");
+                _OWDEBUG_
             }
+            _OWDEBUG_
             Note = Queue_.waitDequeueNotification();
+            _OWDEBUG_
         }
+        _OWDEBUG_
         Logger().information("Exiting...");
+        _OWDEBUG_
     }
 
 }
