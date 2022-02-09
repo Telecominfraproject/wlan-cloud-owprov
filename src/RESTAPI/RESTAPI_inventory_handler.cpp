@@ -396,6 +396,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if(!ValidDevClass(NewObject.devClass)) {
+            return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
+        }
+
         if(!NewObject.deviceType.empty()) {
             if(!StorageService()->IsAcceptableDeviceType(NewObject.deviceType)) {
                 return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
@@ -476,6 +480,10 @@ namespace OpenWifi{
             } else {
                 Existing.subscriber = "";
             }
+        }
+
+        if( RawObject->has("devClass") && NewObject.devClass!= Existing.devClass) {
+            Existing.devClass = NewObject.devClass;
         }
 
         std::string Arg;
