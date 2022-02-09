@@ -3231,17 +3231,19 @@ namespace OpenWifi {
                                                                           "%Y-%m-%d %H:%M:%S %s: [%p] %t");
             if (LoggingDestination == "console") {
                 Poco::AutoPtr<Poco::ConsoleChannel> Console(new Poco::ConsoleChannel);
+                Poco::AutoPtr<Poco::AsyncChannel> Async(new Poco::AsyncChannel(Console));
                 Poco::AutoPtr<Poco::PatternFormatter> Formatter(new Poco::PatternFormatter);
                 Formatter->setProperty("pattern", LoggingFormat);
                 Poco::AutoPtr<Poco::FormattingChannel> FormattingChannel(
-                        new Poco::FormattingChannel(Formatter, Console));
+                        new Poco::FormattingChannel(Formatter, Async));
                 Poco::Logger::root().setChannel(FormattingChannel);
             } else if (LoggingDestination == "colorconsole") {
                 Poco::AutoPtr<Poco::ColorConsoleChannel> Console(new Poco::ColorConsoleChannel);
+                Poco::AutoPtr<Poco::AsyncChannel> Async(new Poco::AsyncChannel(Console));
                 Poco::AutoPtr<Poco::PatternFormatter> Formatter(new Poco::PatternFormatter);
                 Formatter->setProperty("pattern", LoggingFormat);
                 Poco::AutoPtr<Poco::FormattingChannel> FormattingChannel(
-                        new Poco::FormattingChannel(Formatter, Console));
+                        new Poco::FormattingChannel(Formatter, Async));
                 Poco::Logger::root().setChannel(FormattingChannel);
             } else if (LoggingDestination == "sql") {
                 //"CREATE TABLE T_POCO_LOG (Source VARCHAR, Name VARCHAR, ProcessId INTEGER, Thread VARCHAR, ThreadId INTEGER, Priority INTEGER, Text VARCHAR, DateTime DATE)"
