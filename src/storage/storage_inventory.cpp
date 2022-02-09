@@ -57,12 +57,15 @@ namespace OpenWifi {
 
     bool InventoryDB::Upgrade(uint32_t from, uint32_t &to) {
         to = Version();
-        try {
-            auto Session = Pool_.get();
-            Session << "alter table " + TableName_ + " add column state text" , Poco::Data::Keywords::now;
-            Session << "alter table " + TableName_ + " add column devClass text" , Poco::Data::Keywords::now;
-        } catch (...) {
+        std::vector<std::string>    Script{  "alter table " + TableName_ + " add column state text" ,
+                                             "alter table " + TableName_ + " add column devClass text" };
+        for(const auto &i:Script) {
+            try {
+                auto Session = Pool_.get();
+                Session << i , Poco::Data::Keywords::now;
+            } catch (...) {
 
+            }
         }
         return true;
     }
