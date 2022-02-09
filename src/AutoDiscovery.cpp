@@ -24,8 +24,6 @@ namespace OpenWifi {
         Worker_.join();
     };
 
-#define __DBG__ std::cout << __FILE__ << ": " << __LINE__ << std::endl;
-
     void AutoDiscovery::run() {
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
         while(Note && Running_) {

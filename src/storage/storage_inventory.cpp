@@ -99,6 +99,7 @@ namespace OpenWifi {
             StateDoc["method"] = "auto-discovery";
             StateDoc["date"] = std::time(nullptr);
             NewDevice.state = to_string(StateDoc);
+            NewDevice.devClass = "any";
             if(!IP.empty()) {
                 StorageService()->VenueDB().GetByIP(IP,NewDevice.venue);
                 if(NewDevice.venue.empty()) {
@@ -150,14 +151,18 @@ namespace OpenWifi {
                     if((Now - Date)<(24*60*60)) {
                         State["method"] = "claimed";
                         State["date"] = std::time(nullptr);
-                        ExistingDevice.state = State;
+                        ExistingDevice.state = to_string(State);
                         modified = true;
                     } else {
                         ExistingDevice.state = "";
                         modified = true;
                     }
                 }
+            } else {
+                ExistingDevice.devClass = "any";
+                modified = true;
             }
+
             if(modified) {
                 ExistingDevice.info.modified = std::time(nullptr);
                 StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber, ExistingDevice);
