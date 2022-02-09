@@ -486,6 +486,10 @@ namespace OpenWifi{
             Existing.devClass = NewObject.devClass;
         }
 
+        if( RawObject->has("state") && NewObject.state!= Existing.state) {
+            Existing.state = NewObject.state;
+        }
+
         std::string Arg;
         bool UnAssign=false;
         if(HasParameter("unassign", Arg) && Arg=="true") {
