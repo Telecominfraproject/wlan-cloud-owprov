@@ -24,28 +24,30 @@ namespace OpenWifi {
         Worker_.join();
     };
 
+#define __DBG__ std::cout << __FILE__ << ": " << __LINE__ << std::endl;
+
     void AutoDiscovery::run() {
         Logger().information("Starting...");
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
         Logger().information("Entering loop...");
         while(Note && Running_) {
-            _OWDEBUG_
+            __DBG__
             Logger().information("Waiting for device message...");
-            _OWDEBUG_
+            __DBG__
             auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
-            _OWDEBUG_
+            __DBG__
             if(Msg!= nullptr) {
-                _OWDEBUG_
+                __DBG__
                 Logger().information("Message received...");
-                _OWDEBUG_
+                __DBG__
                 try {
-                    _OWDEBUG_
+                    __DBG__
                     Poco::JSON::Parser Parser;
                     auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
-                    _OWDEBUG_
+                    __DBG__
 
                     if (Object->has(uCentralProtocol::PAYLOAD)) {
-                        _OWDEBUG_
+                        __DBG__
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
                         std::string ConnectedIP, SerialNumber, DeviceType;
                         if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
@@ -67,31 +69,31 @@ namespace OpenWifi {
                                 DeviceType = PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
                             }
                         }
-                        _OWDEBUG_
+                        __DBG__
                         if (!SerialNumber.empty()) {
-                            _OWDEBUG_
+                            __DBG__
                             StorageService()->InventoryDB().CreateFromConnection(SerialNumber, ConnectedIP, DeviceType);
-                            _OWDEBUG_
+                            __DBG__
                         }
-                        _OWDEBUG_
+                        __DBG__
                     }
                 } catch (const Poco::Exception &E) {
-                    _OWDEBUG_
+                    __DBG__
                     Logger().log(E);
-                    _OWDEBUG_
+                    __DBG__
                 }
             } else {
-                _OWDEBUG_
+                __DBG__
                 Logger().information("No Message received...");
-                _OWDEBUG_
+                __DBG__
             }
-            _OWDEBUG_
+            __DBG__
             Note = Queue_.waitDequeueNotification();
-            _OWDEBUG_
+            __DBG__
         }
-        _OWDEBUG_
+        __DBG__
         Logger().information("Exiting...");
-        _OWDEBUG_
+        __DBG__
     }
 
 }
