@@ -12,7 +12,6 @@
 #include "StorageService.h"
 #include "Poco/JSON/Parser.h"
 #include "Daemon.h"
-#include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi{

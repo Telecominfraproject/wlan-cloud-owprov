@@ -3,7 +3,7 @@
 //
 
 #include "AutoDiscovery.h"
-#include "framework/uCentral_Protocol.h"
+#include "framework/ow_constants.h"
 #include "framework/KafkaTopics.h"
 #include "StorageService.h"
 

@@ -8,10 +8,8 @@
 
 #include "RESTAPI_inventory_handler.h"
 
-#include "framework/RESTAPI_protocol.h"
 #include "StorageService.h"
 #include "APConfig.h"
-#include "framework/RESTAPI_errors.h"
 #include "AutoDiscovery.h"
 #include "sdks/SDK_gw.h"
 #include "sdks/SDK_sec.h"

@@ -9,7 +9,6 @@
 
 #include "RESTAPI_inventory_list_handler.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_errors.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi{

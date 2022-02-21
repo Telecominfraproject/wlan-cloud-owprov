@@ -8,8 +8,7 @@
 
 #include "RESTAPI_contact_handler.h"
 
-#include "framework/RESTAPI_protocol.h"
-#include "framework/RESTAPI_errors.h"
+#include "framework/ow_constants.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "RESTAPI_db_helpers.h"
 

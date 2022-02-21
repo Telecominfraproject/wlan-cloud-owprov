@@ -7,7 +7,6 @@
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/MicroService.h"
-#include "framework/RESTAPI_errors.h"
 
 namespace OpenWifi {
 

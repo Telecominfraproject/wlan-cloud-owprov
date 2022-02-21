@@ -8,11 +8,8 @@
 
 
 #include "RESTAPI_location_handler.h"
-#include "framework/RESTAPI_errors.h"
-
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_protocol.h"
 #include "Daemon.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
