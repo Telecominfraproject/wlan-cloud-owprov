@@ -111,6 +111,7 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_managementRole_list_handler.cpp src/RESTAPI/RESTAPI_managementRole_list_handler.h
         src/RESTAPI/RESTAPI_configurations_list_handler.cpp src/RESTAPI/RESTAPI_configurations_list_handler.h
         src/RESTAPI/RESTAPI_iptocountry_handler.cpp src/RESTAPI/RESTAPI_iptocountry_handler.h
+        src/RESTAPI/RESTAPI_signup_handler.h src/RESTAPI/RESTAPI_signup_handler.cpp
         src/FindCountry.h
         src/sdks/SDK_gw.cpp src/sdks/SDK_gw.h
         src/sdks/SDK_prov.cpp src/sdks/SDK_prov.h
