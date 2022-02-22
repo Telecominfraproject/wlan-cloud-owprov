@@ -32,11 +32,11 @@ namespace OpenWifi {
         SignupDB::RecordVec SEs;
         if(StorageService()->SignupDB().GetRecords(0,100, SEs, "email='" + UserName + "'")) {
             for(const auto &i:SEs) {
-                if((i.created + Signup()->GracePeriod()) > OpenWifi::Now() && i.serialNumber==SerialNumber) {
+                if((i.submitted + Signup()->GracePeriod()) > OpenWifi::Now() && i.serialNumber==SerialNumber) {
                     Poco::JSON::Object  Answer;
                     i.to_json(Answer);
                     return ReturnObject(Answer);
-                } else if((i.created + Signup()->GracePeriod()) < OpenWifi::Now() && i.completed==0) {
+                } else if((i.submitted + Signup()->GracePeriod()) < OpenWifi::Now() && i.completed==0) {
                     StorageService()->SignupDB().DeleteRecord("id", i.info.id);
                 }
             }
@@ -80,7 +80,7 @@ namespace OpenWifi {
             ProvObjects::SignupEntry    SE;
 
             SE.info.id = SignupUUID;
-            SE.info.created = SE.info.modified = SE.created = OpenWifi::Now();
+            SE.info.created = SE.info.modified = SE.submitted = OpenWifi::Now();
             SE.completed = 0 ;
             SE.serialNumber = SerialNumber;
             SE.error = 0 ;

@@ -22,7 +22,7 @@ namespace OpenWifi {
             ORM::Field{"email",ORM::FieldType::FT_TEXT},
             ORM::Field{"userId",ORM::FieldType::FT_TEXT},
             ORM::Field{"serialNumber",ORM::FieldType::FT_TEXT},
-            ORM::Field{"created",ORM::FieldType::FT_BIGINT},
+            ORM::Field{"submitted",ORM::FieldType::FT_BIGINT},
             ORM::Field{"completed",ORM::FieldType::FT_BIGINT},
             ORM::Field{"status",ORM::FieldType::FT_TEXT}
     };
@@ -50,7 +50,7 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.email = In.get<6>();
     Out.userId = In.get<7>();
     Out.serialNumber = In.get<8>();
-    Out.created = In.get<9>();
+    Out.submitted = In.get<9>();
     Out.completed = In.get<10>();
     Out.status = In.get<11>();
 }
@@ -65,7 +65,7 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.set<6>(In.email);
     Out.set<7>(In.userId);
     Out.set<8>(In.serialNumber);
-    Out.set<9>(In.created);
-    Out.set<10>(In.created);
+    Out.set<9>(In.submitted);
+    Out.set<10>(In.completed);
     Out.set<11>(In.status);
 }

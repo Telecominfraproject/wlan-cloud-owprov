@@ -391,7 +391,7 @@ namespace OpenWifi::ProvObjects {
         std::string         email;
         std::string         userId;
         std::string         serialNumber;
-        uint64_t            created = 0 ;
+        uint64_t            submitted = 0 ;
         uint64_t            completed = 0 ;
         std::string         status;
         uint64_t            error=0;

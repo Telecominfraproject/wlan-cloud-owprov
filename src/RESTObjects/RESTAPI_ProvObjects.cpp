@@ -608,7 +608,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"email", email);
         RESTAPI_utils::field_to_json( Obj,"userId", userId);
         RESTAPI_utils::field_to_json( Obj,"serialNumber", serialNumber);
-        RESTAPI_utils::field_to_json( Obj,"created", created);
+        RESTAPI_utils::field_to_json( Obj,"submitted", submitted);
         RESTAPI_utils::field_to_json( Obj,"completed", completed);
         RESTAPI_utils::field_to_json( Obj,"status", status);
         RESTAPI_utils::field_to_json( Obj,"error", error);
@@ -620,7 +620,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"email", email);
             RESTAPI_utils::field_from_json( Obj,"userId", userId);
             RESTAPI_utils::field_from_json( Obj,"serialNumber", serialNumber);
-            RESTAPI_utils::field_from_json( Obj,"created", created);
+            RESTAPI_utils::field_from_json( Obj,"submitted", submitted);
             RESTAPI_utils::field_from_json( Obj,"completed", completed);
             RESTAPI_utils::field_from_json( Obj,"status", status);
             RESTAPI_utils::field_from_json( Obj,"error", error);
