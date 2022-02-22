@@ -6,7 +6,6 @@
 //	Arilia Wireless Inc.
 //
 
-
 #include "storage_entity.h"
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"

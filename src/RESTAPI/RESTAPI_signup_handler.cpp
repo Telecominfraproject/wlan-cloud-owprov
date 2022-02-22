@@ -25,6 +25,9 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
 
+        //  let's see if the user already exists. If so, we will try and see if
+        //  it's just
+
         // Do we already exist? Can only signup once...
         return OK();
     }

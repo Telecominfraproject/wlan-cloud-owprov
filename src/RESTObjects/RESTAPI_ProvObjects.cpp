@@ -603,6 +603,30 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void SignupEntry::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        RESTAPI_utils::field_to_json( Obj,"email", email);
+        RESTAPI_utils::field_to_json( Obj,"userId", userId);
+        RESTAPI_utils::field_to_json( Obj,"serialNumber", serialNumber);
+        RESTAPI_utils::field_to_json( Obj,"created", created);
+        RESTAPI_utils::field_to_json( Obj,"completed", completed);
+    }
+
+    bool SignupEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            RESTAPI_utils::field_from_json( Obj,"email", email);
+            RESTAPI_utils::field_from_json( Obj,"userId", userId);
+            RESTAPI_utils::field_from_json( Obj,"serialNumber", serialNumber);
+            RESTAPI_utils::field_from_json( Obj,"created", created);
+            RESTAPI_utils::field_from_json( Obj,"completed", completed);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I) {
         uint64_t Now = std::time(nullptr);
         if(O->has("name"))
