@@ -72,6 +72,9 @@ namespace OpenWifi {
             SecurityObjects::UserInfo   UI;
 
             UI.from_json(Answer);
+            std::ostringstream os;
+            Answer->stringify(os);
+            std::cout << "Create user: " << std::endl << os.str() << std::endl;
 
             //  so create the Signup entry and modify the inventory
             ProvObjects::SignupEntry    SE;
