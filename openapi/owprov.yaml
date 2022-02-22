@@ -568,7 +568,7 @@ components:
           type: string
         devClass:
           type: string
-          enum:4
+          enum:
             - any
             - venue
             - entity
@@ -732,6 +732,31 @@ components:
           type: integer
           format: int64
         reason:
+          type: string
+
+    SignupEntry:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        email:
+          type: string
+          format: email
+        userId:
+          type: string
+          format: uuid
+        serialNumber:
+          type: string
+        created:
+          type: integer
+          format: int64
+        completed:
+          type: integer
+          format: int64
+        error:
+          type: integer
+          format: int64
+        status:
           type: string
 
     #########################################################################################
@@ -2571,16 +2596,7 @@ paths:
           required: true
       responses:
         200:
-          description: Success signup post
-          content:
-            application/json:
-              schema:
-                type:
-                  object
-                properties:
-                  signupUUID:
-                    type: string
-                    format: uuid
+          $ref: '#/components/schemas/SignupEntry'
         400:
           $ref: '#/components/responses/BadRequest'
         403:
@@ -2625,11 +2641,13 @@ paths:
                 errorCode:
                   type: integer
                   format: int32
+                status:
+                  type: string
         required: false
 
       responses:
         200:
-          $ref: '#/components/responses/Success'
+          $ref: '#/components/schemas/SignupEntry'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

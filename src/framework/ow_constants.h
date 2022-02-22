@@ -67,6 +67,9 @@ namespace OpenWifi::RESTAPI::Errors {
 	static const std::string SMSCouldNotBeSentRetry{"SMS could not be sent to validate device, try later or change the phone number."};
 	static const std::string SMSCouldNotValidate{"Code and number could not be validated"};
 	static const std::string InvalidDeviceClass{"Invalid device class. Must be: any, venue, entity, or subscriber"};
+    static const std::string SerialNumberAlreadyProvisioned{"This device has already been provisioned to a subscriber."};
+    static const std::string SerialNumberNotTheProperClass{"Device is not available to subscribers. It ahs been assigned to another class of devices."};
+    static const std::string UserAlreadyExists{"Username already exists."};
 }
 
 namespace OpenWifi::RESTAPI::Protocol {
@@ -214,6 +217,9 @@ namespace OpenWifi::uCentralProtocol {
 	static const char * FIRMWARE = "firmware";
 	static const char * CONNECT = "connect";
 	static const char * STATE = "state";
+	static const char * STATUS = "status";
+	static const char * ERROR = "error";
+	static const char * TEXT = "text";
 	static const char * HEALTHCHECK = "healthcheck";
 	static const char * LOG = "log";
 	static const char * CRASHLOG = "crashlog";

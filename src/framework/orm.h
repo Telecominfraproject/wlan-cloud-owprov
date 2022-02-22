@@ -466,9 +466,10 @@ namespace ORM {
             return false;
         }
 
-        typedef std::vector<RecordTuple> RecordList;
+        typedef std::vector<RecordTuple>    RecordList;
+        typedef std::vector<RecordType>     RecordVec;
 
-        bool GetRecords( uint64_t Offset, uint64_t HowMany, std::vector<RecordType> & Records, const std::string & Where = "", const std::string & OrderBy = "") {
+        bool GetRecords( uint64_t Offset, uint64_t HowMany, RecordVec & Records, const std::string & Where = "", const std::string & OrderBy = "") {
             try {
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);

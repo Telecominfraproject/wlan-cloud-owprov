@@ -19,7 +19,8 @@ namespace OpenWifi {
             std::string,
             std::string,
             uint64_t,
-            uint64_t
+            uint64_t,
+            std::string
     > SignupDBRecordType;
 
     class SignupDB : public ORM::DB<SignupDBRecordType, ProvObjects::SignupEntry> {

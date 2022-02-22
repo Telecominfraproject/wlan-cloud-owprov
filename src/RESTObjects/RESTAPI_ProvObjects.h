@@ -393,6 +393,8 @@ namespace OpenWifi::ProvObjects {
         std::string         serialNumber;
         uint64_t            created = 0 ;
         uint64_t            completed = 0 ;
+        std::string         status;
+        uint64_t            error=0;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

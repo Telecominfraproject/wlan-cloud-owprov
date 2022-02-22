@@ -23,7 +23,8 @@ namespace OpenWifi {
             ORM::Field{"userId",ORM::FieldType::FT_TEXT},
             ORM::Field{"serialNumber",ORM::FieldType::FT_TEXT},
             ORM::Field{"created",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"completed",ORM::FieldType::FT_BIGINT}
+            ORM::Field{"completed",ORM::FieldType::FT_BIGINT},
+            ORM::Field{"status",ORM::FieldType::FT_TEXT}
     };
 
     const static  ORM::IndexVec    SignupDB_Indexes{
@@ -51,6 +52,7 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.serialNumber = In.get<8>();
     Out.created = In.get<9>();
     Out.completed = In.get<10>();
+    Out.status = In.get<11>();
 }
 
 template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects::SignupEntry>::Convert(const OpenWifi::ProvObjects::SignupEntry &In, OpenWifi::SignupDBRecordType &Out) {
@@ -65,4 +67,5 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.set<8>(In.serialNumber);
     Out.set<9>(In.created);
     Out.set<10>(In.created);
+    Out.set<11>(In.status);
 }

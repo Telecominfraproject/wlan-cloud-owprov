@@ -18,6 +18,7 @@
 #include "JobController.h"
 #include "WebSocketClientServer.h"
 #include "FindCountry.h"
+#include "Signup.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -36,7 +37,8 @@ namespace OpenWifi {
 									   AutoDiscovery(),
 									   JobController(),
 									   WebSocketClientServer(),
-                                       FindCountryFromIP()
+                                       FindCountryFromIP(),
+                                       Signup()
 								   });
 		}
 		return instance_;
