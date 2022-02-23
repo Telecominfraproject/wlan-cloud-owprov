@@ -365,7 +365,7 @@ namespace OpenWifi{
 
     }
 
-#define __DBG__ std::cout << __LINE__ std::endl;
+#define __DBG__ std::cout << __LINE__ << std::endl;
 
     void RESTAPI_inventory_handler::DoPut() {
 
