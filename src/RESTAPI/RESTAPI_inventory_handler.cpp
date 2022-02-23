@@ -155,8 +155,12 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
+        if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
+        }
+
+        if(NewObject.devClass.empty()) {
+            NewObject.devClass = Provisioning::DeviceClass::ANY;
         }
 
         if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
@@ -389,9 +393,12 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
+        if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
+
+
+
 
         if(!NewObject.deviceType.empty()) {
             if(!StorageService()->IsAcceptableDeviceType(NewObject.deviceType)) {
