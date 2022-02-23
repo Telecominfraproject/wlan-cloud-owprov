@@ -2595,7 +2595,7 @@ paths:
             type: string
           required: false
         - in: query
-          mame: signupUUID
+          name: signupUUID
           schema:
             type: string
             format: uuid
@@ -2614,7 +2614,7 @@ paths:
       tags:
         - Subscriber Registration
       summary: This call allows someone to get the status of a signup.
-      operationId: getSignup
+      operationId: deleteSignup
       parameters:
         - in: query
           name: email
@@ -2628,7 +2628,7 @@ paths:
             type: string
           required: false
         - in: query
-          mame: signupUUID
+          name: signupUUID
           schema:
             type: string
             format: uuid
