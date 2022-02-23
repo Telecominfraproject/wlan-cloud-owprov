@@ -68,7 +68,7 @@ namespace OpenWifi {
         }, Body, 30000);
 
         Poco::JSON::Object::Ptr Answer;
-        if(CreateUser.Do(Answer)) {
+        if(CreateUser.Do(Answer) == Poco::Net::HTTPServerResponse::HTTP_OK) {
             SecurityObjects::UserInfo   UI;
 
             UI.from_json(Answer);
@@ -90,6 +90,7 @@ namespace OpenWifi {
 
             std::cout << "Creating signup entry: " << SE.email << std::endl;
             StorageService()->SignupDB().CreateRecord(SE);
+            Signup()->AddOutstandingSignup(SE);
 
             //  We do not have a device, so let's create one.
             if(IT.serialNumber.empty()) {
@@ -103,9 +104,9 @@ namespace OpenWifi {
                 StateDoc.set("errorCode",0);
                 StateDoc.set("date", OpenWifi::Now());
                 StateDoc.set("status", "waiting for email-verification");
-                std::ostringstream os;
-                StateDoc.stringify(os);
-                IT.state = os.str();
+                std::ostringstream os2;
+                StateDoc.stringify(os2);
+                IT.state = os2.str();
                 std::cout << "Creating inventory entry: " << SE.serialNumber << std::endl;
                 StorageService()->InventoryDB().CreateRecord(IT);
             } else {
@@ -116,9 +117,9 @@ namespace OpenWifi {
                 StateDoc.set("errorCode",0);
                 StateDoc.set("date", OpenWifi::Now());
                 StateDoc.set("status", "waiting for email-verification");
-                std::ostringstream os;
-                StateDoc.stringify(os);
-                IT.state = os.str();
+                std::ostringstream os2;
+                StateDoc.stringify(os2);
+                IT.state = os2.str();
                 IT.info.modified = OpenWifi::Now();
                 std::cout << "Updating inventory entry: " << SE.serialNumber << std::endl;
                 StorageService()->InventoryDB().UpdateRecord("id",IT.info.id,IT);
@@ -151,13 +152,48 @@ namespace OpenWifi {
 
             SE.info.modified = OpenWifi::Now();
             SE.status = "emailVerified";
+
             StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
+            Signup()->AddOutstandingSignup(SE);
 
             Poco::JSON::Object  Answer;
             SE.to_json(Answer);
+
             return ReturnObject(Answer);
         }
+    }
 
+    void RESTAPI_signup_handler::DoGet() {
+        auto EMail = GetParameter("email", "");
+        auto SignupUUID = GetParameter("signupUUID", "");
+        auto SerialNumber = GetParameter("serialNumber", "");
+
+        Poco::JSON::Object          Answer;
+        ProvObjects::SignupEntry    SE;
+        if(!SignupUUID.empty()) {
+            if(StorageService()->SignupDB().GetRecord("id", SignupUUID, SE)) {
+                SE.to_json(Answer);
+                return ReturnObject(Answer);
+            }
+            return NotFound();
+        } else if(!EMail.empty()) {
+            SignupDB::RecordVec SEs;
+            if(StorageService()->SignupDB().GetRecords(0,100,SEs, " email='"+EMail+"' ")) {
+                return ReturnObject("signups",SEs);
+            }
+            return NotFound();
+        } else if(!SerialNumber.empty()) {
+            SignupDB::RecordVec SEs;
+            if(StorageService()->SignupDB().GetRecords(0,100,SEs, " serialNumber='"+SerialNumber+"' ")) {
+                return ReturnObject("signups",SEs);
+            }
+            return NotFound();
+        }
+        return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+    }
+
+    void RESTAPI_signup_handler::DoDelete() {
+        return BadRequest(RESTAPI::Errors::NotImplemented);
     }
 
 }

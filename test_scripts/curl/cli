@@ -462,7 +462,7 @@ affecteddevices() {
 }
 
 signup() {
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/signup?email=stehane.bourque@gmail.com&serialNumber=112233445566" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/signup?email=stephane.bourque@gmail.com&serialNumber=112233445566" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}

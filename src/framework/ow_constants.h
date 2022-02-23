@@ -70,6 +70,7 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string SerialNumberAlreadyProvisioned{"This device has already been provisioned to a subscriber."};
     static const std::string SerialNumberNotTheProperClass{"Device is not available to subscribers. It ahs been assigned to another class of devices."};
     static const std::string UserAlreadyExists{"Username already exists."};
+    static const std::string NotImplemented{"Function not implemented."};
 }
 
 namespace OpenWifi::RESTAPI::Protocol {

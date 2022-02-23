@@ -2577,6 +2577,72 @@ paths:
           $ref: '#/components/responses/NotFound'
 
   /signup:
+    get:
+      tags:
+        - Subscriber Registration
+      summary: This call allows someone to get the status of a signup.
+      operationId: getSignup
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            format: email
+          required: false
+        - in: query
+          name: serialNumber
+          schema:
+            type: string
+          required: false
+        - in: query
+          mame: signupUUID
+          schema:
+            type: string
+            format: uuid
+          required: false
+      responses:
+        200:
+          $ref: '#/components/schemas/SignupEntry'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Subscriber Registration
+      summary: This call allows someone to get the status of a signup.
+      operationId: getSignup
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            format: email
+          required: false
+        - in: query
+          name: serialNumber
+          schema:
+            type: string
+          required: false
+        - in: query
+          mame: signupUUID
+          schema:
+            type: string
+            format: uuid
+          required: false
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
     post:
       tags:
         - Subscriber Registration

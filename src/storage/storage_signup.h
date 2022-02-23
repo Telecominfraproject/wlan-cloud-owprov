@@ -20,12 +20,14 @@ namespace OpenWifi {
             std::string,
             uint64_t,
             uint64_t,
-            std::string
+            std::string,
+            uint64_t
     > SignupDBRecordType;
 
     class SignupDB : public ORM::DB<SignupDBRecordType, ProvObjects::SignupEntry> {
     public:
-        SignupDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        explicit SignupDB(OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept;
+        bool GetIncompleteSignups( SignupDB::RecordVec & Signups );
     private:
     };
 }
