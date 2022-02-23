@@ -135,11 +135,6 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
-    static bool ValidDevClass(const std::string &D) {
-        const static std::vector<std::string> Classes{ "any", "entity", "subscriber" , "venue" };
-        return std::find(cbegin(Classes), cend(Classes), D)!=cend(Classes);
-    }
-
     void RESTAPI_inventory_handler::DoPost() {
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty()) {
@@ -160,7 +155,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!ValidDevClass(NewObject.devClass)) {
+        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
@@ -394,7 +389,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!ValidDevClass(NewObject.devClass)) {
+        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
