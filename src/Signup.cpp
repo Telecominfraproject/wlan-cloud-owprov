@@ -4,6 +4,7 @@
 
 #include "Signup.h"
 #include "StorageService.h"
+#include "sdks/SDK_gw.h"
 
 namespace OpenWifi {
 
@@ -66,6 +67,7 @@ namespace OpenWifi {
                         SE.info.modified = OpenWifi::Now();
                         SE.error = 0 ;
                         StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
+                        SDK::GW::Device::SetSubscriber( SE.serialNumber, IT.subscriber );
                     }
                 }
             }
