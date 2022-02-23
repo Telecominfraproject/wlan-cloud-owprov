@@ -97,6 +97,7 @@ namespace OpenWifi {
                 IT.serialNumber = SerialNumber;
                 IT.info.id = MicroService::instance().CreateUUID();
                 IT.info.created = IT.info.modified = OpenWifi::Now();
+                IT.info.name = SerialNumber;
                 Poco::JSON::Object StateDoc;
                 StateDoc.set("method", "signup");
                 StateDoc.set("claimer", UserName);
