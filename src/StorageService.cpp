@@ -100,6 +100,7 @@ namespace OpenWifi {
 	                DeviceTypes_.clear();
 	                auto Array = Response->getArray("deviceTypes");
 	                for(const auto &i:*Array) {
+                        std::cout << "Adding deviceType:" << i.toString() << std::endl;
 	                    DeviceTypes_.insert(i.toString());
 	                }
 	                return true;
