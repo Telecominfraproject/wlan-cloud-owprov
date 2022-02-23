@@ -401,6 +401,7 @@ namespace OpenWifi{
         }
         __DBG__
 
+        std::cout << "Devclass: " << NewObject.devClass << std::endl;
         if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
