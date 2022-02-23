@@ -365,6 +365,8 @@ namespace OpenWifi{
 
     }
 
+#define __DBG__ std::cout << __LINE__ std::endl;
+
     void RESTAPI_inventory_handler::DoPut() {
 
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
@@ -372,6 +374,8 @@ namespace OpenWifi{
         if(SerialNumber.empty() || !Utils::ValidSerialNumber(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
+
+        __DBG__
 
         std::string Claimer;
         if(HasParameter("claimer",Claimer) && !Claimer.empty()) {
@@ -382,21 +386,26 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
+        __DBG__
+
         ProvObjects::InventoryTag   Existing;
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
             return NotFound();
         }
 
+        __DBG__
         auto RawObject = ParseStream();
         ProvObjects::InventoryTag   NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
+        __DBG__
 
         if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
+        __DBG__
 
 
 
@@ -405,10 +414,12 @@ namespace OpenWifi{
                 return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
             }
         }
+        __DBG__
 
         if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
+        __DBG__
 
         std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration, NewPolicy;
         bool    MovingVenue=false,
@@ -418,6 +429,7 @@ namespace OpenWifi{
                 MovingConfiguration=false,
                 MovingPolicy=false;
 
+        __DBG__
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         if(AssignIfPresent(RawObject, "venue",NewVenue)) {
@@ -427,16 +439,19 @@ namespace OpenWifi{
             MovingVenue = Existing.venue != NewVenue;
         }
 
+        __DBG__
         if(AssignIfPresent(RawObject, "entity",NewEntity)) {
             if(!NewEntity.empty() && !StorageService()->EntityDB().Exists("id",NewEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MovingEntity = Existing.entity != NewEntity;
         }
+        __DBG__
 
         if(!NewEntity.empty() && !NewVenue.empty()) {
             return BadRequest(RESTAPI::Errors::NotBoth);
         }
+        __DBG__
 
         if(AssignIfPresent(RawObject, "location",NewLocation)) {
             if(!NewLocation.empty() && !StorageService()->LocationDB().Exists("id",NewLocation)) {
@@ -444,6 +459,7 @@ namespace OpenWifi{
             }
             MovingLocation = Existing.location != NewLocation;
         }
+        __DBG__
 
         if(AssignIfPresent(RawObject, "contact",NewContact)) {
             if(!NewContact.empty() && !StorageService()->ContactDB().Exists("id",NewContact)) {
@@ -451,6 +467,7 @@ namespace OpenWifi{
             }
             MovingContact = Existing.contact != NewContact;
         }
+        __DBG__
 
         if(AssignIfPresent(RawObject, "deviceConfiguration",NewConfiguration)) {
             if(!NewConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewConfiguration)) {
@@ -458,6 +475,7 @@ namespace OpenWifi{
             }
             MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
         }
+        __DBG__
 
         if(AssignIfPresent(RawObject, "managementPolicy",NewPolicy)) {
             if(!NewPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewPolicy)) {
@@ -465,6 +483,7 @@ namespace OpenWifi{
             }
             MovingPolicy = Existing.managementPolicy != NewPolicy;
         }
+        __DBG__
 
         std::string NewSubScriber;
         if(AssignIfPresent(RawObject, "subscriber", NewSubScriber)) {
@@ -481,15 +500,18 @@ namespace OpenWifi{
                 Existing.subscriber = "";
             }
         }
+        __DBG__
 
         if( RawObject->has("devClass") && NewObject.devClass!= Existing.devClass) {
             Existing.devClass = NewObject.devClass;
         }
+        __DBG__
 
         if( RawObject->has("state") && NewObject.state!= Existing.state) {
             Existing.state = NewObject.state;
         }
 
+        __DBG__
         std::string Arg;
         bool UnAssign=false;
         if(HasParameter("unassign", Arg) && Arg=="true") {
@@ -515,7 +537,11 @@ namespace OpenWifi{
             Existing.managementPolicy.clear();
         }
 
+        __DBG__
+
+        std::cout << "Updating: " << Existing.info.id << "   " << Existing.serialNumber << std::endl;
         if(StorageService()->InventoryDB().UpdateRecord("id", Existing.info.id, Existing)) {
+            __DBG__
             if(!UnAssign) {
                 if(MovingEntity) {
                     if(!Existing.entity.empty())
@@ -560,12 +586,15 @@ namespace OpenWifi{
                     Existing.managementPolicy = NewPolicy;
                 }
             }
+            __DBG__
             DB_.UpdateRecord("id", Existing.info.id, Existing);
+            __DBG__
 
             ProvObjects::InventoryTag   NewObjectCreated;
             DB_.GetRecord("id", Existing.info.id, NewObjectCreated);
             Poco::JSON::Object  Answer;
             NewObject.to_json(Answer);
+            __DBG__
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
