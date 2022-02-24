@@ -10,26 +10,32 @@ namespace OpenWifi {
 
     void RESTAPI_signup_handler::DoPost() {
 
+        std::cout << __LINE__ << std::endl;
         auto UserName = GetParameter("email","");
         Poco::toLowerInPlace(UserName);
         auto SerialNumber = GetParameter("serialNumber","");
         Poco::toLowerInPlace(SerialNumber);
 
+        std::cout << __LINE__ << std::endl;
         if(UserName.empty() || SerialNumber.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(!Utils::ValidEMailAddress(UserName)) {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(!Utils::ValidSerialNumber(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
+        std::cout << __LINE__ << std::endl;
 
         //  if a signup already exists for this user, we should just return its value
         //  or its completion
         SignupDB::RecordVec SEs;
+        std::cout << __LINE__ << std::endl;
         if(StorageService()->SignupDB().GetRecords(0,100, SEs, "email='" + UserName + "'")) {
             for(const auto &i:SEs) {
                 if((i.submitted + Signup()->GracePeriod()) > OpenWifi::Now() && i.serialNumber==SerialNumber) {
@@ -41,10 +47,12 @@ namespace OpenWifi {
                 }
             }
         }
+        std::cout << __LINE__ << std::endl;
 
         //  So we do not have an outstanding signup...
         //  Can we actually claim this serial number??? if not, we need to return an error
         ProvObjects::InventoryTag   IT;
+        std::cout << __LINE__ << std::endl;
         if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,IT)) {
 
             if(!IT.subscriber.empty()) {
@@ -55,11 +63,13 @@ namespace OpenWifi {
                 return BadRequest(RESTAPI::Errors::SerialNumberNotTheProperClass);
             }
         }
+        std::cout << __LINE__ << std::endl;
 
         //  OK, we can claim this device, can we create a userid?
         //  Let's create one
         //  If sec.signup("email",uuid);
         auto SignupUUID = MicroService::instance().CreateUUID();
+        std::cout << __LINE__ << std::endl;
 
         Poco::JSON::Object  Body;
         OpenAPIRequestPost  CreateUser( uSERVICE_SECURITY, "/api/v1/signup", {
@@ -67,6 +77,7 @@ namespace OpenWifi {
                 { "signupUUID" , SignupUUID }
         }, Body, 30000);
 
+        std::cout << __LINE__ << std::endl;
         Poco::JSON::Object::Ptr Answer;
         if(CreateUser.Do(Answer) == Poco::Net::HTTPServerResponse::HTTP_OK) {
             SecurityObjects::UserInfo   UI;
@@ -130,6 +141,8 @@ namespace OpenWifi {
             SE.to_json(SEAnswer);
             return ReturnObject(SEAnswer);
         }
+
+        std::cout << __LINE__ << std::endl;
 
         return BadRequest(RESTAPI::Errors::UserAlreadyExists);
     }
