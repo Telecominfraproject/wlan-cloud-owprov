@@ -41,7 +41,8 @@ namespace OpenWifi {
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"state",ORM::FieldType::FT_TEXT},
-        ORM::Field{"devClass",ORM::FieldType::FT_TEXT}
+        ORM::Field{"devClass",ORM::FieldType::FT_TEXT},
+        ORM::Field{"locale",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -57,8 +58,12 @@ namespace OpenWifi {
 
     bool InventoryDB::Upgrade(uint32_t from, uint32_t &to) {
         to = Version();
-        std::vector<std::string>    Script{  "alter table " + TableName_ + " add column state text" ,
-                                             "alter table " + TableName_ + " add column devClass text" };
+        std::vector<std::string>    Script{
+            "alter table " + TableName_ + " add column state text" ,
+            "alter table " + TableName_ + " add column locale varchar(16)" ,
+            "alter table " + TableName_ + " add column devClass text"
+        };
+
         for(const auto &i:Script) {
             try {
                 auto Session = Pool_.get();
@@ -77,7 +82,8 @@ namespace OpenWifi {
 
     bool InventoryDB::CreateFromConnection( const std::string &SerialNumber,
                                             const std::string &ConnectionInfo,
-                                            const std::string &DeviceType) {
+                                            const std::string &DeviceType,
+                                            const std::string &Locale) {
 
         ProvObjects::InventoryTag   ExistingDevice;
         if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
@@ -95,6 +101,7 @@ namespace OpenWifi {
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
             NewDevice.serialNumber = SerialNumber;
             NewDevice.deviceType = DeviceType;
+            NewDevice.locale = Locale;
             nlohmann::json StateDoc;
             StateDoc["method"] = "auto-discovery";
             StateDoc["date"] = std::time(nullptr);

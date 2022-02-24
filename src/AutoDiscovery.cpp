@@ -55,8 +55,12 @@ namespace OpenWifi {
                                 DeviceType = PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
                             }
                         }
+                        std::string Locale;
+                        if(PayloadObj->has("locale"))
+                            Locale = PayloadObj->get("locale").toString();
+
                         if (!SerialNumber.empty()) {
-                            StorageService()->InventoryDB().CreateFromConnection(SerialNumber, ConnectedIP, DeviceType);
+                            StorageService()->InventoryDB().CreateFromConnection(SerialNumber, ConnectedIP, DeviceType, Locale);
                         }
                     }
                 } catch (const Poco::Exception &E) {

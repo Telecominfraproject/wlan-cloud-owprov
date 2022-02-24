@@ -573,6 +573,10 @@ components:
             - venue
             - entity
             - subscriber
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 2
 
     InventoryTagList:
       type: object
