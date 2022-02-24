@@ -27,12 +27,12 @@ namespace OpenWifi {
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory/{serialNumber}"}; };
 
     private:
+        InventoryDB     &DB_;
         void DoGet() final;
         void DoPost() final;
         void DoPut() final;
         void DoDelete() final;
         void PerformClaim(const std::string &SerialNumber, const std::string & Claimer ,
                           std::string & ClaimId, uint64_t &ErrorCode, Poco::JSON::Object &Answer);
-        InventoryDB     &DB_;
     };
 }

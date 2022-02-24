@@ -10,6 +10,7 @@
 #pragma once
 
 #include "framework/MicroService.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
     class RESTAPI_entity_list_handler : public RESTAPIHandler {
@@ -22,9 +23,11 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal) {}
+            Internal),
+          DB_(StorageService()->EntityDB()) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/entity"}; };
-
+    private:
+        EntityDB    &DB_;
         void DoGet() final;
         void DoPost() final ;
         void DoPut() final {};

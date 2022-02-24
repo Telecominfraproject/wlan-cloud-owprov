@@ -43,45 +43,45 @@ namespace OpenWifi{
 
         std::string OrderBy{" ORDER BY serialNumber ASC "};
         if(HasParameter("orderBy",Arg)) {
-            if(!StorageService()->InventoryDB().PrepareOrderBy(Arg,OrderBy)) {
+            if(!DB_.PrepareOrderBy(Arg,OrderBy)) {
                 return BadRequest(RESTAPI::Errors::InvalidLOrderBy);
             }
         }
 
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->InventoryDB())>("taglist",StorageService()->InventoryDB(),*this );
+            return ReturnRecordList<decltype(DB_)>("taglist",DB_,*this );
         } else if(HasParameter("entity",UUID)) {
             if(QB_.CountOnly) {
-                auto C = StorageService()->InventoryDB().Count( StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID));
+                auto C = DB_.Count( StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID));
                 return ReturnCountOnly( C);
             }
             ProvObjects::InventoryTagVec Tags;
-            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, StorageService()->InventoryDB().OP("entity",ORM::EQ,UUID), OrderBy);
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, DB_.OP("entity",ORM::EQ,UUID), OrderBy);
             return SendList(Tags, SerialOnly);
         } else if(HasParameter("venue",UUID)) {
             if(QB_.CountOnly) {
-                auto C = StorageService()->InventoryDB().Count(StorageService()->InventoryDB().OP("venue",ORM::EQ,UUID));
+                auto C = DB_.Count(DB_.OP("venue",ORM::EQ,UUID));
                 return ReturnCountOnly( C);
             }
             ProvObjects::InventoryTagVec Tags;
-            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, StorageService()->InventoryDB().OP("venue",ORM::EQ,UUID), OrderBy);
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, DB_.OP("venue",ORM::EQ,UUID), OrderBy);
             return SendList( Tags, SerialOnly);
         } else if(HasParameter("unassigned",Arg) && Arg=="true") {
             if(QB_.CountOnly) {
                 std::string Empty;
-                auto C = StorageService()->InventoryDB().Count( InventoryDB::OP( StorageService()->InventoryDB().OP("venue",ORM::EQ,Empty),
-                                                                          ORM::AND, StorageService()->InventoryDB().OP("entity",ORM::EQ,Empty) ));
+                auto C = DB_.Count( InventoryDB::OP( DB_.OP("venue",ORM::EQ,Empty),
+                                                                          ORM::AND, DB_.OP("entity",ORM::EQ,Empty) ));
                 return ReturnCountOnly(C);
             }
             ProvObjects::InventoryTagVec Tags;
             std::string Empty;
-            StorageService()->InventoryDB().GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( StorageService()->InventoryDB().OP("venue",ORM::EQ,Empty),
-                                                                                              ORM::AND, StorageService()->InventoryDB().OP("entity",ORM::EQ,Empty) ) , OrderBy );
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, InventoryDB::OP( DB_.OP("venue",ORM::EQ,Empty),
+                                                                         ORM::AND, DB_.OP("entity",ORM::EQ,Empty) ) , OrderBy );
             return SendList(Tags, SerialOnly);
         } else if (HasParameter("subscriber",Arg) && !Arg.empty()) {
             // looking for device(s) for a specific subscriber...
             ProvObjects::InventoryTagVec Tags;
-            StorageService()->InventoryDB().GetRecords(0,100,Tags," subscriber='" + Arg + "'");
+            DB_.GetRecords(0,100,Tags," subscriber='" + Arg + "'");
             if(SerialOnly) {
                 std::vector<std::string>    SerialNumbers;
                 std::transform(cbegin(Tags), cend(Tags), std::back_inserter(SerialNumbers), [](const auto &T) { return T.serialNumber; });
@@ -90,11 +90,11 @@ namespace OpenWifi{
                 return MakeJSONObjectArray("taglist", Tags, *this);
             }
         } else if (QB_.CountOnly) {
-            auto C = StorageService()->InventoryDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else if (GetBoolParameter("rrmOnly",false)) {
             Types::UUIDvec_t   DeviceList;
-            StorageService()->InventoryDB().GetRRMDeviceList(DeviceList);
+            DB_.GetRRMDeviceList(DeviceList);
             if(QB_.CountOnly)
                 return ReturnCountOnly(DeviceList.size());
             else {
@@ -102,7 +102,7 @@ namespace OpenWifi{
             }
         } else {
             ProvObjects::InventoryTagVec Tags;
-            StorageService()->InventoryDB().GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Tags,"",OrderBy);
             return MakeJSONObjectArray("taglist", Tags, *this);
         }
     }

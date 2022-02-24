@@ -24,15 +24,14 @@ namespace OpenWifi {
             TransactionId,
             Internal),
             DB_(StorageService()->ConfigurationDB()){}
-
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/configurations/{uuid}"}; };
-
+    private:
+        ConfigurationDB     &DB_;
         void DoGet();
         void DoPost();
         void DoPut();
         void DoDelete();
-    private:
+
         bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error);
-        ConfigurationDB     &DB_;
     };
 }

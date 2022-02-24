@@ -8,8 +8,8 @@
 
 #pragma once
 
+#include "StorageService.h"
 #include "framework/MicroService.h"
-#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 
@@ -22,9 +22,11 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal) {}
+            Internal),
+          DB_(StorageService()->InventoryDB()) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory"}; };
-
+    private:
+        InventoryDB     &DB_;
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

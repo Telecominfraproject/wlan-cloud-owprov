@@ -15,18 +15,18 @@ namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->EntityDB()),
-            ProvObjects::Entity>("entities",StorageService()->EntityDB(),*this );
+            return ReturnRecordList<decltype(DB_),
+            ProvObjects::Entity>("entities",DB_,*this );
         } else if(QB_.CountOnly) {
-            auto C = StorageService()->EntityDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else if (GetBoolParameter("getTree",false)) {
             Poco::JSON::Object  FullTree;
-            StorageService()->EntityDB().BuildTree(FullTree);
+            DB_.BuildTree(FullTree);
             return ReturnObject(FullTree);
         } else {
-            ProvObjects::EntityVec Entities;
-            StorageService()->EntityDB().GetRecords(QB_.Offset, QB_.Limit,Entities);
+            EntityDB::RecordVec Entities;
+            DB_.GetRecords(QB_.Offset, QB_.Limit,Entities);
             return MakeJSONObjectArray("entities", Entities, *this);
         }
     }
@@ -34,7 +34,7 @@ namespace OpenWifi{
     void RESTAPI_entity_list_handler::DoPost() {
         if (GetBoolParameter("setTree",false)) {
             auto FullTree = ParseStream();
-            StorageService()->EntityDB().ImportTree(FullTree);
+            DB_.ImportTree(FullTree);
             return OK();
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);

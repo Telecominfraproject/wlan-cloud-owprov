@@ -12,15 +12,15 @@
 namespace OpenWifi{
     void RESTAPI_managementRole_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->RolesDB()),
-            ProvObjects::ManagementRole>("roles",StorageService()->RolesDB(),*this );
+            return ReturnRecordList<decltype(DB_),
+            ProvObjects::ManagementRole>("roles",DB_,*this );
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = StorageService()->RolesDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else {
-            ProvObjects::ManagementRoleVec Roles;
-            StorageService()->RolesDB().GetRecords(QB_.Offset,QB_.Limit,Roles);
+            ManagementRoleDB::RecordVec Roles;
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Roles);
             return MakeJSONObjectArray("roles", Roles, *this);
         }
     }

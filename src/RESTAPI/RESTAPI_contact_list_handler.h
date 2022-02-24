@@ -6,6 +6,7 @@
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -18,9 +19,11 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal) {}
+            Internal),
+          DB_(StorageService()->ContactDB()) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/contact"}; };
-
+    private:
+        ContactDB   & DB_;
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

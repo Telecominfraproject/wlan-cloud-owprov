@@ -11,29 +11,29 @@ namespace OpenWifi{
         try {
             std::string Arg;
             if(!QB_.Select.empty()) {
-                return ReturnRecordList<decltype(StorageService()->VenueDB()),
-                ProvObjects::Venue>("venues",StorageService()->VenueDB(),*this );
+                return ReturnRecordList<decltype(DB_),
+                ProvObjects::Venue>("venues",DB_,*this );
             } else if(HasParameter("entity",Arg)) {
                 ProvObjects::VenueVec Venues;
-                StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues, StorageService()->VenueDB().OP("entity",ORM::EQ,Arg));
+                DB_.GetRecords(QB_.Offset,QB_.Limit,Venues, DB_.OP("entity",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
                 }
                 return MakeJSONObjectArray("venues", Venues, *this);
             } else if(HasParameter("venue",Arg)) {
-                ProvObjects::VenueVec Venues;
-                StorageService()->VenueDB().GetRecords(QB_.Offset,QB_.Limit,Venues,StorageService()->VenueDB().OP("venue",ORM::EQ,Arg));
+                VenueDB::RecordVec Venues;
+                DB_.GetRecords(QB_.Offset,QB_.Limit,Venues,DB_.OP("venue",ORM::EQ,Arg));
                 if(QB_.CountOnly) {
                     return ReturnCountOnly(Venues.size());
                 }
                 return MakeJSONObjectArray("venues", Venues, *this);
             } else if(QB_.CountOnly) {
                 Poco::JSON::Object  Answer;
-                auto C = StorageService()->VenueDB().Count();
+                auto C = DB_.Count();
                 return ReturnCountOnly(C);
             } else {
-                ProvObjects::VenueVec Venues;
-                StorageService()->VenueDB().GetRecords(QB_.Offset, QB_.Limit,Venues);
+                VenueDB::RecordVec Venues;
+                DB_.GetRecords(QB_.Offset, QB_.Limit,Venues);
                 return MakeJSONObjectArray("venues", Venues, *this);
             }
         } catch(const Poco::Exception &E) {

@@ -10,21 +10,21 @@
 namespace OpenWifi{
     void RESTAPI_map_list_handler::DoGet() {
         if(GetBoolParameter("myMaps",false)) {
-            auto where = StorageService()->MapDB().OP("creator",ORM::EQ,UserInfo_.userinfo.id);
+            auto where = DB_.OP("creator",ORM::EQ,UserInfo_.userinfo.id);
             std::vector<ProvObjects::Map>   Maps;
-            StorageService()->MapDB().GetRecords(QB_.Offset,QB_.Limit,Maps,where);
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Maps,where);
             return MakeJSONObjectArray("list", Maps, *this);
         } else if(GetBoolParameter("sharedWithMe",false)) {
 
         } else if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->MapDB()),ProvObjects::Map>("list",StorageService()->MapDB(),*this );
+            return ReturnRecordList<decltype(DB_),ProvObjects::Map>("list",DB_,*this );
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = StorageService()->MapDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else {
-            std::vector<ProvObjects::Map>   Maps;
-            StorageService()->MapDB().GetRecords(QB_.Offset,QB_.Limit,Maps);
+            MapDB::RecordVec Maps;
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Maps);
             return MakeJSONObjectArray("list", Maps, *this);
         }
     }

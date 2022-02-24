@@ -12,15 +12,15 @@ namespace OpenWifi{
 
     void RESTAPI_location_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->LocationDB()),
-            ProvObjects::Location>("locations",StorageService()->LocationDB(),*this );
+            return ReturnRecordList<decltype(DB_),
+            ProvObjects::Location>("locations",DB_,*this );
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = StorageService()->LocationDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else {
-            ProvObjects::LocationVec Locations;
-            StorageService()->LocationDB().GetRecords(QB_.Offset,QB_.Limit,Locations);
+            LocationDB::RecordVec Locations;
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Locations);
             return MakeJSONObjectArray("locations", Locations, *this);
         }
     }

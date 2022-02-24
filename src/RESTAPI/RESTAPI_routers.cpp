@@ -22,8 +22,10 @@
 #include "RESTAPI/RESTAPI_managementRole_list_handler.h"
 #include "RESTAPI/RESTAPI_map_handler.h"
 #include "RESTAPI/RESTAPI_map_list_handler.h"
-#include "RESTAPI_iptocountry_handler.h"
+#include "RESTAPI/RESTAPI_iptocountry_handler.h"
 #include "RESTAPI/RESTAPI_signup_handler.h"
+#include "RESTAPI/RESTAPI_variables_handler.h"
+#include "RESTAPI/RESTAPI_variables_list_handler.h"
 
 namespace OpenWifi {
 
@@ -50,7 +52,9 @@ namespace OpenWifi {
                     RESTAPI_map_list_handler,
                     RESTAPI_webSocketServer,
                     RESTAPI_iptocountry_handler,
-                    RESTAPI_signup_handler
+                    RESTAPI_signup_handler,
+                    RESTAPI_variables_handler,
+                    RESTAPI_variables_list_handler
                 >(Path,Bindings,L, S, TransactionId);
     }
 

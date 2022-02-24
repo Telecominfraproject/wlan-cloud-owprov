@@ -759,6 +759,68 @@ components:
         status:
           type: string
 
+    Variable:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - integer
+            - string
+            - float
+            - variable
+        weight:
+          type: integer
+          format: int64
+        prefix:
+          type: string
+        value:
+          type: string
+
+    VariableList:
+      type: object
+      properties:
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+
+    VariableBlock:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+        entity:
+          type: string
+          format: uuid
+        venue:
+          type: string
+          format: uuid
+        subscriber:
+          type: string
+          format: uuid
+        inventory:
+          type: string
+          format: uuid
+        inUse:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    VariableBlockList:
+      type: object
+      properties:
+        variableBlocks:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/VariableBlock'
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide

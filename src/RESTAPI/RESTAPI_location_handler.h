@@ -26,11 +26,11 @@ namespace OpenWifi {
             DB_(StorageService()->LocationDB()){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/location/{uuid}"}; };
 
+    private:
+        LocationDB  &DB_;
         void DoGet() final ;
         void DoPost() final ;
         void DoPut() final ;
         void DoDelete() final ;
-    private:
-        LocationDB  &DB_;
     };
 }

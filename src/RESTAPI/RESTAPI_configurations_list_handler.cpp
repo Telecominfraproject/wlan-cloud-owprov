@@ -11,15 +11,15 @@
 namespace OpenWifi{
     void RESTAPI_configurations_list_handler::DoGet() {
         if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(StorageService()->ConfigurationDB()),
-                    ProvObjects::DeviceConfiguration>("configurations",StorageService()->ConfigurationDB(),*this );
+            return ReturnRecordList<decltype(DB_),
+                    ProvObjects::DeviceConfiguration>("configurations",DB_,*this );
         } else if(QB_.CountOnly) {
             Poco::JSON::Object  Answer;
-            auto C = StorageService()->ConfigurationDB().Count();
+            auto C = DB_.Count();
             return ReturnCountOnly(C);
         } else {
-            ProvObjects::DeviceConfigurationVec Configs;
-            StorageService()->ConfigurationDB().GetRecords(QB_.Offset,QB_.Limit,Configs);
+            ConfigurationDB::RecordVec Configs;
+            DB_.GetRecords(QB_.Offset,QB_.Limit,Configs);
             return MakeJSONObjectArray("configurations", Configs, *this);
         }
     }

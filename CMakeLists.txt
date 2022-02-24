@@ -128,7 +128,7 @@ add_executable(owprov
         src/WebSocketClientServer.cpp src/WebSocketClientServer.h
         src/storage/storage_maps.cpp src/storage/storage_maps.h
         src/RESTAPI/RESTAPI_map_handler.cpp src/RESTAPI/RESTAPI_map_handler.h
-        src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h src/storage/storage_signup.cpp src/storage/storage_signup.h src/Signup.cpp src/Signup.h src/DeviceTypeCache.h)
+        src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h src/storage/storage_signup.cpp src/storage/storage_signup.h src/Signup.cpp src/Signup.h src/DeviceTypeCache.h src/storage/storage_variables.cpp src/storage/storage_variables.h src/RESTAPI/RESTAPI_variables_handler.cpp src/RESTAPI/RESTAPI_variables_handler.h src/RESTAPI/RESTAPI_variables_list_handler.cpp src/RESTAPI/RESTAPI_variables_list_handler.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES} ${MySQL_LIBRARIES}

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "framework/MicroService.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 
@@ -17,9 +18,12 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal) {}
+            Internal), DB_(StorageService()->VenueDB()) {
+        }
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/venue"}; };
 
+    private:
+        VenueDB     &DB_;
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

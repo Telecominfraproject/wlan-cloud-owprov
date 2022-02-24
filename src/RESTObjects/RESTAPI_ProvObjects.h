@@ -400,6 +400,43 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct Variable {
+        std::string         type;
+        uint64_t            weight=0;
+        std::string         prefix;
+        std::string         value;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct VariableList {
+        std::vector<Variable>   variables;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct VariableBlock {
+        ObjectInfo                  info;
+        std::vector<Variable>       variables;
+        std::string                 entity;
+        std::string                 venue;
+        std::string                 subscriber;
+        std::string                 inventory;
+        std::vector<std::string>    inUse;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct VariableBlockList {
+        std::vector<VariableBlock>      variableBlocks;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);
     bool CreateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);
 };
