@@ -19,6 +19,7 @@
 #include "WebSocketClientServer.h"
 #include "FindCountry.h"
 #include "Signup.h"
+#include "DeviceTypeCache.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -32,6 +33,7 @@ namespace OpenWifi {
 								   vDAEMON_BUS_TIMER,
 								   SubSystemVec{
 									   OpenWifi::StorageService(),
+                                       DeviceTypeCache(),
 									   ConfigurationValidator(),
 									   SerialNumberCache(),
 									   AutoDiscovery(),

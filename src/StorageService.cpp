@@ -79,39 +79,7 @@ namespace OpenWifi {
     }
 
     void Storage::onTimer(Poco::Timer &timer) {
-        UpdateDeviceTypes();
     }
-
-	bool Storage::UpdateDeviceTypes() {
-	    try {
-	        Types::StringPairVec QueryData;
-
-	        QueryData.push_back(std::make_pair("deviceSet","true"));
-	        OpenAPIRequestGet	Req(    uSERVICE_FIRMWARE,
-                                     "/api/v1/firmwares",
-                                     QueryData,
-                                     5000);
-
-	        Poco::JSON::Object::Ptr Response;
-	        auto StatusCode = Req.Do(Response);
-	        if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-	            if(Response->isArray("deviceTypes")) {
-	                std::lock_guard G(Mutex_);
-	                DeviceTypes_.clear();
-	                auto Array = Response->getArray("deviceTypes");
-	                for(const auto &i:*Array) {
-                        std::cout << "Adding deviceType:" << i.toString() << std::endl;
-	                    DeviceTypes_.insert(i.toString());
-	                }
-	                return true;
-	            }
-	        } else {
-	        }
-	    } catch (const Poco::Exception &E) {
-	        Logger().log(E);
-	    }
-	    return false;
-	}
 
     void Storage::Stop() {
         Timer_.stop();
