@@ -13,6 +13,7 @@
 #include "StorageService.h"
 #include "framework/ConfigurationValidator.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
+#include "DeviceTypeCache.h"
 
 namespace OpenWifi{
 
@@ -135,7 +136,7 @@ namespace OpenWifi{
         }
 
         C.inUse.clear();
-        if(C.deviceTypes.empty() || !StorageService()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
+        if(C.deviceTypes.empty() || !DeviceTypeCache()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
@@ -173,7 +174,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!NewConfig.deviceTypes.empty() && !StorageService()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
+        if(!NewConfig.deviceTypes.empty() && !DeviceTypeCache()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 

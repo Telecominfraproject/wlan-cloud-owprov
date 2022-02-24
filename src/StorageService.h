@@ -58,17 +58,6 @@ namespace OpenWifi {
             bool ValidateSingle(const std::string &P, std::string & Error);
             bool Validate(const std::string &P);
 
-            inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
-            inline bool AreAcceptableDeviceTypes(const Types::StringVec &S, bool WildCardAllowed=true) const {
-                for(const auto &i:S) {
-                    if(WildCardAllowed && i=="*") {
-                       //   We allow wildcards
-                    } else if(DeviceTypes_.find(i)==DeviceTypes_.end())
-                        return false;
-                }
-                return true;
-            }
-
             void onTimer(Poco::Timer & timer);
 
           private:
@@ -91,10 +80,7 @@ namespace OpenWifi {
             std::map<std::string, exist_func>                   ExistFunc_;
             std::map<std::string, expand_func>                  ExpandFunc_;
             Poco::Timer                                         Timer_;
-            std::set<std::string>                               DeviceTypes_;
             std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
-
-            bool UpdateDeviceTypes();
 
    };
 

@@ -15,6 +15,7 @@
 #include "sdks/SDK_sec.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "SerialNumberCache.h"
+#include "DeviceTypeCache.h"
 
 namespace OpenWifi{
 
@@ -167,7 +168,7 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(NewObject.deviceType.empty() || !StorageService()->IsAcceptableDeviceType(NewObject.deviceType)) {
+        if(NewObject.deviceType.empty() || !DeviceTypeCache()->IsAcceptableDeviceType(NewObject.deviceType)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
@@ -411,7 +412,7 @@ namespace OpenWifi{
 
 
         if(!NewObject.deviceType.empty()) {
-            if(!StorageService()->IsAcceptableDeviceType(NewObject.deviceType)) {
+            if(!DeviceTypeCache()->IsAcceptableDeviceType(NewObject.deviceType)) {
                 return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
             }
         }

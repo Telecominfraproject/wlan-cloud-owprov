@@ -13,7 +13,7 @@ namespace OpenWifi {
 
     class DeviceTypeCache : public SubSystemServer {
     public:
-        static auto instance() {
+        inline static auto instance() {
             static auto instance_ = new DeviceTypeCache;
             return instance_;
         }
@@ -35,6 +35,17 @@ namespace OpenWifi {
             UpdateDeviceTypes();
         }
 
+        inline bool IsAcceptableDeviceType(const std::string &D) const { return (DeviceTypes_.find(D)!=DeviceTypes_.end());};
+        inline bool AreAcceptableDeviceTypes(const Types::StringVec &S, bool WildCardAllowed=true) const {
+            for(const auto &i:S) {
+                if(WildCardAllowed && i=="*") {
+                    //   We allow wildcards
+                } else if(DeviceTypes_.find(i)==DeviceTypes_.end())
+                    return false;
+            }
+            return true;
+        }
+
     private:
         std::atomic_bool                                        Initialized_=false;
         Poco::Timer                                             Timer_;
@@ -46,7 +57,7 @@ namespace OpenWifi {
         {
         }
 
-        void InitializeCache() {
+        inline void InitializeCache() {
             std::lock_guard G(Mutex_);
 
             Initialized_ = true;
@@ -57,7 +68,6 @@ namespace OpenWifi {
                     auto O = P.parse(DeviceTypes).extract<Poco::JSON::Array::Ptr>();
                     for(const auto &i:*O) {
                         DeviceTypes_.insert(i.toString());
-                        std::cout << "Cached: " << i.toString() << std::endl;
                     }
                 } catch (...) {
 
@@ -65,7 +75,7 @@ namespace OpenWifi {
             }
         }
 
-        bool UpdateDeviceTypes() {
+        inline bool UpdateDeviceTypes() {
             try {
                 Types::StringPairVec QueryData;
 
@@ -83,7 +93,7 @@ namespace OpenWifi {
                         DeviceTypes_.clear();
                         auto Array = Response->getArray("deviceTypes");
                         for(const auto &i:*Array) {
-                            std::cout << "Adding deviceType:" << i.toString() << std::endl;
+                            // std::cout << "Adding deviceType:" << i.toString() << std::endl;
                             DeviceTypes_.insert(i.toString());
                         }
                         SaveCache();
@@ -97,7 +107,7 @@ namespace OpenWifi {
             return false;
         }
 
-        void SaveCache() {
+        inline void SaveCache() {
             std::lock_guard G(Mutex_);
 
             Poco::JSON::Array   Arr;
@@ -111,6 +121,6 @@ namespace OpenWifi {
         }
     };
 
-    auto DeviceTypeCache() { return DeviceTypeCache::instance(); }
+    inline auto DeviceTypeCache() { return DeviceTypeCache::instance(); }
 
 }
