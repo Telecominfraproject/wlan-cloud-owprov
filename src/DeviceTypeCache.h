@@ -57,6 +57,7 @@ namespace OpenWifi {
                     auto O = P.parse(DeviceTypes).extract<Poco::JSON::Array::Ptr>();
                     for(const auto &i:*O) {
                         DeviceTypes_.insert(i.toString());
+                        std::cout << "Cached: " << i.toString() << std::endl;
                     }
                 } catch (...) {
 
