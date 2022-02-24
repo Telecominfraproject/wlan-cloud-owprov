@@ -170,6 +170,11 @@ namespace OpenWifi {
                 modified = true;
             }
 
+            if(Locale!=ExistingDevice.locale) {
+                ExistingDevice.locale = Locale;
+                modified = true;
+            }
+
             if(modified) {
                 ExistingDevice.info.modified = std::time(nullptr);
                 StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber, ExistingDevice);
