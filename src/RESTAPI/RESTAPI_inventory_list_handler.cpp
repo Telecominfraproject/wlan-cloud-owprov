@@ -37,6 +37,8 @@ namespace OpenWifi{
         std::string UUID;
         std::string Arg;
 
+        std::cout << "URI: " << this->Request->getURI() << std::endl;
+
         bool SerialOnly=false;
         if(HasParameter("serialOnly",Arg) && Arg=="true")
             SerialOnly=true;
