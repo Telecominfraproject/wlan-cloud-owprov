@@ -207,7 +207,27 @@ namespace OpenWifi {
     }
 
     void RESTAPI_signup_handler::DoDelete() {
-        return BadRequest(RESTAPI::Errors::NotImplemented);
+        auto EMail = GetParameter("email", "");
+        auto SignupUUID = GetParameter("signupUUID", "");
+        auto SerialNumber = GetParameter("serialNumber", "");
+
+        if(!SignupUUID.empty()) {
+            if(StorageService()->SignupDB().DeleteRecord("id", SignupUUID)) {
+                return OK();
+            }
+            return NotFound();
+        } else if(!EMail.empty()) {
+            if(StorageService()->SignupDB().DeleteRecord("email",EMail)) {
+                return OK();
+            }
+            return NotFound();
+        } else if(!SerialNumber.empty()) {
+            if(StorageService()->SignupDB().DeleteRecord("serialNumber", SerialNumber)) {
+                return OK();
+            }
+            return NotFound();
+        }
+        return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
 
 }
