@@ -2462,8 +2462,7 @@ namespace OpenWifi {
         std::string GitSchema;
         try {
             if(Utils::wgets(GitUCentralJSONSchemaFile, GitSchema)) {
-                auto schema = json::parse(GitSchema);
-                Validator_->set_root_schema(schema);
+                RootSchema_ = json::parse(GitSchema);
                 Logger().information("Using uCentral validation schema from GIT.");
             } else {
                 std::string FileName{ MicroService::instance().DataDir() + "/ucentral.schema.json" };
@@ -2471,12 +2470,11 @@ namespace OpenWifi {
                 std::stringstream   schema_file;
                 schema_file << input.rdbuf();
                 input.close();
-                auto schema = json::parse(schema_file.str());
-                Validator_->set_root_schema(schema);
+                RootSchema_ = json::parse(schema_file.str());
                 Logger().information("Using uCentral validation schema from local file.");
             }
         } catch (const Poco::Exception &E) {
-            Validator_->set_root_schema(DefaultUCentralSchema);
+            RootSchema_ = DefaultUCentralSchema;
             Logger().information("Using uCentral validation from built-in default.");
         }
         Initialized_ = Working_ = true;
@@ -2593,7 +2591,9 @@ namespace OpenWifi {
             try {
                 auto Doc = json::parse(C);
                 custom_error_handler CE;
-                Validator_->validate(Doc,CE);
+                json_validator  Validator(nullptr, my_format_checker);
+                Validator.set_root_schema(RootSchema_);
+                Validator.validate(Doc,CE);
                 return true;
             } catch (const std::invalid_argument &E) {
                 std::cout << "1 Validation failed, here is why: " << E.what() << "\n";

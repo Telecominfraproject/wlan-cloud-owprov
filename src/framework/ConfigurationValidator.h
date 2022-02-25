@@ -29,7 +29,7 @@ namespace OpenWifi {
         bool            Initialized_=false;
         bool            Working_=false;
         void            Init();
-        std::unique_ptr<json_validator>  Validator_=std::make_unique<json_validator>(nullptr, my_format_checker);
+        nlohmann::json  RootSchema_;
 
         ConfigurationValidator():
             SubSystemServer("configvalidator", "CFG-VALIDATOR", "config.validator") {
