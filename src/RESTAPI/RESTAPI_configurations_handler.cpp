@@ -81,14 +81,18 @@ namespace OpenWifi{
                 BadRequest(RESTAPI::Errors::NameMustBeSet);
                 return false;
             }
-            auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-            auto N = Blocks->getNames();
-            for(const auto &j:N) {
-                if(std::find(SectionNames.cbegin(),SectionNames.cend(),j)==SectionNames.cend()) {
-                    std::cout << "Block section name rejected: " << j << std::endl;
-                    BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
-                    return false;
+            try {
+                auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+                auto N = Blocks->getNames();
+                for (const auto &j: N) {
+                    if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
+                        std::cout << "Block section name rejected: " << j << std::endl;
+                        BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+                        return false;
+                    }
                 }
+            } catch (...) {
+                std::cout << "Failed parsing block" << std::endl;
             }
 
             try {
