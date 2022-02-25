@@ -2458,17 +2458,19 @@ namespace OpenWifi {
                 Validator_->validate(Doc);
                 return true;
             } catch (const std::invalid_argument &E) {
+                std::cout << "1 Validation failed, here is why: " << E.what() << "\n";
                 Error = E.what();
                 return false;
             } catch (const std::logic_error &E) {
+                std::cout << "2 Validation failed, here is why: " << E.what() << "\n";
                 Error = E.what();
                 return false;
             } catch(const std::exception &E) {
                 Error = E.what();
-                std::cout << "Validation failed, here is why: " << E.what() << "\n";
+                std::cout << "3 Validation failed, here is why: " << E.what() << "\n";
                 return false;
             } catch(...) {
-                std::cout << "Some kind of bullshit exception..." << std::endl;
+                std::cout << "4 Some kind of bullshit exception..." << std::endl;
             }
         }
         return true;
