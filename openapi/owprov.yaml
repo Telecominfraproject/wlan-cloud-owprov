@@ -2679,7 +2679,7 @@ paths:
     delete:
       tags:
         - Subscriber Registration
-      summary: This call allows someone to get the status of a signup.
+      summary: This call allows someone to delete a specific signUp or all signups according to serialNumber of email address
       operationId: deleteSignup
       parameters:
         - in: query
