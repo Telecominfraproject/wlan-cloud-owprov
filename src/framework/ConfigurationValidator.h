@@ -14,9 +14,8 @@ namespace OpenWifi {
     class ConfigurationValidator : public  SubSystemServer {
     public:
 
-        static ConfigurationValidator *instance() {
-            if(instance_== nullptr)
-                instance_ = new ConfigurationValidator;
+        static auto instance() {
+            static auto instance_ = new ConfigurationValidator;
             return instance_;
         }
 
@@ -27,7 +26,6 @@ namespace OpenWifi {
         void reinitialize(Poco::Util::Application &self) override;
 
     private:
-        static  ConfigurationValidator * instance_;
         bool            Initialized_=false;
         bool            Working_=false;
         void            Init();
@@ -38,7 +36,7 @@ namespace OpenWifi {
         }
     };
 
-    inline ConfigurationValidator * ConfigurationValidator() { return ConfigurationValidator::instance(); }
+    inline auto ConfigurationValidator() { return ConfigurationValidator::instance(); }
     inline bool ValidateUCentralConfiguration(const std::string &C, std::string &Error) { return ConfigurationValidator::instance()->Validate(C, Error); }
 }
 
