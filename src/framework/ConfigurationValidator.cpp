@@ -2446,6 +2446,16 @@ namespace OpenWifi {
 }
     )"_json;
 
+    class custom_error_handler : public nlohmann::json_schema::basic_error_handler
+    {
+        void error(const nlohmann::json_pointer<nlohmann::basic_json<>> &pointer, const json &instance,
+                   const std::string &message) override
+        {
+            nlohmann::json_schema::basic_error_handler::error(pointer, instance, message);
+            std::cout << "ERROR: '" << pointer << "' - '" << instance << "': " << message << "\n";
+        }
+    };
+
     void ConfigurationValidator::Init() {
         if(Initialized_)
             return;
@@ -2582,7 +2592,8 @@ namespace OpenWifi {
         if(Working_) {
             try {
                 auto Doc = json::parse(C);
-                Validator_->validate(Doc);
+                custom_error_handler CE;
+                Validator_->validate(Doc,CE);
                 return true;
             } catch (const std::invalid_argument &E) {
                 std::cout << "1 Validation failed, here is why: " << E.what() << "\n";
