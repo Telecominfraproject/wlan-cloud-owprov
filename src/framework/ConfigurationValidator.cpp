@@ -2447,11 +2447,7 @@ namespace OpenWifi {
                 return;
             throw std::invalid_argument(value + " is not a valid IP address.");
         } else {
-            try {
-                nlohmann::json_schema::default_string_format_check(format,value);
-            } catch (const std::logic_error &E) {
-                std::string Error{"JSON Schema validation: "};
-            }
+            nlohmann::json_schema::default_string_format_check(format,value);
         }
     }
 
@@ -2461,6 +2457,12 @@ namespace OpenWifi {
                 auto Doc = json::parse(C);
                 Validator_->validate(Doc);
                 return true;
+            } catch (const std::invalid_argument &E) {
+                Error = E.what();
+                return false;
+            } catch (const std::logic_error &E) {
+                Error = E.what();
+                return false;
             } catch(const std::exception &E) {
                 Error = E.what();
                 std::cout << "Validation failed, here is why: " << E.what() << "\n";
