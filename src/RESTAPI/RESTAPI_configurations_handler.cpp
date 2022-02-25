@@ -77,6 +77,7 @@ namespace OpenWifi{
         for(const auto &i:Config.configuration) {
             Poco::JSON::Parser  P;
             if(i.name.empty()) {
+                std::cout << "Name is empty" << std::endl;
                 BadRequest(RESTAPI::Errors::NameMustBeSet);
                 return false;
             }
@@ -84,6 +85,7 @@ namespace OpenWifi{
             auto N = Blocks->getNames();
             for(const auto &j:N) {
                 if(std::find(SectionNames.cbegin(),SectionNames.cend(),j)==SectionNames.cend()) {
+                    std::cout << "Block section name rejected: " << j << std::endl;
                     BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
                     return false;
                 }
@@ -91,8 +93,9 @@ namespace OpenWifi{
 
             if(ValidateUCentralConfiguration(i.configuration, Error)) {
                 /* nothing to do */ ;
+                std::cout << "Block: " << i.name << " is valid" << std::endl;
             } else {
-                // std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
+                std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl << ">>> REJECTED" << std::endl;
                 return false;
             }
 
@@ -105,6 +108,8 @@ namespace OpenWifi{
         if(UUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
+
+        std::cout << __LINE__ << std::endl;
 
         std::string Arg;
         if(HasParameter("validateOnly",Arg) && Arg=="true") {
@@ -120,38 +125,48 @@ namespace OpenWifi{
             Answer.set("error", Error);
             return ReturnObject(Answer);
         }
+        std::cout << __LINE__ << std::endl;
 
         ProvObjects::DeviceConfiguration C;
         Poco::JSON::Object::Ptr Obj = ParseStream();
         if (!C.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,C.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(!C.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",C.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownId);
         }
+        std::cout << __LINE__ << std::endl;
 
         C.inUse.clear();
         if(C.deviceTypes.empty() || !DeviceTypeCache()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
+        std::cout << __LINE__ << std::endl;
 
         std::string Error;
         if(!ValidateConfigBlock(C,Error)) {
             return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(DB_.CreateRecord(C)) {
+            std::cout << __LINE__ << std::endl;
             DB_.GetRecord("id", C.info.id, C);
+            std::cout << __LINE__ << std::endl;
             if(!C.managementPolicy.empty())
                 StorageService()->PolicyDB().AddInUse("id",C.managementPolicy,DB_.Prefix(), C.info.id);
 
+            std::cout << __LINE__ << std::endl;
             Poco::JSON::Object  Answer;
             C.to_json(Answer);
+            std::cout << __LINE__ << std::endl;
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
