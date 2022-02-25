@@ -81,7 +81,7 @@ namespace OpenWifi{
                 BadRequest(RESTAPI::Errors::NameMustBeSet);
                 return false;
             }
-            try {
+/*            try {
                 auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
                 auto N = Blocks->getNames();
                 for (const auto &j: N) {
@@ -94,7 +94,7 @@ namespace OpenWifi{
             } catch (...) {
                 std::cout << "Failed parsing block" << std::endl;
             }
-
+*/
             try {
                 if (ValidateUCentralConfiguration(i.configuration, Error)) {
                     /* nothing to do */ ;
