@@ -2467,6 +2467,8 @@ namespace OpenWifi {
                 Error = E.what();
                 std::cout << "Validation failed, here is why: " << E.what() << "\n";
                 return false;
+            } catch(...) {
+                std::cout << "Some kind of bullshit exception..." << std::endl;
             }
         }
         return true;
