@@ -2446,8 +2446,6 @@ namespace OpenWifi {
 }
     )"_json;
 
-    class ConfigurationValidator *ConfigurationValidator::instance_ = nullptr;
-
     void ConfigurationValidator::Init() {
         if(Initialized_)
             return;
