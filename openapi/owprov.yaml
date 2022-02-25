@@ -1623,6 +1623,8 @@ paths:
                   - $ref: '#/components/schemas/SerialNumberList'
                   - $ref: '#/components/schemas/InventoryTagList'
                   - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1671,6 +1673,8 @@ paths:
                   - $ref: '#/components/schemas/InventoryTag'
                   - $ref: '#/components/schemas/FirmwareOptions'
                   - $ref: '#/components/schemas/InventoryConfigApplyResult'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

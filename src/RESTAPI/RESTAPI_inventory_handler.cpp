@@ -71,33 +71,23 @@ namespace OpenWifi{
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
             APConfig Device(SerialNumber, Existing.deviceType, Logger(), false);
             Poco::JSON::Object::Ptr Configuration;
-
-            Types::StringVec Errors, Warnings;
             Poco::JSON::Object ErrorsObj, WarningsObj;
-            int ErrorCode;
+            ProvObjects::InventoryConfigApplyResult Results;
             if (Device.Get(Configuration)) {
+                std::ostringstream OS;
+                Configuration->stringify(OS);
+                Results.appliedConfiguration = OS.str();
                 Poco::JSON::Object::Ptr Response;
                 if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
-                    std::ostringstream os;
-                    Response->stringify(os);
-                    // std::cout << "Success: " << os.str() << std::endl;
-                    GetRejectedLines(Response, Warnings);
-                    ErrorCode = 0;
+                    GetRejectedLines(Response, Results.warnings);
+                    Results.errorCode = 0;
                 } else {
-                    std::ostringstream os;
-                    Response->stringify(os);
-                    ErrorCode = 1;
-                    // std::cout << "Failure: " << os.str() << std::endl;
+                    Results.errorCode = 1;
                 }
-                Answer.set("appliedConfiguration", Configuration);
-                Answer.set("response", Response);
             } else {
-                Answer.set("appliedConfiguration", "");
-                ErrorCode = 1;
+                Results.errorCode = 1;
             }
-            Answer.set("errorCode", ErrorCode);
-            RESTAPI_utils::field_to_json(Answer, "errors", Errors);
-            RESTAPI_utils::field_to_json(Answer, "warnings", Warnings);
+            Results.to_json(Answer);
             return ReturnObject(Answer);
         }   else if(QB_.AdditionalInfo) {
             AddExtendedInfo(Existing,Answer);

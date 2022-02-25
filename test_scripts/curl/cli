@@ -448,6 +448,13 @@ reloadsubsystem() {
             -d "$payload"
 }
 
+getsubdevs() {
+    curl ${FLAGS} -X GET "https://${OWPROV}/api/v1/inventory?subscriber=$1" \
+            -H "accept: application/json" \
+            -H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
 addresscheck() {
     echo "Token:${token}"
     wscat -c wss://${OWPROV}/api/v1/ws
@@ -522,6 +529,7 @@ case "$1" in
     "affecteddevices") login; affecteddevices "$2"; logout;;
     "signup") login; signup ; logout;;
     "getsignup") login; getsignup $2; logout;;
+    "getsubdevs") login; getsubdevs $2; logout;;
     *) help ;;
 esac
 
