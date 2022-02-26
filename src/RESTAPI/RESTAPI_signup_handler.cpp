@@ -164,6 +164,7 @@ namespace OpenWifi {
         auto EMail = GetParameter("email", "");
         auto SignupUUID = GetParameter("signupUUID", "");
         auto SerialNumber = GetParameter("serialNumber", "");
+        auto List = GetBoolParameter("listOnly",false);
 
         Poco::JSON::Object          Answer;
         ProvObjects::SignupEntry    SE;
@@ -185,6 +186,10 @@ namespace OpenWifi {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
+        } else if(List) {
+            SignupDB::RecordVec SEs;
+            StorageService()->SignupDB().GetRecords(0,100,SEs);
+            return ReturnObject("signups",SEs);
         }
         return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
