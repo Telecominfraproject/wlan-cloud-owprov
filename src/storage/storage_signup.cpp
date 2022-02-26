@@ -8,6 +8,7 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
 #include "framework/MicroService.h"
+#include "Signup.h"
 
 namespace OpenWifi {
 
@@ -48,6 +49,16 @@ namespace OpenWifi {
         return false;
     }
 
+    void SignupDB::RemoveIncompleteSignups() {
+        try {
+            uint64_t Floor = OpenWifi::Now() - Signup()->GracePeriod() ;
+            uint64_t TooOld = OpenWifi::Now() - Signup()->LingerPeriod() ;
+            DeleteRecords(" completed=0 and submitted < " + std::to_string(Floor) );    //  Remove incomplete entries
+            DeleteRecords(" completed < " + std::to_string(TooOld) );                   //  Remove really old stuff
+        } catch (...) {
+
+        }
+    }
 }
 
 template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects::SignupEntry>::Convert(const OpenWifi::SignupDBRecordType &In, OpenWifi::ProvObjects::SignupEntry &Out) {

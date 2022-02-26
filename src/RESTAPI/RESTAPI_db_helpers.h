@@ -211,4 +211,37 @@ namespace OpenWifi {
         return true;
     }
 
+    template <typename DB> void ListHandler(const char *BlockName,DB & DBInstance, RESTAPIHandler & R) {
+        auto Entity = R.GetParameter("entity", "");
+        auto Venue = R.GetParameter("venue", "");
+
+        typedef typename DB::RecordVec      RecVec;
+        typedef typename DB::RecordName     RecType;
+
+        if(!R.QB_.Select.empty()) {
+            return ReturnRecordList<decltype(DBInstance),
+                    RecType>(BlockName, DBInstance, R);
+        } if(!Entity.empty()) {
+            RecVec Entries;
+            DBInstance.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries," entity=' " + Entity +"'");
+            if(R.QB_.CountOnly)
+                return R.ReturnCountOnly(Entries.size());
+            return MakeJSONObjectArray(BlockName, Entries, R);
+        } if(!Venue.empty()) {
+            RecVec Entries;
+            DBInstance.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries," venue=' " + Venue +"'");
+            if(R.QB_.CountOnly)
+                return R.ReturnCountOnly(Entries.size());
+            return MakeJSONObjectArray(BlockName, Entries, R);
+        } else if(R.QB_.CountOnly) {
+            Poco::JSON::Object  Answer;
+            auto C = DBInstance.Count();
+            return R.ReturnCountOnly(C);
+        } else {
+            RecVec Entries;
+            DBInstance.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries);
+            return MakeJSONObjectArray(BlockName, Entries, R);
+        }
+    }
+
 }

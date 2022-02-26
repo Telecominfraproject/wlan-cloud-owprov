@@ -6,6 +6,7 @@
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "Poco/Timer.h"
 
 namespace OpenWifi {
 
@@ -45,12 +46,16 @@ namespace OpenWifi {
             OutstandingSignups_[SE.info.id] = SE;
         }
 
+        void onTimer(Poco::Timer & timer);
+
     private:
-        uint64_t            GracePeriod_ = 60 * 60;
-        uint64_t            LingerPeriod_ = 24 * 60 * 60;
-        std::atomic_bool    Running_ = false;
+        uint64_t                GracePeriod_ = 60 * 60;
+        uint64_t                LingerPeriod_ = 7 * 24 * 60 * 60;   //   7 days
+        std::atomic_bool        Running_ = false;
         std::map<std::string, ProvObjects::SignupEntry>  OutstandingSignups_;
-        Poco::Thread    Worker_;
+        Poco::Thread            Worker_;
+        Poco::Timer                                        Timer_;
+        std::unique_ptr<Poco::TimerCallback<Signup>>       TimerCallback_;
 
         Signup() noexcept:
                 SubSystemServer("SignupServer", "SIGNUP", "signup")

@@ -10,17 +10,6 @@
 
 namespace OpenWifi{
     void RESTAPI_managementPolicy_list_handler::DoGet() {
-        if(!QB_.Select.empty()) {
-            return ReturnRecordList<decltype(DB_),
-            ProvObjects::ManagementPolicy>("managementPolicies",DB_,*this );
-        } else if(QB_.CountOnly) {
-            Poco::JSON::Object  Answer;
-            auto C = DB_.Count();
-            return ReturnCountOnly(C);
-        } else {
-            ProvObjects::ManagementPolicyVec Policies;
-            DB_.GetRecords(QB_.Offset,QB_.Limit,Policies);
-            return MakeJSONObjectArray("managementPolicies", Policies, *this);
-        }
+        return ListHandler<PolicyDB>("managementPolicies", DB_, *this);
     }
 }

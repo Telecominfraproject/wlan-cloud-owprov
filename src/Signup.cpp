@@ -18,14 +18,26 @@ namespace OpenWifi {
         for(const auto &i:Signups_) {
             OutstandingSignups_[i.info.id] = i;
         }
+
+        TimerCallback_ = std::make_unique<Poco::TimerCallback<Signup>>(*this,&Signup::onTimer);
+        Timer_.setStartInterval( 60 * 1000);            // first run in 20 seconds
+        Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
+        Timer_.start(*TimerCallback_);
+
         Worker_.start(*this);
         return 0;
     }
 
     void Signup::Stop() {
         Running_ = false;
+        Timer_.stop();
         Worker_.wakeUp();
         Worker_.join();
+    }
+
+    void Signup::onTimer(Poco::Timer &timer) {
+        std::lock_guard     G(Mutex_);
+        StorageService()->SignupDB().RemoveIncompleteSignups();
     }
 
     void Signup::run() {

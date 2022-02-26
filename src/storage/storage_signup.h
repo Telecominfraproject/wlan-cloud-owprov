@@ -28,6 +28,7 @@ namespace OpenWifi {
     public:
         explicit SignupDB(OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept;
         bool GetIncompleteSignups( SignupDB::RecordVec & Signups );
+        void RemoveIncompleteSignups();
     private:
     };
 }
