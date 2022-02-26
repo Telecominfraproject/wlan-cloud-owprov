@@ -264,6 +264,7 @@ namespace OpenWifi::ProvObjects {
         std::string                     rrm;
         std::string                     firmwareUpgrade;
         bool                            firmwareRCOnly=false;
+        bool                            subscriberOnly=false;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -396,6 +397,16 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    enum SignupStatusCodes {
+        SignupCreated = 0 ,
+        SignupWaitingForEmail,
+        SignupWaitingForDevice,
+        SignupSuccess,
+        SignupFailure,
+        SignupCanceled,
+        SignupTimedOut
+    };
+
     struct SignupEntry {
         ObjectInfo          info;
         std::string         email;
@@ -405,6 +416,7 @@ namespace OpenWifi::ProvObjects {
         uint64_t            completed = 0 ;
         std::string         status;
         uint64_t            error=0;
+        uint64_t            statusCode=0;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

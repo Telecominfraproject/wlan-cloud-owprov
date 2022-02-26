@@ -27,13 +27,15 @@ namespace OpenWifi {
     std::string,
     std::string,
     std::string,
-    uint32_t
+    uint32_t,
+    bool
     > ConfigurationDBRecordType;
 
     class ConfigurationDB : public ORM::DB<ConfigurationDBRecordType, ProvObjects::DeviceConfiguration> {
     public:
         ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         bool GetListOfAffectedDevices(const Types::UUID_t & ConfigUUID, Types::UUIDvec_t & DeviceSerialNumbers );
+        bool Upgrade(uint32_t from, uint32_t &to) override;
     private:
     };
 }

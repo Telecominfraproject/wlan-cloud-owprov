@@ -9,52 +9,42 @@
 namespace OpenWifi {
 
     void RESTAPI_signup_handler::DoPost() {
-
-        std::cout << __LINE__ << std::endl;
         auto UserName = GetParameter("email","");
         Poco::toLowerInPlace(UserName);
         auto SerialNumber = GetParameter("serialNumber","");
         Poco::toLowerInPlace(SerialNumber);
 
-        std::cout << __LINE__ << std::endl;
         if(UserName.empty() || SerialNumber.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        std::cout << __LINE__ << std::endl;
         if(!Utils::ValidEMailAddress(UserName)) {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
-        std::cout << __LINE__ << std::endl;
         if(!Utils::ValidSerialNumber(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
-        std::cout << __LINE__ << std::endl;
 
-        //  if a signup already exists for this user, we should just return its value
-        //  or its completion
+        //  if a signup already exists for this user, we should just return its value completion
         SignupDB::RecordVec SEs;
-        std::cout << __LINE__ << std::endl;
-        if(StorageService()->SignupDB().GetRecords(0,100, SEs, "email='" + UserName + "'")) {
+        if(StorageService()->SignupDB().GetRecords(0,100, SEs, " email='" + UserName + "' and serialNumber='"+SerialNumber+"' ")) {
             for(const auto &i:SEs) {
-                if((i.submitted + Signup()->GracePeriod()) > OpenWifi::Now() && i.serialNumber==SerialNumber) {
-                    Poco::JSON::Object  Answer;
+                if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
+                    i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice ||
+                    i.statusCode == ProvObjects::SignupStatusCodes::SignupSuccess ) {
+                    Logger().information(Poco::format("SIGNUP: Returning existing signup record for '%s'",i.email));
+                    Poco::JSON::Object Answer;
                     i.to_json(Answer);
                     return ReturnObject(Answer);
-                } else if((i.submitted + Signup()->GracePeriod()) < OpenWifi::Now() && i.completed==0) {
-                    StorageService()->SignupDB().DeleteRecord("id", i.info.id);
                 }
             }
         }
-        std::cout << __LINE__ << std::endl;
 
         //  So we do not have an outstanding signup...
         //  Can we actually claim this serial number??? if not, we need to return an error
         ProvObjects::InventoryTag   IT;
-        std::cout << __LINE__ << std::endl;
         if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,IT)) {
-
             if(!IT.subscriber.empty()) {
                 return BadRequest(RESTAPI::Errors::SerialNumberAlreadyProvisioned);
             }
@@ -63,13 +53,12 @@ namespace OpenWifi {
                 return BadRequest(RESTAPI::Errors::SerialNumberNotTheProperClass);
             }
         }
-        std::cout << __LINE__ << std::endl;
 
         //  OK, we can claim this device, can we create a userid?
         //  Let's create one
         //  If sec.signup("email",uuid);
         auto SignupUUID = MicroService::instance().CreateUUID();
-        std::cout << __LINE__ << std::endl;
+        Logger().information(Poco::format("SIGNUP: Creating signup entry for '%s', uuid=%s",UserName, SignupUUID));
 
         Poco::JSON::Object  Body;
         OpenAPIRequestPost  CreateUser( uSERVICE_SECURITY, "/api/v1/signup", {
@@ -77,7 +66,6 @@ namespace OpenWifi {
                 { "signupUUID" , SignupUUID }
         }, Body, 30000);
 
-        std::cout << __LINE__ << std::endl;
         Poco::JSON::Object::Ptr Answer;
         if(CreateUser.Do(Answer) == Poco::Net::HTTPServerResponse::HTTP_OK) {
             SecurityObjects::UserInfo   UI;
@@ -85,11 +73,10 @@ namespace OpenWifi {
             UI.from_json(Answer);
             std::ostringstream os;
             Answer->stringify(os);
-            std::cout << "Create user: " << std::endl << os.str() << std::endl;
+            Logger().information(Poco::format("SIGNUP: email: '%s' signupID: '%s' userId: '%s'", UserName, SignupUUID, UI.id));
 
             //  so create the Signup entry and modify the inventory
             ProvObjects::SignupEntry    SE;
-
             SE.info.id = SignupUUID;
             SE.info.created = SE.info.modified = SE.submitted = OpenWifi::Now();
             SE.completed = 0 ;
@@ -98,12 +85,10 @@ namespace OpenWifi {
             SE.userId = UI.id;
             SE.email = UserName;
             SE.status = "waiting-for-email-verification";
-
-            std::cout << "Creating signup entry: " << SE.email << std::endl;
+            SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForEmail;
             StorageService()->SignupDB().CreateRecord(SE);
             Signup()->AddOutstandingSignup(SE);
 
-            //  We do not have a device, so let's create one.
             if(IT.serialNumber.empty()) {
                 IT.serialNumber = SerialNumber;
                 IT.info.id = MicroService::instance().CreateUUID();
@@ -112,7 +97,8 @@ namespace OpenWifi {
                 Poco::JSON::Object StateDoc;
                 StateDoc.set("method", "signup");
                 StateDoc.set("claimer", UserName);
-                StateDoc.set("claimId", UI.id);
+                StateDoc.set("claimerId", UI.id);
+                StateDoc.set("signupUUID", SignupUUID);
                 StateDoc.set("errorCode",0);
                 StateDoc.set("date", OpenWifi::Now());
                 StateDoc.set("status", "waiting for email-verification");
@@ -125,7 +111,8 @@ namespace OpenWifi {
                 Poco::JSON::Object StateDoc;
                 StateDoc.set("method", "signup");
                 StateDoc.set("claimer", UserName);
-                StateDoc.set("claimId", UI.id);
+                StateDoc.set("claimerId", UI.id);
+                StateDoc.set("signupUUID", SignupUUID);
                 StateDoc.set("errorCode",0);
                 StateDoc.set("date", OpenWifi::Now());
                 StateDoc.set("status", "waiting for email-verification");
@@ -141,9 +128,6 @@ namespace OpenWifi {
             SE.to_json(SEAnswer);
             return ReturnObject(SEAnswer);
         }
-
-        std::cout << __LINE__ << std::endl;
-
         return BadRequest(RESTAPI::Errors::UserAlreadyExists);
     }
 
@@ -161,20 +145,19 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(Operation == "emailVerified") {
+        if(Operation == "emailVerified" && SE.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForEmail) {
             std::cout << "Verified email for : " << SE.email << std::endl;
-
             SE.info.modified = OpenWifi::Now();
             SE.status = "emailVerified";
-
+            SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForDevice;
             StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
             Signup()->AddOutstandingSignup(SE);
-
             Poco::JSON::Object  Answer;
             SE.to_json(Answer);
-
             return ReturnObject(Answer);
         }
+
+        return BadRequest("Not implemented");
     }
 
     void RESTAPI_signup_handler::DoGet() {

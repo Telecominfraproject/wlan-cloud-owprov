@@ -115,8 +115,16 @@ namespace OpenWifi{
         if(!Existing.contact.empty())
             StorageService()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
 
-        if(!Existing.deviceConfiguration.empty())
-            StorageService()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(), Existing.info.id);
+        if(!Existing.deviceConfiguration.empty()) {
+            ProvObjects::DeviceConfiguration    DC;
+            if(StorageService()->ConfigurationDB().GetRecord("id", Existing.deviceConfiguration, DC)) {
+                if(DC.subscriberOnly)
+                    StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration);
+                else
+                    StorageService()->ConfigurationDB().DeleteInUse("id", Existing.deviceConfiguration, DB_.Prefix(),
+                                                                    Existing.info.id);
+            }
+        }
 
         if(DB_.DeleteRecord("id", Existing.info.id)) {
             DB_.DeleteRecord(RESTAPI::Protocol::ID, Existing.info.id);

@@ -9,6 +9,7 @@
 #include "StorageService.h"
 #include "framework/MicroService.h"
 #include "Signup.h"
+#include "sdks/SDK_sec.h"
 
 namespace OpenWifi {
 
@@ -26,7 +27,8 @@ namespace OpenWifi {
             ORM::Field{"submitted",ORM::FieldType::FT_BIGINT},
             ORM::Field{"completed",ORM::FieldType::FT_BIGINT},
             ORM::Field{"status",ORM::FieldType::FT_TEXT},
-            ORM::Field{"error",ORM::FieldType::FT_BIGINT}
+            ORM::Field{"error",ORM::FieldType::FT_BIGINT},
+            ORM::Field{"statusCode",ORM::FieldType::FT_BIGINT}
     };
 
     const static  ORM::IndexVec    SignupDB_Indexes{
@@ -37,7 +39,7 @@ namespace OpenWifi {
     };
 
     SignupDB::SignupDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept :
-            DB(T, "signups", SignupDB_Fields, SignupDB_Indexes, P, L, "sig") {
+            DB(T, "signups2", SignupDB_Fields, SignupDB_Indexes, P, L, "sig") {
     }
 
     bool SignupDB::GetIncompleteSignups(SignupDB::RecordVec &Signups) {
@@ -51,10 +53,63 @@ namespace OpenWifi {
 
     void SignupDB::RemoveIncompleteSignups() {
         try {
-            uint64_t Floor = OpenWifi::Now() - Signup()->GracePeriod() ;
-            uint64_t TooOld = OpenWifi::Now() - Signup()->LingerPeriod() ;
-            DeleteRecords(" completed=0 and submitted < " + std::to_string(Floor) );    //  Remove incomplete entries
-            DeleteRecords(" completed < " + std::to_string(TooOld) );                   //  Remove really old stuff
+            Types::StringVec ToDelete, TimedOut;
+            uint64_t         now = OpenWifi::Now();
+            auto F = [&](const SignupDB::RecordName &R) -> bool {
+
+                if(R.completed!=0)
+                    return true;
+
+                if((now-R.submitted)>Signup()->LingerPeriod()) {
+                    ToDelete.emplace_back(R.info.id);
+                    return true;
+                }
+
+                if((now-R.submitted)>Signup()->GracePeriod()) {
+                    TimedOut.push_back(R.info.id);
+                    //  delete this temporary user
+                    SDK::Sec::Subscriber::Delete(nullptr,R.userId);
+                    if(R.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForDevice) {
+                        ProvObjects::InventoryTag   IT;
+                        if(StorageService()->InventoryDB().GetRecord("serialNumber",R.serialNumber,IT)) {
+                            if(IT.devClass.empty() || IT.devClass=="any" || IT.devClass=="subscriber") {
+                                try {
+                                    auto DeviceStatus = nlohmann::json::parse(IT.state);
+                                    if(DeviceStatus["method"]=="signup" && DeviceStatus["signupUUID"]==R.info.id)  {
+                                        DeviceStatus["claimer"] = "";
+                                        DeviceStatus["claimerId"] = "";
+                                        DeviceStatus["signupUUID"] = "";
+                                        IT.subscriber = "";
+                                        IT.info.modified = Now();
+                                        IT.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now(),.createdBy="signup-bot",.note="Device release from signup process."});
+                                        StorageService()->InventoryDB().UpdateRecord("serialNumber",R.serialNumber,IT);
+                                    }
+                                } catch (...) {
+
+                                }
+                            }
+                        }
+                    }
+                    return true;
+                }
+                return true;
+            };
+
+            Iterate(F);
+
+            for(const auto &i:ToDelete)
+                DeleteRecord("id",i);
+
+            for(const auto &i:TimedOut) {
+                SignupDB::RecordName R;
+                if(GetRecord("id",i,R)) {
+                    R.statusCode=ProvObjects::SignupStatusCodes::SignupTimedOut;
+                    R.status = "timedOut";
+                    R.info.modified=Now();
+                    UpdateRecord("id",i,R);
+                }
+            }
+
         } catch (...) {
 
         }
@@ -75,6 +130,7 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.completed = In.get<10>();
     Out.status = In.get<11>();
     Out.error = In.get<12>();
+    Out.statusCode = In.get<13>();
 }
 
 template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects::SignupEntry>::Convert(const OpenWifi::ProvObjects::SignupEntry &In, OpenWifi::SignupDBRecordType &Out) {
@@ -91,4 +147,5 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.set<10>(In.completed);
     Out.set<11>(In.status);
     Out.set<12>(In.error);
+    Out.set<13>(In.statusCode);
 }

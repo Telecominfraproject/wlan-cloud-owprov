@@ -404,6 +404,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"rrm",rrm);
         field_to_json( Obj,"firmwareUpgrade",firmwareUpgrade);
         field_to_json( Obj,"firmwareRCOnly",firmwareRCOnly);
+        field_to_json( Obj,"subscriberOnly",subscriberOnly);
     }
 
     bool DeviceConfiguration::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -417,6 +418,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"rrm",rrm);
             field_from_json( Obj,"firmwareUpgrade",firmwareUpgrade);
             field_from_json( Obj,"firmwareRCOnly",firmwareRCOnly);
+            field_from_json( Obj,"subscriberOnly",subscriberOnly);
             return true;
         } catch(...) {
 
@@ -635,6 +637,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"completed", completed);
         RESTAPI_utils::field_to_json( Obj,"status", status);
         RESTAPI_utils::field_to_json( Obj,"error", error);
+        RESTAPI_utils::field_to_json( Obj,"statusCode", statusCode);
     }
 
     bool SignupEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -647,6 +650,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"completed", completed);
             RESTAPI_utils::field_from_json( Obj,"status", status);
             RESTAPI_utils::field_from_json( Obj,"error", error);
+            RESTAPI_utils::field_from_json( Obj,"statusCode", statusCode);
             return true;
         } catch(...) {
 

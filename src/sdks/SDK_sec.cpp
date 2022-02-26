@@ -64,6 +64,21 @@ namespace OpenWifi::SDK::Sec {
             }
             return false;
         }
+
+        bool Delete(RESTAPIHandler *client, const Types::UUID_t & Id) {
+            OpenAPIRequestDelete	Req(    uSERVICE_SECURITY,
+                                         "/api/v1/subuser/" + Id,
+                                         {},
+                                         5000);
+
+            auto StatusCode = Req.Do();
+            if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK ||
+                StatusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT ||
+                StatusCode == Poco::Net::HTTPResponse::HTTP_ACCEPTED) {
+                return true;
+            }
+            return false;
+        }
     }
 
 }

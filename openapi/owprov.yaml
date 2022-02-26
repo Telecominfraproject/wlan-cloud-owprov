@@ -507,6 +507,9 @@ components:
           items:
             type: string
             format: uuid
+        subscriberOnly:
+          type: boolean
+          default: false
         rrm:
           type: string
           enum:
@@ -762,6 +765,9 @@ components:
           format: int64
         status:
           type: string
+        statusCode:
+          type: integer
+          format: int64
 
     Variable:
       type: object
@@ -2794,10 +2800,8 @@ paths:
             type: string
             enum:
               - cancel
-              - success
-              - inprogress
-              - failed
-              - poll
+              - emailVerified
+              - deviceVerified
           required: true
       requestBody:
         content:

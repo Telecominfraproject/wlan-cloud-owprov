@@ -21,6 +21,7 @@ namespace OpenWifi {
             uint64_t,
             uint64_t,
             std::string,
+            uint64_t,
             uint64_t
     > SignupDBRecordType;
 

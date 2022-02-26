@@ -17,6 +17,7 @@ namespace OpenWifi::SDK::Sec {
     namespace Subscriber {
         bool Exists(RESTAPIHandler *client, const Types::UUID_t & User);
         bool Get(RESTAPIHandler *client, const Types::UUID_t & User, SecurityObjects::UserInfo & UserInfo);
+        bool Delete(RESTAPIHandler *client, const Types::UUID_t & User);
     }
 
 }

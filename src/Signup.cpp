@@ -51,7 +51,7 @@ namespace OpenWifi {
             //  get the list of outstanding stuff and see if we have gotten the device...
             std::lock_guard     G(Mutex_);
             for(auto &[uuid,SE]:OutstandingSignups_) {
-                if(SE.status == "emailVerified") {
+                if(SE.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice) {
                     //  look for the device...
                     ProvObjects::InventoryTag   IT;
                     if(StorageService()->InventoryDB().GetRecord("serialNumber",SE.serialNumber,IT)) {
@@ -75,6 +75,7 @@ namespace OpenWifi {
                         StorageService()->InventoryDB().UpdateRecord("id",IT.info.id,IT);
 
                         SE.status = "signup completed";
+                        SE.statusCode = ProvObjects::SignupStatusCodes::SignupSuccess;
                         SE.completed = OpenWifi::Now();
                         SE.info.modified = OpenWifi::Now();
                         SE.error = 0 ;
