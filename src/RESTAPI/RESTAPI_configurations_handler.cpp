@@ -65,10 +65,12 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(DB_.DeleteRecord("id", UUID)) {
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        DB_.DeleteRecord("id", UUID);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        for(const auto &i:Existing.variables)
+            RemoveMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations,i,Existing.info.id);
+
+        return OK();
     }
 
     bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
@@ -160,10 +162,8 @@ namespace OpenWifi{
         }
 
         if(DB_.CreateRecord(C)) {
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",C.managementPolicy,C.info.id);
             DB_.GetRecord("id", C.info.id, C);
-            if(!C.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",C.managementPolicy,DB_.Prefix(), C.info.id);
-
             Poco::JSON::Object  Answer;
             C.to_json(Answer);
             return ReturnObject(Answer);
@@ -192,6 +192,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
+        if(!NewConfig.deviceTypes.empty())
+            Existing.deviceTypes = NewConfig.deviceTypes;
+
         std::string Error;
         if(!ValidateConfigBlock( NewConfig,Error)) {
             return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
@@ -201,34 +204,44 @@ namespace OpenWifi{
             Existing.configuration = NewConfig.configuration;
         }
 
-        std::string MovePolicy;
-        bool        MovingPolicy=false;
+        std::string MovePolicy, ExistingPolicy;
         if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
             if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
-            MovingPolicy = NewConfig.managementPolicy != Existing.managementPolicy;
+            ExistingPolicy = Existing.managementPolicy;
         }
 
-        if(!NewConfig.deviceTypes.empty())
-            Existing.deviceTypes = NewConfig.deviceTypes;
+        Types::UUIDvec_t FromVariables, ToVariables;
+        if(ParsedObj->has("variables")) {
+            for(const auto &i:NewConfig.variables) {
+                if(!i.empty() && !StorageService()->VariablesDB().Exists("id",i)) {
+                    return BadRequest(RESTAPI::Errors::VariableMustExist);
+                }
+            }
+            for(const auto &i:Existing.variables)
+                FromVariables.emplace_back(i);
+            for(const auto &i:NewConfig.variables)
+                ToVariables.emplace_back(i);
+            FromVariables = Existing.variables;
+            ToVariables = NewConfig.variables;
+            Existing.variables = ToVariables;
+        }
 
-        AssignIfPresent(ParsedObj, "rrm", Existing.rrm);
-        AssignIfPresent(ParsedObj,"firmwareUpgrade",Existing.firmwareUpgrade);
-        AssignIfPresent(ParsedObj,"firmwareRCOnly", Existing.firmwareRCOnly);
+        if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
+            if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            }
+            ExistingPolicy = Existing.managementPolicy;
+        }
 
-        if(!NewConfig.variables.empty())
-            Existing.variables = NewConfig.variables;
+        AssignIfPresent(ParsedObj,  "rrm", Existing.rrm);
+        AssignIfPresent(ParsedObj,  "firmwareUpgrade",Existing.firmwareUpgrade);
+        AssignIfPresent(ParsedObj,  "firmwareRCOnly", Existing.firmwareRCOnly);
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            if(MovingPolicy) {
-                if(!Existing.managementPolicy.empty())
-                    StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
-                if(!MovePolicy.empty())
-                    StorageService()->PolicyDB().AddInUse("id",MovePolicy,DB_.Prefix(),Existing.info.id);
-                Existing.managementPolicy = MovePolicy;
-            }
-            DB_.UpdateRecord("id", UUID, Existing);
+            MoveUsage(StorageService()->PolicyDB(), DB_, ExistingPolicy, MovePolicy, Existing.info.id);
+            ManageMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations, FromVariables, ToVariables, Existing.info.id);
 
             ProvObjects::DeviceConfiguration    D;
             DB_.GetRecord("id",UUID,D);

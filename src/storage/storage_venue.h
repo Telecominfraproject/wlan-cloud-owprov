@@ -31,6 +31,7 @@ namespace OpenWifi {
         std::string,
         std::string,
         std::string,
+        std::string,
         std::string
     > VenueDBRecordType;
 
@@ -39,6 +40,7 @@ namespace OpenWifi {
         VenueDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         bool CreateShortCut(ProvObjects::Venue &V);
         bool GetByIP(const std::string &IP, std::string & uuid);
+        bool Upgrade(uint32_t from, uint32_t &to) override;
     private:
     };
 }

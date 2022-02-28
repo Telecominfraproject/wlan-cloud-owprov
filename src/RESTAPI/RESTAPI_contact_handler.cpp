@@ -136,23 +136,21 @@ namespace OpenWifi{
         }
 
         std::string MoveToPolicy, MoveFromPolicy;
-        bool MovingPolicy=false;
         if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
             if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MoveFromPolicy = Existing.managementPolicy;
-            MovingPolicy = MoveToPolicy != Existing.managementPolicy;
+            Existing.managementPolicy = MoveToPolicy;
         }
 
         std::string MoveToEntity,MoveFromEntity;
-        bool MovingEntity=false;
         if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
             if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MoveFromEntity = Existing.entity;
-            MovingEntity = MoveToEntity != Existing.entity ;
+            Existing.entity = MoveToEntity;
         }
 
         AssignIfPresent(RawObject, "title", Existing.title);
@@ -171,26 +169,10 @@ namespace OpenWifi{
         if(RawObject->has("phones"))
             Existing.phones = NewObject.phones;
 
-        Existing.entity = MoveToEntity;
-        Existing.managementPolicy = MoveToPolicy;
-
         if(DB_.UpdateRecord("id", UUID, Existing)) {
 
-            if(MovingPolicy) {
-                if(!MoveFromPolicy.empty())
-                    StorageService()->PolicyDB().DeleteInUse("id",MoveFromPolicy,DB_.Prefix(),Existing.info.id);
-                if(!MoveToPolicy.empty())
-                    StorageService()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
-            }
-
-            if(MovingEntity) {
-                if(!MoveFromEntity.empty()) {
-                    StorageService()->EntityDB().DeleteContact("id", MoveFromEntity, Existing.info.id);
-                }
-                if(!MoveToEntity.empty()) {
-                    StorageService()->EntityDB().AddContact("id", MoveToEntity, Existing.info.id);
-                }
-            }
+            MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy,MoveToPolicy,Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::contacts,MoveFromEntity,MoveToEntity,Existing.info.id);
 
             ProvObjects::Contact    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);

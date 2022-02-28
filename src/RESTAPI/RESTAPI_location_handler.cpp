@@ -64,13 +64,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(DB_.DeleteRecord("id",UUID)) {
-            if(!Existing.entity.empty())
-                StorageService()->EntityDB().DeleteLocation("id",Existing.entity,UUID);
-
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        DB_.DeleteRecord("id",UUID);
+        ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::locations,Existing.entity,"",Existing.info.id);
+        return OK();
     }
 
     void RESTAPI_location_handler::DoPost() {
@@ -130,24 +126,20 @@ namespace OpenWifi{
         }
 
         std::string MoveFromPolicy,MoveToPolicy;
-        bool MovingPolicy=false;
         if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
             if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
             MoveFromPolicy = Existing.managementPolicy;
-            MovingPolicy = MoveToPolicy != MoveFromPolicy;
             Existing.managementPolicy = MoveToPolicy;
         }
 
         std::string MoveFromEntity,MoveToEntity;
-        bool MovingEntity=false;
         if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
             if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
             MoveFromEntity = Existing.entity;
-            MovingEntity = MoveToEntity != Existing.entity;
             Existing.entity = MoveToEntity;
         }
 
@@ -168,22 +160,12 @@ namespace OpenWifi{
             Existing.type = NewObject.type;
 
         if(DB_.UpdateRecord("id", UUID, Existing)) {
-            if(MovingPolicy) {
-                if(!MoveFromPolicy.empty())
-                    StorageService()->PolicyDB().DeleteInUse("id",MoveFromPolicy,DB_.Prefix(),Existing.info.id);
-                if(!MoveToPolicy.empty())
-                    StorageService()->PolicyDB().AddInUse("id", MoveToPolicy, DB_.Prefix(), Existing.info.id);
-            }
-            if(MovingEntity) {
-                if(!MoveFromEntity.empty())
-                    StorageService()->EntityDB().DeleteLocation("id",MoveFromEntity,Existing.info.id);
-                if(!MoveToEntity.empty())
-                    StorageService()->EntityDB().AddLocation("id", MoveToEntity, Existing.info.id);
-            }
+
+            MoveUsage(StorageService()->PolicyDB(), DB_, MoveFromPolicy, MoveToPolicy, Existing.info.id);
+            ManageMembership(Storage().EntityDB(),&ProvObjects::Entity::locations,MoveFromEntity, MoveToEntity, Existing.info.id);
 
             ProvObjects::Location    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);
-
             Poco::JSON::Object  Answer;
             NewObjectAdded.to_json(Answer);
             return ReturnObject(Answer);

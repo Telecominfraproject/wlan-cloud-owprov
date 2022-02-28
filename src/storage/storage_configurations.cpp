@@ -142,7 +142,7 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.deviceTypes = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<8>());
     Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
-    Out.variables = OpenWifi::RESTAPI_utils::to_stringpair_array(In.get<10>());
+    Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<10>());
     Out.rrm = In.get<11>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<12>());
     Out.firmwareUpgrade = In.get<13>();

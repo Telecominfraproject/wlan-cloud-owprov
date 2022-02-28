@@ -244,4 +244,59 @@ namespace OpenWifi {
         }
     }
 
+    template <typename DBUsage, typename ObjectDB> void MoveUsage(DBUsage &DB_InUse, ObjectDB & DB, const std::string & From, const std::string & To, const std::string &Id) {
+        if(From!=To) {
+            if(!From.empty())
+                DB_InUse.DeleteInUse("id",From,DB.Prefix(),Id);
+            if(!To.empty())
+                DB_InUse.AddInUse("id",To,DB.Prefix(),Id);
+        }
+    }
+
+    template <typename DBUsage, typename ObjectDB> void MoveUsage(DBUsage &DB_InUse, ObjectDB & DB, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
+        if(From!=To) {
+            if(!From.empty()) {
+                for(const auto &i:From)
+                    DB_InUse.DeleteInUse("id", i, DB.Prefix(), Id);
+            }
+            if(!To.empty()) {
+                for(const auto &i:To)
+                    DB_InUse.AddInUse("id", i, DB.Prefix(), Id);
+            }
+        }
+    }
+
+    template <typename DB> void MoveChild(DB &TheDB, const std::string & Parent, const std::string & Child, const std::string &Id) {
+        if(Parent!=Child) {
+            if(!Parent.empty())
+                TheDB.InUse.DeleteInUse("id",Parent,Id);
+            if(!Child.empty())
+                TheDB.AddInUse("id",Child,Id);
+        }
+    }
+
+    template <typename DB, typename Member> void RemoveMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+        if(!Obj.empty())
+            TheDB.ManipulateVectorMember(T, "id", Obj, Id, false);
+    }
+
+    template <typename DB, typename Member> void AddMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+        if(!Obj.empty())
+            TheDB.ManipulateVectorMember(T, "id", Obj, Id, true);
+    }
+
+    template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const std::string & From, const std::string & To, const std::string &Id) {
+        RemoveMembership(TheDB,T,From,Id);
+        AddMembership(TheDB,T,To,Id);
+    }
+
+    template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
+        if(From!=To) {
+            for (const auto &i: From)
+                RemoveMembership(TheDB, T, i, Id);
+            for (const auto &i: To)
+                AddMembership(TheDB, T, i, Id);
+        }
+    }
+
 }

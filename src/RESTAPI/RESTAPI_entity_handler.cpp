@@ -88,13 +88,6 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::ParentUUIDMustExist);
         }
 
-        if(!NewEntity.deviceConfiguration.empty()) {
-            for(auto &i:NewEntity.deviceConfiguration)
-                if(!StorageService()->ConfigurationDB().Exists("id",i)) {
-                    return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-                }
-        }
-
         if(!NewEntity.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id", NewEntity.managementPolicy)){
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
@@ -107,8 +100,11 @@ namespace OpenWifi{
         NewEntity.children.clear();
         NewEntity.contacts.clear();
         NewEntity.locations.clear();
+        NewEntity.deviceConfiguration.clear();
+        NewEntity.managementRoles.clear();
 
         if(DB_.CreateShortCut(NewEntity)) {
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewEntity.managementPolicy,NewEntity.info.id);
             if(UUID==EntityDB::RootUUID()) {
                 DB_.CheckForRoot();
             } else {
@@ -185,23 +181,6 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "rrm", Existing.rrm);
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            for(const auto &i:*Request) {
-                std::string Child{i.second};
-                auto UUID_parts = Utils::Split(Child,':');
-                if(i.first=="add" && UUID_parts[0] == "con") {
-                    DB_.AddContact("id", UUID, UUID_parts[1]);
-                    StorageService()->ContactDB().AddInUse("id",UUID_parts[1],DB_.Prefix(), UUID);
-                } else if (i.first == "del" && UUID_parts[0] == "con") {
-                    DB_.DeleteContact("id", UUID, UUID_parts[1]);
-                    StorageService()->ContactDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
-                } else if (i.first == "add" && UUID_parts[0] == "loc") {
-                    DB_.AddLocation("id", UUID, UUID_parts[1]);
-                    StorageService()->LocationDB().AddInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
-                } else if (i.first == "del" && UUID_parts[0] == "loc") {
-                    DB_.DeleteLocation("id", UUID, UUID_parts[1]);
-                    StorageService()->LocationDB().DeleteInUse("id",UUID_parts[1],DB_.Prefix(),UUID);
-                }
-            }
 
             if(MovingConfiguration) {
                 if(!Existing.deviceConfiguration.empty())

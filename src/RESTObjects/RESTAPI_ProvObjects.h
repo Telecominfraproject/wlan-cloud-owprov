@@ -66,6 +66,9 @@ namespace OpenWifi::ProvObjects {
         Types::UUIDvec_t        devices;
         std::string             rrm;
         Types::StringVec        sourceIP;
+        Types::UUIDvec_t        variables;
+        Types::UUIDvec_t        managementPolicies;
+        Types::UUIDvec_t        managementRoles;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -96,6 +99,7 @@ namespace OpenWifi::ProvObjects {
         std::string         location;
         std::string         rrm;
         Types::StringVec    sourceIP;
+        Types::UUIDvec_t    variables;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -260,7 +264,7 @@ namespace OpenWifi::ProvObjects {
         Types::StringVec                deviceTypes;
         DeviceConfigurationElementVec   configuration;
         Types::StringVec                inUse;
-        Types::StringPairVec            variables;
+        Types::UUIDvec_t                variables;
         std::string                     rrm;
         std::string                     firmwareUpgrade;
         bool                            firmwareRCOnly=false;
@@ -446,7 +450,7 @@ namespace OpenWifi::ProvObjects {
         std::string                 venue;
         std::string                 subscriber;
         std::string                 inventory;
-        std::vector<std::string>    inUse;
+        Types::UUIDvec_t            configurations;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

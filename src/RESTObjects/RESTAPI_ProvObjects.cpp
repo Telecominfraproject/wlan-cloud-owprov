@@ -93,6 +93,8 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"devices",devices);
         field_to_json( Obj,"rrm",rrm);
         field_to_json( Obj,"sourceIP",sourceIP);
+        field_to_json( Obj,"variables", variables);
+        field_to_json( Obj,"managementPolicies", managementPolicies);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -108,6 +110,8 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"devices",devices);
             field_from_json( Obj,"rrm",rrm);
             field_from_json( Obj,"sourceIP",sourceIP);
+            field_from_json( Obj,"variables", variables);
+            field_from_json( Obj,"managementPolicies", managementPolicies);
             return true;
         } catch(...) {
 
@@ -146,6 +150,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"location",location);
         field_to_json( Obj,"rrm",rrm);
         field_to_json( Obj,"sourceIP",sourceIP);
+        field_to_json( Obj,"variables", variables);
     }
 
     bool Venue::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -164,6 +169,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"location",location);
             field_from_json( Obj,"rrm",rrm);
             field_from_json( Obj,"sourceIP",sourceIP);
+            field_from_json( Obj,"variables", variables);
             return true;
         } catch (...) {
 
@@ -699,7 +705,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"venue", venue);
         RESTAPI_utils::field_to_json( Obj,"subscriber", subscriber);
         RESTAPI_utils::field_to_json( Obj,"inventory", inventory);
-        RESTAPI_utils::field_to_json( Obj,"inUse", inUse);
+        RESTAPI_utils::field_to_json( Obj,"configurations", configurations);
     }
 
     bool VariableBlock::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -710,7 +716,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"venue", venue);
             RESTAPI_utils::field_from_json( Obj,"subscriber", subscriber);
             RESTAPI_utils::field_from_json( Obj,"inventory", inventory);
-            RESTAPI_utils::field_from_json( Obj,"inUse", inUse);
+            RESTAPI_utils::field_from_json( Obj,"configurations", configurations);
             return true;
         } catch(...) {
         }
@@ -754,7 +760,7 @@ namespace OpenWifi::ProvObjects {
     }
 
     bool CreateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I) {
-        uint64_t Now = std::time(nullptr);
+        uint64_t Now = OpenWifi::Now();
         if(O->has("name"))
             I.name = O->get("name").toString();
 

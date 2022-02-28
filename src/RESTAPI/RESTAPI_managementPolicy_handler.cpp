@@ -63,11 +63,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(StorageService()->PolicyDB().DeleteRecord("id", UUID)) {
-            return OK();
-        }
-
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        StorageService()->PolicyDB().DeleteRecord("id", UUID);
+        ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies,Existing.entity,"",Existing.info.id);
+        return OK();
     }
 
     void RESTAPI_managementPolicy_handler::DoPost() {
@@ -86,8 +84,11 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        NewPolicy.inUse.clear();
+        if(NewPolicy.entity.empty() || !StorageService()->EntityDB().Exists("id", NewPolicy.entity)) {
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+        }
 
+        NewPolicy.inUse.clear();
         if(DB_.CreateRecord(NewPolicy)) {
             ProvObjects::ManagementPolicy   Policy;
             DB_.GetRecord("id",NewPolicy.info.id,Policy);
@@ -106,20 +107,30 @@ namespace OpenWifi{
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
-        auto NewObject = ParseStream();
-        if(!NewPolicy.from_json(NewObject)) {
+        auto RawObject = ParseStream();
+        if(!NewPolicy.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!UpdateObjectInfo(NewObject, UserInfo_.userinfo, Existing.info)) {
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
+        std::string MoveFromEntity,MoveToEntity;
+        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
+            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
+                return BadRequest(RESTAPI::Errors::EntityMustExist);
+            }
+            MoveFromEntity = Existing.entity;
+            Existing.entity = MoveToEntity;
         }
 
         if(!NewPolicy.entries.empty())
             Existing.entries = NewPolicy.entries;
 
         if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
-           ProvObjects::ManagementPolicy   P;
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies, MoveFromEntity,MoveToEntity,Existing.info.id);
+            ProvObjects::ManagementPolicy   P;
             DB_.GetRecord("id",Existing.info.id,P);
             Poco::JSON::Object  Answer;
             P.to_json(Answer);

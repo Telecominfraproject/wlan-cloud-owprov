@@ -34,7 +34,10 @@ namespace OpenWifi {
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
-        ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT}
+        ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
+        ORM::Field{"variables",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementPolicies",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT}
      };
 
     static  ORM::IndexVec    EntityDB_Indexes{
@@ -48,6 +51,25 @@ namespace OpenWifi {
         DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L, "ent") {
 
         CheckForRoot();
+    }
+
+    bool EntityDB::Upgrade(uint32_t from, uint32_t &to) {
+        to = Version();
+        std::vector<std::string>    Script{
+                "alter table " + TableName_ + " add column variables text",
+                "alter table " + TableName_ + " add column managementPolicies text",
+                "alter table " + TableName_ + " add column managementRoles text"
+        };
+
+        for(const auto &i:Script) {
+            try {
+                auto Session = Pool_.get();
+                Session << i , Poco::Data::Keywords::now;
+            } catch (...) {
+
+            }
+        }
+        return true;
     }
 
     bool EntityDB::GetByIP(const std::string &IP, std::string & uuid) {
@@ -220,6 +242,9 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.rrm = In.get<14>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<16>());
+    Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
+    Out.managementPolicies = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
+    Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<19>());
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -240,4 +265,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<14>(In.rrm);
     Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
+    Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.variables));
+    Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.managementPolicies));
+    Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
 }

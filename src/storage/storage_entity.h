@@ -30,6 +30,9 @@ namespace OpenWifi {
                 std::string,
                 std::string,
                 std::string,
+                std::string,
+                std::string,
+                std::string,
                 std::string
             > EntityDBRecordType;
 
@@ -47,6 +50,7 @@ namespace OpenWifi {
         void ImportVenues(const Poco::JSON::Object::Ptr &Ptr, const std::string & Node = RootUUID_ );
         bool CreateShortCut( ProvObjects::Entity & E);
         bool GetByIP(const std::string &IP, std::string & uuid);
+        bool Upgrade(uint32_t from, uint32_t &to) override;
     private:
         bool RootExists_=false;
     };

@@ -23,7 +23,7 @@ namespace OpenWifi {
             ORM::Field{"venue",ORM::FieldType::FT_TEXT},
             ORM::Field{"subscriber",ORM::FieldType::FT_BIGINT},
             ORM::Field{"inventory",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"inUse",ORM::FieldType::FT_TEXT}
+            ORM::Field{"configurations",ORM::FieldType::FT_TEXT}
     };
 
     const static  ORM::IndexVec    VariablesDB_Indexes{
@@ -55,7 +55,7 @@ template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::
     Out.venue = In.get<8>();
     Out.subscriber = In.get<9>();
     Out.inventory = In.get<10>();
-    Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
+    Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
 }
 
 template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::VariableBlock>::Convert(const OpenWifi::ProvObjects::VariableBlock &In, OpenWifi::VariablesDBRecordType &Out) {
@@ -70,5 +70,5 @@ template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::
     Out.set<8>(In.venue);
     Out.set<9>(In.subscriber);
     Out.set<10>(In.inventory);
-    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.inUse));
+    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
 }

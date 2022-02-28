@@ -36,7 +36,8 @@ namespace OpenWifi {
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
-        ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT}
+        ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
+        ORM::Field{"variables",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -48,6 +49,23 @@ namespace OpenWifi {
 
     VenueDB::VenueDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
+
+    bool VenueDB::Upgrade(uint32_t from, uint32_t &to) {
+        to = Version();
+        std::vector<std::string>    Script{
+                "alter table " + TableName_ + " add column variables text"
+        };
+
+        for(const auto &i:Script) {
+            try {
+                auto Session = Pool_.get();
+                Session << i , Poco::Data::Keywords::now;
+            } catch (...) {
+
+            }
+        }
+        return true;
+    }
 
     bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {
         if(StorageService()->VenueDB().CreateRecord(V)) {
@@ -115,7 +133,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
     Out.deviceConfiguration = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
-
+    Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<19>());
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -138,4 +156,5 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.deviceConfiguration));
     Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
+    Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.variables));
 }

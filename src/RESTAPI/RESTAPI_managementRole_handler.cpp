@@ -62,13 +62,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(!Existing.managementPolicy.empty())
-            StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
-
-        if(StorageService()->RolesDB().DeleteRecord("id", Existing.info.id)) {
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        DB_.DeleteRecord("id", Existing.info.id);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles,Existing.entity,Existing.info.id);
+        return OK();
     }
 
     void RESTAPI_managementRole_handler::DoPost() {
@@ -77,14 +74,18 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto Obj = ParseStream();
+        auto RawObj = ParseStream();
         ProvObjects::ManagementRole NewObject;
-        if (!NewObject.from_json(Obj)) {
+        if (!NewObject.from_json(RawObj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+        if(!CreateObjectInfo(RawObj, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
+        if(NewObject.entity.empty() || !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
@@ -92,8 +93,9 @@ namespace OpenWifi{
         }
 
         if(DB_.CreateRecord(NewObject)) {
-            if(!NewObject.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id", NewObject.managementPolicy, DB_.Prefix(), NewObject.info.id);
+            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles,NewObject.entity,NewObject.info.id);
+            MoveUsage(StorageService()->PolicyDB(), DB_, "", NewObject.managementPolicy, NewObject.info.id);
+
             Poco::JSON::Object Answer;
             ProvObjects::ManagementRole Role;
             DB_.GetRecord("id", NewObject.info.id,Role);
@@ -120,20 +122,27 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string NewPolicy,OldPolicy = Existing.managementPolicy;
-        AssignIfPresent(RawObject, "managementPolicy", NewPolicy);
-        if(!NewPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+        std::string MoveToPolicy,MoveFromPolicy;
+        if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
+            if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+            }
+            MoveFromPolicy = Existing.managementPolicy;
+            Existing.managementPolicy = MoveToPolicy;
         }
 
-        if(!NewPolicy.empty())
-            Existing.managementPolicy = NewPolicy;
+        std::string MoveToEntity,MoveFromEntity;
+        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
+            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
+                return BadRequest(RESTAPI::Errors::EntityMustExist);
+            }
+            MoveFromEntity = Existing.entity;
+            Existing.entity = MoveToEntity;
+        }
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            if(!OldPolicy.empty())
-                StorageService()->PolicyDB().DeleteInUse("id",OldPolicy,DB_.Prefix(),UUID);
-            if(!NewPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",NewPolicy,DB_.Prefix(),UUID);
+            MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy, MoveToPolicy, Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles, MoveFromEntity, MoveToEntity, Existing.info.id);
 
             ProvObjects::ManagementRole NewRecord;
 

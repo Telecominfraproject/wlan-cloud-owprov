@@ -120,8 +120,15 @@ namespace OpenWifi{
         }
 
         NewObject.children.clear();
-
         if(DB_.CreateShortCut(NewObject)) {
+
+            MoveUsage(StorageService()->ContactDB(),DB_,"", NewObject.contact, NewObject.info.id);
+            MoveUsage(StorageService()->LocationDB(),DB_,"", NewObject.location, NewObject.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::venues,"",NewObject.entity,NewObject.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::children,"",NewObject.parent,NewObject.info.id);
+            MoveUsage(StorageService()->ConfigurationDB(),DB_,{},NewObject.deviceConfiguration,NewObject.info.id);
+
             ProvObjects::Venue  NewRecord;
             DB_.GetRecord("id",NewObject.info.id,NewRecord);
             Poco::JSON::Object  Answer;
@@ -157,114 +164,72 @@ namespace OpenWifi{
             Existing.sourceIP = NewObject.sourceIP;
         }
 
-        std::string MoveEntity;
-        bool MovingEntity=false;
-        if(AssignIfPresent(RawObject, "entity", MoveEntity)) {
-            if(!MoveEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveEntity)) {
+        std::string MoveFromEntity,MoveToEntity;
+        if(AssignIfPresent(RawObject, "entity", MoveToEntity)) {
+            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
                 return BadRequest(RESTAPI::Errors::EntityMustExist);
             }
-            MovingEntity = MoveEntity != Existing.entity;
+            MoveFromEntity = Existing.entity;
+            Existing.entity = MoveToEntity;
         }
 
-        std::string MoveVenue;
-        bool MovingVenue=false;
-        if(AssignIfPresent(RawObject, "venue", MoveVenue)) {
-            if(!MoveVenue.empty() && !StorageService()->VenueDB().Exists("id",MoveVenue)) {
+        std::string MoveToVenue,MoveFromVenue;
+        if(AssignIfPresent(RawObject, "venue", MoveToVenue)) {
+            if(!MoveToVenue.empty() && !StorageService()->VenueDB().Exists("id",MoveToVenue)) {
                 return BadRequest(RESTAPI::Errors::VenueMustExist);
             }
-            MovingVenue = MoveVenue != Existing.parent;
+            MoveFromVenue = Existing.parent;
+            Existing.parent = MoveToVenue;
         }
 
-        std::string MoveLocation;
-        bool MovingLocation=false;
-        if(AssignIfPresent(RawObject,"location",MoveLocation)) {
-            if(!MoveLocation.empty() && !StorageService()->LocationDB().Exists("id",MoveLocation)) {
+        std::string MoveFromLocation, MoveToLocation;
+        if(AssignIfPresent(RawObject,"location",MoveToLocation)) {
+            if(!MoveToLocation.empty() && !StorageService()->LocationDB().Exists("id",MoveToLocation)) {
                 return BadRequest(RESTAPI::Errors::LocationMustExist);
             }
-            MovingLocation = MoveLocation!=Existing.location;
+            MoveFromLocation = Existing.location;
+            Existing.location = MoveToLocation;
         }
 
-        std::string MoveContact;
-        bool MovingContact=false;
-        if(AssignIfPresent(RawObject,"contact",MoveContact)) {
-            if(!MoveContact.empty() && !StorageService()->ContactDB().Exists("id",MoveContact)) {
+        std::string MoveFromContact, MoveToContact;
+        if(AssignIfPresent(RawObject,"contact",MoveToContact)) {
+            if(!MoveToContact.empty() && !StorageService()->ContactDB().Exists("id",MoveToContact)) {
                 return BadRequest(RESTAPI::Errors::ContactMustExist);
             }
-            MovingContact = MoveContact!=Existing.contact;
+            MoveFromContact = Existing.contact;
+            Existing.contact = MoveToContact;
         }
 
-        std::string MovePolicy;
-        bool MovingPolicy=false;
-        if(AssignIfPresent(RawObject,"managementPolicy",MovePolicy)) {
-            if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",MovePolicy)) {
+        std::string MoveFromPolicy, MoveToPolicy;
+        if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
+            if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
                 return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
             }
-            MovingPolicy = MovePolicy != Existing.managementPolicy;
+            MoveFromPolicy = Existing.managementPolicy;
+            Existing.managementPolicy = MoveToPolicy;
         }
 
-        Types::UUIDvec_t MoveConfiguration;
-        bool MovingConfiguration=false;
+        Types::UUIDvec_t MoveToConfigurations, MoveFromConfigurations;
         if(RawObject->has("deviceConfiguration")){
-            if(!NewObject.deviceConfiguration.empty()){
-                for(auto &i:NewObject.deviceConfiguration) {
-                    if(!StorageService()->ConfigurationDB().Exists("id",i)) {
-                        return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-                    }
+            MoveToConfigurations = NewObject.deviceConfiguration;
+            for(auto &i:MoveToConfigurations) {
+                if(!StorageService()->ConfigurationDB().Exists("id",i)) {
+                    return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
                 }
-                MoveConfiguration = NewObject.deviceConfiguration;
-             }
-            MovingConfiguration = MoveConfiguration != Existing.deviceConfiguration;
+            }
+            MoveToConfigurations = NewObject.deviceConfiguration;
+            MoveFromConfigurations = Existing.deviceConfiguration;
+            Existing.deviceConfiguration = MoveToConfigurations;
         }
 
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
-            if(MovingContact) {
-                if(!Existing.contact.empty())
-                    StorageService()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
-                if(!MoveContact.empty())
-                    StorageService()->ContactDB().AddInUse("id", MoveContact, DB_.Prefix(), Existing.info.id);
-                Existing.contact = MoveContact;
-            }
-            if(MovingEntity) {
-                if(!Existing.entity.empty())
-                    StorageService()->EntityDB().DeleteVenue("id", Existing.entity, Existing.info.id);
-                if(!MoveEntity.empty())
-                    StorageService()->EntityDB().AddVenue("id",MoveEntity,Existing.info.id);
-                Existing.entity = MoveEntity;
-            }
-            if(MovingVenue) {
-               if(!Existing.parent.empty())
-                   DB_.DeleteChild("id",Existing.parent,Existing.info.id);
-               if(!MoveVenue.empty())
-                   DB_.AddChild("id", MoveVenue, Existing.info.id);
-               Existing.parent = MoveVenue;
-            }
-            if(MovingLocation) {
-                if(!Existing.location.empty())
-                    StorageService()->LocationDB().DeleteInUse("id", Existing.location, DB_.Prefix(), Existing.info.id);
-                if(!MoveLocation.empty())
-                    StorageService()->LocationDB().AddInUse("id", MoveLocation, DB_.Prefix(), Existing.info.id);
-                Existing.location = MoveLocation;
-            }
-            if(MovingPolicy) {
-                if(!Existing.managementPolicy.empty())
-                    StorageService()->PolicyDB().DeleteInUse("id", Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
-                if(!MovePolicy.empty())
-                    StorageService()->PolicyDB().AddInUse("id", MovePolicy, DB_.Prefix(), Existing.info.id);
-                Existing.managementPolicy = MovePolicy;
-            }
-            if(MovingConfiguration) {
-                if(!Existing.deviceConfiguration.empty()) {
-                    for(auto &i:Existing.deviceConfiguration)
-                        StorageService()->ConfigurationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
-                }
-                if(!MoveConfiguration.empty()) {
-                    for(auto &i:MoveConfiguration)
-                        StorageService()->ConfigurationDB().AddInUse("id", i, DB_.Prefix(), Existing.info.id);
-                }
-                Existing.deviceConfiguration = MoveConfiguration;
-            }
+            MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContact, MoveToContact, Existing.info.id);
+            MoveUsage(StorageService()->LocationDB(),DB_,MoveFromLocation, MoveToLocation, Existing.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy,MoveToPolicy,Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::venues,MoveFromEntity,MoveToEntity,Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::children,MoveFromVenue,MoveToVenue,Existing.info.id);
+            MoveUsage(StorageService()->ConfigurationDB(),DB_,MoveFromConfigurations,MoveToConfigurations,Existing.info.id);
 
-            DB_.UpdateRecord("id",Existing.info.id, Existing);
             ProvObjects::Venue AddedRecord;
             DB_.GetRecord("id",UUID,AddedRecord);
             Poco::JSON::Object  Answer;
