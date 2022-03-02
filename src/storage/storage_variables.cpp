@@ -21,8 +21,8 @@ namespace OpenWifi {
             ORM::Field{"variables",ORM::FieldType::FT_TEXT},
             ORM::Field{"entity",ORM::FieldType::FT_TEXT},
             ORM::Field{"venue",ORM::FieldType::FT_TEXT},
-            ORM::Field{"subscriber",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"inventory",ORM::FieldType::FT_BIGINT},
+            ORM::Field{"subscriber",ORM::FieldType::FT_TEXT},
+            ORM::Field{"inventory",ORM::FieldType::FT_TEXT},
             ORM::Field{"configurations",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT}
     };
@@ -39,14 +39,16 @@ namespace OpenWifi {
     };
 
     VariablesDB::VariablesDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept :
-            DB(T, "variables", VariablesDB_Fields, VariablesDB_Indexes, P, L, "var") {
+            DB(T, "variables2", VariablesDB_Fields, VariablesDB_Indexes, P, L, "var") {
     }
 
     bool VariablesDB::Upgrade(uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
-                "alter table " + TableName_ + " add column managementPolicy BOOLEAN;"
+//            "alter table " + TableName_ + " add column configurations TEXT;" ,
+//            "alter table " + TableName_ + " add column managementPolicy TEXT;"
         };
-        RunScript(Statements);
+        if(!Statements.empty())
+            RunScript(Statements);
         to = 2;
         return true;
     }
