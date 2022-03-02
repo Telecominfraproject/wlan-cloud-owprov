@@ -38,10 +38,11 @@ namespace OpenWifi{
             return UnAuthorized("You must be the creator of the map to delete it");
         }
 
-        if(DB_.DeleteRecord("id", Existing.info.id)) {
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        DB_.DeleteRecord("id", Existing.info.id);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::maps,Existing.entity,Existing.info.id);
+        RemoveMembership(StorageService()->VenueDB(),&ProvObjects::Venue::maps,Existing.venue,Existing.info.id);
+        return OK();
     }
 
     static auto ValidateVisibility(const std::string &V) {
@@ -54,20 +55,32 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto Obj = ParseStream();
+        auto RawObject = ParseStream();
         ProvObjects::Map NewObject;
-        if (!NewObject.from_json(Obj)) {
+        if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+        if(!CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
+        if(RawObject->has("entity")) {
+            if(!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity))
+                return BadRequest(RESTAPI::Errors::EntityMustExist);
+        }
+
+        if(RawObject->has("managementPolicy")) {
+            if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy))
+                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
         NewObject.creator = UserInfo_.userinfo.id;
 
         if(DB_.CreateRecord(NewObject)) {
-
+            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::maps,NewObject.entity,NewObject.info.id);
+            AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::maps,NewObject.venue,NewObject.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
             Poco::JSON::Object  Answer;
             ProvObjects::Map    M;
             DB_.GetRecord("id", NewObject.info.id,M);
@@ -108,19 +121,28 @@ namespace OpenWifi{
             }
         }
 
-        if(RawObject->has("entity") && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&MapDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
             return BadRequest(RESTAPI::Errors::EntityMustExist);
-        }
 
-        AssignIfPresent(RawObject,"entity",Existing.entity);
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&MapDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+
+        std::string FromVenue, ToVenue;
+        if(!CreateMove(RawObject,"venue",&MapDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
+
         AssignIfPresent(RawObject,"data", Existing.data);
         if(RawObject->has("visibility"))
             Existing.visibility = NewObject.visibility;
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
+            MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::maps,FromEntity,ToEntity,Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::maps,FromVenue,ToVenue,Existing.info.id);
 
             ProvObjects::Map NewRecord;
-
             DB_.GetRecord("id", UUID, NewRecord);
             Poco::JSON::Object  Answer;
             NewRecord.to_json(Answer);

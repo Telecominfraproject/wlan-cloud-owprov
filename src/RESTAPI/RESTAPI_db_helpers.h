@@ -299,4 +299,14 @@ namespace OpenWifi {
         }
     }
 
+    template <typename Member, typename Rec, typename DB > bool CreateMove(const Poco::JSON::Object::Ptr & RawObj, const char *fieldname, Member T, Rec & Existing, std::string &From, std::string &To, DB & TheDB) {
+        if(RawObj->has(fieldname)) {
+            From = Existing.*T;
+            To = RawObj->get(fieldname).toString();
+            if(!To.empty() && !TheDB.Exists("id",To))
+                return false;
+            Existing.*T=To;
+        }
+        return true;
+    }
 }

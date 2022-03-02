@@ -67,6 +67,8 @@ namespace OpenWifi{
 
         DB_.DeleteRecord("id", UUID);
         MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        RemoveMembership(StorageService()->VenueDB(),&ProvObjects::Venue::configurations,Existing.venue,Existing.info.id);
+        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::configurations,Existing.entity,Existing.info.id);
         for(const auto &i:Existing.variables)
             RemoveMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations,i,Existing.info.id);
 
@@ -137,35 +139,47 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
-        ProvObjects::DeviceConfiguration C;
-        Poco::JSON::Object::Ptr Obj = ParseStream();
-        if (!C.from_json(Obj)) {
+        ProvObjects::DeviceConfiguration NewObject;
+        auto RawObject = ParseStream();
+        if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,C.info)) {
+        if(!ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!C.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",C.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownId);
+        if(!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        C.inUse.clear();
-        if(C.deviceTypes.empty() || !DeviceTypeCache()->AreAcceptableDeviceTypes(C.deviceTypes, true)) {
+        if(!NewObject.venue.empty() && !StorageService()->VenueDB().Exists("id",NewObject.venue)) {
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
+        }
+
+        if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+        }
+
+        NewObject.inUse.clear();
+        if(NewObject.deviceTypes.empty() || !DeviceTypeCache()->AreAcceptableDeviceTypes(NewObject.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
         std::string Error;
-        if(!ValidateConfigBlock(C,Error)) {
+        if(!ValidateConfigBlock(NewObject,Error)) {
             return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
         }
 
-        if(DB_.CreateRecord(C)) {
-            MoveUsage(StorageService()->PolicyDB(),DB_,"",C.managementPolicy,C.info.id);
-            DB_.GetRecord("id", C.info.id, C);
+        if(DB_.CreateRecord(NewObject)) {
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
+            AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::configurations,NewObject.venue, NewObject.info.id);
+            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::configurations,NewObject.entity, NewObject.info.id);
+
+            ConfigurationDB::RecordName AddedRecord;
+            DB_.GetRecord("id", NewObject.info.id, AddedRecord);
             Poco::JSON::Object  Answer;
-            C.to_json(Answer);
+            AddedRecord.to_json(Answer);
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
@@ -179,12 +193,12 @@ namespace OpenWifi{
         }
 
         ProvObjects::DeviceConfiguration    NewConfig;
-        auto ParsedObj = ParseStream();
-        if (!NewConfig.from_json(ParsedObj)) {
+        auto RawObject = ParseStream();
+        if (!NewConfig.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!UpdateObjectInfo(ParsedObj, UserInfo_.userinfo, Existing.info)) {
+        if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
@@ -200,20 +214,24 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
         }
 
-        if(ParsedObj->has("configuration")) {
+        if(RawObject->has("configuration")) {
             Existing.configuration = NewConfig.configuration;
         }
 
-        std::string MovePolicy, ExistingPolicy;
-        if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
-            if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            ExistingPolicy = Existing.managementPolicy;
-        }
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&ConfigurationDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&ConfigurationDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+
+        std::string FromVenue, ToVenue;
+        if(!CreateMove(RawObject,"venue",&ConfigurationDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         Types::UUIDvec_t FromVariables, ToVariables;
-        if(ParsedObj->has("variables")) {
+        if(RawObject->has("variables")) {
             for(const auto &i:NewConfig.variables) {
                 if(!i.empty() && !StorageService()->VariablesDB().Exists("id",i)) {
                     return BadRequest(RESTAPI::Errors::VariableMustExist);
@@ -228,20 +246,15 @@ namespace OpenWifi{
             Existing.variables = ToVariables;
         }
 
-        if(AssignIfPresent(ParsedObj,"managementPolicy",MovePolicy)) {
-            if(!MovePolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewConfig.managementPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            ExistingPolicy = Existing.managementPolicy;
-        }
-
-        AssignIfPresent(ParsedObj,  "rrm", Existing.rrm);
-        AssignIfPresent(ParsedObj,  "firmwareUpgrade",Existing.firmwareUpgrade);
-        AssignIfPresent(ParsedObj,  "firmwareRCOnly", Existing.firmwareRCOnly);
+        AssignIfPresent(RawObject,  "rrm", Existing.rrm);
+        AssignIfPresent(RawObject,  "firmwareUpgrade",Existing.firmwareUpgrade);
+        AssignIfPresent(RawObject,  "firmwareRCOnly", Existing.firmwareRCOnly);
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            MoveUsage(StorageService()->PolicyDB(), DB_, ExistingPolicy, MovePolicy, Existing.info.id);
             ManageMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations, FromVariables, ToVariables, Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(), &ProvObjects::Venue::configurations, FromVenue, ToVenue, Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(), &ProvObjects::Entity::configurations, FromEntity, ToEntity, Existing.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);
 
             ProvObjects::DeviceConfiguration    D;
             DB_.GetRecord("id",UUID,D);

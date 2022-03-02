@@ -23,7 +23,8 @@ namespace OpenWifi {
             ORM::Field{"venue",ORM::FieldType::FT_TEXT},
             ORM::Field{"subscriber",ORM::FieldType::FT_BIGINT},
             ORM::Field{"inventory",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"configurations",ORM::FieldType::FT_TEXT}
+            ORM::Field{"configurations",ORM::FieldType::FT_TEXT},
+            ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT}
     };
 
     const static  ORM::IndexVec    VariablesDB_Indexes{
@@ -41,6 +42,14 @@ namespace OpenWifi {
             DB(T, "variables", VariablesDB_Fields, VariablesDB_Indexes, P, L, "var") {
     }
 
+    bool VariablesDB::Upgrade(uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column managementPolicy BOOLEAN;"
+        };
+        RunScript(Statements);
+        to = 2;
+        return true;
+    }
 }
 
 template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::VariableBlock>::Convert(const OpenWifi::VariablesDBRecordType &In, OpenWifi::ProvObjects::VariableBlock &Out) {
@@ -56,6 +65,7 @@ template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::
     Out.subscriber = In.get<9>();
     Out.inventory = In.get<10>();
     Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
+    Out.managementPolicy = In.get<12>();
 }
 
 template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::VariableBlock>::Convert(const OpenWifi::ProvObjects::VariableBlock &In, OpenWifi::VariablesDBRecordType &Out) {
@@ -71,4 +81,5 @@ template<> void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::
     Out.set<9>(In.subscriber);
     Out.set<10>(In.inventory);
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
+    Out.set<12>(In.managementPolicy);
 }

@@ -103,17 +103,11 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        if(!Existing.venue.empty())
-            StorageService()->VenueDB().DeleteDevice("id",Existing.venue,Existing.info.id);
-
-        if(!Existing.entity.empty())
-            StorageService()->EntityDB().DeleteDevice("id",Existing.entity,Existing.info.id);
-
-        if(!Existing.location.empty())
-            StorageService()->LocationDB().DeleteInUse("id",Existing.location,DB_.Prefix(),Existing.info.id);
-
-        if(!Existing.contact.empty())
-            StorageService()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        RemoveMembership(StorageService()->VenueDB(),&ProvObjects::Venue::configurations,Existing.venue,Existing.info.id);
+        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::configurations,Existing.entity,Existing.info.id);
+        MoveUsage(StorageService()->LocationDB(),DB_,Existing.location,"",Existing.info.id);
+        MoveUsage(StorageService()->ContactDB(),DB_,Existing.contact,"",Existing.info.id);
 
         if(!Existing.deviceConfiguration.empty()) {
             ProvObjects::DeviceConfiguration    DC;
@@ -126,12 +120,15 @@ namespace OpenWifi{
             }
         }
 
-        if(DB_.DeleteRecord("id", Existing.info.id)) {
-            DB_.DeleteRecord(RESTAPI::Protocol::ID, Existing.info.id);
-            SerialNumberCache()->DeleteSerialNumber(SerialNumber);
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        MoveUsage(StorageService()->LocationDB(),DB_,Existing.location,"",Existing.info.id);
+        MoveUsage(StorageService()->ContactDB(),DB_,Existing.contact,"",Existing.info.id);
+        MoveUsage(StorageService()->ConfigurationDB(),DB_,Existing.deviceConfiguration,"",Existing.info.id);
+        ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,Existing.entity,"",Existing.info.id);
+        ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,Existing.venue,"",Existing.info.id);
+        DB_.DeleteRecord("id", Existing.info.id);
+        SerialNumberCache()->DeleteSerialNumber(SerialNumber);
+        return OK();
     }
 
     void RESTAPI_inventory_handler::DoPost() {
@@ -219,18 +216,13 @@ namespace OpenWifi{
 
         if(DB_.CreateRecord(NewObject)) {
             SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
-            if (!NewObject.venue.empty())
-                StorageService()->VenueDB().AddDevice("id",NewObject.venue,NewObject.info.id);
-            if (!NewObject.entity.empty())
-                StorageService()->EntityDB().AddDevice("id",NewObject.entity,NewObject.info.id);
-            if (!NewObject.location.empty())
-                StorageService()->LocationDB().AddInUse("id",NewObject.location,DB_.Prefix(),NewObject.info.id);
-            if (!NewObject.contact.empty())
-                StorageService()->ContactDB().AddInUse("id",NewObject.contact,DB_.Prefix(),NewObject.info.id);
-            if (!NewObject.deviceConfiguration.empty())
-                StorageService()->ConfigurationDB().AddInUse("id",NewObject.deviceConfiguration,DB_.Prefix(),NewObject.info.id);
-            if (!NewObject.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
+
+            MoveUsage(StorageService()->PolicyDB(),DB_,NewObject.managementPolicy,"",NewObject.info.id);
+            MoveUsage(StorageService()->LocationDB(),DB_,NewObject.location,"",NewObject.info.id);
+            MoveUsage(StorageService()->ContactDB(),DB_,NewObject.contact,"",NewObject.info.id);
+            MoveUsage(StorageService()->ConfigurationDB(),DB_,NewObject.deviceConfiguration,"",NewObject.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,NewObject.entity,"",NewObject.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,NewObject.venue,"",NewObject.info.id);
 
             ProvObjects::InventoryTag   NewTag;
             DB_.GetRecord("id",NewObject.info.id,NewTag);
@@ -409,61 +401,31 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string NewVenue, NewEntity, NewLocation, NewContact, NewConfiguration, NewPolicy;
-        bool    MovingVenue=false,
-                MovingEntity=false,
-                MovingLocation=false,
-                MovingContact=false,
-                MovingConfiguration=false,
-                MovingPolicy=false;
-
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
-        if(AssignIfPresent(RawObject, "venue",NewVenue)) {
-            if(!NewVenue.empty() && !StorageService()->VenueDB().Exists("id",NewVenue)) {
-                return BadRequest(RESTAPI::Errors::VenueMustExist);
-            }
-            MovingVenue = Existing.venue != NewVenue;
-        }
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&InventoryDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        if(AssignIfPresent(RawObject, "entity",NewEntity)) {
-            if(!NewEntity.empty() && !StorageService()->EntityDB().Exists("id",NewEntity)) {
-                return BadRequest(RESTAPI::Errors::EntityMustExist);
-            }
-            MovingEntity = Existing.entity != NewEntity;
-        }
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&InventoryDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        if(!NewEntity.empty() && !NewVenue.empty()) {
-            return BadRequest(RESTAPI::Errors::NotBoth);
-        }
+        std::string FromVenue, ToVenue;
+        if(!CreateMove(RawObject,"venue",&InventoryDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
 
-        if(AssignIfPresent(RawObject, "location",NewLocation)) {
-            if(!NewLocation.empty() && !StorageService()->LocationDB().Exists("id",NewLocation)) {
-                return BadRequest(RESTAPI::Errors::LocationMustExist);
-            }
-            MovingLocation = Existing.location != NewLocation;
-        }
+        std::string FromLocation, ToLocation;
+        if(!CreateMove(RawObject,"location",&InventoryDB::RecordName::location, Existing, FromLocation, ToLocation, StorageService()->LocationDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
 
-        if(AssignIfPresent(RawObject, "contact",NewContact)) {
-            if(!NewContact.empty() && !StorageService()->ContactDB().Exists("id",NewContact)) {
-                return BadRequest(RESTAPI::Errors::ContactMustExist);
-            }
-            MovingContact = Existing.contact != NewContact;
-        }
+        std::string FromContact, ToContact;
+        if(!CreateMove(RawObject,"contact",&InventoryDB::RecordName::contact, Existing, FromContact, ToContact, StorageService()->ContactDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
 
-        if(AssignIfPresent(RawObject, "deviceConfiguration",NewConfiguration)) {
-            if(!NewConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewConfiguration)) {
-                return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-            }
-            MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
-        }
-
-        if(AssignIfPresent(RawObject, "managementPolicy",NewPolicy)) {
-            if(!NewPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            MovingPolicy = Existing.managementPolicy != NewPolicy;
-        }
+        std::string FromConfiguration, ToConfiguration;
+        if(!CreateMove(RawObject,"deviceConfiguration",&InventoryDB::RecordName::deviceConfiguration, Existing, FromConfiguration, ToConfiguration, StorageService()->ContactDB()))
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         std::string NewSubScriber;
         if(AssignIfPresent(RawObject, "subscriber", NewSubScriber)) {
@@ -489,79 +451,13 @@ namespace OpenWifi{
             Existing.state = NewObject.state;
         }
 
-        std::string Arg;
-        bool UnAssign=false;
-        if(HasParameter("unassign", Arg) && Arg=="true") {
-            UnAssign=true;
-            if(!Existing.venue.empty()) {
-                StorageService()->VenueDB().DeleteDevice("id",Existing.venue,Existing.info.id);
-            } else if(!Existing.entity.empty()) {
-                StorageService()->EntityDB().DeleteDevice("id",Existing.entity,Existing.info.id);
-            }
-            if(!Existing.location.empty())
-                StorageService()->LocationDB().DeleteInUse("id",Existing.location,DB_.Prefix(),Existing.info.id);
-            if(!Existing.contact.empty())
-                StorageService()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
-            if(!Existing.deviceConfiguration.empty())
-                StorageService()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
-            if(!Existing.managementPolicy.empty())
-                StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
-            Existing.venue.clear();
-            Existing.entity.clear();
-            Existing.deviceConfiguration.clear();
-            Existing.contact.clear();
-            Existing.location.clear();
-            Existing.managementPolicy.clear();
-        }
-
-        std::cout << "Updating: " << Existing.info.id << "   " << Existing.serialNumber << std::endl;
         if(StorageService()->InventoryDB().UpdateRecord("id", Existing.info.id, Existing)) {
-            if(!UnAssign) {
-                if(MovingEntity) {
-                    if(!Existing.entity.empty())
-                        StorageService()->EntityDB().DeleteDevice("id",Existing.entity,Existing.info.id);
-                    if(!NewEntity.empty())
-                        StorageService()->EntityDB().AddDevice("id", NewEntity, Existing.info.id);
-                    Existing.entity = NewEntity;
-                }
-                if(MovingVenue) {
-                    if(!Existing.venue.empty())
-                        StorageService()->VenueDB().DeleteDevice("id",Existing.venue,Existing.info.id);
-                    if(!NewVenue.empty())
-                        StorageService()->VenueDB().AddDevice("id", NewVenue, Existing.info.id);
-                    Existing.venue = NewVenue;
-                }
-                if(MovingConfiguration) {
-                    if(!Existing.deviceConfiguration.empty())
-                        StorageService()->ConfigurationDB().DeleteInUse("id",Existing.deviceConfiguration,DB_.Prefix(),Existing.info.id);
-                    if(!NewConfiguration.empty())
-                        StorageService()->ConfigurationDB().AddInUse("id",NewConfiguration,DB_.Prefix(),Existing.info.id);
-                    Existing.deviceConfiguration = NewConfiguration;
-                }
-                if(MovingContact) {
-                    if(!Existing.contact.empty())
-                        StorageService()->ContactDB().DeleteInUse("id",Existing.contact,DB_.Prefix(),Existing.info.id);
-                    if(!NewContact.empty())
-                        StorageService()->ContactDB().AddInUse("id",NewContact,DB_.Prefix(),Existing.info.id);
-                    Existing.contact = NewContact;
-                }
-                if(MovingLocation) {
-                    if(!Existing.location.empty())
-                        StorageService()->LocationDB().DeleteInUse("id",Existing.location,DB_.Prefix(),Existing.info.id);
-                    if(!NewLocation.empty())
-                        StorageService()->LocationDB().AddInUse("id",NewLocation,DB_.Prefix(),Existing.info.id);
-                    Existing.location = NewLocation;
-                }
-                if(MovingPolicy) {
-                    if(!Existing.managementPolicy.empty())
-                        StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy,DB_.Prefix(),Existing.info.id);
-                    if(!NewPolicy.empty())
-                        StorageService()->PolicyDB().AddInUse("id",NewPolicy,DB_.Prefix(),Existing.info.id);
-                    Existing.managementPolicy = NewPolicy;
-                }
-            }
-
-            DB_.UpdateRecord("id", Existing.info.id, Existing);
+            MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);
+            MoveUsage(StorageService()->LocationDB(),DB_,FromLocation,ToLocation,Existing.info.id);
+            MoveUsage(StorageService()->ContactDB(),DB_,FromContact,ToContact,Existing.info.id);
+            MoveUsage(StorageService()->ConfigurationDB(),DB_,FromConfiguration,ToConfiguration,Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,FromEntity,ToEntity,Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,FromVenue,ToVenue,Existing.info.id);
 
             ProvObjects::InventoryTag   NewObjectCreated;
             DB_.GetRecord("id", Existing.info.id, NewObjectCreated);

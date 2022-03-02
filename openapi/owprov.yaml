@@ -166,6 +166,12 @@ components:
             type: string
             format: uuid
             example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
+        entity:
+          type: string
+          format: uuid
+        venue:
+          type: string
+          format: uuid
 
     ManagementPolicyList:
       type: object
@@ -215,6 +221,36 @@ components:
           type: string
           format: uuid
         devices:
+          type: array
+          items:
+            type: string
+            format: uuid
+        managementPolicies:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        variables:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        managementRoles:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        maps:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        configurations:
+          description: The list of UUID of the venues for this entity
           type: array
           items:
             type: string
@@ -297,6 +333,36 @@ components:
             - inherit
         sourceIP:
           $ref: '#/components/schemas/StringList'
+        managementPolicies:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        managementRoles:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        variables:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        maps:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
+        configurations:
+          description: The list of UUID of the venues for this entity
+          type: array
+          items:
+            type: string
+            format: uuid
 
     VenueList:
       type: object
@@ -337,6 +403,12 @@ components:
             type: string
             format: uuid
             example: each uuid is preceded by ent, or ven to say that the elemenet is entity or venue
+        entity:
+          type: string
+          format: uuid
+        venue:
+          type: string
+          format: uuid
 
     ManagementRoleList:
       type: object
@@ -521,6 +593,15 @@ components:
           example: auto or a time string of the format DOW-HH:MM
         firmwareRCOnly:
           type: boolean
+        venue:
+          type: string
+          format: uuid
+        entity:
+          type: string
+          format: uuid
+        subscriber:
+          type: string
+          format: uuid
 
     DeviceConfigurationList:
       type: object
@@ -543,6 +624,9 @@ components:
           type: string
           format: uuid
         entity:
+          type: string
+          format: uuid
+        subscriber:
           type: string
           format: uuid
         qrCode:
@@ -701,6 +785,12 @@ components:
         entity:
           type: string
           format: uuid
+        venue:
+          type: string
+          format: uuid
+        managementPolicy:
+          type: string
+          format: uuid
         data:
           type: string
         visibility:
@@ -778,7 +868,9 @@ components:
             - integer
             - string
             - float
+            - boolean
             - variable
+            - json
         weight:
           type: integer
           format: int64

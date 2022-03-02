@@ -23,6 +23,7 @@ namespace OpenWifi {
         std::string,
         std::string,
         std::string,
+        std::string,
         std::string
     > ManagementRoleDBRecordType;
 
@@ -30,5 +31,6 @@ namespace OpenWifi {
         public:
             ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         private:
+        bool Upgrade(uint32_t from, uint32_t &to) override;
     };
 }

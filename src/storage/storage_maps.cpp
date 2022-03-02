@@ -19,7 +19,9 @@ namespace OpenWifi {
         ORM::Field{"creator",ORM::FieldType::FT_TEXT},
         ORM::Field{"visibility",ORM::FieldType::FT_TEXT},
         ORM::Field{"access",ORM::FieldType::FT_TEXT},
-        ORM::Field{"entity",ORM::FieldType::FT_TEXT}
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
+        ORM::Field{"venue",ORM::FieldType::FT_TEXT}
         };
 
     static  ORM::IndexVec    MapsDB_Indexes{
@@ -31,6 +33,17 @@ namespace OpenWifi {
 
     MapDB::MapDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
     DB(T, "maps", MapsDB_Fields, MapsDB_Indexes, P, L, "map") {}
+
+    bool MapDB::Upgrade(uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+            "alter table " + TableName_ + " add column managementPolicy text;",
+            "alter table " + TableName_ + " add column entity text;",
+            "alter table " + TableName_ + " add column venue text;"
+        };
+        RunScript(Statements);
+        to = 2;
+        return true;
+    }
 
 }
 
@@ -47,6 +60,8 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.visibility = OpenWifi::ProvObjects::visibility_from_string(In.get<9>());
     Out.access = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::ObjectACLList>(In.get<10>());
     Out.entity = In.get<11>();
+    Out.managementPolicy = In.get<12>();
+    Out.venue = In.get<13>();
 }
 
 template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Map>::Convert(const OpenWifi::ProvObjects::Map &In, OpenWifi::MapDBRecordType &Out) {
@@ -62,4 +77,6 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.set<9>(OpenWifi::ProvObjects::to_string(In.visibility));
     Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.access));
     Out.set<11>(In.entity);
+    Out.set<12>(In.managementPolicy);
+    Out.set<13>(In.venue);
 }

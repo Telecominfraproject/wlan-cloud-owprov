@@ -65,6 +65,7 @@ namespace OpenWifi{
         DB_.DeleteRecord("id", Existing.info.id);
         MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
         RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles,Existing.entity,Existing.info.id);
+        RemoveMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementRoles,Existing.venue,Existing.info.id);
         return OK();
     }
 
@@ -94,6 +95,7 @@ namespace OpenWifi{
 
         if(DB_.CreateRecord(NewObject)) {
             AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles,NewObject.entity,NewObject.info.id);
+            AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementRoles,NewObject.venue,NewObject.info.id);
             MoveUsage(StorageService()->PolicyDB(), DB_, "", NewObject.managementPolicy, NewObject.info.id);
 
             Poco::JSON::Object Answer;
@@ -122,27 +124,22 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string MoveToPolicy,MoveFromPolicy;
-        if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
-            if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            MoveFromPolicy = Existing.managementPolicy;
-            Existing.managementPolicy = MoveToPolicy;
-        }
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&ManagementRoleDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        std::string MoveToEntity,MoveFromEntity;
-        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
-            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
-                return BadRequest(RESTAPI::Errors::EntityMustExist);
-            }
-            MoveFromEntity = Existing.entity;
-            Existing.entity = MoveToEntity;
-        }
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&ManagementRoleDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+
+        std::string FromVenue, ToVenue;
+        if(!CreateMove(RawObject,"venue",&ManagementRoleDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-            MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy, MoveToPolicy, Existing.info.id);
-            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles, MoveFromEntity, MoveToEntity, Existing.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_, FromPolicy, ToPolicy, Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementRoles, FromEntity, ToEntity, Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementRoles, FromVenue, ToVenue, Existing.info.id);
 
             ProvObjects::ManagementRole NewRecord;
 

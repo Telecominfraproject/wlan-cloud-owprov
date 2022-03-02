@@ -37,7 +37,11 @@ namespace OpenWifi {
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
         ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
-        ORM::Field{"variables",ORM::FieldType::FT_TEXT}
+        ORM::Field{"variables",ORM::FieldType::FT_TEXT},
+        ORM::Field{"configurations",ORM::FieldType::FT_TEXT},
+        ORM::Field{"maps",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementPolicies",ORM::FieldType::FT_TEXT},
+        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -53,7 +57,11 @@ namespace OpenWifi {
     bool VenueDB::Upgrade(uint32_t from, uint32_t &to) {
         to = Version();
         std::vector<std::string>    Script{
-                "alter table " + TableName_ + " add column variables text"
+                "alter table " + TableName_ + " add column variables text",
+                "alter table " + TableName_ + " add column configurations text",
+                "alter table " + TableName_ + " add column maps text",
+                "alter table " + TableName_ + " add column managementRoles text",
+                "alter table " + TableName_ + " add column managementPolicies text"
         };
 
         for(const auto &i:Script) {
@@ -134,6 +142,10 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.deviceConfiguration = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
     Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<19>());
+    Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<20>());
+    Out.maps = OpenWifi::RESTAPI_utils::to_object_array(In.get<21>());
+    Out.managementPolicies = OpenWifi::RESTAPI_utils::to_object_array(In.get<22>());
+    Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<23>());
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -157,4 +169,8 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.deviceConfiguration));
     Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.variables));
+    Out.set<20>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
+    Out.set<21>(OpenWifi::RESTAPI_utils::to_string(In.maps));
+    Out.set<22>(OpenWifi::RESTAPI_utils::to_string(In.managementPolicies));
+    Out.set<23>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
 }

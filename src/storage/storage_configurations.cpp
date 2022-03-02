@@ -32,7 +32,10 @@ namespace OpenWifi {
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT},
         ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_INT},
-        ORM::Field{"subscriberOnly",ORM::FieldType::FT_BOOLEAN}
+        ORM::Field{"subscriberOnly",ORM::FieldType::FT_BOOLEAN},
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT},
+        ORM::Field{"venue",ORM::FieldType::FT_TEXT},
+        ORM::Field{"subscriber",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    ConfigurationDB_Indexes{
@@ -44,7 +47,10 @@ namespace OpenWifi {
 
     bool ConfigurationDB::Upgrade(uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
-                "alter table " + TableName_ + " add column subscriberOnly BOOLEAN;"
+            "alter table " + TableName_ + " add column subscriberOnly BOOLEAN;",
+            "alter table " + TableName_ + " add column entity TEXT;",
+            "alter table " + TableName_ + " add column subscriber TEXT;",
+            "alter table " + TableName_ + " add column venue TEXT;"
         };
         RunScript(Statements);
         to = 2;
@@ -148,6 +154,9 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.firmwareUpgrade = In.get<13>();
     Out.firmwareRCOnly = In.get<14>();
     Out.subscriberOnly = In.get<15>();
+    Out.entity = In.get<16>();
+    Out.venue = In.get<17>();
+    Out.subscriber = In.get<18>();
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(const OpenWifi::ProvObjects::DeviceConfiguration &In, OpenWifi::ConfigurationDBRecordType &Out) {
@@ -167,4 +176,7 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<13>(In.firmwareUpgrade);
     Out.set<14>(In.firmwareRCOnly);
     Out.set<15>(In.subscriberOnly);
+    Out.set<16>(In.entity);
+    Out.set<17>(In.venue);
+    Out.set<18>(In.subscriber);
 }

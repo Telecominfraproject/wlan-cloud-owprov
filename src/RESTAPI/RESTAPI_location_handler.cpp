@@ -65,7 +65,8 @@ namespace OpenWifi{
         }
 
         DB_.DeleteRecord("id",UUID);
-        ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::locations,Existing.entity,"",Existing.info.id);
+        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::locations,Existing.entity,Existing.info.id);
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.info.id,"",Existing.info.id);
         return OK();
     }
 
@@ -96,11 +97,11 @@ namespace OpenWifi{
         NewObject.inUse.clear();
 
         if(DB_.CreateRecord(NewObject)) {
-            if(!NewObject.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",NewObject.managementPolicy,DB_.Prefix(),NewObject.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
+            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::locations,NewObject.entity,NewObject.info.id);
 
-            StorageService()->EntityDB().AddLocation("id",NewObject.entity,NewObject.info.id);
-
+            LocationDB::RecordName AddedRecord;
+            DB_.GetRecord("id", NewObject.info.id,AddedRecord);
             Poco::JSON::Object Answer;
             NewObject.to_json(Answer);
             return ReturnObject(Answer);
@@ -125,23 +126,13 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string MoveFromPolicy,MoveToPolicy;
-        if(AssignIfPresent(RawObject,"managementPolicy",MoveToPolicy)) {
-            if(!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id",MoveToPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            MoveFromPolicy = Existing.managementPolicy;
-            Existing.managementPolicy = MoveToPolicy;
-        }
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&LocationDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        std::string MoveFromEntity,MoveToEntity;
-        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
-            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
-                return BadRequest(RESTAPI::Errors::EntityMustExist);
-            }
-            MoveFromEntity = Existing.entity;
-            Existing.entity = MoveToEntity;
-        }
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&LocationDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
         AssignIfPresent(RawObject, "buildingName", Existing.buildingName);
         AssignIfPresent(RawObject, "city", Existing.city);
@@ -160,9 +151,8 @@ namespace OpenWifi{
             Existing.type = NewObject.type;
 
         if(DB_.UpdateRecord("id", UUID, Existing)) {
-
-            MoveUsage(StorageService()->PolicyDB(), DB_, MoveFromPolicy, MoveToPolicy, Existing.info.id);
-            ManageMembership(Storage().EntityDB(),&ProvObjects::Entity::locations,MoveFromEntity, MoveToEntity, Existing.info.id);
+            MoveUsage(StorageService()->PolicyDB(), DB_, FromPolicy, ToPolicy, Existing.info.id);
+            ManageMembership(Storage().EntityDB(),&ProvObjects::Entity::locations,FromEntity, ToEntity, Existing.info.id);
 
             ProvObjects::Location    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);

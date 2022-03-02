@@ -20,6 +20,7 @@ namespace OpenWifi {
             std::string,
             std::string,
             std::string,
+            std::string,
             std::string
     > VariablesDBRecordType;
 
@@ -27,5 +28,6 @@ namespace OpenWifi {
     public:
         explicit VariablesDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept;
     private:
+        bool Upgrade(uint32_t from, uint32_t &to) override;
     };
 }

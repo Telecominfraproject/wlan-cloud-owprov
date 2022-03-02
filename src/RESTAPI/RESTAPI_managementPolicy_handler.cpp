@@ -65,6 +65,7 @@ namespace OpenWifi{
 
         StorageService()->PolicyDB().DeleteRecord("id", UUID);
         ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies,Existing.entity,"",Existing.info.id);
+        ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementPolicies,Existing.venue,"",Existing.info.id);
         return OK();
     }
 
@@ -74,26 +75,32 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        ProvObjects::ManagementPolicy   NewPolicy;
-        auto NewObject = ParseStream();
-        if(!NewPolicy.from_json(NewObject)) {
+        ProvObjects::ManagementPolicy   NewObject;
+        auto RawObject = ParseStream();
+        if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!CreateObjectInfo(NewObject, UserInfo_.userinfo, NewPolicy.info)) {
+        if(!CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(NewPolicy.entity.empty() || !StorageService()->EntityDB().Exists("id", NewPolicy.entity)) {
+        if(NewObject.entity.empty() || !StorageService()->EntityDB().Exists("id", NewObject.entity)) {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        NewPolicy.inUse.clear();
-        if(DB_.CreateRecord(NewPolicy)) {
-            ProvObjects::ManagementPolicy   Policy;
-            DB_.GetRecord("id",NewPolicy.info.id,Policy);
+        if(NewObject.venue.empty() || !StorageService()->VenueDB().Exists("id", NewObject.venue)) {
+            return BadRequest(RESTAPI::Errors::VenueMustExist);
+        }
+
+        NewObject.inUse.clear();
+        if(DB_.CreateRecord(NewObject)) {
+            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies,NewObject.entity,NewObject.info.id);
+            AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementPolicies,NewObject.venue,NewObject.info.id);
+            PolicyDB::RecordName  AddedObject;
+            DB_.GetRecord("id",NewObject.info.id,AddedObject);
             Poco::JSON::Object  Answer;
-            Policy.to_json(Answer);
+            AddedObject.to_json(Answer);
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
@@ -116,20 +123,21 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string MoveFromEntity,MoveToEntity;
-        if(AssignIfPresent(RawObject,"entity",MoveToEntity)) {
-            if(!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id",MoveToEntity)) {
-                return BadRequest(RESTAPI::Errors::EntityMustExist);
-            }
-            MoveFromEntity = Existing.entity;
-            Existing.entity = MoveToEntity;
-        }
+        std::string FromEntity, ToEntity;
+        if(!CreateMove(RawObject,"entity",&PolicyDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+
+        std::string FromVenue, ToVenue;
+        if(!CreateMove(RawObject,"venue",&PolicyDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
 
         if(!NewPolicy.entries.empty())
             Existing.entries = NewPolicy.entries;
 
         if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
-            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies, MoveFromEntity,MoveToEntity,Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::managementPolicies, FromEntity,ToEntity,Existing.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::managementPolicies, FromVenue,ToVenue,Existing.info.id);
+
             ProvObjects::ManagementPolicy   P;
             DB_.GetRecord("id",Existing.info.id,P);
             Poco::JSON::Object  Answer;

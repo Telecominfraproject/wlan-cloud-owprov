@@ -37,7 +37,9 @@ namespace OpenWifi {
         ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
         ORM::Field{"variables",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicies",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT}
+        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT},
+        ORM::Field{"maps",ORM::FieldType::FT_TEXT},
+        ORM::Field{"configurations",ORM::FieldType::FT_TEXT}
      };
 
     static  ORM::IndexVec    EntityDB_Indexes{
@@ -58,6 +60,8 @@ namespace OpenWifi {
         std::vector<std::string>    Script{
                 "alter table " + TableName_ + " add column variables text",
                 "alter table " + TableName_ + " add column managementPolicies text",
+                "alter table " + TableName_ + " add column maps text",
+                "alter table " + TableName_ + " add column configurations text",
                 "alter table " + TableName_ + " add column managementRoles text"
         };
 
@@ -245,6 +249,8 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
     Out.managementPolicies = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
     Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<19>());
+    Out.maps = OpenWifi::RESTAPI_utils::to_object_array(In.get<20>());
+    Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<21>());
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -268,4 +274,6 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.variables));
     Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.managementPolicies));
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
+    Out.set<20>(OpenWifi::RESTAPI_utils::to_string(In.maps));
+    Out.set<21>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
 }

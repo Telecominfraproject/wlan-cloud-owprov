@@ -42,20 +42,15 @@ namespace OpenWifi{
         }
 
         if( !Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty() || !Existing.locations.empty()
-            || !Existing.contacts.empty()) {
+            || !Existing.contacts.empty() || !Existing.configurations.empty()) {
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(!Existing.deviceConfiguration.empty()) {
-            for(auto &i:Existing.deviceConfiguration)
-                StorageService()->ConfigurationDB().DeleteInUse("id", i, DB_.Prefix(), Existing.info.id);
-        }
+        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
+        DB_.DeleteRecord("id",UUID);
+        DB_.DeleteChild("id",Existing.parent,UUID);
+        return OK();
 
-        if(DB_.DeleteRecord("id",UUID)) {
-            DB_.DeleteChild("id",Existing.parent,UUID);
-            return OK();
-        }
-        InternalError(RESTAPI::Errors::CouldNotBeDeleted);
     }
 
     void RESTAPI_entity_handler::DoPost() {
@@ -144,27 +139,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        std::string NewManagementPolicy;
-        Types::UUIDvec_t NewConfiguration;
-        bool        MovingConfiguration=false,
-                    MovingManagementPolicy=false;
-        if(RawObject->has("deviceConfiguration")) {
-            if(!NewEntity.deviceConfiguration.empty()) {
-                for(auto &i:NewEntity.deviceConfiguration) {
-                    if(!StorageService()->ConfigurationDB().Exists("id",i)) {
-                        return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
-                    }
-                }
-                NewConfiguration = NewEntity.deviceConfiguration;
-            }
-            MovingConfiguration = Existing.deviceConfiguration != NewConfiguration;
-        }
-        if(AssignIfPresent(RawObject,"managementPolicy",NewManagementPolicy)) {
-            if(!NewManagementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewManagementPolicy)) {
-                return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-            }
-            MovingManagementPolicy = Existing.managementPolicy != NewManagementPolicy;
-        }
+        std::string FromPolicy, ToPolicy;
+        if(!CreateMove(RawObject,"managementPolicy",&EntityDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
 
         if(RawObject->has("sourceIP")) {
             if(!NewEntity.sourceIP.empty() && !CIDR::ValidateIpRanges(NewEntity.sourceIP)) {
@@ -181,26 +158,7 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "rrm", Existing.rrm);
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
-
-            if(MovingConfiguration) {
-                if(!Existing.deviceConfiguration.empty())
-                    for(auto &i:Existing.deviceConfiguration)
-                        StorageService()->ConfigurationDB().DeleteInUse("id",i,DB_.Prefix(),Existing.info.id);
-                if(!NewConfiguration.empty())
-                    for(auto &i:NewConfiguration)
-                        StorageService()->ConfigurationDB().AddInUse("id",i,DB_.Prefix(),Existing.info.id);
-                Existing.deviceConfiguration = NewConfiguration;
-            }
-
-            if(MovingManagementPolicy) {
-                if(!Existing.managementPolicy.empty())
-                    StorageService()->PolicyDB().DeleteInUse("id",Existing.managementPolicy, DB_.Prefix(), Existing.info.id);
-                if(!NewManagementPolicy.empty())
-                    StorageService()->PolicyDB().AddInUse("id", NewManagementPolicy, DB_.Prefix(), Existing.info.id);
-                Existing.managementPolicy = NewManagementPolicy;
-            }
-
-            DB_.UpdateRecord("id", Existing.info.id, Existing);
+            MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);
 
             Poco::JSON::Object  Answer;
             ProvObjects::Entity NewRecord;

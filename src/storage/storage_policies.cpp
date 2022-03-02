@@ -24,8 +24,8 @@ namespace OpenWifi {
         ORM::Field{"entries",ORM::FieldType::FT_TEXT},
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
-        ORM::Field{"entity",ORM::FieldType::FT_TEXT}
-
+        ORM::Field{"entity",ORM::FieldType::FT_TEXT},
+        ORM::Field{"venue",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    PolicyDB_Indexes{
@@ -37,6 +37,16 @@ namespace OpenWifi {
 
     PolicyDB::PolicyDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "policies", PolicyDB_Fields, PolicyDB_Indexes, P, L, "pol") {}
+
+    bool PolicyDB::Upgrade(uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column entity text;",
+                "alter table " + TableName_ + " add column venue text;"
+        };
+        RunScript(Statements);
+        to = 2;
+        return true;
+    }
 
 }
 
@@ -51,6 +61,7 @@ template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects:
     Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<8>());
     Out.entity = In.get<9>();
+    Out.venue = In.get<10>();
 }
 
 template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects::ManagementPolicy>::Convert(const OpenWifi::ProvObjects::ManagementPolicy &In, OpenWifi::PolicyDBRecordType &Out) {
@@ -64,4 +75,5 @@ template<> void ORM::DB<    OpenWifi::PolicyDBRecordType, OpenWifi::ProvObjects:
     Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.inUse));
     Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<9>(In.entity);
+    Out.set<10>(In.venue);
 }

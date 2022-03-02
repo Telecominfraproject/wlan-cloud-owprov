@@ -27,6 +27,7 @@ namespace OpenWifi {
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
+        ORM::Field{"venue",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    RolesDB_Indexes{
@@ -38,6 +39,16 @@ namespace OpenWifi {
 
     ManagementRoleDB::ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "roles", RolesDB_Fields, RolesDB_Indexes, P, L, "rol") {}
+
+    bool ManagementRoleDB::Upgrade(uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column entity text;",
+                "alter table " + TableName_ + " add column venue text;"
+        };
+        RunScript(Statements);
+        to = 2;
+        return true;
+    }
 
 }
 
@@ -53,6 +64,7 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<8>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<9>());
     Out.entity = In.get<10>();
+    Out.venue = In.get<11>();
 }
 
 template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::ProvObjects::ManagementRole>::Convert(const OpenWifi::ProvObjects::ManagementRole &In, OpenWifi::ManagementRoleDBRecordType &Out) {
@@ -67,4 +79,5 @@ template<> void ORM::DB<    OpenWifi::ManagementRoleDBRecordType, OpenWifi::Prov
     Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.inUse));
     Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<10>(In.entity);
+    Out.set<11>(In.venue);
 }
