@@ -730,11 +730,11 @@ namespace ORM {
                     try {
                         Command << i, Poco::Data::Keywords::now;
                     } catch (const Poco::Exception &E) {
-                        Logger_.log(E);
-                        Logger_.error(Poco::format("The following statement '%s' generated an exception during a table upgrade. This maya or may not be a problem.", i));
-                    }
-                    if(!IgnoreExceptions) {
-                        return false;
+                        // Logger_.log(E);
+                        // Logger_.error(Poco::format("The following statement '%s' generated an exception during a table upgrade. This may or may not be a problem.", i));
+                        if(!IgnoreExceptions) {
+                            return false;
+                        }
                     }
                     Command.reset(Session);
                 }
