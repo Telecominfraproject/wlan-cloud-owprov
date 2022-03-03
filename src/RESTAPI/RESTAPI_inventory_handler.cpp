@@ -424,8 +424,8 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         std::string FromConfiguration, ToConfiguration;
-        if(!CreateMove(RawObject,"deviceConfiguration",&InventoryDB::RecordName::deviceConfiguration, Existing, FromConfiguration, ToConfiguration, StorageService()->ContactDB()))
-            return BadRequest(RESTAPI::Errors::VenueMustExist);
+        if(!CreateMove(RawObject,"deviceConfiguration",&InventoryDB::RecordName::deviceConfiguration, Existing, FromConfiguration, ToConfiguration, StorageService()->ConfigurationDB()))
+            return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
 
         std::string NewSubScriber;
         if(AssignIfPresent(RawObject, "subscriber", NewSubScriber)) {
