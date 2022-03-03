@@ -673,6 +673,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json( Obj,"status", status);
         RESTAPI_utils::field_to_json( Obj,"error", error);
         RESTAPI_utils::field_to_json( Obj,"statusCode", statusCode);
+        RESTAPI_utils::field_to_json( Obj,"deviceID", deviceID);
     }
 
     bool SignupEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -687,6 +688,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json( Obj,"status", status);
             RESTAPI_utils::field_from_json( Obj,"error", error);
             RESTAPI_utils::field_from_json( Obj,"statusCode", statusCode);
+            RESTAPI_utils::field_from_json( Obj,"deviceID", deviceID);
             return true;
         } catch(...) {
 

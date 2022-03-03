@@ -13,6 +13,7 @@ namespace OpenWifi {
         Poco::toLowerInPlace(UserName);
         auto macAddress = GetParameter("macAddress","");
         Poco::toLowerInPlace(macAddress);
+        auto deviceID = GetParameter("deviceID","");
 
         if(UserName.empty() || macAddress.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
@@ -30,6 +31,11 @@ namespace OpenWifi {
         SignupDB::RecordVec SEs;
         if(StorageService()->SignupDB().GetRecords(0,100, SEs, " email='" + UserName + "' and serialNumber='"+macAddress+"' ")) {
             for(const auto &i:SEs) {
+
+                if(!i.deviceID.empty() && i.deviceID!=deviceID) {
+                    return BadRequest("Invalid deviceID");
+                }
+
                 if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupSuccess ) {
@@ -94,6 +100,7 @@ namespace OpenWifi {
             SE.error = 0 ;
             SE.userId = UI.id;
             SE.email = UserName;
+            SE.deviceID = deviceID;
             SE.status = "waiting-for-email-verification";
             SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForEmail;
             StorageService()->SignupDB().CreateRecord(SE);
@@ -191,6 +198,7 @@ namespace OpenWifi {
         auto EMail = GetParameter("email", "");
         auto SignupUUID = GetParameter("signupUUID", "");
         auto macAddress = GetParameter("macAddress", "");
+        auto deviceID = GetParameter("deviceID","");
 
         if(!SignupUUID.empty()) {
             if(StorageService()->SignupDB().DeleteRecord("id", SignupUUID)) {
