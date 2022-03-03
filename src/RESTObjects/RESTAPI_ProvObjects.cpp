@@ -334,6 +334,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"state",state);
         field_to_json( Obj,"devClass",devClass);
         field_to_json( Obj,"locale",locale);
+        field_to_json( Obj,"realMacAddress",realMacAddress);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -354,6 +355,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"state",state);
             field_from_json( Obj,"devClass",devClass);
             field_from_json( Obj,"locale",locale);
+            field_from_json( Obj,"realMacAddress",realMacAddress);
 
             return true;
         } catch(...) {
@@ -664,6 +666,7 @@ namespace OpenWifi::ProvObjects {
         info.to_json(Obj);
         RESTAPI_utils::field_to_json( Obj,"email", email);
         RESTAPI_utils::field_to_json( Obj,"userId", userId);
+        RESTAPI_utils::field_to_json( Obj,"macAddress", macAddress);
         RESTAPI_utils::field_to_json( Obj,"serialNumber", serialNumber);
         RESTAPI_utils::field_to_json( Obj,"submitted", submitted);
         RESTAPI_utils::field_to_json( Obj,"completed", completed);
@@ -677,6 +680,7 @@ namespace OpenWifi::ProvObjects {
             info.from_json(Obj);
             RESTAPI_utils::field_from_json( Obj,"email", email);
             RESTAPI_utils::field_from_json( Obj,"userId", userId);
+            RESTAPI_utils::field_from_json( Obj,"macAddress", macAddress);
             RESTAPI_utils::field_from_json( Obj,"serialNumber", serialNumber);
             RESTAPI_utils::field_from_json( Obj,"submitted", submitted);
             RESTAPI_utils::field_from_json( Obj,"completed", completed);

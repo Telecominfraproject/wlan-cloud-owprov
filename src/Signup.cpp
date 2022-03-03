@@ -54,33 +54,40 @@ namespace OpenWifi {
                 if(SE.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice) {
                     //  look for the device...
                     ProvObjects::InventoryTag   IT;
-                    if(StorageService()->InventoryDB().GetRecord("serialNumber",SE.serialNumber,IT)) {
-                        //  if the deviceType is empty, we know that the device has not contacted
-                        //  the service yet.
-                        if(IT.deviceType.empty())
-                            continue;
+                    auto TrySerialNumber = Utils::SerialNumberToInt(SE.macAddress);
+                    for(uint i=0;i<4;++i) {
+                        std::string SerialNumber = Utils::IntToSerialNumber(TrySerialNumber+i);
+                        if (StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber, IT)) {
+                            //  if the deviceType is empty, we know that the device has not contacted
+                            //  the service yet.
+                            if (IT.deviceType.empty())
+                                continue;
 
-                        //  We have a device type, so the device contacted us.
-                        //  We must now complete the device transfer to this new subscriber and complete the
-                        //  signup job.
-                        IT.subscriber = SE.userId;
-                        IT.info.modified = OpenWifi::Now();
-                        Poco::JSON::Object  NewState;
-                        NewState.set("method","signup");
-                        NewState.set("date", OpenWifi::Now());
-                        NewState.set("status", "completed");
-                        std::ostringstream OS;
-                        NewState.stringify(OS);
-                        IT.state = OS.str();
-                        StorageService()->InventoryDB().UpdateRecord("id",IT.info.id,IT);
+                            //  We have a device type, so the device contacted us.
+                            //  We must now complete the device transfer to this new subscriber and complete the
+                            //  signup job.
+                            IT.subscriber = SE.userId;
+                            IT.info.modified = OpenWifi::Now();
+                            IT.realMacAddress = SE.macAddress;
+                            Poco::JSON::Object NewState;
+                            NewState.set("method", "signup");
+                            NewState.set("date", OpenWifi::Now());
+                            NewState.set("status", "completed");
+                            std::ostringstream OS;
+                            NewState.stringify(OS);
+                            IT.state = OS.str();
+                            StorageService()->InventoryDB().UpdateRecord("id", IT.info.id, IT);
 
-                        SE.status = "signup completed";
-                        SE.statusCode = ProvObjects::SignupStatusCodes::SignupSuccess;
-                        SE.completed = OpenWifi::Now();
-                        SE.info.modified = OpenWifi::Now();
-                        SE.error = 0 ;
-                        StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
-                        SDK::GW::Device::SetSubscriber( SE.serialNumber, IT.subscriber );
+                            SE.status = "signup completed";
+                            SE.serialNumber = SerialNumber;
+                            SE.statusCode = ProvObjects::SignupStatusCodes::SignupSuccess;
+                            SE.completed = OpenWifi::Now();
+                            SE.info.modified = OpenWifi::Now();
+                            SE.error = 0;
+                            StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
+                            SDK::GW::Device::SetSubscriber(SerialNumber, IT.subscriber);
+                            break;
+                        }
                     }
                 }
             }

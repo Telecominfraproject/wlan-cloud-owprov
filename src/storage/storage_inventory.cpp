@@ -42,7 +42,8 @@ namespace OpenWifi {
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"state",ORM::FieldType::FT_TEXT},
         ORM::Field{"devClass",ORM::FieldType::FT_TEXT},
-        ORM::Field{"locale",ORM::FieldType::FT_TEXT}
+        ORM::Field{"locale",ORM::FieldType::FT_TEXT},
+        ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -61,6 +62,7 @@ namespace OpenWifi {
         std::vector<std::string>    Script{
             "alter table " + TableName_ + " add column state text" ,
             "alter table " + TableName_ + " add column locale varchar(16)" ,
+            "alter table " + TableName_ + " add column realMacAddress text" ,
             "alter table " + TableName_ + " add column devClass text"
         };
 
@@ -387,6 +389,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.managementPolicy = In.get<18>();
     Out.state = In.get<19>();
     Out.devClass = In.get<20>();
+    Out.realMacAddress = In.get<21>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -411,4 +414,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<18>(In.managementPolicy);
     Out.set<19>(In.state);
     Out.set<20>(In.devClass);
+    Out.set<21>(In.realMacAddress);
 }

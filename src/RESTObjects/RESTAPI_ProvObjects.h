@@ -303,6 +303,7 @@ namespace OpenWifi::ProvObjects {
         std::string     state;
         std::string     devClass;
         std::string     locale;
+        std::string     realMacAddress;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -428,6 +429,7 @@ namespace OpenWifi::ProvObjects {
         ObjectInfo          info;
         std::string         email;
         std::string         userId;
+        std::string         macAddress;
         std::string         serialNumber;
         uint64_t            submitted = 0 ;
         uint64_t            completed = 0 ;

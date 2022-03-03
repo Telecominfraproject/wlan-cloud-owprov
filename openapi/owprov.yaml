@@ -842,6 +842,8 @@ components:
         userId:
           type: string
           format: uuid
+        macAddress:
+          type: string
         serialNumber:
           type: string
         created:
@@ -2782,7 +2784,7 @@ paths:
             format: email
           required: false
         - in: query
-          name: serialNumber
+          name: macAddress
           schema:
             type: string
           required: false
@@ -2797,6 +2799,11 @@ paths:
           schema:
             type: boolean
             default: false
+          required: false
+        - in: query
+          name: deviceID
+          schema:
+            type: string
           required: false
       responses:
         200:
@@ -2827,7 +2834,7 @@ paths:
             format: email
           required: false
         - in: query
-          name: serialNumber
+          name: macAddress
           schema:
             type: string
           required: false
@@ -2836,6 +2843,11 @@ paths:
           schema:
             type: string
             format: uuid
+          required: false
+        - in: query
+          name: deviceID
+          schema:
+            type: string
           required: false
       responses:
         204:
@@ -2860,10 +2872,15 @@ paths:
             format: email
           required: true
         - in: query
-          name: serialNumber
+          name: macAddress
           schema:
             type: string
           required: true
+        - in: query
+          name: deviceID
+          schema:
+            type: string
+          required: false
       responses:
         200:
           $ref: '#/components/schemas/SignupEntry'
