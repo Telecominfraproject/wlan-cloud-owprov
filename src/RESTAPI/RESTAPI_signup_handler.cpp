@@ -11,10 +11,10 @@ namespace OpenWifi {
     void RESTAPI_signup_handler::DoPost() {
         auto UserName = GetParameter("email","");
         Poco::toLowerInPlace(UserName);
-        auto SerialNumber = GetParameter("serialNumber","");
-        Poco::toLowerInPlace(SerialNumber);
+        auto macAddress = GetParameter("macAddress","");
+        Poco::toLowerInPlace(macAddress);
 
-        if(UserName.empty() || SerialNumber.empty()) {
+        if(UserName.empty() || macAddress.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
@@ -22,13 +22,13 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
-        if(!Utils::ValidSerialNumber(SerialNumber)) {
+        if(!Utils::ValidSerialNumber(macAddress)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
 
         //  if a signup already exists for this user, we should just return its value completion
         SignupDB::RecordVec SEs;
-        if(StorageService()->SignupDB().GetRecords(0,100, SEs, " email='" + UserName + "' and serialNumber='"+SerialNumber+"' ")) {
+        if(StorageService()->SignupDB().GetRecords(0,100, SEs, " email='" + UserName + "' and serialNumber='"+macAddress+"' ")) {
             for(const auto &i:SEs) {
                 if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice ||
@@ -44,13 +44,23 @@ namespace OpenWifi {
         //  So we do not have an outstanding signup...
         //  Can we actually claim this serial number??? if not, we need to return an error
         ProvObjects::InventoryTag   IT;
-        if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,IT)) {
-            if(!IT.subscriber.empty()) {
-                return BadRequest(RESTAPI::Errors::SerialNumberAlreadyProvisioned);
-            }
+        std::string SerialNumber;
+        bool FoundIT=false;
+        for(int Index=0;Index<4;Index++) {
+            auto TrySerialNumber = Utils::SerialNumberToInt(macAddress);
+            for (uint i = 0; i < 4; ++i) {
+                SerialNumber = Utils::IntToSerialNumber(TrySerialNumber + i);
+                if (StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber, IT)) {
+                    if (!IT.subscriber.empty()) {
+                        return BadRequest(RESTAPI::Errors::SerialNumberAlreadyProvisioned);
+                    }
 
-            if(!(IT.devClass.empty() || IT.devClass=="subscriber" || IT.devClass=="any")) {
-                return BadRequest(RESTAPI::Errors::SerialNumberNotTheProperClass);
+                    if (!(IT.devClass.empty() || IT.devClass == "subscriber" || IT.devClass == "any")) {
+                        return BadRequest(RESTAPI::Errors::SerialNumberNotTheProperClass);
+                    }
+                    FoundIT = true;
+                    break;
+                }
             }
         }
 
@@ -80,7 +90,7 @@ namespace OpenWifi {
             SE.info.id = SignupUUID;
             SE.info.created = SE.info.modified = SE.submitted = OpenWifi::Now();
             SE.completed = 0 ;
-            SE.serialNumber = SerialNumber;
+            SE.macAddress = macAddress;
             SE.error = 0 ;
             SE.userId = UI.id;
             SE.email = UserName;
@@ -89,11 +99,7 @@ namespace OpenWifi {
             StorageService()->SignupDB().CreateRecord(SE);
             Signup()->AddOutstandingSignup(SE);
 
-            if(IT.serialNumber.empty()) {
-                IT.serialNumber = SerialNumber;
-                IT.info.id = MicroService::instance().CreateUUID();
-                IT.info.created = IT.info.modified = OpenWifi::Now();
-                IT.info.name = SerialNumber;
+            if(FoundIT) {
                 Poco::JSON::Object StateDoc;
                 StateDoc.set("method", "signup");
                 StateDoc.set("claimer", UserName);
@@ -104,23 +110,10 @@ namespace OpenWifi {
                 StateDoc.set("status", "waiting for email-verification");
                 std::ostringstream os2;
                 StateDoc.stringify(os2);
-                IT.state = os2.str();
-                std::cout << "Creating inventory entry: " << SE.serialNumber << std::endl;
-                StorageService()->InventoryDB().CreateRecord(IT);
-            } else {
-                Poco::JSON::Object StateDoc;
-                StateDoc.set("method", "signup");
-                StateDoc.set("claimer", UserName);
-                StateDoc.set("claimerId", UI.id);
-                StateDoc.set("signupUUID", SignupUUID);
-                StateDoc.set("errorCode",0);
-                StateDoc.set("date", OpenWifi::Now());
-                StateDoc.set("status", "waiting for email-verification");
-                std::ostringstream os2;
-                StateDoc.stringify(os2);
+                IT.realMacAddress = macAddress;
                 IT.state = os2.str();
                 IT.info.modified = OpenWifi::Now();
-                std::cout << "Updating inventory entry: " << SE.serialNumber << std::endl;
+                std::cout << "Updating inventory entry: " << SE.macAddress << std::endl;
                 StorageService()->InventoryDB().UpdateRecord("id",IT.info.id,IT);
             }
 
@@ -163,7 +156,7 @@ namespace OpenWifi {
     void RESTAPI_signup_handler::DoGet() {
         auto EMail = GetParameter("email", "");
         auto SignupUUID = GetParameter("signupUUID", "");
-        auto SerialNumber = GetParameter("serialNumber", "");
+        auto macAddress = GetParameter("macAddress", "");
         auto List = GetBoolParameter("listOnly",false);
 
         Poco::JSON::Object          Answer;
@@ -180,9 +173,9 @@ namespace OpenWifi {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
-        } else if(!SerialNumber.empty()) {
+        } else if(!macAddress.empty()) {
             SignupDB::RecordVec SEs;
-            if(StorageService()->SignupDB().GetRecords(0,100,SEs, " serialNumber='"+SerialNumber+"' ")) {
+            if(StorageService()->SignupDB().GetRecords(0,100,SEs, " serialNumber='"+macAddress+"' ")) {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
@@ -197,7 +190,7 @@ namespace OpenWifi {
     void RESTAPI_signup_handler::DoDelete() {
         auto EMail = GetParameter("email", "");
         auto SignupUUID = GetParameter("signupUUID", "");
-        auto SerialNumber = GetParameter("serialNumber", "");
+        auto macAddress = GetParameter("macAddress", "");
 
         if(!SignupUUID.empty()) {
             if(StorageService()->SignupDB().DeleteRecord("id", SignupUUID)) {
@@ -209,8 +202,8 @@ namespace OpenWifi {
                 return OK();
             }
             return NotFound();
-        } else if(!SerialNumber.empty()) {
-            if(StorageService()->SignupDB().DeleteRecord("serialNumber", SerialNumber)) {
+        } else if(!macAddress.empty()) {
+            if(StorageService()->SignupDB().DeleteRecord("serialNumber", macAddress)) {
                 return OK();
             }
             return NotFound();
