@@ -573,7 +573,8 @@ components:
         variables:
           type: array
           items:
-            $ref: '#/components/schemas/TagValuePairList'
+            type: string
+            format: uuid
         inUse:
           type: array
           items:
