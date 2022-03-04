@@ -18,7 +18,7 @@ namespace OpenWifi {
 	}
 
 	void SerialNumberCache::AddSerialNumber(const std::string &S, const std::string &DeviceType) {
-		std::lock_guard		G(M_);
+		std::lock_guard		G(Mutex_);
 
 		auto Hint = DeviceTypeDictionary_.find(DeviceType);
 		int     Index;
@@ -41,7 +41,7 @@ namespace OpenWifi {
 	}
 
 	void SerialNumberCache::DeleteSerialNumber(const std::string &S) {
-		std::lock_guard		G(M_);
+		std::lock_guard		G(Mutex_);
 
 		uint64_t SN = std::stoull(S, nullptr,16);
 		auto It = std::find_if(SNs_.begin(),SNs_.end(),[SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; });
@@ -51,7 +51,7 @@ namespace OpenWifi {
 	}
 
 	void SerialNumberCache::FindNumbers(const std::string &S, uint HowMany, std::vector<uint64_t> &A) {
-		std::lock_guard		G(M_);
+		std::lock_guard		G(Mutex_);
 
 		if(S.length()==12) {
 			uint64_t SN = std::stoull(S, nullptr, 16);
@@ -79,6 +79,7 @@ namespace OpenWifi {
 	}
 
 	bool SerialNumberCache::FindDevice(const std::string &SerialNumber, std::string & DeviceType) {
+        std::lock_guard		G(Mutex_);
 	    uint64_t SN = std::stoull(SerialNumber, nullptr, 16);
 	    auto It = std::find_if(SNs_.begin(),SNs_.end(),[SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; });
 	    if(It != SNs_.end()) {

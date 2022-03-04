@@ -40,7 +40,6 @@ namespace OpenWifi {
 		uint64_t 					LastUpdate_ = 0 ;
 		SerialCacheContent	        SNs_;
 		std::map<std::string,int>   DeviceTypeDictionary_;
-		std::mutex					M_;
 
 		SerialNumberCache() noexcept:
 			SubSystemServer("SerialNumberCache", "SNCACHE-SVR", "serialcache")
