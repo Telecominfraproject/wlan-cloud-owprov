@@ -17,11 +17,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-            DB_(StorageService()->MapDB()){}
+            Internal){}
             static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/map/{uuid}"}; };
     private:
-        MapDB    &DB_;
+        MapDB    &DB_=StorageService()->MapDB();
         void DoGet() final ;
         void DoPost() final ;
         void DoPut() final ;

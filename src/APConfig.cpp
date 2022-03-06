@@ -120,8 +120,33 @@ namespace OpenWifi {
                 // ShowJSON(C);
             }
         }
-
         return true;
+    }
+
+    void APConfig::AddVariables(const Poco::JSON::Object::Ptr &Section, Poco::JSON::Object::Ptr &Result) {
+        auto Names = Section->getNames();
+        for(const auto &v:Names) {
+            if(v=="__variableBlock") {
+                //  process the variable
+                auto uuids = Section->get(v);
+                if(uuids.isArray()) {
+                    VariablesDB::RecordName VarInfo;
+                    if (StorageService()->VariablesDB().GetRecord("id", uuids, VarInfo)) {
+                        Poco::JSON::Parser P;
+                        for (const auto &var: VarInfo.variables) {
+                            auto vv = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+                            auto VarNames = vv->getNames();
+                            for (const auto &single_var: VarNames)
+                                Result->set(single_var, vv->get(single_var));
+                        }
+                    } else {
+                        Result->set(v, Section->get(v));
+                    }
+                }
+            } else {
+                Result->set(v,Section->get(v));
+            }
+        }
     }
 
     bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
@@ -152,15 +177,16 @@ namespace OpenWifi {
         //      services
         //      globals
         //      unit
-        auto Tmp=Poco::makeShared<Poco::JSON::Object>();
+        // auto Tmp=Poco::makeShared<Poco::JSON::Object>();
         std::set<std::string>   Sections;
         for(const auto &i:Config_) {
-            ShowJSON("Iteration Start:", Tmp);
+            ShowJSON("Iteration Start:", Configuration);
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
-            auto SectionInfo = O->get(Names[0]);
-            auto InsertInfo = Sections.insert(Names[0]);
+            auto SectionName = Names[0];
+            auto SectionInfo = O->getObject(SectionName);
+            auto InsertInfo = Sections.insert(SectionName);
             if(InsertInfo.second) {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
@@ -170,7 +196,9 @@ namespace OpenWifi {
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
-                Tmp->set(Names[0],O->get(Names[0]));
+                Poco::JSON::Object::Ptr Result;
+                AddVariables(SectionInfo, Result);
+                Configuration->set(SectionName, Result);
             } else {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
@@ -183,7 +211,7 @@ namespace OpenWifi {
                 }
             }
         }
-        Configuration = Tmp;
+        // Configuration = Tmp;
         if(Config_.empty())
             return false;
 
@@ -204,13 +232,11 @@ namespace OpenWifi {
     }
 
     void APConfig::AddConfiguration(const std::string &UUID) {
-
-        ProvObjects::DeviceConfiguration    Config;
         if(UUID.empty())
             return;
 
-        if(StorageService()->ConfigurationDB().GetRecord("id", UUID,Config)) {
-            //  find where to insert into this list using the weight.
+        ProvObjects::DeviceConfiguration    Config;
+        if(StorageService()->ConfigurationDB().GetRecord("id", UUID, Config)) {
             if(!Config.configuration.empty()) {
                 if(DeviceTypeMatch(DeviceType_,Config.deviceTypes)) {
                     for(const auto &i:Config.configuration) {
@@ -241,7 +267,7 @@ namespace OpenWifi {
     void APConfig::AddEntityConfig(const std::string &UUID) {
         ProvObjects::Entity E;
         if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
-            AddConfiguration(E.deviceConfiguration);
+            AddConfiguration(E.configurations);
             if(!E.parent.empty())
                 AddEntityConfig(E.parent);
         }
@@ -250,7 +276,7 @@ namespace OpenWifi {
     void APConfig::AddVenueConfig(const std::string &UUID) {
         ProvObjects::Venue V;
         if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
-            AddConfiguration(V.deviceConfiguration);
+            AddConfiguration(V.configurations);
             if(!V.entity.empty()) {
                 AddEntityConfig(V.entity);
             } else if(!V.parent.empty()) {

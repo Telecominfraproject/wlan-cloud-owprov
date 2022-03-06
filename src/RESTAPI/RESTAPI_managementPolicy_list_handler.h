@@ -16,11 +16,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-          DB_(StorageService()->PolicyDB()) {}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementPolicy"}; };
     private:
-        PolicyDB        &DB_;
+        PolicyDB        &DB_=StorageService()->PolicyDB();
         void DoGet() final ;
         void DoPost() final {};
         void DoPut() final {};

@@ -22,11 +22,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-          DB_(StorageService()->InventoryDB()) {}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory"}; };
     private:
-        InventoryDB     &DB_;
+        InventoryDB     &DB_=StorageService()->InventoryDB();
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

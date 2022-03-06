@@ -16,11 +16,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-            DB_(StorageService()->RolesDB()){}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementRole/{uuid}"}; };
     private:
-        ManagementRoleDB    &DB_;
+        ManagementRoleDB    &DB_=StorageService()->RolesDB();
         void DoGet() final ;
         void DoPost() final ;
         void DoPut() final ;

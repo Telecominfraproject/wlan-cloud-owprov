@@ -71,6 +71,26 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        auto LocationToCreate = GetParameter("locationToCreate","");
+        if(!LocationToCreate.empty()) {
+            std::cout << "LocationToCreate: " << LocationToCreate << std::endl;
+            Poco::JSON::Parser  P;
+            auto LocationObj = P.parse(LocationToCreate).extract<Poco::JSON::Object::Ptr>();
+            if(LocationObj->has("location")) {
+                auto LocationDetails = LocationObj->get("location").extract<Poco::JSON::Object::Ptr>();
+                ProvObjects::Location   LC;
+                if(LC.from_json(LocationDetails)) {
+                    std::cout << "Location decoded: " << LC.info.name << std::endl;
+                } else {
+                    std::cout << "Location not decoded." << std::endl;
+                }
+            } else {
+                std::cout << "No location included." << std::endl;
+            }
+        } else {
+            std::cout << "NoLocation to create." << std::endl;
+        }
+
         if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }

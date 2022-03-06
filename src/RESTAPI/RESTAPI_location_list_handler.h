@@ -18,11 +18,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-            DB_(StorageService()->LocationDB()){}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/location"}; };
     private:
-        LocationDB  & DB_;
+        LocationDB  & DB_=StorageService()->LocationDB();
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

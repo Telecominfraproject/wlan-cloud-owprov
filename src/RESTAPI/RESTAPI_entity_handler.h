@@ -24,12 +24,11 @@ namespace OpenWifi {
                                 Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                 Server,
                                 TransactionId,
-                                Internal),
-                                DB_(StorageService()->EntityDB()){}
+                                Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/entity/{uuid}"}; };
 
     private:
-        EntityDB        & DB_;
+        EntityDB        & DB_=StorageService()->EntityDB();
         void DoGet() final;
         void DoPost() final ;
         void DoPut() final;

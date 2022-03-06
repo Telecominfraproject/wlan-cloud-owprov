@@ -22,15 +22,14 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal),
-            DB_(StorageService()->ContactDB()){}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/contact/{uuid}"}; };
 
     private:
+        ContactDB       &DB_=StorageService()->ContactDB();
         void DoGet() final;
         void DoPost() final;
         void DoPut() final;
         void DoDelete() final;
-        ContactDB       &DB_;
     };
 }

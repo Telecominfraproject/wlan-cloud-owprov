@@ -22,10 +22,10 @@ namespace OpenWifi {
             Poco::Net::HTTPRequest::HTTP_OPTIONS},
             Server,
             TransactionId,
-            Internal), DB_(StorageService()->VenueDB()) {}
+            Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/venue/{uuid}"}; };
     private:
-        VenueDB     &DB_;
+        VenueDB     &DB_=StorageService()->VenueDB();
         void DoGet() final;
         void DoPost() final;
         void DoPut() final;

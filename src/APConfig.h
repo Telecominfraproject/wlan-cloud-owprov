@@ -28,6 +28,7 @@ namespace OpenWifi {
             void AddVenueConfig(const std::string &UUID);
             void AddEntityConfig(const std::string &UUID);
             const Poco::JSON::Array & Explanation() { return Explanation_; };
+            void AddVariables( const Poco::JSON::Object::Ptr &Section, Poco::JSON::Object::Ptr & Result);
         private:
             std::string                 SerialNumber_;
             std::string                 DeviceType_;

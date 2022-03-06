@@ -17,11 +17,10 @@ namespace OpenWifi {
                                          Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                  Server,
                                  TransactionId,
-                                 Internal),
-                  DB_(StorageService()->VariablesDB()){}
+                                 Internal){}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/variables/{uuid}"}; };
     private:
-        VariablesDB    & DB_;
+        VariablesDB    & DB_=StorageService()->VariablesDB();
         void DoGet() final ;
         void DoPost() final ;
         void DoPut() final ;
