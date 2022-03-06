@@ -319,9 +319,11 @@ components:
         deviceConfiguration:
           type: string
           format: uuid
-        contact:
-          type: string
-          format: uuid
+        contacts:
+          type: array
+          items:
+            type: string
+            format: uuid
         location:
           type: string
           format: uuid
@@ -923,8 +925,7 @@ components:
         variableBlocks:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/VariableBlock'
+            $ref: '#/components/schemas/VariableBlock'
 
     #########################################################################################
     ##
@@ -1998,6 +1999,14 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          name: locationToCreate
+          schema:
+            type: object
+            properties:
+              location:
+                $ref: '#/components/schemas/Location'
+          required: false
       requestBody:
         description: Information used to create the new venue
         content:
