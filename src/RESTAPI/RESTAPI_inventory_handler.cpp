@@ -37,9 +37,11 @@ namespace OpenWifi{
 
         ProvObjects::InventoryTag   Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        Logger().debug(Poco::format("%s: Retrieving inventory information.",SerialNumber));
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
             return NotFound();
         }
+        Logger().debug(Poco::format("%s,%s: Retrieving inventory information.", Existing.serialNumber, Existing.info.id ));
 
         Poco::JSON::Object  Answer;
         std::string Arg;
