@@ -34,6 +34,7 @@ namespace OpenWifi{
     }
 
     void RESTAPI_inventory_handler::DoGet() {
+
         ProvObjects::InventoryTag   Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {

@@ -364,7 +364,6 @@ namespace OpenWifi {
         }
         return true;
     }
-
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::InventoryDBRecordType &In, OpenWifi::ProvObjects::InventoryTag &Out) {
@@ -389,7 +388,8 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.managementPolicy = In.get<18>();
     Out.state = In.get<19>();
     Out.devClass = In.get<20>();
-    Out.realMacAddress = In.get<21>();
+    Out.locale = In.get<21>();
+    Out.realMacAddress = In.get<22>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -414,5 +414,6 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<18>(In.managementPolicy);
     Out.set<19>(In.state);
     Out.set<20>(In.devClass);
-    Out.set<21>(In.realMacAddress);
+    Out.set<21>(In.locale);
+    Out.set<22>(In.realMacAddress);
 }
