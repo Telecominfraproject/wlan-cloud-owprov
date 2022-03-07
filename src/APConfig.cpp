@@ -212,9 +212,11 @@ namespace OpenWifi {
             std::cout << "Names[0]" << SectionName << std::endl;
             _OWDEBUG_
             if(O->isArray(SectionName)) {
+                _OWDEBUG_
                 Configuration->set(SectionName, O->get(SectionName));
+                _OWDEBUG_
             } else {
-                auto SectionInfo = O->get(SectionName);
+                auto SectionInfo = O->getObject(SectionName);
                 _OWDEBUG_
                 auto InsertInfo = Sections.insert(SectionName);
                 _OWDEBUG_
