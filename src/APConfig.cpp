@@ -126,24 +126,32 @@ namespace OpenWifi {
     void APConfig::AddVariables(const Poco::JSON::Object::Ptr &Section, Poco::JSON::Object::Ptr &Result) {
         auto Names = Section->getNames();
         for(const auto &v:Names) {
+            _OWDEBUG_
             if(v=="__variableBlock") {
                 //  process the variable
+                _OWDEBUG_
                 auto uuids = Section->get(v);
+                _OWDEBUG_
                 if(uuids.isArray()) {
                     VariablesDB::RecordName VarInfo;
+                    _OWDEBUG_
                     if (StorageService()->VariablesDB().GetRecord("id", uuids, VarInfo)) {
+                        _OWDEBUG_
                         Poco::JSON::Parser P;
                         for (const auto &var: VarInfo.variables) {
+                            _OWDEBUG_
                             auto vv = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
                             auto VarNames = vv->getNames();
                             for (const auto &single_var: VarNames)
                                 Result->set(single_var, vv->get(single_var));
                         }
                     } else {
+                        _OWDEBUG_
                         Result->set(v, Section->get(v));
                     }
                 }
             } else {
+                _OWDEBUG_
                 Result->set(v,Section->get(v));
             }
         }
@@ -183,10 +191,15 @@ namespace OpenWifi {
             ShowJSON("Iteration Start:", Configuration);
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
+            _OWDEBUG_
             auto Names = O->getNames();
+            _OWDEBUG_
             auto SectionName = Names[0];
+            _OWDEBUG_
             auto SectionInfo = O->getObject(SectionName);
+            _OWDEBUG_
             auto InsertInfo = Sections.insert(SectionName);
+            _OWDEBUG_
             if(InsertInfo.second) {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
@@ -196,9 +209,13 @@ namespace OpenWifi {
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
-//                Poco::JSON::Object::Ptr Result;
-//                AddVariables(SectionInfo, Result);
-                Configuration->set(SectionName, SectionInfo);
+                _OWDEBUG_
+                auto Result = Poco::makeShared<Poco::JSON::Object>();
+                _OWDEBUG_
+                AddVariables(SectionInfo, Result);
+                _OWDEBUG_
+                Configuration->set(SectionName, Result);
+                _OWDEBUG_
             } else {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
