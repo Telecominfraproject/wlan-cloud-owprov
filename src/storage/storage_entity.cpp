@@ -159,7 +159,7 @@ namespace OpenWifi {
             V.info.id = MicroService::CreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
-            StorageService()->VenueDB().CreateShortCut(V);
+            // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
     }
@@ -176,7 +176,7 @@ namespace OpenWifi {
             E.info.name = Name;
             E.info.id = EntityDB::RootUUID();
             E.info.created = E.info.modified = std::time(nullptr);
-            StorageService()->EntityDB().CreateShortCut(E);
+            // StorageService()->EntityDB().CreateShortCut(E);
         }
 
         auto Children = O->getArray("children");
@@ -188,7 +188,7 @@ namespace OpenWifi {
             E.info.id = MicroService::CreateUUID();
             E.parent = Parent;
             E.info.created = E.info.modified = std::time(nullptr);
-            StorageService()->EntityDB().CreateShortCut(E);
+            // StorageService()->EntityDB().CreateShortCut(E);
             ImportTree( Child, E.info.id );
         }
 
@@ -200,30 +200,9 @@ namespace OpenWifi {
             V.info.id = MicroService::CreateUUID();
             V.entity = Parent;
             V.info.created = V.info.modified = std::time(nullptr);
-            StorageService()->VenueDB().CreateShortCut(V);
+            // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
-    }
-
-    bool EntityDB::CreateShortCut( ProvObjects::Entity & E) {
-        if(StorageService()->EntityDB().CreateRecord(E)) {
-            if(E.info.id==EntityDB::RootUUID())
-                StorageService()->EntityDB().CheckForRoot();
-            else {
-                StorageService()->EntityDB().AddChild("id",E.parent,E.info.id);
-            }
-            if(!E.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",E.managementPolicy, Prefix(), E.info.id);
-            if(!E.deviceConfiguration.empty()) {
-                for(auto &i:E.deviceConfiguration)
-                    StorageService()->ConfigurationDB().AddInUse("id", i, Prefix(), E.info.id);
-            }
-            ProvObjects::Entity NE;
-            StorageService()->EntityDB().GetRecord("id",E.info.id,NE);
-            E = NE;
-            return true;
-        }
-        return false;
     }
 
 }

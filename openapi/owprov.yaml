@@ -816,23 +816,6 @@ components:
           items:
             $ref: '#/components/schemas/Map'
 
-    ClaimResult:
-      type: object
-      properties:
-        claimer:
-          type: string
-          format: uuid
-        claimId:
-          type: string
-          format: uuid
-        date:
-          type: integer
-          format: int64
-        errorCode:
-          type: integer
-          format: int64
-        reason:
-          type: string
 
     SignupEntry:
       type: object
@@ -1836,12 +1819,13 @@ paths:
           schema:
             type: boolean
           required: false
-        - in: query
-          name: claimer
+        - in: path
+          name: removeSubscriber
           schema:
             type: string
             format: uuid
-          required: false
+          required: true
+
       requestBody:
         description: Information used to modify the new entity
         content:
@@ -1855,9 +1839,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ClaimResult'
-                  - $ref: '#/components/schemas/InventoryTag'
+                $ref: '#/components/schemas/InventoryTag'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2000,12 +1982,22 @@ paths:
             format: uuid
           required: true
         - in: query
-          name: locationToCreate
+          name: createObjects
           schema:
             type: object
             properties:
-              location:
-                $ref: '#/components/schemas/Location'
+              objects:
+                type: array
+                items:
+                  oneOf:
+                    - type: object
+                      properties:
+                        location:
+                          $ref: '#/components/schemas/Location'
+                    - type: object
+                      properties:
+                        contact:
+                          $ref: '#/components/schemas/Contact'
           required: false
       requestBody:
         description: Information used to create the new venue

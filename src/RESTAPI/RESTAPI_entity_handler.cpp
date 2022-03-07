@@ -98,7 +98,7 @@ namespace OpenWifi{
         NewEntity.deviceConfiguration.clear();
         NewEntity.managementRoles.clear();
 
-        if(DB_.CreateShortCut(NewEntity)) {
+        if(DB_.CreateRecord(NewEntity)) {
             MoveUsage(StorageService()->PolicyDB(),DB_,"",NewEntity.managementPolicy,NewEntity.info.id);
             if(UUID==EntityDB::RootUUID()) {
                 DB_.CheckForRoot();

@@ -41,8 +41,11 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
-        if(!Existing.contact.empty())
-            StorageService()->ContactDB().DeleteInUse("id",Existing.contact,StorageService()->VenueDB().Prefix(),UUID);
+        if(!Existing.contacts.empty()) {
+            for(const auto &i:Existing.contacts)
+                StorageService()->ContactDB().DeleteInUse("id", i, StorageService()->VenueDB().Prefix(),
+                                                      UUID);
+        }
         if(!Existing.location.empty())
             StorageService()->LocationDB().DeleteInUse("id",Existing.location,StorageService()->VenueDB().Prefix(),UUID);
         if(!Existing.managementPolicy.empty())
@@ -61,7 +64,7 @@ namespace OpenWifi{
 
     void RESTAPI_venue_handler::DoPost() {
         std::string UUID = GetBinding("uuid", "");
-        if(UUID.empty()) {
+        if (UUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
@@ -71,52 +74,36 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        auto LocationToCreate = GetParameter("locationToCreate","");
-        if(!LocationToCreate.empty()) {
-            std::cout << "LocationToCreate: " << LocationToCreate << std::endl;
-            Poco::JSON::Parser  P;
-            auto LocationObj = P.parse(LocationToCreate).extract<Poco::JSON::Object::Ptr>();
-            if(LocationObj->has("location")) {
-                auto LocationDetails = LocationObj->get("location").extract<Poco::JSON::Object::Ptr>();
-                ProvObjects::Location   LC;
-                if(LC.from_json(LocationDetails)) {
-                    std::cout << "Location decoded: " << LC.info.name << std::endl;
-                } else {
-                    std::cout << "Location not decoded." << std::endl;
-                }
-            } else {
-                std::cout << "No location included." << std::endl;
-            }
-        } else {
-            std::cout << "NoLocation to create." << std::endl;
+        if (!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+            return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
-            return BadRequest( RESTAPI::Errors::NameMustBeSet);
-        }
-
-        if(NewObject.parent.empty() && NewObject.entity.empty()) {
+        if (NewObject.parent.empty() && NewObject.entity.empty()) {
             return BadRequest(RESTAPI::Errors::ParentOrEntityMustBeSet);
         }
 
-        if(!NewObject.parent.empty() && !NewObject.entity.empty()) {
+        if (!NewObject.parent.empty() && !NewObject.entity.empty()) {
             return BadRequest(RESTAPI::Errors::NotBoth);
         }
 
-        if(!NewObject.parent.empty() && !DB_.Exists("id",NewObject.parent)) {
+        if (!NewObject.parent.empty() && !DB_.Exists("id", NewObject.parent)) {
             return BadRequest(RESTAPI::Errors::VenueMustExist);
         }
 
-        if(NewObject.entity == EntityDB::RootUUID()) {
+        if (NewObject.entity == EntityDB::RootUUID()) {
             return BadRequest(RESTAPI::Errors::ValidNonRootUUID);
         }
 
-        if(!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
+        if (!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id", NewObject.entity)) {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        if(!NewObject.contact.empty() && !StorageService()->ContactDB().Exists("id",NewObject.contact)) {
-            return BadRequest(RESTAPI::Errors::ContactMustExist);
+        if (!NewObject.contacts.empty()) {
+            for(const auto &i:NewObject.contacts) {
+                if(!StorageService()->ContactDB().Exists("id", i)) {
+                    return BadRequest(RESTAPI::Errors::ContactMustExist);
+                }
+            }
         }
 
         if(!NewObject.location.empty() && !StorageService()->LocationDB().Exists("id",NewObject.location)) {
@@ -140,9 +127,16 @@ namespace OpenWifi{
         }
 
         NewObject.children.clear();
-        if(DB_.CreateShortCut(NewObject)) {
 
-            MoveUsage(StorageService()->ContactDB(),DB_,"", NewObject.contact, NewObject.info.id);
+        std::string ErrorText;
+        auto ObjectsToCreate = CreateObjects(NewObject, *this, ErrorText);
+
+        if(!ErrorText.empty()) {
+            return BadRequest(ErrorText);
+        }
+
+        if(DB_.CreateRecord(NewObject)) {
+            MoveUsage(StorageService()->ContactDB(),DB_,{}, NewObject.contacts, NewObject.info.id);
             MoveUsage(StorageService()->LocationDB(),DB_,"", NewObject.location, NewObject.info.id);
             MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
             ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::venues,"",NewObject.entity,NewObject.info.id);
@@ -211,13 +205,15 @@ namespace OpenWifi{
             Existing.location = MoveToLocation;
         }
 
-        std::string MoveFromContact, MoveToContact;
-        if(AssignIfPresent(RawObject,"contact",MoveToContact)) {
-            if(!MoveToContact.empty() && !StorageService()->ContactDB().Exists("id",MoveToContact)) {
-                return BadRequest(RESTAPI::Errors::ContactMustExist);
+        Types::UUIDvec_t MoveFromContacts, MoveToContacts;
+        if(AssignIfPresent(RawObject,"contacts",MoveToContacts)) {
+            for(const auto &i:NewObject.contacts) {
+                if(!StorageService()->ContactDB().Exists("id", i)) {
+                    return BadRequest(RESTAPI::Errors::ContactMustExist);
+                }
             }
-            MoveFromContact = Existing.contact;
-            Existing.contact = MoveToContact;
+            MoveFromContacts = Existing.contacts;
+            Existing.contacts = MoveToContacts;
         }
 
         std::string MoveFromPolicy, MoveToPolicy;
@@ -243,7 +239,7 @@ namespace OpenWifi{
         }
 
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
-            MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContact, MoveToContact, Existing.info.id);
+            MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContacts, MoveToContacts, Existing.info.id);
             MoveUsage(StorageService()->LocationDB(),DB_,MoveFromLocation, MoveToLocation, Existing.info.id);
             MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy,MoveToPolicy,Existing.info.id);
             ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::venues,MoveFromEntity,MoveToEntity,Existing.info.id);

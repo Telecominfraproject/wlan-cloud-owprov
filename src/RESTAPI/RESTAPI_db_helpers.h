@@ -309,4 +309,60 @@ namespace OpenWifi {
         }
         return true;
     }
+
+    inline std::string FindParentEntity(const ProvObjects::Venue &V) {
+        if(V.parent.empty())
+            return V.entity;
+        ProvObjects::Venue  P;
+        if(StorageService()->VenueDB().GetRecord("id",V.parent,P))
+            return FindParentEntity(P);
+        return EntityDB::RootUUID();
+    }
+
+    template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, std::string &ErrorText) {
+        std::map<std::string,std::string>   Result;
+
+        auto createObjects = R.GetParameter("createObjects","");
+        if(!createObjects.empty()) {
+            std::cout << "createObjects: " << createObjects << std::endl;
+            Poco::JSON::Parser P;
+            auto Objects = P.parse(createObjects).extract<Poco::JSON::Object::Ptr>();
+            if(Objects->isArray("objects")) {
+                auto ObjectsArray = Objects->getArray("objects");
+                for(const auto &i:*ObjectsArray) {
+                    auto Object = i.extract<Poco::JSON::Object::Ptr>();
+                    if (Object->has("location")) {
+                        auto LocationDetails = Object->get("location").extract<Poco::JSON::Object::Ptr>();
+                        ProvObjects::Location LC;
+                        if (LC.from_json(LocationDetails)) {
+                            if constexpr(std::is_same_v<Type,ProvObjects::Venue>) {
+                                std::cout << "Location decoded: " << LC.info.name << std::endl;
+                                std::string ParentEntity = FindParentEntity(NewObject);
+                                ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo,LC.info);
+                                LC.entity = ParentEntity;
+                                if(StorageService()->LocationDB().CreateRecord(LC)) {
+                                    NewObject.location = LC.info.id;
+                                    AddMembership(StorageService()->EntityDB(), &ProvObjects::Entity::locations,
+                                                  ParentEntity, LC.info.id);
+                                }
+                            }
+                        } else {
+                            std::cout << "Location not decoded." << std::endl;
+                        }
+                    } else if (Object->has("contact")) {
+                        auto ContactDetails = Object->get("contact").extract<Poco::JSON::Object::Ptr>();
+                        ProvObjects::Contact CC;
+                        if (CC.from_json(ContactDetails)) {
+                            std::cout << "contact decoded: " << CC.info.name << std::endl;
+                        } else {
+                            std::cout << "contact not decoded." << std::endl;
+                        }
+                        std::cout << "No contact included." << std::endl;
+                    }
+                }
+            }
+        }
+
+        return Result;
+    }
 }

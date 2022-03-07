@@ -1858,7 +1858,17 @@ namespace OpenWifi {
 	            return Return;
 	    }
 
-	    static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value) {
+        static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, Types::UUIDvec_t & Value) {
+            if(O->has(Field) && O->isArray(Field)) {
+                auto Arr = O->getArray(Field);
+                for(const auto &i:*Arr)
+                    Value.emplace_back(i.toString());
+                return true;
+            }
+            return false;
+        }
+
+        static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value) {
 	        if(O->has(Field)) {
 	            Value = O->get(Field).toString();
 	            return true;

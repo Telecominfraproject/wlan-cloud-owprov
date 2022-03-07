@@ -239,151 +239,41 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
-    void RESTAPI_inventory_handler::PerformClaim(const std::string &SerialNumber, const std::string &Claimer, std::string & ClaimId, uint64_t &ErrorCode, Poco::JSON::Object &Answer ) {
-
-        if(UserInfo_.userinfo.userRole==SecurityObjects::SUBSCRIBER && Claimer!=UserInfo_.userinfo.id) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-        } else if(UserInfo_.userinfo.userRole==SecurityObjects::ROOT && !SDK::Sec::Subscriber::Exists(this, Claimer)) {
-            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-        } else if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::SUBSCRIBER) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights,ACCESS_DENIED);
-        }
-
-        uint64_t Now = std::time(nullptr);
-
-        // if the device exists, check the status to see if we would follow this claim.
-        ProvObjects::InventoryTag   ExistingDevice;
-        if(DB_.GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
-            // Device is already in there... so we could have claimed that device before, or someone else uses it
-            // or, it is free and clear: it connected but nobody has ever used it...
-            if(!ExistingDevice.state.empty()) {
-                try {
-                    Poco::JSON::Parser P;
-                    auto StateDoc = P.parse(ExistingDevice.state).extract<Poco::JSON::Object::Ptr>();
-                    if (StateDoc->has("method")) {
-                        auto Method = StateDoc->get("method").toString();
-                        if(Method=="claiming") {
-                            auto RecordedClaimer = StateDoc->get("claimer").toString();
-                            auto RecordedClaimId = StateDoc->get("claimId").toString();
-                            if(Claimer==RecordedClaimer) {
-                                ErrorCode = 3;
-                                ClaimId = RecordedClaimId;
-                                Answer.set("claimer", Claimer);
-                                Answer.set("claimId", RecordedClaimId);
-                                Answer.set("errorCode",ErrorCode);
-                                Answer.set("date", Now);
-                                Answer.set("reason", "Claim already in progress");
-                                return;
-                            }
-                            ErrorCode = 1;
-                            ClaimId = RecordedClaimId;
-                            Answer.set("claimer", Claimer);
-                            Answer.set("claimId", RecordedClaimId);
-                            Answer.set("errorCode",ErrorCode);
-                            Answer.set("date", Now);
-                            Answer.set("reason", "Claimed by another user: "+ RecordedClaimer);
-                            return;
-                        } else if(Method=="claimed") {
-                            //  We already own this one...
-                            if(Claimer==ExistingDevice.subscriber) {
-                                auto RecordedClaimer = StateDoc->get("claimer").toString();
-                                auto RecordedClaimId = StateDoc->get("claimId").toString();
-                                ErrorCode = 0;
-                                ClaimId = RecordedClaimId;
-                                Answer.set("claimer", Claimer);
-                                Answer.set("claimId", RecordedClaimId);
-                                Answer.set("errorCode",ErrorCode);
-                                Answer.set("date", Now);
-                                Answer.set("reason", "Success");
-                                return;
-                            } else {
-                            //  Someone else has claimed this device.
-                                ErrorCode = 1;
-                                ClaimId = "";
-                                Answer.set("claimer", Claimer);
-                                Answer.set("claimId", "");
-                                Answer.set("errorCode",ErrorCode);
-                                Answer.set("date", Now);
-                                Answer.set("reason", "Claimed by another user: "+ ExistingDevice.subscriber);
-                                return;
-                            }
-                       } else if(Method=="auto-discovery") {
-                            if(StateDoc->has("assignedTo")) {
-                                auto AssignedTo = StateDoc->get("assignedTo").toString();
-                                ErrorCode = 1;
-                                ClaimId = "";
-                                Answer.set("claimer", Claimer);
-                                Answer.set("claimId", "");
-                                Answer.set("errorCode",ErrorCode);
-                                Answer.set("date", Now);
-                                Answer.set("reason", "Claimed by venue: '" + ExistingDevice.venue + "' or entity: '" + ExistingDevice.entity + "'");
-                                return;
-                            }
-
-                        }
-                    }
-                } catch (...) {
-
-                }
-            } else {
-
-            }
-        } else {
-            //  Device does not exist, so claim it for now.
-            ProvObjects::InventoryTag   NewDevice;
-            NewDevice.info.created = NewDevice.info.modified = Now;
-            NewDevice.info.id = MicroService::instance().CreateUUID();
-            NewDevice.info.name = SerialNumber;
-            NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{ .created=Now,
-                                                                      .createdBy=UserInfo_.userinfo.email,
-                                                                      .note="Claim started for device"});
-            NewDevice.info.description = "Subscriber device";
-            NewDevice.subscriber = UserInfo_.userinfo.id;
-            NewDevice.deviceType = "unknown";
-            nlohmann::json StateDoc;
-
-            ClaimId = MicroService::instance().CreateUUID();
-
-            StateDoc["method"] = "claiming";
-            StateDoc["date"] = Now;
-            StateDoc["claimer"] = Claimer;
-            StateDoc["claimId"] = ClaimId;
-            NewDevice.state = StateDoc;
-            ErrorCode = 0 ;
-            DB_.CreateRecord(NewDevice);
-
-            Answer.set("claimer", Claimer);
-            Answer.set("claimId", ClaimId);
-            Answer.set("errorCode",0);
-            Answer.set("date", Now);
-            Answer.set("reason", "Success");
-            return;
-        }
-
-    }
 
 #define __DBG__ std::cout << __LINE__ << std::endl;
 
     void RESTAPI_inventory_handler::DoPut() {
 
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-
         if(SerialNumber.empty() || !Utils::ValidSerialNumber(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-        }
-
-        std::string Claimer;
-        if(HasParameter("claimer",Claimer) && !Claimer.empty()) {
-            uint64_t ErrorCode;
-            Poco::JSON::Object  Answer;
-            std::string ClaimId;
-            PerformClaim(SerialNumber, Claimer, ClaimId, ErrorCode, Answer);
-            return ReturnObject(Answer);
         }
 
         ProvObjects::InventoryTag   Existing;
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
             return NotFound();
+        }
+
+        auto RemoveSubscriber = GetParameter("removeSubscriber","");
+        if(!RemoveSubscriber.empty()) {
+            if(Existing.subscriber == RemoveSubscriber) {
+                ProvObjects::DeviceConfiguration    DC;
+                if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
+                    if(DC.subscriberOnly)
+                        StorageService()->ConfigurationDB().DeleteRecord("id",Existing.deviceConfiguration);
+                    Existing.deviceConfiguration = "";
+                }
+                Existing.subscriber = "";
+                nlohmann::json state;
+                state["date"] = OpenWifi::Now();
+                state["method"] = "auto-discovery";
+                state["last-operation"] = "returned to inventory";
+                Existing.state = state;
+                StorageService()->InventoryDB().UpdateRecord("id",Existing.info.id,Existing);
+                Poco::JSON::Object  Answer;
+                Existing.to_json(Answer);
+                return ReturnObject(Answer);
+            }
         }
 
         auto RawObject = ParseStream();

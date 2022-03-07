@@ -42,7 +42,6 @@ namespace OpenWifi {
     class VenueDB : public ORM::DB<VenueDBRecordType, ProvObjects::Venue> {
     public:
         VenueDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-        bool CreateShortCut(ProvObjects::Venue &V);
         bool GetByIP(const std::string &IP, std::string & uuid);
         bool Upgrade(uint32_t from, uint32_t &to) override;
     private:

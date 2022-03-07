@@ -31,7 +31,7 @@ namespace OpenWifi {
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"topology",ORM::FieldType::FT_TEXT},
         ORM::Field{"design",ORM::FieldType::FT_TEXT},
-        ORM::Field{"contact",ORM::FieldType::FT_TEXT},
+        ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
         ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
@@ -61,7 +61,8 @@ namespace OpenWifi {
                 "alter table " + TableName_ + " add column configurations text",
                 "alter table " + TableName_ + " add column maps text",
                 "alter table " + TableName_ + " add column managementRoles text",
-                "alter table " + TableName_ + " add column managementPolicies text"
+                "alter table " + TableName_ + " add column managementPolicies text",
+                "alter table " + TableName_ + " rename column contact to contacts",
         };
 
         for(const auto &i:Script) {
@@ -73,30 +74,6 @@ namespace OpenWifi {
             }
         }
         return true;
-    }
-
-    bool VenueDB::CreateShortCut(ProvObjects::Venue &V) {
-        if(StorageService()->VenueDB().CreateRecord(V)) {
-            if(!V.parent.empty())
-                StorageService()->VenueDB().AddChild("id", V.parent, V.info.id);
-            if(!V.entity.empty())
-                StorageService()->EntityDB().AddVenue("id", V.entity, V.info.id);
-            if(!V.location.empty())
-                StorageService()->LocationDB().AddInUse("id",V.location, StorageService()->VenueDB().Prefix(), V.info.id);
-            if(!V.contact.empty())
-                StorageService()->ContactDB().AddInUse("id",V.contact, StorageService()->VenueDB().Prefix(), V.info.id);
-            if(!V.managementPolicy.empty())
-                StorageService()->PolicyDB().AddInUse("id",V.managementPolicy, StorageService()->VenueDB().Prefix(), V.info.id);
-            if(!V.deviceConfiguration.empty()) {
-                for(auto &i:V.deviceConfiguration)
-                    StorageService()->ConfigurationDB().AddInUse("id", i, StorageService()->ConfigurationDB().Prefix(), V.info.id);
-            }
-            ProvObjects::Venue  NV;
-            StorageService()->VenueDB().GetRecord("id",V.info.id,NV);
-            V = NV;
-            return true;
-        }
-        return false;
     }
 
     bool VenueDB::GetByIP(const std::string &IP, std::string & uuid) {
@@ -135,7 +112,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.managementPolicy = In.get<10>();
     Out.topology = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DiGraphEntry>(In.get<11>());
     Out.design = In.get<12>();
-    Out.contact = In.get<13>();
+    Out.contacts = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
     Out.location = In.get<14>();
     Out.rrm = In.get<15>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
@@ -162,7 +139,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<10>(In.managementPolicy);
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.topology));
     Out.set<12>(In.design);
-    Out.set<13>(In.contact);
+    Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.contacts));
     Out.set<14>(In.location);
     Out.set<15>(In.rrm);
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
