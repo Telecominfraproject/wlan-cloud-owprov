@@ -38,6 +38,7 @@ namespace OpenWifi {
             Types::StringPairVec        Errors;
             bool                        Explain_=false;
             Poco::JSON::Array           Explanation_;
+            Poco::Logger & Logger() { return Logger_;}
 
             bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio);
             bool mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr);

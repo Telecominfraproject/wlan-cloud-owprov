@@ -85,7 +85,7 @@ namespace OpenWifi {
                                              QueryData,
                                              10000);
 
-                Poco::JSON::Object::Ptr Response;
+                auto Response = Poco::makeShared<Poco::JSON::Object>();
                 auto StatusCode = Req.Do(Response);
                 if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
                     if(Response->isArray("deviceTypes")) {

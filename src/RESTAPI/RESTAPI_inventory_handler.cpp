@@ -73,12 +73,12 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
             Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
-            APConfig Device(SerialNumber, Existing.deviceType, Logger(), false);
+            auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             Poco::JSON::Object ErrorsObj, WarningsObj;
             ProvObjects::InventoryConfigApplyResult Results;
             Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
-            if (Device.Get(Configuration)) {
+            if (Device->Get(Configuration)) {
                 std::ostringstream OS;
                 Configuration->stringify(OS);
                 Results.appliedConfiguration = OS.str();

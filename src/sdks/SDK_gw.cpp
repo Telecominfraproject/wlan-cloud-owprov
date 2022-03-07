@@ -61,7 +61,7 @@ namespace OpenWifi::SDK::GW {
 
         void PerformCommand(RESTAPIHandler *client, const std::string &Command, const std::string & EndPoint, Poco::JSON::Object & CommandRequest) {
             auto API = OpenAPIRequestPost(uSERVICE_GATEWAY, EndPoint, {}, CommandRequest, 60000);
-            Poco::JSON::Object::Ptr CallResponse;
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
 
             auto ResponseStatus = API.Do(CallResponse, client->UserInfo_.webtoken.access_token_);
             if (ResponseStatus == Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT) {
@@ -109,8 +109,8 @@ namespace OpenWifi::SDK::GW {
                                           {},
                                           Body,
                                           10000);
-            Poco::JSON::Object::Ptr Response;
-            auto ResponseStatus = R.Do(Response, client ? client->UserInfo_.webtoken.access_token_ : "");
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto ResponseStatus = R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
             if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
                 return true;
             }
@@ -127,8 +127,8 @@ namespace OpenWifi::SDK::GW {
                                           {},
                                           Body,
                                           10000);
-            Poco::JSON::Object::Ptr Response;
-            auto ResponseStatus = R.Do(Response, client ? client->UserInfo_.webtoken.access_token_ : "");
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto ResponseStatus = R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
             if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
                 return true;
             }
@@ -145,8 +145,8 @@ namespace OpenWifi::SDK::GW {
                                           {},
                                           Body,
                                           10000);
-            Poco::JSON::Object::Ptr Response;
-            auto ResponseStatus = R.Do(Response, client ? client->UserInfo_.webtoken.access_token_ : "");
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto ResponseStatus = R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
             if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
                 return true;
             }

@@ -13,8 +13,8 @@ namespace OpenWifi::SDK::Sec {
                                          {},
                                          5000);
 
-            Poco::JSON::Object::Ptr Response;
-            auto StatusCode = Req.Do(Response);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto StatusCode = Req.Do(CallResponse);
             if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
                 return true;
             }
@@ -27,10 +27,10 @@ namespace OpenWifi::SDK::Sec {
                                          {},
                                          5000);
 
-            Poco::JSON::Object::Ptr Response;
-            auto StatusCode = Req.Do(Response);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto StatusCode = Req.Do(CallResponse);
             if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-                return UserInfo.from_json(Response);
+                return UserInfo.from_json(CallResponse);
             }
             return false;
         }
@@ -43,8 +43,8 @@ namespace OpenWifi::SDK::Sec {
                                          {},
                                          5000);
 
-            Poco::JSON::Object::Ptr Response;
-            auto StatusCode = Req.Do(Response);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto StatusCode = Req.Do(CallResponse);
             if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
                 return true;
             }
@@ -57,10 +57,10 @@ namespace OpenWifi::SDK::Sec {
                                          {},
                                          5000);
 
-            Poco::JSON::Object::Ptr Response;
-            auto StatusCode = Req.Do(Response);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto StatusCode = Req.Do(CallResponse);
             if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-                return UserInfo.from_json(Response);
+                return UserInfo.from_json(CallResponse);
             }
             return false;
         }
