@@ -149,7 +149,7 @@ namespace OpenWifi {
         }
     }
 
-    bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
+    bool APConfig::Get(Poco::JSON::Object::Ptr & Configuration) {
         if(Config_.empty()) {
             Explanation_.clear();
             try {
