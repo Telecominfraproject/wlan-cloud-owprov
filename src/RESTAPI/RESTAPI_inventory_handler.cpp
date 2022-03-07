@@ -72,28 +72,29 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
-            Logger().debug(Poco::format("%: Retrieving configuration.",Existing.serialNumber));
+
+            Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
             APConfig Device(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             Poco::JSON::Object ErrorsObj, WarningsObj;
             ProvObjects::InventoryConfigApplyResult Results;
-            Logger().debug(Poco::format("%: Computing configuration.",Existing.serialNumber));
+            Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
             if (Device.Get(Configuration)) {
                 std::ostringstream OS;
                 Configuration->stringify(OS);
                 Results.appliedConfiguration = OS.str();
                 Poco::JSON::Object::Ptr Response;
-                Logger().debug(Poco::format("%: Sending configuration push.",Existing.serialNumber));
+                Logger().debug(Poco::format("%s: Sending configuration push.",Existing.serialNumber));
                 if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
-                    Logger().debug(Poco::format("%: Sending configuration pushed.",Existing.serialNumber));
+                    Logger().debug(Poco::format("%s: Sending configuration pushed.",Existing.serialNumber));
                     GetRejectedLines(Response, Results.warnings);
                     Results.errorCode = 0;
                 } else {
-                    Logger().debug(Poco::format("%: Sending configuration failed.",Existing.serialNumber));
+                    Logger().debug(Poco::format("%s: Sending configuration failed.",Existing.serialNumber));
                     Results.errorCode = 1;
                 }
             } else {
-                Logger().debug(Poco::format("%: Configuration is bad.",Existing.serialNumber));
+                Logger().debug(Poco::format("%s: Configuration is bad.",Existing.serialNumber));
                 Results.errorCode = 1;
             }
             Results.to_json(Answer);
