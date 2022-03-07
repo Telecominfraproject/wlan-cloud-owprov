@@ -196,9 +196,9 @@ namespace OpenWifi {
                     ExObj.set("element",SectionInfo);
                     Explanation_.add(ExObj);
                 }
-                Poco::JSON::Object::Ptr Result;
-                AddVariables(SectionInfo, Result);
-                Configuration->set(SectionName, Result);
+//                Poco::JSON::Object::Ptr Result;
+//                AddVariables(SectionInfo, Result);
+                Configuration->set(SectionName, SectionInfo);
             } else {
                 if(Explain_) {
                     Poco::JSON::Object  ExObj;
