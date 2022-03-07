@@ -211,7 +211,7 @@ namespace OpenWifi {
             auto SectionName = Names[0];
             std::cout << "Names[0]" << SectionName << std::endl;
             _OWDEBUG_
-            auto SectionInfo = O->get(SectionName).extract<Poco::JSON::Object>();
+            auto SectionInfo = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
             _OWDEBUG_
             auto InsertInfo = Sections.insert(SectionName);
             _OWDEBUG_
