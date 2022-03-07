@@ -12,7 +12,9 @@ namespace OpenWifi {
             DeviceType_(DeviceType),
             Logger_(L),
             Explain_(Explain)
-    {}
+    {
+        _OWDEBUG_
+    }
 
     bool APConfig::FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio) {
         for(const auto &i:*Arr) {
@@ -158,8 +160,11 @@ namespace OpenWifi {
     }
 
     bool APConfig::Get(Poco::JSON::Object::Ptr & Configuration) {
+        _OWDEBUG_
         if(Config_.empty()) {
+            _OWDEBUG_
             Explanation_.clear();
+            _OWDEBUG_
             try {
                 ProvObjects::InventoryTag   D;
                 _OWDEBUG_
@@ -191,9 +196,13 @@ namespace OpenWifi {
         //      globals
         //      unit
         // auto Tmp=Poco::makeShared<Poco::JSON::Object>();
+        _OWDEBUG_
         std::set<std::string>   Sections;
+        _OWDEBUG_
         for(const auto &i:Config_) {
+            _OWDEBUG_
             ShowJSON("Iteration Start:", Configuration);
+            _OWDEBUG_
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             _OWDEBUG_
