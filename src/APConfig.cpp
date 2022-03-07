@@ -212,8 +212,16 @@ namespace OpenWifi {
             std::cout << "Names[0]" << SectionName << std::endl;
             _OWDEBUG_
             if(O->isArray(SectionName)) {
+                auto A = O->getArray(SectionName);
                 _OWDEBUG_
-                Configuration->set(SectionName, O->get(SectionName));
+                Poco::JSON::Array   FinalArray;
+                for(const auto &arr_element:*A) {
+                    auto element = arr_element.extract<Poco::JSON::Object::Ptr>();
+                    auto res = Poco::makeShared<Poco::JSON::Object>();
+                    AddVariables(element,res);
+                    FinalArray.add(res);
+                }
+                Configuration->set(SectionName, FinalArray);
                 _OWDEBUG_
             } else {
                 auto SectionInfo = O->getObject(SectionName);
