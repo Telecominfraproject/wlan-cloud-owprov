@@ -72,7 +72,6 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
-
             Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
             APConfig Device(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
