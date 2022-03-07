@@ -211,35 +211,39 @@ namespace OpenWifi {
             auto SectionName = Names[0];
             std::cout << "Names[0]" << SectionName << std::endl;
             _OWDEBUG_
-            auto SectionInfo = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
-            _OWDEBUG_
-            auto InsertInfo = Sections.insert(SectionName);
-            _OWDEBUG_
-            if(InsertInfo.second) {
-                if(Explain_) {
-                    Poco::JSON::Object  ExObj;
-                    ExObj.set("from-uuid", i.info.id);
-                    ExObj.set("from-name", i.info.name);
-                    ExObj.set("action", "added");
-                    ExObj.set("element",SectionInfo);
-                    Explanation_.add(ExObj);
-                }
-                _OWDEBUG_
-                auto Result = Poco::makeShared<Poco::JSON::Object>();
-                _OWDEBUG_
-                AddVariables(SectionInfo, Result);
-                _OWDEBUG_
-                Configuration->set(SectionName, Result);
-                _OWDEBUG_
+            if(O->isArray(SectionName)) {
+                Configuration->set(SectionName, O->get(SectionName));
             } else {
-                if(Explain_) {
-                    Poco::JSON::Object  ExObj;
-                    ExObj.set("from-uuid", i.info.id);
-                    ExObj.set("from-name", i.info.name);
-                    ExObj.set("action", "ignored");
-                    ExObj.set("reason","weight insufficient");
-                    ExObj.set("element",SectionInfo);
-                    Explanation_.add(ExObj);
+                auto SectionInfo = O->get(SectionName);
+                _OWDEBUG_
+                auto InsertInfo = Sections.insert(SectionName);
+                _OWDEBUG_
+                if (InsertInfo.second) {
+                    if (Explain_) {
+                        Poco::JSON::Object ExObj;
+                        ExObj.set("from-uuid", i.info.id);
+                        ExObj.set("from-name", i.info.name);
+                        ExObj.set("action", "added");
+                        ExObj.set("element", SectionInfo);
+                        Explanation_.add(ExObj);
+                    }
+                    _OWDEBUG_
+                    auto Result = Poco::makeShared<Poco::JSON::Object>();
+                    _OWDEBUG_
+                    AddVariables(SectionInfo, Result);
+                    _OWDEBUG_
+                    Configuration->set(SectionName, Result);
+                    _OWDEBUG_
+                } else {
+                    if (Explain_) {
+                        Poco::JSON::Object ExObj;
+                        ExObj.set("from-uuid", i.info.id);
+                        ExObj.set("from-name", i.info.name);
+                        ExObj.set("action", "ignored");
+                        ExObj.set("reason", "weight insufficient");
+                        ExObj.set("element", SectionInfo);
+                        Explanation_.add(ExObj);
+                    }
                 }
             }
         }
