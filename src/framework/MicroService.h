@@ -82,8 +82,8 @@ using namespace std::chrono_literals;
 
 #include "ow_version.h"
 
-// #define _OWDEBUG_ std::cout<< __FILE__ <<":" << __LINE__ << std::endl;
-#define _OWDEBUG_ Logger().debug(Poco::format("%s: %lu",__FILE__,__LINE__));
+#define _OWDEBUG_ std::cout<< __FILE__ <<":" << __LINE__ << std::endl;
+// #define _OWDEBUG_ Logger().debug(Poco::format("%s: %lu",__FILE__,__LINE__));
 namespace OpenWifi {
 
     inline uint64_t Now() { return std::time(nullptr); };
