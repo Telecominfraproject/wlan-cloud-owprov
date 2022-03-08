@@ -260,8 +260,10 @@ namespace OpenWifi{
         auto RemoveSubscriber = GetParameter("removeSubscriber","");
         if(!RemoveSubscriber.empty()) {
             if(Existing.subscriber == RemoveSubscriber) {
+                Logger().information(Poco::format("%s: removing subscriber (%s)", SerialNumber, RemoveSubscriber));
                 ProvObjects::DeviceConfiguration    DC;
                 if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
+                    Logger().information(Poco::format("%s: removing configuration for subscriber (%s)", SerialNumber, RemoveSubscriber));
                     if(DC.subscriberOnly)
                         StorageService()->ConfigurationDB().DeleteRecord("id",Existing.deviceConfiguration);
                     Existing.deviceConfiguration = "";
@@ -276,7 +278,10 @@ namespace OpenWifi{
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
                 return ReturnObject(Answer);
+            } else {
+                Logger().information(Poco::format("%s: wrong subscriber (%s)", SerialNumber, RemoveSubscriber));
             }
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         auto RawObject = ParseStream();
