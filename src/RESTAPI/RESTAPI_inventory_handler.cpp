@@ -265,7 +265,7 @@ namespace OpenWifi{
                 if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
                     Logger().information(Poco::format("%s: removing configuration for subscriber (%s)", SerialNumber, RemoveSubscriber));
                     if(DC.subscriberOnly) {
-                        if(StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration))
+                        if(!StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration))
                             Logger().debug("Could not delete the subscriber configuration");
                     }
                     else
