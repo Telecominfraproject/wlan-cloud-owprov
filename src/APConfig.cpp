@@ -125,42 +125,64 @@ namespace OpenWifi {
         return true;
     }
 
-    void APConfig::AddVariables(const Poco::JSON::Object::Ptr &Section, Poco::JSON::Object::Ptr &Result) {
-        auto Names = Section->getNames();
-        for(const auto &v:Names) {
-            _OWDEBUG_
-            if(v=="__variableBlock") {
-                //  process the variable
-                _OWDEBUG_
-                auto uuids = Section->get(v);
-                _OWDEBUG_
-                if(uuids.isArray()) {
-                    VariablesDB::RecordName VarInfo;
-                    _OWDEBUG_
-                    if (StorageService()->VariablesDB().GetRecord("id", uuids, VarInfo)) {
-                        _OWDEBUG_
-                        Poco::JSON::Parser P;
-                        for (const auto &var: VarInfo.variables) {
-                            _OWDEBUG_
-                            auto vv = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-                            auto VarNames = vv->getNames();
-                            for (const auto &single_var: VarNames)
-                                Result->set(single_var, vv->get(single_var));
+    bool APConfig::ReplaceVariablesInObject( Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
+        // get all the names and expand
+        auto Names = Original->getNames();
+        for(const auto &i:Names) {
+            if(i=="__variableBlock") {
+                if(Original->isArray(i)) {
+                    auto UUIDs = Original->getArray(i);
+                    for(const auto &uuid:*UUIDs) {
+                        ProvObjects::VariableBlock  VB;
+                        if(StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+                            for(const auto &var:VB.variables) {
+                                Poco::JSON::Parser P;
+                                auto VariableBlockInfo = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+                                auto VarNames = VariableBlockInfo->getNames();
+                                for(const auto &j:VarNames) {
+                                    Result->set(j,VariableBlockInfo->get(j));
+                                }
+                            }
                         }
-                    } else {
-                        _OWDEBUG_
-                        Result->set(v, Section->get(v));
                     }
                 }
+            } else if(Original->isArray(i)) {
+                auto Arr = Poco::makeShared<Poco::JSON::Array>();
+                auto Obj = Original->getArray(i);
+                ReplaceVariablesInArray(Obj,Arr);
+                Result->set(i,Arr);
+            } else if (Original->isObject(i)) {
+                auto Expanded = Poco::makeShared<Poco::JSON::Object>();
+                auto Obj = Original->getObject(i);
+                ReplaceVariablesInObject(Obj,Expanded);
+                Result->set(i,Expanded);
             } else {
-                _OWDEBUG_
-                Result->set(v,Section->get(v));
+                Result->set(i,Original->get(i));
             }
         }
+        return true;
+    }
+
+    bool APConfig::ReplaceVariablesInArray( Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
+        for(const auto &element:*Original) {
+            if(element.isArray()) {
+                auto Expanded = Poco::makeShared<Poco::JSON::Array>();
+                auto Object = element.extract<Poco::JSON::Array::Ptr>();
+                ReplaceVariablesInArray(Object,Expanded);
+                ResultArray->add(Expanded);
+            } else if(element.isStruct()) {
+                auto Expanded = Poco::makeShared<Poco::JSON::Object>();
+                auto Obj = element.extract<Poco::JSON::Object::Ptr>();
+                ReplaceVariablesInObject(Obj,Expanded);
+                ResultArray->add(Expanded);
+            } else {
+                ResultArray->add(element);
+            }
+        }
+        return true;
     }
 
     bool APConfig::Get(Poco::JSON::Object::Ptr & Configuration) {
-        _OWDEBUG_
         if(Config_.empty()) {
             _OWDEBUG_
             Explanation_.clear();
@@ -188,62 +210,45 @@ namespace OpenWifi {
             }
         }
 
-        //  So we have sections...
-        //      interfaces
-        //      metrics
-        //      radios
-        //      services
-        //      globals
-        //      unit
-        // auto Tmp=Poco::makeShared<Poco::JSON::Object>();
-        _OWDEBUG_
         std::set<std::string>   Sections;
-        _OWDEBUG_
         for(const auto &i:Config_) {
-            _OWDEBUG_
             ShowJSON("Iteration Start:", Configuration);
-            _OWDEBUG_
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
-            _OWDEBUG_
             auto Names = O->getNames();
-            _OWDEBUG_
-            auto SectionName = Names[0];
-            std::cout << "Names[0]" << SectionName << std::endl;
-            _OWDEBUG_
-            if(O->isArray(SectionName)) {
-                auto A = O->getArray(SectionName);
-                _OWDEBUG_
-                Poco::JSON::Array   FinalArray;
-                for(const auto &arr_element:*A) {
-                    auto element = arr_element.extract<Poco::JSON::Object::Ptr>();
-                    auto res = Poco::makeShared<Poco::JSON::Object>();
-                    AddVariables(element,res);
-                    FinalArray.add(res);
-                }
-                Configuration->set(SectionName, FinalArray);
-                _OWDEBUG_
-            } else {
-                auto SectionInfo = O->getObject(SectionName);
-                _OWDEBUG_
+            for(const auto &SectionName:Names) {
+                std::cout << "SectionName: " << SectionName << std::endl;
                 auto InsertInfo = Sections.insert(SectionName);
-                _OWDEBUG_
                 if (InsertInfo.second) {
-                    if (Explain_) {
-                        Poco::JSON::Object ExObj;
-                        ExObj.set("from-uuid", i.info.id);
-                        ExObj.set("from-name", i.info.name);
-                        ExObj.set("action", "added");
-                        ExObj.set("element", SectionInfo);
-                        Explanation_.add(ExObj);
+                    if (O->isArray(SectionName)) {
+                        auto OriginalArray = O->getArray(SectionName);
+                        if (Explain_) {
+                            Poco::JSON::Object ExObj;
+                            ExObj.set("from-uuid", i.info.id);
+                            ExObj.set("from-name", i.info.name);
+                            ExObj.set("action", "added");
+                            ExObj.set("element", OriginalArray);
+                            Explanation_.add(ExObj);
+                        }
+                        auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
+                        ReplaceVariablesInArray(OriginalArray, ExpandedArray);
+                        Configuration->set(SectionName, ExpandedArray);
+                    } else if (O->isObject(SectionName)) {
+                        auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
+                        if (Explain_) {
+                            Poco::JSON::Object ExObj;
+                            ExObj.set("from-uuid", i.info.id);
+                            ExObj.set("from-name", i.info.name);
+                            ExObj.set("action", "added");
+                            ExObj.set("element", OriginalSection);
+                            Explanation_.add(ExObj);
+                        }
+                        auto ExpandedSection = Poco::makeShared<Poco::JSON::Object>();
+                        ReplaceVariablesInObject(OriginalSection, ExpandedSection);
+                        Configuration->set(SectionName, ExpandedSection);
+                    } else {
+
                     }
-                    _OWDEBUG_
-                    auto Result = Poco::makeShared<Poco::JSON::Object>();
-                    _OWDEBUG_
-                    AddVariables(SectionInfo, Result);
-                    _OWDEBUG_
-                    Configuration->set(SectionName, Result);
-                    _OWDEBUG_
                 } else {
                     if (Explain_) {
                         Poco::JSON::Object ExObj;
@@ -251,13 +256,12 @@ namespace OpenWifi {
                         ExObj.set("from-name", i.info.name);
                         ExObj.set("action", "ignored");
                         ExObj.set("reason", "weight insufficient");
-                        ExObj.set("element", SectionInfo);
+                        ExObj.set("element", O->get(SectionName));
                         Explanation_.add(ExObj);
                     }
                 }
             }
         }
-        // Configuration = Tmp;
         if(Config_.empty())
             return false;
 

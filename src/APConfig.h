@@ -28,7 +28,6 @@ namespace OpenWifi {
             void AddVenueConfig(const std::string &UUID);
             void AddEntityConfig(const std::string &UUID);
             const Poco::JSON::Array & Explanation() { return Explanation_; };
-            void AddVariables( const Poco::JSON::Object::Ptr &Section, Poco::JSON::Object::Ptr & Result);
         private:
             std::string                 SerialNumber_;
             std::string                 DeviceType_;
@@ -39,6 +38,9 @@ namespace OpenWifi {
             bool                        Explain_=false;
             Poco::JSON::Array           Explanation_;
             Poco::Logger & Logger() { return Logger_;}
+
+            bool ReplaceVariablesInArray( Poco::JSON::Array::Ptr & O, Poco::JSON::Array::Ptr & Result);
+            bool ReplaceVariablesInObject( Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result);
 
             bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio);
             bool mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr);
