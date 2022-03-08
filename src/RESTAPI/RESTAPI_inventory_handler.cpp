@@ -264,8 +264,12 @@ namespace OpenWifi{
                 ProvObjects::DeviceConfiguration    DC;
                 if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
                     Logger().information(Poco::format("%s: removing configuration for subscriber (%s)", SerialNumber, RemoveSubscriber));
-                    if(DC.subscriberOnly)
-                        StorageService()->ConfigurationDB().DeleteRecord("id",Existing.deviceConfiguration);
+                    if(DC.subscriberOnly) {
+                        if(StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration))
+                            Logger().debug("Could not delete the subscriber configuration");
+                    }
+                    else
+                        Logger().debug("Configurations is not for a subscriber.");
                     Existing.deviceConfiguration = "";
                 }
                 Existing.subscriber = "";
@@ -273,7 +277,7 @@ namespace OpenWifi{
                 state["date"] = OpenWifi::Now();
                 state["method"] = "auto-discovery";
                 state["last-operation"] = "returned to inventory";
-                Existing.state = state;
+                Existing.state = state.get<std::string>();
                 StorageService()->InventoryDB().UpdateRecord("id",Existing.info.id,Existing);
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
