@@ -4302,12 +4302,6 @@ namespace OpenWifi {
                 Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_DELETE,
                                                Path,
                                                Poco::Net::HTTPMessage::HTTP_1_1);
-                std::ostringstream obody;
-                Poco::JSON::Stringifier::stringify(Body_,obody);
-
-                Request.setContentType("application/json");
-                Request.setContentLength(obody.str().size());
-
                 if(BearerToken.empty()) {
                     Request.add("X-API-KEY", Svc.AccessKey);
                     Request.add("X-INTERNAL-NAME", MicroService::instance().PublicEndPoint());
@@ -4315,9 +4309,6 @@ namespace OpenWifi {
                     // Authorization: Bearer ${token}
                     Request.add("Authorization", "Bearer " + BearerToken);
                 }
-
-                std::ostream & os = Session.sendRequest(Request);
-                os << obody.str();
 
                 Poco::Net::HTTPResponse Response;
                 Session.receiveResponse(Response);
