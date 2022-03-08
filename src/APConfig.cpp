@@ -13,7 +13,6 @@ namespace OpenWifi {
             Logger_(L),
             Explain_(Explain)
     {
-        _OWDEBUG_
     }
 
     bool APConfig::FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio) {
@@ -184,23 +183,16 @@ namespace OpenWifi {
 
     bool APConfig::Get(Poco::JSON::Object::Ptr & Configuration) {
         if(Config_.empty()) {
-            _OWDEBUG_
             Explanation_.clear();
-            _OWDEBUG_
             try {
                 ProvObjects::InventoryTag   D;
-                _OWDEBUG_
                 if(StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
-                    _OWDEBUG_
                     if(!D.deviceConfiguration.empty()) {
-                        _OWDEBUG_
                         AddConfiguration(D.deviceConfiguration);
                     }
                     if(!D.entity.empty()) {
-                        _OWDEBUG_
                         AddEntityConfig(D.entity);
                     } else if(!D.venue.empty()) {
-                        _OWDEBUG_
                         AddVenueConfig(D.venue);
                     }
                 }
@@ -212,12 +204,10 @@ namespace OpenWifi {
 
         std::set<std::string>   Sections;
         for(const auto &i:Config_) {
-            ShowJSON("Iteration Start:", Configuration);
             Poco::JSON::Parser  P;
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
             for(const auto &SectionName:Names) {
-                std::cout << "SectionName: " << SectionName << std::endl;
                 auto InsertInfo = Sections.insert(SectionName);
                 if (InsertInfo.second) {
                     if (O->isArray(SectionName)) {
@@ -316,36 +306,25 @@ namespace OpenWifi {
 
     void APConfig::AddEntityConfig(const std::string &UUID) {
         ProvObjects::Entity E;
-        _OWDEBUG_
         if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
-            _OWDEBUG_
             AddConfiguration(E.configurations);
-            _OWDEBUG_
             if(!E.parent.empty()) {
-                _OWDEBUG_
                 AddEntityConfig(E.parent);
             }
         } else {
-            _OWDEBUG_
         }
     }
 
     void APConfig::AddVenueConfig(const std::string &UUID) {
         ProvObjects::Venue V;
-        _OWDEBUG_
         if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
-            _OWDEBUG_
             AddConfiguration(V.configurations);
-            _OWDEBUG_
             if(!V.entity.empty()) {
-                _OWDEBUG_
                 AddEntityConfig(V.entity);
             } else if(!V.parent.empty()) {
-                _OWDEBUG_
                 AddVenueConfig(V.parent);
             }
         } else {
-            _OWDEBUG_
         }
     }
 }

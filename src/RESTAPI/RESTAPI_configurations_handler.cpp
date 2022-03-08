@@ -91,22 +91,20 @@ namespace OpenWifi{
                 auto N = Blocks->getNames();
                 for (const auto &j: N) {
                     if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
-                        std::cout << "Block section name rejected: " << j << std::endl;
                         BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
                         return false;
                     }
                 }
             } catch (const Poco::JSON::JSONException &E ) {
-                Error = "Block " + i.name + " failed parsing: " + E.message();
+                Error = "Block: " + i.name + " failed parsing: " + E.message();
                 return false;
             }
 
             try {
                 if (ValidateUCentralConfiguration(i.configuration, Error)) {
-                    std::cout << "Block: " << i.name << " is valid" << std::endl;
+                    // std::cout << "Block: " << i.name << " is valid" << std::endl;
                 } else {
-                    std::cout << "Block: " << std::endl << ">>>" << std::endl << i.configuration << std::endl
-                              << ">>> REJECTED" << std::endl;
+                    Error =  "Block: " + i.name + "  Rejected config:" + i.configuration ;
                     return false;
                 }
             } catch(...) {
