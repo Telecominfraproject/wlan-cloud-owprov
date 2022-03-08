@@ -273,11 +273,13 @@ namespace OpenWifi{
                     Existing.deviceConfiguration = "";
                 }
                 Existing.subscriber = "";
-                nlohmann::json state;
-                state["date"] = OpenWifi::Now();
-                state["method"] = "auto-discovery";
-                state["last-operation"] = "returned to inventory";
-                Existing.state = state.get<std::string>();
+                Poco::JSON::Object state;
+                state.set("date",OpenWifi::Now());
+                state.set("method","auto-discovery");
+                state.set("last-operation", "returned to inventory");
+                std::ostringstream OO;
+                state.stringify(OO);
+                Existing.state = OO.str();
                 StorageService()->InventoryDB().UpdateRecord("id",Existing.info.id,Existing);
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
