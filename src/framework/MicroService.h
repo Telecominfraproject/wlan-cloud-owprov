@@ -1679,7 +1679,7 @@ namespace OpenWifi {
                         std::vector<std::string> Methods,
                         RESTAPI_GenericServer & Server,
                         uint64_t TransactionId,
-                        bool Internal=false,
+                        bool Internal,
                         bool AlwaysAuthorize=true,
                         bool RateLimited=false,
 	                    const RateLimit & Profile = RateLimit{.Interval=1000,.MaxCalls=100},
@@ -2219,8 +2219,8 @@ namespace OpenWifi {
 
 	    class RESTAPI_UnknownRequestHandler : public RESTAPIHandler {
 	    public:
-	        RESTAPI_UnknownRequestHandler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, uint64_t TransactionId)
-	        : RESTAPIHandler(bindings, L, std::vector<std::string>{}, Server, TransactionId) {}
+	        RESTAPI_UnknownRequestHandler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, uint64_t TransactionId, bool Internal)
+	        : RESTAPIHandler(bindings, L, std::vector<std::string>{}, Server, TransactionId, Internal) {}
 	        inline void DoGet() override {};
 	        inline void DoPost() override {};
 	        inline void DoPut() override {};
@@ -2243,11 +2243,11 @@ namespace OpenWifi {
 											   Poco::Logger & Logger, RESTAPI_GenericServer & Server, uint64_t TransactionId) {
 	                static_assert(test_has_PathName_method((T*)nullptr), "Class must have a static PathName() method.");
 	                if(RESTAPIHandler::ParseBindings(RequestedPath,T::PathName(),Bindings)) {
-	                    return new T(Bindings, Logger, Server, false, TransactionId);
+	                    return new T(Bindings, Logger, Server, TransactionId, false);
 	                }
 
 	                if constexpr (sizeof...(Args) == 0) {
-	                    return new RESTAPI_UnknownRequestHandler(Bindings,Logger, Server, TransactionId);
+	                    return new RESTAPI_UnknownRequestHandler(Bindings,Logger, Server, TransactionId, false);
 	                } else {
 	                    return RESTAPI_Router<Args...>(RequestedPath, Bindings, Logger, Server, TransactionId);
 	                }
@@ -2258,11 +2258,11 @@ namespace OpenWifi {
 												 Poco::Logger & Logger, RESTAPI_GenericServer & Server, uint64_t TransactionId) {
 	                static_assert(test_has_PathName_method((T*)nullptr), "Class must have a static PathName() method.");
 	                if(RESTAPIHandler::ParseBindings(RequestedPath,T::PathName(),Bindings)) {
-	                    return new T(Bindings, Logger, Server, true, TransactionId);
+	                    return new T(Bindings, Logger, Server, TransactionId, true );
 	                }
 
 	                if constexpr (sizeof...(Args) == 0) {
-	                    return new RESTAPI_UnknownRequestHandler(Bindings,Logger, Server, TransactionId);
+	                    return new RESTAPI_UnknownRequestHandler(Bindings,Logger, Server, TransactionId, true);
 	                } else {
 	                    return RESTAPI_Router_I<Args...>(RequestedPath, Bindings, Logger, Server, TransactionId);
 	                }
