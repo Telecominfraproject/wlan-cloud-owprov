@@ -66,6 +66,10 @@ namespace OpenWifi{
             ProvObjects::InventoryTagVec Tags;
             DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, DB_.OP("venue",ORM::EQ,UUID), OrderBy);
             return SendList( Tags, SerialOnly);
+        } else if((HasParameter("subscribersOnly",Arg) && Arg=="true")) {
+            ProvObjects::InventoryTagVec Tags;
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' ", OrderBy);
+            return SendList(Tags, SerialOnly);
         } else if(HasParameter("unassigned",Arg) && Arg=="true") {
             if(QB_.CountOnly) {
                 std::string Empty;
