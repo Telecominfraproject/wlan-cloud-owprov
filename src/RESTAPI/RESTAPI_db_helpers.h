@@ -153,9 +153,6 @@ namespace OpenWifi {
         return R.ReturnObject(Answer);
     }
 
-//    ReturnRecordList<decltype(StorageService()->InventoryDB()),
-//            ProvObjects::InventoryTag>("taglist",StorageService()->InventoryDB(),*this );
-
     inline static bool is_uuid(const std::string &u) {
         return u.find('-') != std::string::npos;
     }
