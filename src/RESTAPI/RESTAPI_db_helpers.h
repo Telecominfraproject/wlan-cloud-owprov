@@ -239,11 +239,12 @@ namespace OpenWifi {
     inline void GetLocationsForVenue(const std::string &ID, std::vector<triplet_t> & IDs) {
         ProvObjects::Venue  Existing;
         if(StorageService()->VenueDB().template GetRecord("id",ID,Existing)) {
-            if(!Existing.location.empty()) {
-                AddLocationTriplet(Existing.location,IDs);
-            }
             if(!Existing.parent.empty()) {
                 GetLocationsForVenue(Existing.parent,IDs);
+            }
+            ProvObjects::Entity E;
+            if(StorageService()->EntityDB().GetRecord("id", Existing.entity, E)) {
+                AddLocationTriplet(E.locations,IDs);
             }
             return;
         }
