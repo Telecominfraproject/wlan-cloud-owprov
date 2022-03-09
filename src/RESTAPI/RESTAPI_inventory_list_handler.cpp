@@ -35,11 +35,9 @@ namespace OpenWifi{
 
     void RESTAPI_inventory_list_handler::DoGet() {
         std::string UUID;
-        std::string Arg;
+        std::string Arg,Arg2;
 
-        bool SerialOnly=false;
-        if(HasParameter("serialOnly",Arg) && Arg=="true")
-            SerialOnly=true;
+        bool SerialOnly=GetBoolParameter("serialOnly");
 
         std::string OrderBy{" ORDER BY serialNumber ASC "};
         if(HasParameter("orderBy",Arg)) {
@@ -66,11 +64,15 @@ namespace OpenWifi{
             ProvObjects::InventoryTagVec Tags;
             DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, DB_.OP("venue",ORM::EQ,UUID), OrderBy);
             return SendList( Tags, SerialOnly);
-        } else if((HasParameter("subscribersOnly",Arg) && Arg=="true")) {
+        } else if(GetBoolParameter("subscribersOnly") && GetBoolParameter("unassigned")) {
             ProvObjects::InventoryTagVec Tags;
-            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' ", OrderBy);
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' and subscriber='' ", OrderBy);
             return SendList(Tags, SerialOnly);
-        } else if(HasParameter("unassigned",Arg) && Arg=="true") {
+        } else if(GetBoolParameter("subscribersOnly")) {
+            ProvObjects::InventoryTagVec Tags;
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' and subscriber!='' ", OrderBy);
+            return SendList(Tags, SerialOnly);
+        } else if(GetBoolParameter("unassigned")) {
             if(QB_.CountOnly) {
                 std::string Empty;
                 auto C = DB_.Count( InventoryDB::OP( DB_.OP("venue",ORM::EQ,Empty),
@@ -96,7 +98,7 @@ namespace OpenWifi{
         } else if (QB_.CountOnly) {
             auto C = DB_.Count();
             return ReturnCountOnly(C);
-        } else if (GetBoolParameter("rrmOnly",false)) {
+        } else if (GetBoolParameter("rrmOnly")) {
             Types::UUIDvec_t   DeviceList;
             DB_.GetRRMDeviceList(DeviceList);
             if(QB_.CountOnly)
