@@ -245,9 +245,7 @@ namespace OpenWifi {
             if(!Existing.parent.empty()) {
                 GetLocationsForVenue(Existing.parent,IDs);
             }
-            if(!Existing.entity.empty()) {
-                GetLocationsForEntity(Existing.entity,IDs);
-            }
+            return;
         }
     }
 
