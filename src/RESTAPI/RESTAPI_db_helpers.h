@@ -211,12 +211,74 @@ namespace OpenWifi {
         return true;
     }
 
+    typedef std::tuple<std::string,std::string,std::string> triplet_t;
+
+    inline void AddLocationTriplet(const std::string &id, std::vector<triplet_t> & IDs) {
+        ProvObjects::Location   L;
+        if(StorageService()->LocationDB().GetRecord("id",id,L)) {
+            IDs.emplace_back(std::make_tuple(L.info.name,L.info.description,L.info.id));
+        }
+    }
+
+    inline void AddLocationTriplet(const std::vector<std::string> &id, std::vector<triplet_t> & IDs) {
+        for(const auto &i:id)
+            AddLocationTriplet(i,IDs);
+    }
+
+    inline void GetLocationsForEntity(const std::string &ID, std::vector<triplet_t> & IDs) {
+        ProvObjects::Entity  Existing;
+        if(StorageService()->EntityDB().template GetRecord("id",ID,Existing)) {
+            if(!Existing.locations.empty()) {
+                AddLocationTriplet(Existing.locations,IDs);
+            }
+            if(!Existing.parent.empty()) {
+                GetLocationsForEntity(Existing.parent,IDs);
+            }
+            if(ID==EntityDB::RootUUID())
+                return;
+        }
+    }
+
+    inline void GetLocationsForVenue(const std::string &ID, std::vector<triplet_t> & IDs) {
+        ProvObjects::Venue  Existing;
+        if(StorageService()->VenueDB().template GetRecord("id",ID,Existing)) {
+            if(!Existing.location.empty()) {
+                AddLocationTriplet(Existing.location,IDs);
+            }
+            if(!Existing.parent.empty()) {
+                GetLocationsForVenue(Existing.parent,IDs);
+            }
+            if(!Existing.entity.empty()) {
+                GetLocationsForEntity(Existing.entity,IDs);
+            }
+        }
+    }
+
     template <typename DB> void ListHandler(const char *BlockName,DB & DBInstance, RESTAPIHandler & R) {
         auto Entity = R.GetParameter("entity", "");
         auto Venue = R.GetParameter("venue", "");
 
         typedef typename DB::RecordVec      RecVec;
         typedef typename DB::RecordName     RecType;
+
+        if constexpr(std::is_same_v<RecType,ProvObjects::Venue>) {
+            auto LocationsForVenue = R.GetParameter("locationsForVenue","");
+            if(!LocationsForVenue.empty()) {
+                std::vector<triplet_t>  IDs;
+                GetLocationsForVenue(LocationsForVenue,IDs);
+                Poco::JSON::Array   A;
+                for(const auto &[name,description,uuid]:IDs) {
+                    Poco::JSON::Object  O;
+                    O.set("name", name);
+                    O.set("description",description);
+                    O.set("uuid",uuid);
+                    A.add(O);
+                }
+                Poco::JSON::Object  Answer;
+                Answer.set("locations",A);
+                return R.ReturnObject(Answer);
+            }
+        }
 
         if(!R.QB_.Select.empty()) {
             return ReturnRecordList<decltype(DBInstance),

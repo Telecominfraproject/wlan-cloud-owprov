@@ -238,6 +238,13 @@ namespace OpenWifi{
             Existing.deviceConfiguration = MoveToConfigurations;
         }
 
+        std::string ErrorText;
+        auto ObjectsToCreate = CreateObjects(NewObject, *this, ErrorText);
+
+        if(!ErrorText.empty()) {
+            return BadRequest(ErrorText);
+        }
+
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
             MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContacts, MoveToContacts, Existing.info.id);
             MoveUsage(StorageService()->LocationDB(),DB_,MoveFromLocation, MoveToLocation, Existing.info.id);

@@ -3076,10 +3076,10 @@ namespace OpenWifi {
 		}
 
         inline Poco::Logger & GetLogger(const std::string &Name) {
-            static auto initilized = false;
+            static auto initialized = false;
 
-            if(!initilized) {
-                initilized = true;
+            if(!initialized) {
+                initialized = true;
                 InitializeLoggingSystem();
             }
             return Poco::Logger::get(Name);
@@ -3237,9 +3237,9 @@ namespace OpenWifi {
 	        }
 
 	        auto i=Services_.begin();
-	        auto Now = (uint64_t )std::time(nullptr);
+	        auto now = OpenWifi::Now();
 	        for(;i!=Services_.end();) {
-	            if((Now - i->second.LastUpdate)>60) {
+	            if((now - i->second.LastUpdate)>60) {
 	                i = Services_.erase(i);
 	            } else
 	                ++i;
