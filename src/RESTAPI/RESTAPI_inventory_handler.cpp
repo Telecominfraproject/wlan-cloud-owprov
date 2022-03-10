@@ -60,7 +60,7 @@ namespace OpenWifi{
             APConfig    Device(SerialNumber,Existing.deviceType,Logger(), Explain);
 
             __DBG__
-            Poco::JSON::Object::Ptr  Configuration;
+            auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             if(Device.Get(Configuration)) {
                 __DBG__
                 Answer.set("config", Configuration);
