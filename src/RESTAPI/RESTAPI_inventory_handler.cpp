@@ -204,6 +204,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
+        /*
         if(!NewObject.venue.empty()) {
             nlohmann::json state;
             state["method"] = "assignedTo";
@@ -222,6 +223,7 @@ namespace OpenWifi{
             state["date"] = std::time(nullptr);
             NewObject.state = to_string(state);
         }
+        */
 
         if(DB_.CreateRecord(NewObject)) {
             SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
