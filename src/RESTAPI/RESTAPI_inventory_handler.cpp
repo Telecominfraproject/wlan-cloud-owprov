@@ -160,7 +160,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
+        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
@@ -296,8 +296,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        std::cout << "Devclass: '" << NewObject.devClass << "'" << std::endl;
-        if(!NewObject.devClass.empty() && !Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
+        if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
 
@@ -314,27 +313,33 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "rrm",Existing.rrm);
 
         std::string FromPolicy, ToPolicy;
-        if(!CreateMove(RawObject,"managementPolicy",&InventoryDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+        if(!CreateMove(RawObject,"managementPolicy",&InventoryDB::RecordName::managementPolicy, Existing, FromPolicy,
+                       ToPolicy, StorageService()->PolicyDB()))
             return BadRequest(RESTAPI::Errors::EntityMustExist);
 
         std::string FromEntity, ToEntity;
-        if(!CreateMove(RawObject,"entity",&InventoryDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
+        if(!CreateMove(RawObject,"entity",&InventoryDB::RecordName::entity, Existing, FromEntity, ToEntity,
+                       StorageService()->EntityDB()))
             return BadRequest(RESTAPI::Errors::EntityMustExist);
 
         std::string FromVenue, ToVenue;
-        if(!CreateMove(RawObject,"venue",&InventoryDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
+        if(!CreateMove(RawObject,"venue",&InventoryDB::RecordName::venue, Existing, FromVenue, ToVenue,
+                       StorageService()->VenueDB()))
             return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         std::string FromLocation, ToLocation;
-        if(!CreateMove(RawObject,"location",&InventoryDB::RecordName::location, Existing, FromLocation, ToLocation, StorageService()->LocationDB()))
+        if(!CreateMove(RawObject,"location",&InventoryDB::RecordName::location, Existing, FromLocation, ToLocation,
+                       StorageService()->LocationDB()))
             return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         std::string FromContact, ToContact;
-        if(!CreateMove(RawObject,"contact",&InventoryDB::RecordName::contact, Existing, FromContact, ToContact, StorageService()->ContactDB()))
+        if(!CreateMove(RawObject,"contact",&InventoryDB::RecordName::contact, Existing, FromContact, ToContact,
+                       StorageService()->ContactDB()))
             return BadRequest(RESTAPI::Errors::VenueMustExist);
 
         std::string FromConfiguration, ToConfiguration;
-        if(!CreateMove(RawObject,"deviceConfiguration",&InventoryDB::RecordName::deviceConfiguration, Existing, FromConfiguration, ToConfiguration, StorageService()->ConfigurationDB()))
+        if(!CreateMove(RawObject,"deviceConfiguration",&InventoryDB::RecordName::deviceConfiguration, Existing,
+                       FromConfiguration, ToConfiguration, StorageService()->ConfigurationDB()))
             return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
 
         std::string NewSubScriber;

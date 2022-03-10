@@ -915,12 +915,10 @@ namespace OpenWifi::Utils {
     [[nodiscard]] inline bool ValidEMailAddress(const std::string &email) {
         // define a regular expression
         static const std::regex pattern
-        (("(\\w+)(\\.|_\\+)?(\\w*)@(\\w+)(\\.(\\w+))+"));
-
+                (("(\\w+)(\\.|_|\\++)?(\\w*)@(\\w+)(\\.(\\w+))+"));
         // try to match the string with the regular expression
         return std::regex_match(email, pattern);
     }
-
 
     [[nodiscard]] inline std::string LoadFile( const Poco::File & F) {
         std::string Result;
