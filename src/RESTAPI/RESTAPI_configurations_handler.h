@@ -30,7 +30,5 @@ namespace OpenWifi {
         void DoPost();
         void DoPut();
         void DoDelete();
-
-        bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error);
     };
 }

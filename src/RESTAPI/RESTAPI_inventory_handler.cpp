@@ -98,7 +98,7 @@ namespace OpenWifi{
                 std::ostringstream OS;
                 Configuration->stringify(OS);
                 Results.appliedConfiguration = OS.str();
-                Poco::JSON::Object::Ptr Response;
+                auto Response=Poco::makeShared<Poco::JSON::Object>();
                 Logger().debug(Poco::format("%s: Sending configuration push.",Existing.serialNumber));
                 if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
                     Logger().debug(Poco::format("%s: Sending configuration pushed.",Existing.serialNumber));
@@ -259,6 +259,12 @@ namespace OpenWifi{
         }
         */
 
+        std::string ErrorText;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,ErrorText);
+        if(!ErrorText.empty()) {
+            return BadRequest(ErrorText);
+        }
+
         __DBG__
         if(DB_.CreateRecord(NewObject)) {
             __DBG__
@@ -412,6 +418,12 @@ namespace OpenWifi{
 
         if( RawObject->has("state") && NewObject.state!= Existing.state) {
             Existing.state = NewObject.state;
+        }
+
+        std::string ErrorText;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,ErrorText);
+        if(!ErrorText.empty()) {
+            return BadRequest(ErrorText);
         }
 
         if(StorageService()->InventoryDB().UpdateRecord("id", Existing.info.id, Existing)) {

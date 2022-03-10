@@ -7,6 +7,7 @@
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "framework/MicroService.h"
+#include "framework/ConfigurationValidator.h"
 
 namespace OpenWifi {
 
@@ -377,6 +378,47 @@ namespace OpenWifi {
         return EntityDB::RootUUID();
     }
 
+    inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
+        static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
+
+        for(const auto &i:Config.configuration) {
+            Poco::JSON::Parser  P;
+            if(i.name.empty()) {
+                std::cout << "Name is empty" << std::endl;
+                Error = RESTAPI::Errors::NameMustBeSet;
+                return false;
+            }
+
+            try {
+                auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+                auto N = Blocks->getNames();
+                for (const auto &j: N) {
+                    if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
+                        Error = "Unknown section: " + j;
+                        return false;
+                    }
+                }
+            } catch (const Poco::JSON::JSONException &E ) {
+                Error = "Block: " + i.name + " failed parsing: " + E.message();
+                return false;
+            }
+
+            try {
+                if (ValidateUCentralConfiguration(i.configuration, Error)) {
+                    // std::cout << "Block: " << i.name << " is valid" << std::endl;
+                } else {
+                    Error =  "Block: " + i.name + "  Rejected config:" + i.configuration ;
+                    return false;
+                }
+            } catch(...) {
+                std::cout << "Exception in validation" << std::endl;
+                return false;
+            }
+
+        }
+        return true;
+    }
+
     template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, std::string &ErrorText) {
         std::map<std::string,std::string>   Result;
 
@@ -396,16 +438,17 @@ namespace OpenWifi {
                             if constexpr(std::is_same_v<Type,ProvObjects::Venue>) {
                                 std::cout << "Location decoded: " << LC.info.name << std::endl;
                                 std::string ParentEntity = FindParentEntity(NewObject);
-                                ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo,LC.info);
+                                ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, LC.info);
                                 LC.entity = ParentEntity;
-                                if(StorageService()->LocationDB().CreateRecord(LC)) {
+                                if (StorageService()->LocationDB().CreateRecord(LC)) {
                                     NewObject.location = LC.info.id;
                                     AddMembership(StorageService()->EntityDB(), &ProvObjects::Entity::locations,
                                                   ParentEntity, LC.info.id);
                                 }
                             }
                         } else {
-                            std::cout << "Location not decoded." << std::endl;
+                            ErrorText = RESTAPI::Errors::InvalidJSONDocument;
+                            break;
                         }
                     } else if (Object->has("contact")) {
                         auto ContactDetails = Object->get("contact").extract<Poco::JSON::Object::Ptr>();
@@ -415,7 +458,24 @@ namespace OpenWifi {
                         } else {
                             std::cout << "contact not decoded." << std::endl;
                         }
-                        std::cout << "No contact included." << std::endl;
+                    } else if (Object->has("configuration")) {
+                        auto ConfigurationDetails = Object->get("configuration").template extract<Poco::JSON::Object::Ptr>();
+                        ProvObjects::DeviceConfiguration    DC;
+                        if(DC.from_json(ConfigurationDetails)) {
+                            if constexpr(std::is_same_v<Type, ProvObjects::InventoryTag>) {
+                                if(!ValidateConfigBlock(DC,ErrorText)) {
+                                    break;
+                                }
+                                std::cout << "Configuration decoded: " << DC.info.name << std::endl;
+                                ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, DC.info);
+                                if (StorageService()->ConfigurationDB().CreateRecord(DC)) {
+                                    NewObject.deviceConfiguration = DC.info.id;
+                                }
+                            }
+                        } else {
+                            ErrorText = RESTAPI::Errors::InvalidJSONDocument;
+                            break;
+                        }
                     }
                 }
             }

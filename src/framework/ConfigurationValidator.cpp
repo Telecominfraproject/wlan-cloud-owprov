@@ -2609,6 +2609,7 @@ namespace OpenWifi {
                 return false;
             } catch(...) {
                 std::cout << "4 Some kind of bullshit exception..." << std::endl;
+                return false;
             }
         }
         return true;

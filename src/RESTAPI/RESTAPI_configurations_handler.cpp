@@ -75,47 +75,6 @@ namespace OpenWifi{
         return OK();
     }
 
-    bool RESTAPI_configurations_handler::ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
-        static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
-
-        for(const auto &i:Config.configuration) {
-            Poco::JSON::Parser  P;
-            if(i.name.empty()) {
-                std::cout << "Name is empty" << std::endl;
-                BadRequest(RESTAPI::Errors::NameMustBeSet);
-                return false;
-            }
-
-            try {
-                auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-                auto N = Blocks->getNames();
-                for (const auto &j: N) {
-                    if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
-                        BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
-                        return false;
-                    }
-                }
-            } catch (const Poco::JSON::JSONException &E ) {
-                Error = "Block: " + i.name + " failed parsing: " + E.message();
-                return false;
-            }
-
-            try {
-                if (ValidateUCentralConfiguration(i.configuration, Error)) {
-                    // std::cout << "Block: " << i.name << " is valid" << std::endl;
-                } else {
-                    Error =  "Block: " + i.name + "  Rejected config:" + i.configuration ;
-                    return false;
-                }
-            } catch(...) {
-                std::cout << "Exception in validation" << std::endl;
-                return false;
-            }
-
-        }
-        return true;
-    }
-
 #define __DBG__ std::cout << __LINE__ << std::endl;
 
     void RESTAPI_configurations_handler::DoPost() {
