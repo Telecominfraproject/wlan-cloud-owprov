@@ -116,13 +116,17 @@ namespace OpenWifi{
         return true;
     }
 
+#define __DBG__ std::cout << __LINE__ << std::endl;
+
     void RESTAPI_configurations_handler::DoPost() {
+        __DBG__
         auto UUID = GetBinding("uuid","");
         if(UUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
         std::string Arg;
+        __DBG__
         if(HasParameter("validateOnly",Arg) && Arg=="true") {
             auto Body = ParseStream();
             if(!Body->has("configuration")) {
@@ -137,49 +141,64 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
+        __DBG__
         ProvObjects::DeviceConfiguration NewObject;
         auto RawObject = ParseStream();
+        __DBG__
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        __DBG__
         if(!ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
+        __DBG__
         if(!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
+        __DBG__
         if(!NewObject.venue.empty() && !StorageService()->VenueDB().Exists("id",NewObject.venue)) {
             return BadRequest(RESTAPI::Errors::VenueMustExist);
         }
 
+        __DBG__
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
+        __DBG__
         NewObject.inUse.clear();
         if(NewObject.deviceTypes.empty() || !DeviceTypeCache()->AreAcceptableDeviceTypes(NewObject.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
         std::string Error;
+        __DBG__
         if(!ValidateConfigBlock(NewObject,Error)) {
             return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
         }
+        __DBG__
 
         if(DB_.CreateRecord(NewObject)) {
+            __DBG__
             MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
+            __DBG__
             AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::configurations,NewObject.venue, NewObject.info.id);
+            __DBG__
             AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::configurations,NewObject.entity, NewObject.info.id);
+            __DBG__
 
             ConfigurationDB::RecordName AddedRecord;
             DB_.GetRecord("id", NewObject.info.id, AddedRecord);
             Poco::JSON::Object  Answer;
             AddedRecord.to_json(Answer);
+            __DBG__
             return ReturnObject(Answer);
         }
+        __DBG__
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
