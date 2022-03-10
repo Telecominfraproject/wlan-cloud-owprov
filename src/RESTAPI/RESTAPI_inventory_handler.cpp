@@ -140,70 +140,89 @@ namespace OpenWifi{
         return OK();
     }
 
+#define __DBG__ std::cout << __LINE__ << std::endl;
+
     void RESTAPI_inventory_handler::DoPost() {
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
         if(SerialNumber.empty()) {
             return BadRequest(RESTAPI::Errors::MissingSerialNumber);
         }
 
+        __DBG__
         if(!NormalizeMac(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
+        __DBG__
 
         if(DB_.Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
             return BadRequest(RESTAPI::Errors::SerialNumberExists + " (" + SerialNumber + ")");
         }
+        __DBG__
 
         auto Obj = ParseStream();
+        __DBG__
         ProvObjects::InventoryTag NewObject;
+        __DBG__
         if (!NewObject.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
+        __DBG__
 
         if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
+        __DBG__
 
         if(NewObject.devClass.empty()) {
             NewObject.devClass = Provisioning::DeviceClass::ANY;
         }
+        __DBG__
 
         if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
+        __DBG__
 
         if(NewObject.deviceType.empty() || !DeviceTypeCache()->IsAcceptableDeviceType(NewObject.deviceType)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
+        __DBG__
 
         if(OpenWifi::EntityDB::IsRoot(NewObject.entity) || (!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity))) {
             return BadRequest(RESTAPI::Errors::ValidNonRootUUID);
         }
+        __DBG__
 
         if(!NewObject.venue.empty() && !StorageService()->VenueDB().Exists("id",NewObject.venue)) {
             return BadRequest(RESTAPI::Errors::VenueMustExist);
         }
+        __DBG__
 
         if(!NewObject.venue.empty() && !NewObject.entity.empty()) {
             return BadRequest(RESTAPI::Errors::NotBoth);
         }
+        __DBG__
 
         if(!NewObject.location.empty() && !StorageService()->LocationDB().Exists("id",NewObject.location)) {
             return BadRequest(RESTAPI::Errors::LocationMustExist);
         }
+        __DBG__
 
         if(!NewObject.contact.empty() && !StorageService()->ContactDB().Exists("id",NewObject.contact)) {
             return BadRequest(RESTAPI::Errors::ContactMustExist);
         }
 
+        __DBG__
         if(!NewObject.deviceConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewObject.deviceConfiguration)) {
             return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
         }
 
+        __DBG__
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
+        __DBG__
         /*
         if(!NewObject.venue.empty()) {
             nlohmann::json state;
@@ -225,20 +244,32 @@ namespace OpenWifi{
         }
         */
 
+        __DBG__
         if(DB_.CreateRecord(NewObject)) {
+            __DBG__
             SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
 
+            __DBG__
             MoveUsage(StorageService()->PolicyDB(),DB_,NewObject.managementPolicy,"",NewObject.info.id);
+            __DBG__
             MoveUsage(StorageService()->LocationDB(),DB_,NewObject.location,"",NewObject.info.id);
+            __DBG__
             MoveUsage(StorageService()->ContactDB(),DB_,NewObject.contact,"",NewObject.info.id);
+            __DBG__
             MoveUsage(StorageService()->ConfigurationDB(),DB_,NewObject.deviceConfiguration,"",NewObject.info.id);
+            __DBG__
             ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,NewObject.entity,"",NewObject.info.id);
+            __DBG__
             ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,NewObject.venue,"",NewObject.info.id);
+            __DBG__
 
             ProvObjects::InventoryTag   NewTag;
+            __DBG__
             DB_.GetRecord("id",NewObject.info.id,NewTag);
+            __DBG__
             Poco::JSON::Object Answer;
             NewTag.to_json(Answer);
+            __DBG__
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
