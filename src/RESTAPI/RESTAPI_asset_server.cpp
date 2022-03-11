@@ -13,11 +13,9 @@ namespace OpenWifi {
 
         std::string AssetName = GetBinding(RESTAPI::Protocol::ID, "");
         AssetFile = Daemon()->AssetDir() + "/" + AssetName;
-
         if(!AssetFile.isFile()) {
             return NotFound();
         }
-
         SendFile(AssetFile);
     }
 }
