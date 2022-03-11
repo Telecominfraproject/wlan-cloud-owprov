@@ -20,6 +20,7 @@
 #include "FindCountry.h"
 #include "Signup.h"
 #include "DeviceTypeCache.h"
+#include "FileDownloader.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -40,7 +41,8 @@ namespace OpenWifi {
 									   JobController(),
 									   WebSocketClientServer(),
                                        FindCountryFromIP(),
-                                       Signup()
+                                       Signup(),
+                                       FileDownloader()
 								   });
 		}
 		return instance_;
@@ -56,6 +58,16 @@ namespace OpenWifi {
 	    } else {
 	        FWRules_ = ProvObjects::dont_upgrade;
 	    }
+
+        AssetDir_ = MicroService::instance().DataDir() + "/wwwassets";
+        Poco::File	DataDir(AssetDir_);
+        if(!DataDir.exists()) {
+            try {
+                DataDir.createDirectory();
+            } catch (const Poco::Exception &E) {
+                logger().log(E);
+            }
+        }
     }
 
     void MicroServicePostInitialization() {

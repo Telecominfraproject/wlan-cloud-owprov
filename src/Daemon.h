@@ -42,11 +42,12 @@ namespace OpenWifi {
 			inline OpenWifi::ProvisioningDashboard & GetDashboard() { return DB_; }
 			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }
 			ProvObjects::FIRMWARE_UPGRADE_RULES FirmwareRules() const { return FWRules_; }
+            inline const std::string & AssetDir() { return AssetDir_; }
 	  	private:
 			static Daemon 				        *instance_;
 			OpenWifi::ProvisioningDashboard		DB_{};
 			ProvObjects::FIRMWARE_UPGRADE_RULES FWRules_{ProvObjects::dont_upgrade};
-
+            std::string         AssetDir_;
     };
 
 	inline Daemon * Daemon() { return Daemon::instance(); }
