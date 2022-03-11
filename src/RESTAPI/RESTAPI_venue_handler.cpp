@@ -239,6 +239,8 @@ namespace OpenWifi{
         }
 
         std::string ErrorText;
+        NewObject.parent = Existing.parent;
+        NewObject.entity = Existing.entity;
         auto ObjectsCreated = CreateObjects(NewObject, *this, ErrorText);
         if(!ErrorText.empty()) {
             return BadRequest(ErrorText);
