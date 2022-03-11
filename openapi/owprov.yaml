@@ -668,6 +668,21 @@ components:
           minLength: 2
           maxLength: 2
 
+    VenueDeviceList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+
     InventoryTagList:
       type: object
       properties:
@@ -1932,7 +1947,20 @@ paths:
           schema:
             type: boolean
           required: false
-
+        - in: query
+          description: return the devices under a venue
+          name: getDevices
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
+          description: return the devices under a venue and its children. Must select getDevices=true as well.
+          name: getChildren
+          schema:
+            type: boolean
+            default: false
+          required: false
       responses:
         200:
           description: Return a list of venues.
@@ -1942,6 +1970,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/VenueList'
                   - $ref: '#/components/schemas/CountAnswer'
+                  - $ref: '#/components/schemas/VenueDeviceList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

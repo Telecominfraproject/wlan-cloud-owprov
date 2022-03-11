@@ -15,11 +15,43 @@
 
 namespace OpenWifi{
 
+    static Types::UUIDvec_t GetDevices(const ProvObjects::Venue &V, bool GetChildren) {
+        Types::UUIDvec_t R;
+        std::copy(V.devices.begin(),V.devices.end(),std::back_inserter(R));
+        if(GetChildren) {
+            for (const auto &i: V.children) {
+                ProvObjects::Venue V2;
+                if (StorageService()->VenueDB().GetRecord("id", i, V2)) {
+                    auto LowerDevs = GetDevices(V2, GetChildren);
+                    std::copy(LowerDevs.begin(), LowerDevs.end(), std::back_inserter(R));
+                }
+            }
+        }
+        std::sort(R.begin(),R.end());
+        auto Last = std::unique(R.begin(),R.end());
+        R.erase(Last,R.end());
+        return R;
+    }
+
     void RESTAPI_venue_handler::DoGet() {
         std::string UUID = GetBinding("uuid", "");
         ProvObjects::Venue Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             return NotFound();
+        }
+
+        if(GetBoolParameter("getDevices")) {
+            auto GetChildren = GetBoolParameter("getChildren");
+            Types::UUIDvec_t Devices = GetDevices(Existing,GetChildren);
+            Poco::JSON::Object  Answer;
+            Answer.set("id", Existing.info.id);
+            Answer.set("name",Existing.info.name);
+            Answer.set("description", Existing.info.description);
+            Poco::JSON::Array SerialNumbers;
+            for(const auto &i:Devices)
+                SerialNumbers.add(i);
+            Answer.set("devices", Devices);
+            return ReturnObject(Answer);
         }
 
         Poco::JSON::Object Answer;
