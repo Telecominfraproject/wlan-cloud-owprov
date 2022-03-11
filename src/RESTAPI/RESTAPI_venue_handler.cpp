@@ -239,10 +239,20 @@ namespace OpenWifi{
         }
 
         std::string ErrorText;
-        auto ObjectsToCreate = CreateObjects(NewObject, *this, ErrorText);
-
+        auto ObjectsCreated = CreateObjects(NewObject, *this, ErrorText);
         if(!ErrorText.empty()) {
             return BadRequest(ErrorText);
+        }
+
+        if(!ObjectsCreated.empty()) {
+            if(!ObjectsCreated.empty()) {
+                auto it = ObjectsCreated.find("location");
+                if(it!=ObjectsCreated.end()) {
+                    MoveFromLocation="";
+                    MoveToLocation=it->second;
+                    Existing.location=MoveToLocation;
+                }
+            }
         }
 
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
