@@ -444,6 +444,7 @@ namespace OpenWifi {
                                     NewObject.location = LC.info.id;
                                     AddMembership(StorageService()->EntityDB(), &ProvObjects::Entity::locations,
                                                   ParentEntity, LC.info.id);
+                                    Result["location"] = LC.info.id;
                                 }
                             }
                         } else {
@@ -470,6 +471,7 @@ namespace OpenWifi {
                                 ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, DC.info);
                                 if (StorageService()->ConfigurationDB().CreateRecord(DC)) {
                                     NewObject.deviceConfiguration = DC.info.id;
+                                    Result["configuration"] = DC.info.id;
                                 }
                             }
                         } else {

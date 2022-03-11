@@ -421,9 +421,18 @@ namespace OpenWifi{
         }
 
         std::string ErrorText;
-        auto ObjectsCreated = CreateObjects(NewObject,*this,ErrorText);
+        auto ObjectsCreated = CreateObjects(Existing,*this,ErrorText);
         if(!ErrorText.empty()) {
             return BadRequest(ErrorText);
+        }
+
+        if(!ObjectsCreated.empty()) {
+            auto it = ObjectsCreated.find("configuration");
+            if(it!=ObjectsCreated.end()) {
+                FromConfiguration="";
+                ToConfiguration=it->second;
+                Existing.deviceConfiguration=ToConfiguration;
+            }
         }
 
         if(StorageService()->InventoryDB().UpdateRecord("id", Existing.info.id, Existing)) {
