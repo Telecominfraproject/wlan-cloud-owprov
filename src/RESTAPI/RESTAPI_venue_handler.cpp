@@ -41,16 +41,14 @@ namespace OpenWifi{
         }
 
         if(GetBoolParameter("getDevices")) {
+            ProvObjects::VenueDeviceList    VDL;
+            VDL.id = Existing.info.id;
+            VDL.name = Existing.info.name;
+            VDL.description = Existing.info.description;
             auto GetChildren = GetBoolParameter("getChildren");
-            Types::UUIDvec_t Devices = GetDevices(Existing,GetChildren);
+            VDL.devices = GetDevices(Existing,GetChildren);
             Poco::JSON::Object  Answer;
-            Answer.set("id", Existing.info.id);
-            Answer.set("name",Existing.info.name);
-            Answer.set("description", Existing.info.description);
-            Poco::JSON::Array SerialNumbers;
-            for(const auto &i:Devices)
-                SerialNumbers.add(i);
-            Answer.set("devices", Devices);
+            VDL.to_json(Answer);
             return ReturnObject(Answer);
         }
 

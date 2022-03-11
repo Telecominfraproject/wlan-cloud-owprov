@@ -770,6 +770,25 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void VenueDeviceList::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj,"id",id);
+        RESTAPI_utils::field_to_json(Obj,"name",name);
+        RESTAPI_utils::field_to_json(Obj,"description",description);
+        RESTAPI_utils::field_to_json(Obj,"devices",devices);
+    }
+
+    bool VenueDeviceList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json(Obj,"id",id);
+            RESTAPI_utils::field_from_json(Obj,"name",name);
+            RESTAPI_utils::field_from_json(Obj,"description",description);
+            RESTAPI_utils::field_from_json(Obj,"devices",devices);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
 
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I) {
         uint64_t Now = std::time(nullptr);
