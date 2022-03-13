@@ -325,6 +325,7 @@ namespace OpenWifi{
                 StorageService()->InventoryDB().UpdateRecord("id",Existing.info.id,Existing);
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
+                SDK::GW::Device::SetSubscriber(nullptr, SerialNumber, "");
                 return ReturnObject(Answer);
             } else {
                 Logger().information(Poco::format("%s: wrong subscriber (%s)", SerialNumber, RemoveSubscriber));
