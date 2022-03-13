@@ -265,32 +265,20 @@ namespace OpenWifi{
             return BadRequest(ErrorText);
         }
 
-        __DBG__
         if(DB_.CreateRecord(NewObject)) {
-            __DBG__
+            SDK::GW::Device::SetOwnerShip(this, SerialNumber, NewObject.entity, NewObject.venue, NewObject.subscriber);
             SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
-
-            __DBG__
             MoveUsage(StorageService()->PolicyDB(),DB_,NewObject.managementPolicy,"",NewObject.info.id);
-            __DBG__
             MoveUsage(StorageService()->LocationDB(),DB_,NewObject.location,"",NewObject.info.id);
-            __DBG__
             MoveUsage(StorageService()->ContactDB(),DB_,NewObject.contact,"",NewObject.info.id);
-            __DBG__
             MoveUsage(StorageService()->ConfigurationDB(),DB_,NewObject.deviceConfiguration,"",NewObject.info.id);
-            __DBG__
             ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,NewObject.entity,"",NewObject.info.id);
-            __DBG__
             ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,NewObject.venue,"",NewObject.info.id);
-            __DBG__
 
             ProvObjects::InventoryTag   NewTag;
-            __DBG__
             DB_.GetRecord("id",NewObject.info.id,NewTag);
-            __DBG__
             Poco::JSON::Object Answer;
             NewTag.to_json(Answer);
-            __DBG__
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
@@ -442,6 +430,8 @@ namespace OpenWifi{
             MoveUsage(StorageService()->ConfigurationDB(),DB_,FromConfiguration,ToConfiguration,Existing.info.id);
             ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,FromEntity,ToEntity,Existing.info.id);
             ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,FromVenue,ToVenue,Existing.info.id);
+
+            SDK::GW::Device::SetOwnerShip(this, SerialNumber, Existing.entity, Existing.venue, Existing.subscriber);
 
             ProvObjects::InventoryTag   NewObjectCreated;
             DB_.GetRecord("id", Existing.info.id, NewObjectCreated);

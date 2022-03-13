@@ -41,7 +41,8 @@ namespace OpenWifi {
         ORM::Field{"configurations",ORM::FieldType::FT_TEXT},
         ORM::Field{"maps",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicies",ORM::FieldType::FT_TEXT},
-        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT}
+        ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT},
+        ORM::Field{"boards",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    VenueDB_Indexes{
@@ -62,6 +63,7 @@ namespace OpenWifi {
                 "alter table " + TableName_ + " add column maps text",
                 "alter table " + TableName_ + " add column managementRoles text",
                 "alter table " + TableName_ + " add column managementPolicies text",
+                "alter table " + TableName_ + " add column boards text",
                 "alter table " + TableName_ + " rename column contact to contacts",
         };
 
@@ -123,6 +125,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.maps = OpenWifi::RESTAPI_utils::to_object_array(In.get<21>());
     Out.managementPolicies = OpenWifi::RESTAPI_utils::to_object_array(In.get<22>());
     Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<23>());
+    Out.boards = OpenWifi::RESTAPI_utils::to_object_array(In.get<24>());
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::ProvObjects::Venue &In, OpenWifi::VenueDBRecordType &Out) {
@@ -150,4 +153,5 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<21>(OpenWifi::RESTAPI_utils::to_string(In.maps));
     Out.set<22>(OpenWifi::RESTAPI_utils::to_string(In.managementPolicies));
     Out.set<23>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
+    Out.set<24>(OpenWifi::RESTAPI_utils::to_string(In.boards));
 }

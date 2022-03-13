@@ -22,7 +22,11 @@ namespace OpenWifi::SDK::GW {
             return SetSubscriber(nullptr, SerialNumber, uuid);
         }
         bool SetEntity(RESTAPIHandler *client, const std::string & SerialNumber, const std::string &uuid);
-
+        bool SetOwnerShip(RESTAPIHandler *client, const std::string & SerialNumber,
+                          const std::string &entity,
+                          const std::string &venue,
+                          const std::string &subscriber
+                          );
    }
 }
 
