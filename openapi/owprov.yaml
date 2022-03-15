@@ -372,7 +372,6 @@ components:
             type: string
             format: uuid
 
-
     VenueList:
       type: object
       properties:

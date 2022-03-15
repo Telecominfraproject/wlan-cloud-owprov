@@ -27,10 +27,21 @@ namespace OpenWifi{
                 }
             }
         }
+
         std::sort(R.begin(),R.end());
         auto Last = std::unique(R.begin(),R.end());
         R.erase(Last,R.end());
-        return R;
+
+        std::vector<std::string>    SerialNumbers;
+
+        for(const auto &device:R) {
+            ProvObjects::InventoryTag   IT;
+            if(StorageService()->InventoryDB().GetRecord("id",device,IT)) {
+                SerialNumbers.push_back(IT.serialNumber);
+            }
+        }
+
+        return SerialNumbers;
     }
 
     void RESTAPI_venue_handler::DoGet() {
