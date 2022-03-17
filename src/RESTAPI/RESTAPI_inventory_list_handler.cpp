@@ -65,10 +65,22 @@ namespace OpenWifi{
             DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, DB_.OP("venue",ORM::EQ,UUID), OrderBy);
             return SendList( Tags, SerialOnly);
         } else if(GetBoolParameter("subscribersOnly") && GetBoolParameter("unassigned")) {
+            if(QB_.CountOnly) {
+                auto C = DB_.Count(" devClass='subscriber' and subscriber='' ");
+                return ReturnCountOnly( C);
+            }
             ProvObjects::InventoryTagVec Tags;
             DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' and subscriber='' ", OrderBy);
+            if(QB_.CountOnly) {
+                auto C = DB_.Count(DB_.OP("venue",ORM::EQ,UUID));
+                return ReturnCountOnly( C);
+            }
             return SendList(Tags, SerialOnly);
         } else if(GetBoolParameter("subscribersOnly")) {
+            if(QB_.CountOnly) {
+                auto C = DB_.Count(" devClass='subscriber' and subscriber!='' ");
+                return ReturnCountOnly( C);
+            }
             ProvObjects::InventoryTagVec Tags;
             DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' and subscriber!='' ", OrderBy);
             return SendList(Tags, SerialOnly);

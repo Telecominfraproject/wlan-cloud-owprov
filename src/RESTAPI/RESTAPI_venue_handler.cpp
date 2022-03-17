@@ -298,6 +298,10 @@ namespace OpenWifi{
             }
         }
 
+        if(RawObject->has("boards")) {
+            Existing.boards = NewObject.boards;
+        }
+
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
             MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContacts, MoveToContacts, Existing.info.id);
             MoveUsage(StorageService()->LocationDB(),DB_,MoveFromLocation, MoveToLocation, Existing.info.id);
