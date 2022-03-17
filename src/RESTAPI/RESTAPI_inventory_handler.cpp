@@ -163,101 +163,63 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingSerialNumber);
         }
 
-        __DBG__
         if(!NormalizeMac(SerialNumber)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
-        __DBG__
 
         if(DB_.Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
             return BadRequest(RESTAPI::Errors::SerialNumberExists + " (" + SerialNumber + ")");
         }
-        __DBG__
 
         auto Obj = ParseStream();
-        __DBG__
         ProvObjects::InventoryTag NewObject;
-        __DBG__
         if (!NewObject.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
-        __DBG__
 
         if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceClass);
         }
-        __DBG__
 
         if(NewObject.devClass.empty()) {
             NewObject.devClass = Provisioning::DeviceClass::ANY;
         }
-        __DBG__
 
         if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
-        __DBG__
 
         if(NewObject.deviceType.empty() || !DeviceTypeCache()->IsAcceptableDeviceType(NewObject.deviceType)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
-        __DBG__
 
         if(OpenWifi::EntityDB::IsRoot(NewObject.entity) || (!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity))) {
             return BadRequest(RESTAPI::Errors::ValidNonRootUUID);
         }
-        __DBG__
 
         if(!NewObject.venue.empty() && !StorageService()->VenueDB().Exists("id",NewObject.venue)) {
             return BadRequest(RESTAPI::Errors::VenueMustExist);
         }
-        __DBG__
 
         if(!NewObject.venue.empty() && !NewObject.entity.empty()) {
             return BadRequest(RESTAPI::Errors::NotBoth);
         }
-        __DBG__
 
         if(!NewObject.location.empty() && !StorageService()->LocationDB().Exists("id",NewObject.location)) {
             return BadRequest(RESTAPI::Errors::LocationMustExist);
         }
-        __DBG__
 
         if(!NewObject.contact.empty() && !StorageService()->ContactDB().Exists("id",NewObject.contact)) {
             return BadRequest(RESTAPI::Errors::ContactMustExist);
         }
 
-        __DBG__
         if(!NewObject.deviceConfiguration.empty() && !StorageService()->ConfigurationDB().Exists("id",NewObject.deviceConfiguration)) {
             return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
         }
 
-        __DBG__
         if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
-
-        __DBG__
-        /*
-        if(!NewObject.venue.empty()) {
-            nlohmann::json state;
-            state["method"] = "assignedTo";
-            state["venue"] = NewObject.venue;
-            state["date"] = std::time(nullptr);
-            NewObject.state = to_string(state);
-        } else if (!NewObject.entity.empty()) {
-            nlohmann::json state;
-            state["method"] = "assignedTo";
-            state["entity"] = NewObject.entity;
-            state["date"] = std::time(nullptr);
-            NewObject.state = to_string(state);
-        } else {
-            nlohmann::json state;
-            state["method"] = "created";
-            state["date"] = std::time(nullptr);
-            NewObject.state = to_string(state);
-        }
-        */
 
         std::string ErrorText;
         auto ObjectsCreated = CreateObjects(NewObject,*this,ErrorText);
@@ -268,12 +230,12 @@ namespace OpenWifi{
         if(DB_.CreateRecord(NewObject)) {
             SDK::GW::Device::SetOwnerShip(this, SerialNumber, NewObject.entity, NewObject.venue, NewObject.subscriber);
             SerialNumberCache()->AddSerialNumber(SerialNumber,NewObject.deviceType);
-            MoveUsage(StorageService()->PolicyDB(),DB_,NewObject.managementPolicy,"",NewObject.info.id);
-            MoveUsage(StorageService()->LocationDB(),DB_,NewObject.location,"",NewObject.info.id);
-            MoveUsage(StorageService()->ContactDB(),DB_,NewObject.contact,"",NewObject.info.id);
-            MoveUsage(StorageService()->ConfigurationDB(),DB_,NewObject.deviceConfiguration,"",NewObject.info.id);
-            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,NewObject.entity,"",NewObject.info.id);
-            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,NewObject.venue,"",NewObject.info.id);
+            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
+            MoveUsage(StorageService()->LocationDB(),DB_,"",NewObject.location,NewObject.info.id);
+            MoveUsage(StorageService()->ContactDB(),DB_,"",NewObject.contact,NewObject.info.id);
+            MoveUsage(StorageService()->ConfigurationDB(),DB_,"",NewObject.deviceConfiguration,NewObject.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,"",NewObject.entity,NewObject.info.id);
+            ManageMembership(StorageService()->VenueDB(),&ProvObjects::Venue::devices,"",NewObject.venue,NewObject.info.id);
 
             ProvObjects::InventoryTag   NewTag;
             DB_.GetRecord("id",NewObject.info.id,NewTag);
