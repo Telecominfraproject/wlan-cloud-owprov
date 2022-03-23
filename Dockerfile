@@ -127,8 +127,6 @@ COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-c
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-sns/libaws-cpp-sdk-sns.so /usr/local/lib
 
-COPY --from=fmtlib-build /fmtlib/cmake-build/lib/* /usr/local/lib
-
 EXPOSE 16005 17005 16105
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
