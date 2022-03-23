@@ -46,7 +46,7 @@ RUN make install
 FROM build-base AS fmtlib-build
 
 ADD https://api.github.com/repos/fmtlib/fmt/git/refs/heads/master version.json
-RUN git clone https://github.com/fmtlib/git /fmtlib
+RUN git clone https://github.com/fmtlib/fmt /fmtlib
 
 WORKDIR /fmtlib
 RUN mkdir cmake-build
