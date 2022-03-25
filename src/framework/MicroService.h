@@ -299,7 +299,7 @@ namespace OpenWifi::RESTAPI_utils {
         Obj.set(Field, Arr);
     }
 
-    template<class T> void field_to_json(Poco::JSON::Object Obj, const char *Field, const T &Value) {
+    template<class T> void field_to_json(Poco::JSON::Object &Obj, const char *Field, const T &Value) {
         Poco::JSON::Object  Answer;
         Value.to_json(Answer);
         Obj.set(Field, Answer);
@@ -3420,7 +3420,6 @@ namespace OpenWifi {
 
 	inline void MicroService::initialize(Poco::Util::Application &self) {
 	    // add the default services
-        std::cout << "Initialize MicroService" << std::endl;
         LoadConfigurationFile();
         InitializeLoggingSystem();
 
