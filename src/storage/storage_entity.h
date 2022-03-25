@@ -42,6 +42,7 @@ namespace OpenWifi {
     public:
         static const std::string RootUUID_;
         EntityDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~EntityDB() {};
         inline bool RootExists() const { return RootExists_; };
         static inline bool IsRoot(const std::string &UUID) { return (UUID == RootUUID_); }
         static inline const std::string RootUUID() { return RootUUID_; }

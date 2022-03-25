@@ -41,6 +41,7 @@ namespace OpenWifi {
     class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
         public:
             InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+            virtual ~InventoryDB() {};
             bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo,
                                       const std::string & DeviceType, const std::string &Locale );
             bool FindFirmwareOptions(std::string  & SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);

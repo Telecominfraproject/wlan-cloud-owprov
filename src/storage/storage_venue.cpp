@@ -55,7 +55,7 @@ namespace OpenWifi {
     VenueDB::VenueDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "venues", VenueDB_Fields, VenueDB_Indexes, P, L, "ven") {}
 
-    bool VenueDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool VenueDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         to = Version();
         std::vector<std::string>    Script{
                 "alter table " + TableName_ + " add column variables text",

@@ -73,7 +73,7 @@ namespace OpenWifi {
             std::string         Description_;
             std::string         RegisteredName_;
             ParametersVec       Parameters_;
-            bool                Parallel_=true;
+            [[maybe_unused]] bool Parallel_=true;
     };
 
     class JobRegistry {

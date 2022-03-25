@@ -45,7 +45,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    bool ConfigurationDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool ConfigurationDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
             "alter table " + TableName_ + " add column subscriberOnly BOOLEAN;",
             "alter table " + TableName_ + " add column entity TEXT;",

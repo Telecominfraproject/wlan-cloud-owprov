@@ -35,12 +35,14 @@ namespace OpenWifi {
     class TagsDictionaryDB : public ORM::DB<TagsDictionaryRecordType, TagsDictionary> {
         public:
             TagsDictionaryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~TagsDictionaryDB() {};
         private:
     };
 
     class TagsObjectDB : public ORM::DB<TagsObjectRecordType, TagsObject> {
         public:
             TagsObjectDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+            virtual ~TagsObjectDB() {};
         private:
     };
 }

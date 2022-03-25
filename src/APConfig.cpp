@@ -37,7 +37,7 @@ namespace OpenWifi {
         return false;
     }
 
-    static void ShowJSON(const char *S, const Poco::JSON::Object::Ptr &Obj) {
+    static void ShowJSON([[maybe_unused]] const char *S, [[maybe_unused]] const Poco::JSON::Object::Ptr &Obj) {
         /*
         std::stringstream O;
         Poco::JSON::Stringifier::stringify(Obj,O);
@@ -286,7 +286,7 @@ namespace OpenWifi {
                         } else {
                             // we need to insert after everything bigger or equal
                             auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
-                                                         [](const VerboseElement &Elem, int Value) {
+                                                         [](const VerboseElement &Elem, uint64_t Value) {
                                 return Elem.element.weight>=Value; });
                             VerboseElement  VE{ .element = i, .info = Config.info};
                             Config_.insert(Hint,VE);

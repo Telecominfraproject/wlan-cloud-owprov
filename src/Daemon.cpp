@@ -48,7 +48,7 @@ namespace OpenWifi {
 		return instance_;
 	}
 
-	void Daemon::initialize() {
+	void Daemon::PostInitialization([[maybe_unused]] Poco::Util::Application &self) {
 	    if(MicroService::instance().ConfigGetBool("firmware.updater.upgrade",false)) {
 	        if(MicroService::instance().ConfigGetBool("firmware.updater.releaseonly",false)) {
 	            FWRules_ = ProvObjects::upgrade_release_only;
@@ -69,10 +69,6 @@ namespace OpenWifi {
             }
         }
     }
-
-    void MicroServicePostInitialization() {
-        Daemon()->initialize();
-	}
 }
 
 int main(int argc, char **argv) {

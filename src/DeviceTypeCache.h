@@ -31,7 +31,7 @@ namespace OpenWifi {
             Timer_.stop();
         }
 
-        inline void onTimer(Poco::Timer & timer) {
+        inline void onTimer([[maybe_unused]] Poco::Timer & timer) {
             UpdateDeviceTypes();
         }
 

@@ -34,7 +34,7 @@ namespace OpenWifi {
     MapDB::MapDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
     DB(T, "maps", MapsDB_Fields, MapsDB_Indexes, P, L, "map") {}
 
-    bool MapDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool MapDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
             "alter table " + TableName_ + " add column managementPolicy text;",
             "alter table " + TableName_ + " add column entity text;",
@@ -57,7 +57,7 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<6>());
     Out.data = In.get<7>();
     Out.creator = In.get<8>();
-    Out.visibility = OpenWifi::ProvObjects::visibility_from_string(In.get<9>());
+    Out.visibility = In.get<9>();
     Out.access = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::ObjectACLList>(In.get<10>());
     Out.entity = In.get<11>();
     Out.managementPolicy = In.get<12>();
@@ -74,7 +74,7 @@ template<> void ORM::DB<    OpenWifi::MapDBRecordType, OpenWifi::ProvObjects::Ma
     Out.set<6>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<7>(In.data);
     Out.set<8>(In.creator);
-    Out.set<9>(OpenWifi::ProvObjects::to_string(In.visibility));
+    Out.set<9>(In.visibility);
     Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.access));
     Out.set<11>(In.entity);
     Out.set<12>(In.managementPolicy);

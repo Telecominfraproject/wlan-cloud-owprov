@@ -55,7 +55,7 @@ namespace OpenWifi {
         CheckForRoot();
     }
 
-    bool EntityDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool EntityDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         to = Version();
         std::vector<std::string>    Script{
                 "alter table " + TableName_ + " add column variables text",

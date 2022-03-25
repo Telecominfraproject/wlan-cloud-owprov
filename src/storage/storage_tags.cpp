@@ -14,7 +14,7 @@ namespace OpenWifi {
         // object info
         ORM::Field{"entity",ORM::FieldType::FT_TEXT, 64},
         ORM::Field{"id",ORM::FieldType::FT_INT, 0,true},
-        ORM::Field{"name",ORM::FieldType::FT_TEXT, 32, }
+        ORM::Field{"name",ORM::FieldType::FT_TEXT, 32}
     };
 
     static  ORM::IndexVec    TagsDictionaryDB_Indexes{

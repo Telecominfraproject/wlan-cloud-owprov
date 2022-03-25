@@ -17,17 +17,17 @@ namespace OpenWifi {
 
     class MyParallelSocketReactor {
     public:
-        explicit MyParallelSocketReactor(unsigned NumReactors=8) :
+        explicit MyParallelSocketReactor(uint32_t NumReactors=8) :
             NumReactors_(NumReactors)
         {
             Reactors_ = new Poco::Net::SocketReactor[NumReactors_];
-            for(int i=0;i<NumReactors_;i++) {
+            for(uint32_t i=0;i<NumReactors_;i++) {
                 ReactorPool_.start(Reactors_[i]);
             }
         }
 
         ~MyParallelSocketReactor() {
-            for(int i=0;i<NumReactors_;i++) {
+            for(uint32_t i=0;i<NumReactors_;i++) {
                 Reactors_[i].stop();
             }
             ReactorPool_.stopAll();
@@ -40,7 +40,7 @@ namespace OpenWifi {
         }
 
     private:
-        unsigned                   NumReactors_;
+        uint32_t                   NumReactors_;
         Poco::Net::SocketReactor   * Reactors_;
         Poco::ThreadPool           ReactorPool_;
     };

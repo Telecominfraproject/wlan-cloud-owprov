@@ -19,7 +19,7 @@ namespace OpenWifi {
         Logger().notice("Stopping.");
     }
 
-    void FileDownloader::onTimer(Poco::Timer &timer) {
+    void FileDownloader::onTimer([[maybe_unused]] Poco::Timer &timer) {
         const static std::vector<std::pair<std::string,std::string>> Files
             {
                 {"https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json", "ucentral.schema.json" },

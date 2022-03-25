@@ -27,6 +27,7 @@ namespace OpenWifi {
     class VariablesDB : public ORM::DB<VariablesDBRecordType, ProvObjects::VariableBlock> {
     public:
         explicit VariablesDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept;
+        virtual ~VariablesDB() {};
     private:
         bool Upgrade(uint32_t from, uint32_t &to) override;
     };

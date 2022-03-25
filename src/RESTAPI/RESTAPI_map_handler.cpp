@@ -45,7 +45,7 @@ namespace OpenWifi{
         return OK();
     }
 
-    static auto ValidateVisibility(const std::string &V) {
+    static bool ValidateVisibility(const std::string &V) {
         return (V=="private" || V=="public" || V=="select");
     }
 
@@ -63,6 +63,10 @@ namespace OpenWifi{
 
         if(!CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
+        }
+
+        if(!ValidateVisibility(NewObject.visibility)) {
+            return BadRequest("Invalid visibility attribute");
         }
 
         if(RawObject->has("entity")) {
@@ -108,10 +112,10 @@ namespace OpenWifi{
         }
 
         if(Existing.creator != UserInfo_.userinfo.id) {
-            if(Existing.visibility == ProvObjects::PRIVATE) {
+            if(Existing.visibility == "private") {
                 return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
             }
-            if(Existing.visibility == ProvObjects::SELECT) {
+            if(Existing.visibility == "select") {
                 for(const auto &i:Existing.access.list) {
                     for(const auto &j:i.users.list) {
                         if(j==UserInfo_.userinfo.id) {

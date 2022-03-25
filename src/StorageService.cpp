@@ -66,11 +66,11 @@ namespace OpenWifi {
         ExpandFunc_[ConfigurationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return ConfigurationDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[LocationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return LocationDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[RolesDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return RolesDB_->GetNameAndDescription(F,V, Name, Description); };
-        ExpandFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsDictionaryDB_->Exists(F,V); };
-        ExpandFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return TagsObjectDB_->Exists(F,V);; };
-        ExpandFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return MapDB_->Exists(F,V);; };
-        ExpandFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SignupDB_->Exists(F,V);; };
-        ExpandFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return VariablesDB_->Exists(F,V);; };
+        ExpandFunc_[TagsDictionaryDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return TagsDictionaryDB_->Exists(F,V); };
+        ExpandFunc_[TagsObjectDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return TagsObjectDB_->Exists(F,V);; };
+        ExpandFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return MapDB_->Exists(F,V);; };
+        ExpandFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return SignupDB_->Exists(F,V);; };
+        ExpandFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return VariablesDB_->Exists(F,V);; };
 
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
@@ -82,7 +82,7 @@ namespace OpenWifi {
         return 0;
     }
 
-    void Storage::onTimer(Poco::Timer &timer) {
+    void Storage::onTimer([[maybe_unused]] Poco::Timer &timer) {
     }
 
     void Storage::Stop() {

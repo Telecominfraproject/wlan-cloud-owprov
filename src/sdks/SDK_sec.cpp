@@ -7,7 +7,7 @@
 namespace OpenWifi::SDK::Sec {
 
     namespace User {
-        bool Exists(RESTAPIHandler *client, const Types::UUID_t & Id) {
+        bool Exists([[maybe_unused]] RESTAPIHandler *client, const Types::UUID_t & Id) {
             OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
                                          "/api/v1/user/" + Id,
                                          {},
@@ -21,7 +21,7 @@ namespace OpenWifi::SDK::Sec {
             return false;
         }
 
-        bool Get(RESTAPIHandler *client, const Types::UUID_t & Id, SecurityObjects::UserInfo & UserInfo) {
+        bool Get([[maybe_unused]] RESTAPIHandler *client, const Types::UUID_t & Id, SecurityObjects::UserInfo & UserInfo) {
             OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
                                          "/api/v1/user/" + Id,
                                          {},
@@ -37,7 +37,7 @@ namespace OpenWifi::SDK::Sec {
     }
 
     namespace Subscriber {
-        bool Exists(RESTAPIHandler *client, const Types::UUID_t & Id) {
+        bool Exists([[maybe_unused]] RESTAPIHandler *client, const Types::UUID_t & Id) {
             OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
                                          "/api/v1/subuser/" + Id,
                                          {},
@@ -51,7 +51,7 @@ namespace OpenWifi::SDK::Sec {
             return false;
         }
 
-        bool Get(RESTAPIHandler *client, const Types::UUID_t & Id, SecurityObjects::UserInfo & UserInfo) {
+        bool Get([[maybe_unused]] RESTAPIHandler *client, const Types::UUID_t & Id, SecurityObjects::UserInfo & UserInfo) {
             OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
                                          "/api/v1/subuser/" + Id,
                                          {},
@@ -65,7 +65,7 @@ namespace OpenWifi::SDK::Sec {
             return false;
         }
 
-        bool Delete(RESTAPIHandler *client, const Types::UUID_t & Id) {
+        bool Delete([[maybe_unused]] RESTAPIHandler *client, const Types::UUID_t & Id) {
             OpenAPIRequestDelete	Req(    uSERVICE_SECURITY,
                                          "/api/v1/subuser/" + Id,
                                          {},

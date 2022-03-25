@@ -42,7 +42,7 @@ namespace OpenWifi {
             DB(T, "variables2", VariablesDB_Fields, VariablesDB_Indexes, P, L, "var") {
     }
 
-    bool VariablesDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool VariablesDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
 //            "alter table " + TableName_ + " add column configurations TEXT;" ,
 //            "alter table " + TableName_ + " add column managementPolicy TEXT;"

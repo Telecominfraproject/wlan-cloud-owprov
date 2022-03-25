@@ -8,7 +8,7 @@
 
 namespace OpenWifi::SDK::GW {
     namespace Device {
-        void Reboot(RESTAPIHandler *client, const std::string & Mac, uint64_t When) {
+        void Reboot(RESTAPIHandler *client, const std::string & Mac, [[maybe_unused]] uint64_t When) {
             std::string         EndPoint = "/api/v1/device/" + Mac + "/reboot";
             Poco::JSON::Object  ObjRequest;
 
@@ -40,7 +40,7 @@ namespace OpenWifi::SDK::GW {
             PerformCommand(client,"factory",EndPoint, ObjRequest);
         }
 
-        void Upgrade(RESTAPIHandler *client, const std::string & Mac, uint64_t When, const std::string & ImageName, bool KeepRedirector) {
+        void Upgrade(RESTAPIHandler *client, const std::string & Mac, uint64_t When, const std::string & ImageName, [[maybe_unused]] bool KeepRedirector) {
             std::string         EndPoint = "/api/v1/device/" + Mac + "/upgrade";
             Poco::JSON::Object  ObjRequest;
 

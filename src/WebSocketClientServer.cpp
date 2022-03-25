@@ -32,7 +32,7 @@ namespace OpenWifi {
         }
     };
 
-    void WebSocketClient::OnSocketError(const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
+    void WebSocketClient::OnSocketError([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
         delete this;
     }
 
@@ -45,7 +45,7 @@ namespace OpenWifi {
         return false;
     }
 
-    void WebSocketClient::OnSocketReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification> &pNf) {
+    void WebSocketClient::OnSocketReadable([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ReadableNotification> &pNf) {
         int flags;
         int n;
         bool Done=false;
@@ -96,7 +96,7 @@ namespace OpenWifi {
                         std::string Answer;
                         Process(Obj, Answer, Done );
                         if (!Answer.empty())
-                            WS_->sendFrame(Answer.c_str(), Answer.size());
+                            WS_->sendFrame(Answer.c_str(), (int) Answer.size());
                         else {
                             WS_->sendFrame("{}", 2);
                         }
@@ -117,7 +117,7 @@ namespace OpenWifi {
         }
     }
 
-    void WebSocketClient::OnSocketShutdown(const Poco::AutoPtr<Poco::Net::ShutdownNotification> &pNf) {
+    void WebSocketClient::OnSocketShutdown([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ShutdownNotification> &pNf) {
         delete this;
     }
 
@@ -127,9 +127,6 @@ namespace OpenWifi {
                 auto Command = O->get("command").toString();
                 if (Command == "serial_number_search" && O->has("serial_prefix")) {
                     auto Prefix = O->get("serial_prefix").toString();
-                    uint64_t HowMany = 32;
-                    if (O->has("howMany"))
-                        HowMany = O->get("howMany");
                     Logger().information(Poco::format("serial_number_search: %s", Prefix));
                     if (!Prefix.empty() && Prefix.length() < 13) {
                         std::vector<uint64_t> Numbers;

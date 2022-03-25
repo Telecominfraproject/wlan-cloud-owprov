@@ -29,6 +29,7 @@ namespace OpenWifi {
     class PolicyDB : public ORM::DB<PolicyDBRecordType, ProvObjects::ManagementPolicy> {
     public:
         PolicyDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~PolicyDB() {};
     private:
         bool Upgrade(uint32_t from, uint32_t &to) override;
     };

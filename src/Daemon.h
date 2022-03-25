@@ -37,12 +37,13 @@ namespace OpenWifi {
 							const SubSystemVec & SubSystems) :
 				MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
-			void initialize();
 			static Daemon *instance();
 			inline OpenWifi::ProvisioningDashboard & GetDashboard() { return DB_; }
 			Poco::Logger & Log() { return Poco::Logger::get(AppName()); }
 			ProvObjects::FIRMWARE_UPGRADE_RULES FirmwareRules() const { return FWRules_; }
             inline const std::string & AssetDir() { return AssetDir_; }
+            void PostInitialization(Poco::Util::Application &self);
+
 	  	private:
 			static Daemon 				        *instance_;
 			OpenWifi::ProvisioningDashboard		DB_{};
@@ -51,5 +52,7 @@ namespace OpenWifi {
     };
 
 	inline Daemon * Daemon() { return Daemon::instance(); }
-}
+    inline void DaemonPostInitialization(Poco::Util::Application &self) {
+        Daemon()->PostInitialization(self);
+    }}
 

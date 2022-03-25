@@ -30,6 +30,7 @@ namespace OpenWifi {
     class SignupDB : public ORM::DB<SignupDBRecordType, ProvObjects::SignupEntry> {
     public:
         explicit SignupDB(OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept;
+        virtual ~SignupDB() {};
         bool GetIncompleteSignups( SignupDB::RecordVec & Signups );
         void RemoveIncompleteSignups();
     private:

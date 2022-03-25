@@ -38,6 +38,7 @@ namespace OpenWifi {
     class LocationDB : public ORM::DB<LocationDBRecordType, ProvObjects::Location> {
     public:
         LocationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~LocationDB() {};
     private:
     };
 }

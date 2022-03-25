@@ -34,6 +34,7 @@ namespace OpenWifi {
     class JobDB : public ORM::DB<JobDBRecordType, JobRecord> {
     public:
         JobDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~JobDB() {};
     private:
     };
 }

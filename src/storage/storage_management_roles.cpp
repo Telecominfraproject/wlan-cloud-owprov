@@ -40,7 +40,7 @@ namespace OpenWifi {
     ManagementRoleDB::ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "roles", RolesDB_Fields, RolesDB_Indexes, P, L, "rol") {}
 
-    bool ManagementRoleDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool ManagementRoleDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
                 "alter table " + TableName_ + " add column entity text;",
                 "alter table " + TableName_ + " add column venue text;"

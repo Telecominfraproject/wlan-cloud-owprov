@@ -38,7 +38,7 @@ namespace OpenWifi {
     PolicyDB::PolicyDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "policies", PolicyDB_Fields, PolicyDB_Indexes, P, L, "pol") {}
 
-    bool PolicyDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool PolicyDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
                 "alter table " + TableName_ + " add column entity text;",
                 "alter table " + TableName_ + " add column venue text;"

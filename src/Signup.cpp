@@ -35,7 +35,7 @@ namespace OpenWifi {
         Worker_.join();
     }
 
-    void Signup::onTimer(Poco::Timer &timer) {
+    void Signup::onTimer([[maybe_unused]] Poco::Timer &timer) {
         std::lock_guard     G(Mutex_);
         StorageService()->SignupDB().RemoveIncompleteSignups();
     }

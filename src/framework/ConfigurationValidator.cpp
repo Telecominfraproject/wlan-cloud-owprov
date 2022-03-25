@@ -2609,13 +2609,12 @@ namespace OpenWifi {
                 return false;
             } catch(...) {
                 std::cout << "4 Some kind of bullshit exception..." << std::endl;
-                return false;
             }
         }
         return true;
     }
 
-    void ConfigurationValidator::reinitialize(Poco::Util::Application &self) {
+    void ConfigurationValidator::reinitialize([[maybe_unused]] Poco::Util::Application &self) {
         Logger().information("Reinitializing.");
         Working_ = Initialized_ = false;
         Init();

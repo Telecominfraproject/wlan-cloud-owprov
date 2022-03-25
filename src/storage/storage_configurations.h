@@ -39,6 +39,7 @@ namespace OpenWifi {
         ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         bool GetListOfAffectedDevices(const Types::UUID_t & ConfigUUID, Types::UUIDvec_t & DeviceSerialNumbers );
         bool Upgrade(uint32_t from, uint32_t &to) override;
+        virtual ~ConfigurationDB() {};
     private:
     };
 }

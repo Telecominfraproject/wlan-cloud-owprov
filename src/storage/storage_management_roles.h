@@ -30,6 +30,7 @@ namespace OpenWifi {
     class ManagementRoleDB : public ORM::DB<ManagementRoleDBRecordType, ProvObjects::ManagementRole> {
         public:
             ManagementRoleDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+            virtual ~ManagementRoleDB() {};
         private:
         bool Upgrade(uint32_t from, uint32_t &to) override;
     };

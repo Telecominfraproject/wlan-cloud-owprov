@@ -40,6 +40,7 @@ namespace OpenWifi {
     class ContactDB : public ORM::DB<ContactDBRecordType, ProvObjects::Contact> {
         public:
             ContactDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+            virtual ~ContactDB() {};
         private:
     };
 }

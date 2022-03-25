@@ -57,7 +57,7 @@ namespace OpenWifi {
              ORM::Indextype::ASC} } }
     };
 
-    bool InventoryDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool InventoryDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         to = Version();
         std::vector<std::string>    Script{
             "alter table " + TableName_ + " add column state text" ,
