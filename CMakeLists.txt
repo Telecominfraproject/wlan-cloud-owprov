@@ -44,7 +44,6 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost      REQUIRED system)
 find_package(OpenSSL    REQUIRED)
 find_package(AWSSDK     REQUIRED COMPONENTS s3)
 find_package(Poco       REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite)
@@ -144,9 +143,10 @@ add_executable(owprov
         src/FileDownloader.cpp src/FileDownloader.h)
 
 target_link_libraries(owprov PUBLIC
-        ${Poco_LIBRARIES} ${MySQL_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES}
+        ${Poco_LIBRARIES}
+        ${MySQL_LIBRARIES}
+        ${ZLIB_LIBRARIES}
+        ${AWSSDK_LINK_LIBRARIES}
         CppKafka::cppkafka
         fmt::fmt
         nlohmann_json_schema_validator)
