@@ -59,8 +59,7 @@ namespace OpenWifi {
                     Title_(std::move(Title)),
                     Description_(std::move(Description)),
                     RegisteredName_(std::move(RegisteredName)),
-                    Parameters_(std::move(Parameters)),
-                    Parallel_(Parallel)
+                    Parameters_(std::move(Parameters))
                 {
                     UUID_ = MicroService::instance().CreateUUID();
                 }
@@ -73,7 +72,6 @@ namespace OpenWifi {
             std::string         Description_;
             std::string         RegisteredName_;
             ParametersVec       Parameters_;
-            [[maybe_unused]] bool Parallel_=true;
     };
 
     class JobRegistry {

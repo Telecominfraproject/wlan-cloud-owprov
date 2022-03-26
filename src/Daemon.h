@@ -21,11 +21,11 @@
 
 namespace OpenWifi {
 
-	static const char * vDAEMON_PROPERTIES_FILENAME = "owprov.properties";
-	static const char * vDAEMON_ROOT_ENV_VAR = "OWPROV_ROOT";
-	static const char * vDAEMON_CONFIG_ENV_VAR = "OWPROV_CONFIG";
-	static const char * vDAEMON_APP_NAME = uSERVICE_PROVISIONING.c_str() ;
-	static const uint64_t vDAEMON_BUS_TIMER = 10000;
+	[[maybe_unused]] static const char * vDAEMON_PROPERTIES_FILENAME = "owprov.properties";
+    [[maybe_unused]] static const char * vDAEMON_ROOT_ENV_VAR = "OWPROV_ROOT";
+    [[maybe_unused]] static const char * vDAEMON_CONFIG_ENV_VAR = "OWPROV_CONFIG";
+    [[maybe_unused]] static const char * vDAEMON_APP_NAME = uSERVICE_PROVISIONING.c_str() ;
+    [[maybe_unused]] static const uint64_t vDAEMON_BUS_TIMER = 10000;
 
     class Daemon : public MicroService {
 		public:

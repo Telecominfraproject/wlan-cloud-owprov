@@ -37,7 +37,6 @@ namespace OpenWifi {
 
 	  private:
 		int                         DeviceTypeIndex_=0;
-		[[maybe_unused]] uint64_t 					LastUpdate_ = 0 ;
 		SerialCacheContent	        SNs_;
 		std::map<std::string,int>   DeviceTypeDictionary_;
 
