@@ -54,5 +54,6 @@ namespace OpenWifi {
 	inline Daemon * Daemon() { return Daemon::instance(); }
     inline void DaemonPostInitialization(Poco::Util::Application &self) {
         Daemon()->PostInitialization(self);
-    }}
+    }
+}
 
