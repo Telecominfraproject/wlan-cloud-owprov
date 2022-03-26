@@ -55,7 +55,7 @@ namespace OpenWifi {
                          std::string Description,
                          std::string RegisteredName,
                          ParametersVec Parameters,
-                         bool Parallel=true) :
+                         [[maybe_unused]] bool Parallel=true) :
                     Title_(std::move(Title)),
                     Description_(std::move(Description)),
                     RegisteredName_(std::move(RegisteredName)),
