@@ -39,13 +39,7 @@ endif()
 
 add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT)
 
-set(BUILD_SHARED_LIBS 1)
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-
 find_package(OpenSSL    REQUIRED)
-find_package(AWSSDK     REQUIRED COMPONENTS s3)
 find_package(Poco       REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite)
 find_package(nlohmann_json  REQUIRED)
 find_package(nlohmann_json_schema_validator REQUIRED)
@@ -148,7 +142,6 @@ target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}
         ${MySQL_LIBRARIES}
         ${ZLIB_LIBRARIES}
-        ${AWSSDK_LINK_LIBRARIES}
         CppKafka::cppkafka
         fmt::fmt
         nlohmann_json_schema_validator)
