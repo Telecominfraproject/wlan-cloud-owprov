@@ -268,7 +268,7 @@ namespace OpenWifi::ProvObjects {
     typedef std::vector<DeviceConfigurationElement> DeviceConfigurationElementVec;
 
     struct DeviceConfiguration {
-    ObjectInfo                          info;
+        ObjectInfo                      info;
         Types::UUID_t                   managementPolicy;
         Types::StringVec                deviceTypes;
         DeviceConfigurationElementVec   configuration;
