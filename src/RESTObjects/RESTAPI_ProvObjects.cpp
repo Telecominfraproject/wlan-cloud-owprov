@@ -649,6 +649,20 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void SerialNumberList::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json( Obj,"serialNumbers",serialNumbers);
+    }
+
+    bool SerialNumberList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json( Obj,"serialNumbers",serialNumbers);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
     void MapList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json( Obj,"list",list);
     }

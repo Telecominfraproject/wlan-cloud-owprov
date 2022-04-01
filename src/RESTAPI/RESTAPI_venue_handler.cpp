@@ -200,6 +200,15 @@ namespace OpenWifi{
             return NotFound();
         }
 
+        auto updateAllDevices = GetBoolParameter("updateAllDevices");
+        if(updateAllDevices) {
+            ProvObjects::SerialNumberList   SNL;
+
+            Poco::JSON::Object  Answer;
+            SNL.to_json(Answer);
+            return ReturnObject(Answer);
+        }
+
         auto RawObject = ParseStream();
         ProvObjects::Venue NewObject;
         if (!NewObject.from_json(RawObject)) {

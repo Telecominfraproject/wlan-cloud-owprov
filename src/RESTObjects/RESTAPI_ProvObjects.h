@@ -33,6 +33,13 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct SerialNumberList {
+        Types::UUIDvec_t    serialNumbers;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
     struct ManagementPolicyEntry {
         Types::UUIDvec_t users;
         Types::UUIDvec_t resources;
