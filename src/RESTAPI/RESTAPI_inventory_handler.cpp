@@ -17,8 +17,6 @@
 #include "SerialNumberCache.h"
 #include "DeviceTypeCache.h"
 
-#define __DBG__ std::cout << __LINE__ << std::endl;
-
 namespace OpenWifi{
 
     void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
@@ -38,41 +36,27 @@ namespace OpenWifi{
     void RESTAPI_inventory_handler::DoGet() {
 
         ProvObjects::InventoryTag   Existing;
-        __DBG__
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-        __DBG__
         Logger().debug(Poco::format("%s: Retrieving inventory information.",SerialNumber));
-        __DBG__
         if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
             return NotFound();
         }
-        __DBG__
         Logger().debug(Poco::format("%s,%s: Retrieving inventory information.", Existing.serialNumber, Existing.info.id ));
 
-        __DBG__
         Poco::JSON::Object  Answer;
         std::string Arg;
-        __DBG__
         if(HasParameter("config",Arg) && Arg=="true") {
-            __DBG__
             bool Explain = (HasParameter("explain",Arg) && Arg == "true");
-            __DBG__
             APConfig    Device(SerialNumber,Existing.deviceType,Logger(), Explain);
 
-            __DBG__
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             if(Device.Get(Configuration)) {
-                __DBG__
                 Answer.set("config", Configuration);
                 if(Explain)
-                    __DBG__
                     Answer.set("explanation", Device.Explanation());
             } else {
-                __DBG__
                 Answer.set("config","none");
-                __DBG__
             }
-            __DBG__
             return ReturnObject(Answer);
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
             ProvObjects::FIRMWARE_UPGRADE_RULES Rules;
@@ -245,9 +229,6 @@ namespace OpenWifi{
         }
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
-
-
-#define __DBG__ std::cout << __LINE__ << std::endl;
 
     void RESTAPI_inventory_handler::DoPut() {
 

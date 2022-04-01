@@ -37,7 +37,7 @@ namespace OpenWifi {
 
         }
 
-        std::string Start() {
+        inline std::string Start() {
             JobId_ = MicroService::CreateUUID();
             Worker_.start(*this);
             return JobId_;
@@ -53,7 +53,7 @@ namespace OpenWifi {
 
         inline Poco::Logger & Logger() { return Logger_; }
 
-        void run() final {
+        inline void run() final {
 
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
@@ -68,7 +68,6 @@ namespace OpenWifi {
 
                     if(StorageService()->InventoryDB().GetRecord("id",uuid,Device)) {
                         Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
-                        std::cout << "Updating device: " << Device.serialNumber << std::endl;
                         auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                         auto Configuration = Poco::makeShared<Poco::JSON::Object>();
                         Poco::JSON::Object ErrorsObj, WarningsObj;
@@ -81,7 +80,6 @@ namespace OpenWifi {
                             Logger().debug(fmt::format("{}: Sending configuration push.",Device.serialNumber));
                             if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
                                 Logger().debug(fmt::format("{}: Sending configuration pushed.",Device.serialNumber));
-                                std::cout << "Updated: " << Device.serialNumber << std::endl;
                                 GetRejectedLines(Response, Results.warnings);
                                 Results.errorCode = 0;
                                 Logger().information(fmt::format("Device {} updated.", Device.serialNumber));
