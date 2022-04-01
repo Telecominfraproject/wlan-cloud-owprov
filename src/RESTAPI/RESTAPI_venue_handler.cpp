@@ -12,6 +12,7 @@
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
+#include "Tasks/VenueConfigUpdater.h"
 
 namespace OpenWifi{
 
@@ -200,13 +201,26 @@ namespace OpenWifi{
             return NotFound();
         }
 
+        auto testUpdateOnly = GetBoolParameter("testUpdateOnly");
+        if(testUpdateOnly) {
+            ProvObjects::SerialNumberList   SNL;
+
+            Poco::JSON::Object  Answer;
+            SNL.serialNumbers = Existing.devices;
+            SNL.to_json(Answer);
+            return ReturnObject(Answer);
+        }
+
         auto updateAllDevices = GetBoolParameter("updateAllDevices");
         if(updateAllDevices) {
             ProvObjects::SerialNumberList   SNL;
 
             Poco::JSON::Object  Answer;
-
             SNL.serialNumbers = Existing.devices;
+
+            auto Task = new VenueConfigUpdater(UUID,UserInfo_.userinfo,0,Logger());
+            Task->Start();
+
             SNL.to_json(Answer);
             return ReturnObject(Answer);
         }

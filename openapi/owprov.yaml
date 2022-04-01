@@ -2067,6 +2067,12 @@ paths:
             type: boolean
             default: false
           required: false
+        - in: query
+          name: testUpdateOnly
+          schema:
+            type: boolean
+            default: false
+          required: false
       requestBody:
         description: Information used to modify the new venue
         content:
