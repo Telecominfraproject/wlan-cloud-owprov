@@ -46,7 +46,11 @@ namespace OpenWifi {
             ProvObjects::Venue  Venue;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
                 for(const Types::UUID_t &uuid:Venue.devices) {
-                    std::cout << "Updating device: " << uuid << std::endl;
+                    ProvObjects::InventoryTag   Device;
+
+                    if(StorageService()->InventoryDB().GetRecord("id",uuid,Device)) {
+                        std::cout << "Updating device: " << Device.serialNumber << std::endl;
+                    }
                 }
             } else {
                 Logger().warning(fmt::format("Venue {} no longer exists.",VenueUUID_));
