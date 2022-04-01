@@ -205,6 +205,8 @@ namespace OpenWifi{
             ProvObjects::SerialNumberList   SNL;
 
             Poco::JSON::Object  Answer;
+
+            SNL.serialNumbers = Existing.devices;
             SNL.to_json(Answer);
             return ReturnObject(Answer);
         }
