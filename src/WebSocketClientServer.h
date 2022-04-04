@@ -12,6 +12,7 @@
 #include "Poco/Net/SocketNotification.h"
 
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {
 
@@ -60,19 +61,28 @@ namespace OpenWifi {
             inline MyParallelSocketReactor & ReactorPool() { return *ReactorPool_; }
             inline bool Register( WebSocketClient * Client, const std::string &Id) {
                 std::lock_guard G(Mutex_);
-                Clients_[Id] = Client;
+                Clients_[Id] = std::make_pair(Client,"");
                 return true;
             }
 
             inline void UnRegister(const std::string &Id) {
                 std::lock_guard G(Mutex_);
                 Clients_.erase(Id);
+            }
 
+            inline void SetUser(const std::string &Id, const std::string &UserId) {
+                std::lock_guard G(Mutex_);
+
+                auto it=Clients_.find(Id);
+                if(it!=Clients_.end()) {
+                    Clients_[Id] = std::make_pair(it->second.first,UserId);
+                }
             }
 
             inline bool GeoCodeEnabled() const { return GeoCodeEnabled_; }
             [[nodiscard]] inline std::string GoogleApiKey() const { return GoogleApiKey_; }
             [[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
+            [[nodiscard]] bool SendUserNotification(const std::string &userName, const ProvObjects::WebSocketNotification & Notification);
 
         private:
             std::atomic_bool                            Running_=false;
@@ -80,7 +90,9 @@ namespace OpenWifi {
             std::unique_ptr<MyParallelSocketReactor>    ReactorPool_;
             bool                                        GeoCodeEnabled_=false;
             std::string                                 GoogleApiKey_;
-            std::map<std::string,WebSocketClient *>     Clients_;
+            std::map<std::string, std::pair<WebSocketClient *,std::string>>     Clients_;
+
+            [[nodiscard]] bool SendToUser(const std::string &userName, const std::string &Payload);
 
             WebSocketClientServer() noexcept:
                 SubSystemServer("WebSocketClientServer", "WSCLNT-SVR", "websocketclients")

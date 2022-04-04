@@ -32,6 +32,16 @@ namespace OpenWifi {
         }
     };
 
+    bool WebSocketClientServer::SendUserNotification(const std::string &userName,
+                                                     const ProvObjects::WebSocketNotification &Notification) {
+
+        Poco::JSON::Object  Payload;
+        Notification.to_json(Payload);
+        std::ostringstream OO;
+        Payload.stringify(OO);
+        return SendToUser(userName,OO.str());
+    }
+
     void WebSocketClient::OnSocketError([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
         delete this;
     }
@@ -41,8 +51,21 @@ namespace OpenWifi {
 
         auto It = Clients_.find(Id);
         if(It!=Clients_.end())
-            return It->second->Send(Payload);
+            return It->second.first->Send(Payload);
         return false;
+    }
+
+    bool WebSocketClientServer::SendToUser(const std::string &UserName, const std::string &Payload) {
+        std::lock_guard G(Mutex_);
+        uint64_t Sent=0;
+
+        for(const auto &client:Clients_) {
+            if(client.second.second == UserName) {
+                 if(client.second.first->Send(Payload))
+                     Sent++;
+            }
+        }
+        return Sent>0;
     }
 
     void WebSocketClient::OnSocketReadable([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ReadableNotification> &pNf) {
@@ -82,6 +105,7 @@ namespace OpenWifi {
                         Authenticated_=true;
                         std::string S{"Welcome! Bienvenue! Bienvenidos!"};
                         WS_->sendFrame(S.c_str(),S.size());
+                        WebSocketClientServer()->SetUser(Id_,UserInfo_.userinfo.email);
                     } else {
                         std::string S{"Invalid token. Closing connection."};
                         WS_->sendFrame(S.c_str(),S.size());

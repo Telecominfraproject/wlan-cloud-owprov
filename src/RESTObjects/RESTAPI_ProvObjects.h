@@ -498,6 +498,26 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct WebSocketNotificationContent {
+        std::string                 title,
+                type;
+        std::vector<std::string>    success,
+                errors,
+                warnings;
+        uint64_t                    timeStamp=std::time(nullptr);
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct WebSocketNotification {
+        inline static uint64_t          xid=1;
+        uint64_t                        notification_id=++xid;
+        WebSocketNotificationContent    content;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
 
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);
     bool CreateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);

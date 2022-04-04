@@ -8,6 +8,7 @@
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
+#include "WebSocketClientServer.h"
 
 namespace OpenWifi {
 
@@ -99,8 +100,21 @@ namespace OpenWifi {
             } else {
                 Logger().warning(fmt::format("Venue {} no longer exists.",VenueUUID_));
             }
-            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations.",
-                                             JobId_, Updated ,Failed, BadConfigs));
+
+            ProvObjects::WebSocketNotification N;
+
+            N.content.title = "Bulk Configuration Updater";
+            N.content.type = "configuration_update";
+            N.content.success.push_back(fmt::format("Successfully updated {} devices.",Updated));
+            if(Failed>0)
+                N.content.warnings.push_back(fmt::format("Could not update {} devices.",Failed));
+            if(BadConfigs>0)
+                N.content.errors.push_back(fmt::format("Bad configuration for {} devices.",BadConfigs));
+
+            auto Sent = WebSocketClientServer()->SendUserNotification(UI_.email,N);
+
+            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations. Notification was send={}",
+                                             JobId_, Updated ,Failed, BadConfigs, Sent));
             delete this;
         }
     };

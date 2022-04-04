@@ -857,5 +857,45 @@ namespace OpenWifi::ProvObjects {
         return true;
     }
 
+    void WebSocketNotificationContent::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj,"title",title);
+        RESTAPI_utils::field_to_json(Obj,"type",type);
+        RESTAPI_utils::field_to_json(Obj,"success",success);
+        RESTAPI_utils::field_to_json(Obj,"errors",errors);
+        RESTAPI_utils::field_to_json(Obj,"warnings",warnings);
+        RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
+    }
+
+    bool WebSocketNotificationContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json(Obj,"title",title);
+            RESTAPI_utils::field_from_json(Obj,"type",type);
+            RESTAPI_utils::field_from_json(Obj,"success",success);
+            RESTAPI_utils::field_from_json(Obj,"errors",errors);
+            RESTAPI_utils::field_from_json(Obj,"warnings",warnings);
+            RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void WebSocketNotification::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj,"notification_id",notification_id);
+        RESTAPI_utils::field_to_json(Obj,"content",content);
+    }
+
+    bool WebSocketNotification::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json(Obj,"notification_id",notification_id);
+            RESTAPI_utils::field_from_json(Obj,"content",content);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
 }
 
