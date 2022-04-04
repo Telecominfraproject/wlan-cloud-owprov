@@ -14,6 +14,8 @@
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "Tasks/VenueConfigUpdater.h"
 
+#include "Kafka_ProvUpdater.h"
+
 namespace OpenWifi{
 
     static Types::UUIDvec_t GetDevices(const ProvObjects::Venue &V, bool GetChildren) {
@@ -101,6 +103,9 @@ namespace OpenWifi{
         if(!Existing.entity.empty())
             StorageService()->EntityDB().DeleteVenue("id",Existing.entity,UUID);
         DB_.DeleteRecord("id",UUID);
+
+        UpdateKafkaProvisioningObject(ProvisioningOperation::removal,Existing);
+
         return OK();
     }
 
@@ -219,9 +224,10 @@ namespace OpenWifi{
             SNL.serialNumbers = Existing.devices;
 
             auto Task = new VenueConfigUpdater(UUID,UserInfo_.userinfo,0,Logger());
-            Task->Start();
+            auto JobId = Task->Start();
 
             SNL.to_json(Answer);
+            Answer.set("jobId",JobId);
             return ReturnObject(Answer);
         }
 
@@ -328,6 +334,7 @@ namespace OpenWifi{
         }
 
         if(StorageService()->VenueDB().UpdateRecord("id", UUID, Existing)) {
+            UpdateKafkaProvisioningObject(ProvisioningOperation::modification,Existing);
             MoveUsage(StorageService()->ContactDB(),DB_,MoveFromContacts, MoveToContacts, Existing.info.id);
             MoveUsage(StorageService()->LocationDB(),DB_,MoveFromLocation, MoveToLocation, Existing.info.id);
             MoveUsage(StorageService()->PolicyDB(),DB_,MoveFromPolicy,MoveToPolicy,Existing.info.id);
