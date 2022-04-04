@@ -124,7 +124,7 @@ namespace OpenWifi {
     void WebSocketClient::Process(const Poco::JSON::Object::Ptr &O, std::string &Result, bool &Done ) {
         try {
             if (O->has("command") && O->has("id")) {
-                auto id = O->get("id");
+                auto id = (uint64_t) O->get("id");
                 std::string Answer;
                 auto Command = O->get("command").toString();
                 if (Command == "serial_number_search" && O->has("serial_prefix")) {
