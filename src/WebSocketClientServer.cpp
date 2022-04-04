@@ -121,9 +121,11 @@ namespace OpenWifi {
         delete this;
     }
 
-    void WebSocketClient::Process(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done ) {
+    void WebSocketClient::Process(const Poco::JSON::Object::Ptr &O, std::string &Result, bool &Done ) {
         try {
-            if (O->has("command")) {
+            if (O->has("command") && O->has("id")) {
+                auto id = O->get("id");
+                std::string Answer;
                 auto Command = O->get("command").toString();
                 if (Command == "serial_number_search" && O->has("serial_prefix")) {
                     auto Prefix = O->get("serial_prefix").toString();
@@ -134,11 +136,10 @@ namespace OpenWifi {
                         Poco::JSON::Array A;
                         for (const auto &i : Numbers)
                             A.add(Utils::int_to_hex(i));
-                        Poco::JSON::Object AO;
-                        AO.set("serialNumbers", A);
-                        AO.set("command","serial_number_search");
+                        Poco::JSON::Object A0;
+                        A0.set("serialNumbers", A0);
                         std::ostringstream SS;
-                        Poco::JSON::Stringifier::stringify(AO, SS);
+                        Poco::JSON::Stringifier::stringify(A, SS);
                         Answer = SS.str();
                     }
                 } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "address_completion" && O->has("address")) {
@@ -150,6 +151,8 @@ namespace OpenWifi {
                 } else {
                     Answer = std::string{R"lit({ "error" : "invalid command" })lit"};
                 }
+
+                Result = fmt::format("{{ \"command_response_id\" : {} , \"response\" : {}  }}" , id, Answer);
             }
         } catch (const Poco::Exception &E) {
             Logger().log(E);
@@ -169,7 +172,6 @@ namespace OpenWifi {
             session.sendRequest(req);
             Poco::Net::HTTPResponse res;
             std::istream& rs = session.receiveResponse(res);
-
             if(res.getStatus()==Poco::Net::HTTPResponse::HTTP_OK) {
                 std::ostringstream os;
                 Poco::StreamCopier::copyStream(rs,os);
