@@ -181,14 +181,16 @@ namespace OpenWifi {
                 ProvObjects::InventoryTag T;
                 if(InventoryDB().GetRecord("id", device, T)) {
                     NewDevices.emplace_back(device);
+                } else {
+
                 }
             }
 
             if(NewDevices!=V.devices) {
                 std::cout << "Fixing venue: " << V.info.name << std::endl;
-//                ProvObjects::Venue NewVenue = V;
-//                NewVenue.devices = NewDevices;
-//                VenueDB().UpdateRecord("id", V.info.id, NewVenue);
+                ProvObjects::Venue NewVenue = V;
+                NewVenue.devices = NewDevices;
+                VenueDB().UpdateRecord("id", V.info.id, NewVenue);
             }
 
             return true;
