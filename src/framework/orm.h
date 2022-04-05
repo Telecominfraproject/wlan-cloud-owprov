@@ -81,14 +81,14 @@ namespace ORM {
     typedef std::vector<Field>  FieldVec;
 
     struct IndexEntry {
-        std::string     FieldName;
-        Indextype   Type;
+        std::string         FieldName;
+        Indextype           Type;
     };
     typedef std::vector<IndexEntry>     IndexEntryVec;
 
     struct Index {
         std::string         Name;
-        IndexEntryVec   Entries;
+        IndexEntryVec       Entries;
     };
     typedef std::vector<Index>      IndexVec;
 
@@ -419,7 +419,7 @@ namespace ORM {
                 Poco::Data::Statement   Select(Session);
                 RecordTuple             RT;
 
-                std::string St = "select " + SelectFields_ + " from " + TableName_ + " where " + FieldName + "=?" ;
+                std::string St = "select " + SelectFields_ + " from " + TableName_ + " where " + FieldName + "=?" + " limit 1";
 
                 auto tValue{Value};
 
