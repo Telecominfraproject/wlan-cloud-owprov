@@ -59,6 +59,9 @@ namespace OpenWifi {
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
+            ProvObjects::WebSocketNotification N;
+            N.content.type = "configuration_update";
+
             Logger().information(fmt::format("Job {} Starting.", JobId_));
 
             ProvObjects::Venue  Venue;
@@ -66,8 +69,8 @@ namespace OpenWifi {
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
                 for(const Types::UUID_t &uuid:Venue.devices) {
                     ProvObjects::InventoryTag   Device;
-
                     if(StorageService()->InventoryDB().GetRecord("id",uuid,Device)) {
+                        N.content.title = "Venue Configuration Updater: " + Venue.info.name;
                         Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                         auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                         auto Configuration = Poco::makeShared<Poco::JSON::Object>();
@@ -85,34 +88,29 @@ namespace OpenWifi {
                                 Results.errorCode = 0;
                                 Logger().information(fmt::format("Device {} updated.", Device.serialNumber));
                                 Updated++;
+                                N.content.success.push_back(Device.serialNumber);
                             } else {
                                 Logger().information(fmt::format("Device {} was not updated.", Device.serialNumber));
                                 Results.errorCode = 1;
                                 Failed++;
+                                N.content.warnings.push_back(Device.serialNumber);
                             }
                         } else {
                             Logger().debug(fmt::format("{}: Configuration is bad.",Device.serialNumber));
                             Results.errorCode = 1;
+                            N.content.errors.push_back(Device.serialNumber);
                             BadConfigs++;
                         }
                     }
                 }
+                N.content.details = fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations. ",
+                                                JobId_, Updated ,Failed, BadConfigs);
             } else {
-                Logger().warning(fmt::format("Venue {} no longer exists.",VenueUUID_));
+                N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
+                Logger().warning(N.content.details);
             }
 
-            ProvObjects::WebSocketNotification N;
-
-            N.content.title = "Bulk Configuration Updater";
-            N.content.type = "configuration_update";
-            N.content.success.push_back(fmt::format("Successfully updated {} devices.",Updated));
-            if(Failed>0)
-                N.content.warnings.push_back(fmt::format("Could not update {} devices.",Failed));
-            if(BadConfigs>0)
-                N.content.errors.push_back(fmt::format("Bad configuration for {} devices.",BadConfigs));
-
             auto Sent = WebSocketClientServer()->SendUserNotification(UI_.email,N);
-
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations. Notification was send={}",
                                              JobId_, Updated ,Failed, BadConfigs, Sent));
             delete this;

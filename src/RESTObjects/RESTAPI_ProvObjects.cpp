@@ -864,6 +864,7 @@ namespace OpenWifi::ProvObjects {
         RESTAPI_utils::field_to_json(Obj,"errors",errors);
         RESTAPI_utils::field_to_json(Obj,"warnings",warnings);
         RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
+        RESTAPI_utils::field_to_json(Obj,"details",details);
     }
 
     bool WebSocketNotificationContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -874,6 +875,7 @@ namespace OpenWifi::ProvObjects {
             RESTAPI_utils::field_from_json(Obj,"errors",errors);
             RESTAPI_utils::field_from_json(Obj,"warnings",warnings);
             RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
+            RESTAPI_utils::field_from_json(Obj,"details",details);
             return true;
         } catch(...) {
 

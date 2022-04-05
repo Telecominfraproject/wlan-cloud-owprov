@@ -500,7 +500,8 @@ namespace OpenWifi::ProvObjects {
 
     struct WebSocketNotificationContent {
         std::string                 title,
-                type;
+                                    type,
+                                    details;
         std::vector<std::string>    success,
                 errors,
                 warnings;
