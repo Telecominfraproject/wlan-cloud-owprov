@@ -428,7 +428,7 @@ namespace ORM {
                     Poco::Data::Keywords::use(tValue);
                 Select.execute();
 
-                if(Select.rowsExtracted()==1) {
+                if(Select.execute()==1) {
                     Convert(RT,R);
                     if(Cache_)
                         Cache_->UpdateCache(R);
