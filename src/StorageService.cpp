@@ -174,7 +174,6 @@ namespace OpenWifi {
     void Storage::ConsistencyCheck() {
 
         // check that all inventory in venues and entities actually exists, if not, fix it.
-        std::cout << "Fixing: venues..." << std::endl;
         auto FixVenueDevices = [&](const ProvObjects::Venue &V) -> bool {
             Types::UUIDvec_t NewDevices;
             for(const auto &device:V.devices) {
@@ -187,7 +186,7 @@ namespace OpenWifi {
             }
 
             if(NewDevices!=V.devices) {
-                std::cout << "Fixing venue: " << V.info.name << std::endl;
+                Logger().warning(fmt::format("  fixing venue: {}", V.info.name));
                 ProvObjects::Venue NewVenue = V;
                 NewVenue.devices = NewDevices;
                 VenueDB().UpdateRecord("id", V.info.id, NewVenue);
@@ -196,7 +195,30 @@ namespace OpenWifi {
             return true;
         };
 
+        auto FixEntityDevices = [&](const ProvObjects::Entity &E) -> bool {
+            Types::UUIDvec_t NewDevices;
+            for(const auto &device:E.devices) {
+                ProvObjects::InventoryTag T;
+                if(InventoryDB().GetRecord("id", device, T)) {
+                    NewDevices.emplace_back(device);
+                } else {
+
+                }
+            }
+
+            if(NewDevices!=E.devices) {
+                Logger().warning(fmt::format("  fixing entity: {}",E.info.name));
+                ProvObjects::Entity NewEntity = E;
+                NewEntity.devices = NewDevices;
+                EntityDB().UpdateRecord("id", E.info.id, NewEntity);
+            }
+            return true;
+        };
+
+        Logger().information("Checking DB consistency: venues");
         VenueDB().Iterate(FixVenueDevices);
+        Logger().information("Checking DB consistency: entities");
+        EntityDB().Iterate(FixEntityDevices);
 
     }
 
