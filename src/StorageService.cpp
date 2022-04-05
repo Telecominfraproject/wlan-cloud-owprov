@@ -227,7 +227,7 @@ namespace OpenWifi {
     void Storage::CreateDefaultSubscriberEntity() {
 
         std::vector<ProvObjects::Entity> Entities;
-        if(EntityDB().GetRecords(0,1,Entities, " where type='subscriber' and defaultEntity=true ")) {
+        if(EntityDB().GetRecords(0,1,Entities, " type='subscriber' and defaultEntity=true ")) {
             DefaultSubscriberEntity_ = Entities[0].info.id;
         } else {
             ProvObjects::Entity DefEntity;
