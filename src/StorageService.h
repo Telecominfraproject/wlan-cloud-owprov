@@ -85,6 +85,8 @@ namespace OpenWifi {
             Poco::Timer                                         Timer_;
             std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
 
+            void ConsistencyCheck();
+
    };
 
    inline auto StorageService() { return Storage::instance(); }

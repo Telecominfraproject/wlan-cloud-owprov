@@ -75,6 +75,8 @@ namespace OpenWifi {
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
 
+        ConsistencyCheck();
+
         TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
         Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
@@ -167,6 +169,33 @@ namespace OpenWifi {
             }
         }
         return true;
+    }
+
+    void Storage::ConsistencyCheck() {
+
+        // check that all inventory in venues and entities actually exists, if not, fix it.
+        std::cout << "Fixing: venues..." << std::endl;
+        auto FixVenueDevices = [&](const ProvObjects::Venue &V) -> bool {
+            Types::UUIDvec_t NewDevices;
+            for(const auto &device:V.devices) {
+                ProvObjects::InventoryTag T;
+                if(InventoryDB().GetRecord("id", device, T)) {
+                    NewDevices.emplace_back(device);
+                }
+            }
+
+            if(NewDevices!=V.devices) {
+                std::cout << "Fixing venue: " << V.info.name << std::endl;
+//                ProvObjects::Venue NewVenue = V;
+//                NewVenue.devices = NewDevices;
+//                VenueDB().UpdateRecord("id", V.info.id, NewVenue);
+            }
+
+            return true;
+        };
+
+        VenueDB().Iterate(FixVenueDevices);
+
     }
 
 }
