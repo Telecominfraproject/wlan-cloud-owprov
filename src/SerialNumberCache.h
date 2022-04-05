@@ -2,53 +2,52 @@
 // Created by stephane bourque on 2021-08-11.
 //
 
-#ifndef UCENTRALGW_SERIALNUMBERCACHE_H
-#define UCENTRALGW_SERIALNUMBERCACHE_H
+#pragma once
 
 #include "framework/MicroService.h"
 
 namespace OpenWifi {
-	class SerialNumberCache : public SubSystemServer {
-		public:
-
-	    struct DeviceTypeCacheEntry {
-	        uint64_t        SerialNumber;
-	        int             DeviceType;
-	    };
-
-        typedef std::vector<DeviceTypeCacheEntry>   SerialCacheContent;
+    class SerialNumberCache : public SubSystemServer {
+    public:
 
         static auto instance() {
-		    static auto instance_ = new SerialNumberCache;
-		    return instance_;
-		}
+            static auto instance_ = new SerialNumberCache;
+            return instance_;
+        }
 
-		int Start() override;
-		void Stop() override;
-		void AddSerialNumber(const std::string &SerialNumber, const std::string &DeviceType);
-		void DeleteSerialNumber(const std::string &S);
-		void FindNumbers(const std::string &S, uint HowMany, std::vector<uint64_t> &A);
-		bool FindDevice(const std::string &SerialNumber, std::string & DeviceType);
+        int Start() override;
+        void Stop() override;
+        void AddSerialNumber(const std::string &SerialNumber , [[maybe_unused]] const std::string &DeviceType);
+        void DeleteSerialNumber(const std::string &SerialNumber);
+        void FindNumbers(const std::string &SerialNumber, uint HowMany, std::vector<uint64_t> &A);
+        inline std::vector<uint64_t> GetCacheCopy() {
+            std::lock_guard    G(Mutex_);
+            return SNs_;
+        }
+        inline bool NumberExists(uint64_t SerialNumber) {
+            std::lock_guard		G(Mutex_);
+            return std::find(SNs_.begin(),SNs_.end(),SerialNumber)!=SNs_.end();
+        }
 
-		inline SerialCacheContent GetCacheCopy() {
-		    std::lock_guard     G(Mutex_);
-		    return SNs_;
-		}
+        static inline std::string ReverseSerialNumber(const std::string &S) {
+            std::string ReversedString;
+            std::copy(rbegin(S),rend(S),std::back_inserter(ReversedString));
+            return ReversedString;
+        }
 
-	  private:
-		int                         DeviceTypeIndex_=0;
-		SerialCacheContent	        SNs_;
-		std::map<std::string,int>   DeviceTypeDictionary_;
+    private:
+        std::vector<uint64_t>		SNs_;
+        std::vector<uint64_t>		Reverse_SNs_;
 
-		SerialNumberCache() noexcept:
-			SubSystemServer("SerialNumberCache", "SNCACHE-SVR", "serialcache")
-			{
-				SNs_.reserve(2000);
-			}
-	};
+        void ReturnNumbers(const std::string &S, uint HowMany, const std::vector<uint64_t> & SNArr, std::vector<uint64_t> &A, bool ReverseResult);
 
-	inline auto SerialNumberCache() { return SerialNumberCache::instance(); }
+        SerialNumberCache() noexcept:
+                SubSystemServer("SerialNumberCache", "SNCACHE-SVR", "serialcache")
+        {
+            SNs_.reserve(2000);
+        }
+    };
+
+    inline auto SerialNumberCache() { return SerialNumberCache::instance(); }
 
 } // namespace OpenWiFi
-
-#endif // UCENTRALGW_SERIALNUMBERCACHE_H

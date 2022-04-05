@@ -10,86 +10,105 @@
 
 namespace OpenWifi {
 
-	int SerialNumberCache::Start() {
-		return 0;
-	}
+    int SerialNumberCache::Start() {
+        return 0;
+    }
 
-	void SerialNumberCache::Stop() {
-	}
+    void SerialNumberCache::Stop() {
 
-	void SerialNumberCache::AddSerialNumber(const std::string &S, const std::string &DeviceType) {
-		std::lock_guard		G(Mutex_);
+    }
 
-		auto Hint = DeviceTypeDictionary_.find(DeviceType);
-		int     Index;
-		if(Hint == end(DeviceTypeDictionary_)) {
-		    Index = DeviceTypeIndex_++;
-		    DeviceTypeDictionary_[DeviceType] = Index;
-		} else {
-		    Index = Hint->second;
-		}
+    void SerialNumberCache::AddSerialNumber(const std::string &S, [[maybe_unused]] const std::string &DeviceType) {
+        std::lock_guard		G(Mutex_);
 
         uint64_t SN = std::stoull(S, nullptr, 16);
-        auto match_fun = [=](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; };
-        auto lower_fun = [=](const DeviceTypeCacheEntry &E1, const DeviceTypeCacheEntry &E2) { return E1.SerialNumber < E2.SerialNumber; };
+        if(std::find(std::begin(SNs_),std::end(SNs_),SN) == std::end(SNs_)) {
+            auto insert_point = std::lower_bound(SNs_.begin(), SNs_.end(), SN);
+            SNs_.insert(insert_point, SN);
 
-		if(std::find_if(SNs_.begin(),SNs_.end(),match_fun ) == SNs_.end()) {
-            auto NewEntry = DeviceTypeCacheEntry{ .SerialNumber = SN, .DeviceType = Index };
-            auto insertion_point = std::lower_bound(begin(SNs_), end(SNs_), NewEntry, lower_fun);
-            SNs_.insert( insertion_point, NewEntry );
-		}
-	}
+            auto R = ReverseSerialNumber(S);
+            uint64_t RSN = std::stoull(R, nullptr, 16);
+            auto rev_insert_point = std::lower_bound(Reverse_SNs_.begin(), Reverse_SNs_.end(), RSN);
+            Reverse_SNs_.insert(rev_insert_point, RSN);
+        }
+    }
 
-	void SerialNumberCache::DeleteSerialNumber(const std::string &S) {
-		std::lock_guard		G(Mutex_);
-
-		uint64_t SN = std::stoull(S, nullptr,16);
-		auto It = std::find_if(SNs_.begin(),SNs_.end(),[SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; });
-		if(It != SNs_.end()) {
-			SNs_.erase(It);
-		}
-	}
-
-	void SerialNumberCache::FindNumbers(const std::string &S, uint HowMany, std::vector<uint64_t> &A) {
-		std::lock_guard		G(Mutex_);
-
-		if(S.length()==12) {
-			uint64_t SN = std::stoull(S, nullptr, 16);
-			auto It = std::find_if(SNs_.begin(),SNs_.end(), [SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; } );
-			if(It != SNs_.end()) {
-				A.push_back(It->SerialNumber);
-			}
-		} else if (S.length()<12){
-			std::string SS{S};
-			SS.insert(SS.end(), 12 - SS.size(), '0');
-			uint64_t SN = std::stoull(SS, nullptr, 16);
-
-			auto LB = std::lower_bound(SNs_.begin(),SNs_.end(),SN, [](const DeviceTypeCacheEntry &E1,uint64_t V) { return E1.SerialNumber < V ; });
-			if(LB!=SNs_.end()) {
-				for(;LB!=SNs_.end() && HowMany;++LB,--HowMany) {
-					std::string TSN = Utils::int_to_hex(LB->SerialNumber);
-					if(S == TSN.substr(0,S.size())) {
-						A.emplace_back(LB->SerialNumber);
-					} else {
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	bool SerialNumberCache::FindDevice(const std::string &SerialNumber, std::string & DeviceType) {
+    void SerialNumberCache::DeleteSerialNumber(const std::string &S) {
         std::lock_guard		G(Mutex_);
-	    uint64_t SN = std::stoull(SerialNumber, nullptr, 16);
-	    auto It = std::find_if(SNs_.begin(),SNs_.end(),[SN](const DeviceTypeCacheEntry &E) { return E.SerialNumber == SN; });
-	    if(It != SNs_.end()) {
-	        for(const auto &i:DeviceTypeDictionary_)
-	            if(i.second==It->DeviceType) {
-	                DeviceType = i.first;
-	                return true;
-	            }
-	    }
-        return false;
-	}
 
+        uint64_t SN = std::stoull(S,nullptr,16);
+        auto It = std::find(SNs_.begin(),SNs_.end(),SN);
+        if(It != SNs_.end()) {
+            SNs_.erase(It);
+
+            auto R = ReverseSerialNumber(S);
+            uint64_t RSN = std::stoull(R, nullptr, 16);
+            auto RIt = std::find(Reverse_SNs_.begin(),Reverse_SNs_.end(),RSN);
+            if(RIt != Reverse_SNs_.end()) {
+                Reverse_SNs_.erase(RIt);
+            }
+        }
+    }
+
+    uint64_t Reverse(uint64_t N) {
+        uint64_t Res = 0;
+
+        for (int i = 0; i < 16; i++) {
+            Res = (Res << 4) + (N & 0x000000000000000f);
+            N  >>= 4;
+        }
+        Res >>= 16;
+        return Res;
+    }
+
+    void SerialNumberCache::ReturnNumbers(const std::string &S, uint HowMany, const std::vector<uint64_t> &SNArr, std::vector<uint64_t> &A, bool ReverseResult) {
+        std::lock_guard G(Mutex_);
+
+        if (S.length() == 12) {
+            uint64_t SN = std::stoull(S, nullptr, 16);
+            auto It = std::find(SNArr.begin(), SNArr.end(), SN);
+            if (It != SNArr.end()) {
+                A.push_back(ReverseResult ? Reverse(*It) : *It);
+            }
+        } else if (S.length() < 12) {
+            std::string SS{S};
+            SS.insert(SS.end(), 12 - SS.size(), '0');
+            uint64_t SN = std::stoull(SS, nullptr, 16);
+            auto LB = std::lower_bound(SNArr.begin(), SNArr.end(), SN);
+            if (LB != SNArr.end()) {
+                for (; LB != SNArr.end() && HowMany; ++LB, --HowMany) {
+                    if(ReverseResult) {
+                        const auto TSN = ReverseSerialNumber(Utils::IntToSerialNumber(Reverse(*LB)));
+                        if (S == TSN.substr(0,S.size())) {
+                            A.emplace_back(Reverse(*LB));
+                        } else {
+                            break;
+                        }
+                    } else {
+                        const auto TSN = Utils::IntToSerialNumber(*LB);
+                        if (S == TSN.substr(0, S.size())) {
+                            A.emplace_back(*LB);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void SerialNumberCache::FindNumbers(const std::string &S, uint HowMany, std::vector<uint64_t> &A) {
+        if(S.empty())
+            return;
+
+        if (S[0] == '*') {
+            std::string Reversed;
+            std::copy(rbegin(S), rend(S)-1, std::back_inserter(Reversed));
+            if(Reversed.empty())
+                return;
+            return ReturnNumbers(Reversed, HowMany, Reverse_SNs_, A, true);
+        } else {
+            return ReturnNumbers(S, HowMany, SNs_, A, false);
+        }
+    }
 }

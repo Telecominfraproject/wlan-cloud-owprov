@@ -350,7 +350,7 @@ namespace OpenWifi {
         auto C = SerialNumberCache()->GetCacheCopy();
 
         for(const auto &i:C) {
-            std::string     SerialNumber = Utils::IntToSerialNumber(i.SerialNumber);
+            std::string     SerialNumber = Utils::IntToSerialNumber(i);
             ProvObjects::InventoryTag   Tag;
             if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,Tag)) {
                 if(Tag.rrm=="no")
