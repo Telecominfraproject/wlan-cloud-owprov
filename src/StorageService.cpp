@@ -245,7 +245,7 @@ namespace OpenWifi {
         //  the default entity.
         //  We also need to make sure that all entities have some type set.
         std::vector<std::string>    Script{
-            "update entities set type='normal' where type='' ",
+            "update entities set type='normal', defaultEntity=false where type is null ",
             fmt::format("update inventory set entity='{}' where entity='' and subscriber!='' ", DefaultSubscriberEntity_)
         };
         EntityDB().RunScript(Script);
