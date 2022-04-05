@@ -98,6 +98,8 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"managementRoles", managementRoles);
         field_to_json( Obj,"maps", maps);
         field_to_json( Obj,"configurations", configurations);
+        field_to_json( Obj,"type", type);
+        field_to_json( Obj,"defaultEntity", defaultEntity);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -118,6 +120,8 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"managementRoles", managementRoles);
             field_from_json( Obj,"maps", maps);
             field_from_json( Obj,"configurations", configurations);
+            field_from_json( Obj,"type", type);
+            field_from_json( Obj,"defaultEntity", defaultEntity);
             return true;
         } catch(...) {
 

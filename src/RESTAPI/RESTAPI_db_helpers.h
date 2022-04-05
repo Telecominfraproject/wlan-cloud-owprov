@@ -485,4 +485,8 @@ namespace OpenWifi {
 
         return Result;
     }
+
+    inline bool ValidEntityType(const std::string &v) {
+        return (v=="normal" || v=="subscriber");
+    }
 }

@@ -35,7 +35,9 @@ namespace OpenWifi {
                 std::string,
                 std::string,
                 std::string,
-                std::string
+                std::string,
+                std::string,
+                bool
             > EntityDBRecordType;
 
     class EntityDB : public ORM::DB<EntityDBRecordType, ProvObjects::Entity> {

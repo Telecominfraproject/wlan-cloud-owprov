@@ -529,6 +529,21 @@ namespace ORM {
             return false;
         }
 
+        bool RunStatement(const std::string &St) {
+            try {
+                Poco::Data::Session     Session = Pool_.get();
+                Poco::Data::Statement   Command(Session);
+
+                Command  << St ;
+                Command.execute();
+
+                return true;
+            } catch (const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return false;
+        }
+
         template <typename T> bool ReplaceRecord(field_name_t FieldName, const T & Value,  RecordType & R) {
             try {
                 if(Exists(FieldName, Value)) {

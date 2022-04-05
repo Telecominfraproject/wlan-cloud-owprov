@@ -77,6 +77,8 @@ namespace OpenWifi {
 
         ConsistencyCheck();
 
+        CreateDefaultSubscriberEntity();
+
         TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
         Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
@@ -222,6 +224,32 @@ namespace OpenWifi {
 
     }
 
+    void Storage::CreateDefaultSubscriberEntity() {
+
+        std::vector<ProvObjects::Entity> Entities;
+        if(EntityDB().GetRecords(0,1,Entities, " where type='subscriber' and defaultEntity=true ")) {
+            DefaultSubscriberEntity_ = Entities[0].info.id;
+        } else {
+            ProvObjects::Entity DefEntity;
+
+            DefEntity.info.name = "Default Subscriber Entity";
+            DefaultSubscriberEntity_ = DefEntity.info.id = MicroService::CreateUUID();
+            DefEntity.type = "subscriber";
+            DefEntity.defaultEntity = true;
+            DefEntity.info.created = DefEntity.info.modified = OpenWifi::Now();
+            DefEntity.rrm = "inherit";
+            EntityDB().CreateRecord(DefEntity);
+        }
+
+        //  To be backwards compatible, we need to assign all the subscribers that do not have an entity to
+        //  the default entity.
+        //  We also need to make sure that all entities have some type set.
+        std::vector<std::string>    Script{
+            "update entities set type='normal' where type='' ",
+            fmt::format("update inventory set entity='{}' where entity='' and subscriber!='' ", DefaultSubscriberEntity_)
+        };
+        EntityDB().RunScript(Script);
+    }
 }
 
 // namespace

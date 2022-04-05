@@ -263,6 +263,15 @@ components:
             - inherit
         sourceIP:
           $ref: '#/components/schemas/StringList'
+        defaultEntity:
+          type: boolean
+          default: false
+        type:
+          type: string
+          enum:
+            - normal
+            - subscriber
+          default: normal
 
     EntityList:
       type: object
@@ -1164,6 +1173,16 @@ paths:
           name: countOnly
           schema:
             type: boolean
+          required: false
+        - in: query
+          decription: entity type
+          name: type
+          schema:
+            type: string
+            enum:
+              - subscriber
+              - normal
+            default: normal
           required: false
 
       responses:

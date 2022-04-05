@@ -41,6 +41,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::CannotDeleteRoot);
         }
 
+        if(Existing.type=="subscriber" && Existing.defaultEntity) {
+            return BadRequest(RESTAPI::Errors::CannotDeleteSubEntity);
+        }
+
         if( !Existing.children.empty() || !Existing.devices.empty() || !Existing.venues.empty() || !Existing.locations.empty()
             || !Existing.contacts.empty() || !Existing.configurations.empty()) {
             return BadRequest(RESTAPI::Errors::StillInUse);
@@ -67,6 +71,14 @@ namespace OpenWifi{
         ProvObjects::Entity NewEntity;
         if (!NewEntity.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if(NewEntity.type.empty()) {
+            NewEntity.type = "normal";
+        }
+
+        if(!ValidEntityType(NewEntity.type)) {
+            return BadRequest(RESTAPI::Errors::InvalidEntityType);
         }
 
         if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,NewEntity.info)) {

@@ -14,11 +14,16 @@
 namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoGet() {
+        auto type = GetParameter("type","normal");
+        if(!ValidEntityType(type)) {
+            return BadRequest(RESTAPI::Errors::InvalidEntityType);
+        }
+
         if(!QB_.Select.empty()) {
             return ReturnRecordList<decltype(DB_),
             ProvObjects::Entity>("entities",DB_,*this );
         } else if(QB_.CountOnly) {
-            auto C = DB_.Count();
+            auto C = DB_.Count(fmt::format(" where type='{}'", type));
             return ReturnCountOnly(C);
         } else if (GetBoolParameter("getTree",false)) {
             Poco::JSON::Object  FullTree;
@@ -26,7 +31,8 @@ namespace OpenWifi{
             return ReturnObject(FullTree);
         } else {
             EntityDB::RecordVec Entities;
-            DB_.GetRecords(QB_.Offset, QB_.Limit,Entities);
+
+            DB_.GetRecords(QB_.Offset, QB_.Limit,Entities,fmt::format(" where type='{}'", type));
             return MakeJSONObjectArray("entities", Entities, *this);
         }
     }

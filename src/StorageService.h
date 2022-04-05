@@ -62,6 +62,8 @@ namespace OpenWifi {
 
             void onTimer(Poco::Timer & timer);
 
+            inline const std::string & DefaultSubscriberEntity() { return DefaultSubscriberEntity_; }
+
           private:
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
             std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;
@@ -76,6 +78,7 @@ namespace OpenWifi {
             std::unique_ptr<OpenWifi::MapDB>                    MapDB_;
             std::unique_ptr<OpenWifi::SignupDB>                 SignupDB_;
             std::unique_ptr<OpenWifi::VariablesDB>              VariablesDB_;
+            std::string                                         DefaultSubscriberEntity_;
 
 
             typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
@@ -86,6 +89,7 @@ namespace OpenWifi {
             std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
 
             void ConsistencyCheck();
+            void CreateDefaultSubscriberEntity();
 
    };
 
