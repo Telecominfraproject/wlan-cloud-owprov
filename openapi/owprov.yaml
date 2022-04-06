@@ -988,12 +988,16 @@ components:
         defaultOperator:
           type: boolean
           default: false
-        location:
-          type: string
-          format: uuid
-        contact:
-          type: string
-          format: uuid
+        locations:
+          type: array
+          items:
+            type: string
+            format: uuid
+        contacts:
+          type: array
+          items:
+            type: string
+            format: uuid
         rrm:
           type: string
           enum:
@@ -1067,6 +1071,10 @@ components:
         suspended:
           type: boolean
           default: false
+        configuration:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceConfigurationElement'
 
     SubscriberDeviceList:
       type: object
