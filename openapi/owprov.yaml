@@ -950,6 +950,10 @@ components:
           format: uuid
         cost:
           type: number
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
         period:
           type: string
           enum:
@@ -1075,6 +1079,8 @@ components:
         serviceClass:
           type: string
           format: uuid
+        billingCode:
+          type: string
 
     SubscriberDeviceList:
       type: object
@@ -3394,6 +3400,8 @@ paths:
     post:
       summary: Create a new operator
       operationId: createOperator
+      tags:
+        - Operators
       parameters:
         - in: path
           name: uuid
@@ -3410,7 +3418,6 @@ paths:
               $ref: '#/components/schemas/Operator'
       responses:
         200:
-          description: successfully created an operator
           $ref: '#/components/schemas/Operator'
         400:
           $ref: '#/components/responses/BadRequest'
@@ -3421,6 +3428,8 @@ paths:
     put:
       summary: Update an existing operator
       operationId: updateOperator
+      tags:
+        - Operators
       parameters:
         - in: path
           name: uuid
@@ -3435,7 +3444,6 @@ paths:
               $ref: '#/components/schemas/Operator'
       responses:
         200:
-          description: successfully created an operator
           $ref: '#/components/schemas/Operator'
         400:
           $ref: '#/components/responses/BadRequest'

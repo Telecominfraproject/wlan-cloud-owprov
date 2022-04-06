@@ -70,15 +70,9 @@ namespace OpenWifi {
                             IT.info.modified = OpenWifi::Now();
                             IT.realMacAddress = SE.macAddress;
                             if(IT.entity.empty()) {
-                                IT.entity = StorageService()->DefaultSubscriberEntity();
+
                             } else {
                                 // if the entity was not a subscriber entity, then we need to goto the default entity
-                                ProvObjects::Entity TE;
-                                if(StorageService()->EntityDB().GetRecord("id",IT.entity,TE) && (TE.type=="subscriber")) {
-                                    // then this is already the right Entity
-                                } else {
-                                    IT.entity = StorageService()->DefaultSubscriberEntity();
-                                }
                             }
                             Poco::JSON::Object NewState;
                             NewState.set("method", "signup");

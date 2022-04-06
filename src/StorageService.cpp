@@ -29,6 +29,7 @@ namespace OpenWifi {
         MapDB_ = std::make_unique<OpenWifi::MapDB>(dbType_, *Pool_, Logger());
         SignupDB_ = std::make_unique<OpenWifi::SignupDB>(dbType_, *Pool_, Logger());
         VariablesDB_ = std::make_unique<OpenWifi::VariablesDB>(dbType_, *Pool_, Logger());
+        OperatorDB_ = std::make_unique<OpenWifi::OperatorDB>(dbType_, *Pool_, Logger());
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -43,6 +44,7 @@ namespace OpenWifi {
         MapDB_->Create();
         SignupDB_->Create();
         VariablesDB_->Create();
+        OperatorDB_->Create();
 
         ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
         ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
@@ -57,6 +59,7 @@ namespace OpenWifi {
         ExistFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return MapDB_->Exists(F,V); };
         ExistFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return SignupDB_->Exists(F,V); };
         ExistFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return VariablesDB_->Exists(F,V); };
+        ExistFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OperatorDB_->Exists(F,V); };
 
         ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
@@ -71,13 +74,13 @@ namespace OpenWifi {
         ExpandFunc_[MapDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return MapDB_->Exists(F,V);; };
         ExpandFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return SignupDB_->Exists(F,V);; };
         ExpandFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return VariablesDB_->Exists(F,V);; };
+        ExpandFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OperatorDB_->GetNameAndDescription(F,V, Name, Description); };
 
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
 
         ConsistencyCheck();
-
-        CreateDefaultSubscriberEntity();
+        CreateDefaultSubscriberOperataor();
 
         TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
@@ -224,31 +227,8 @@ namespace OpenWifi {
 
     }
 
-    void Storage::CreateDefaultSubscriberEntity() {
+    void Storage::CreateDefaultSubscriberOperataor() {
 
-        std::vector<ProvObjects::Entity> Entities;
-        if(EntityDB().GetRecords(0,1,Entities, " type='subscriber' and defaultEntity=true ")) {
-            DefaultSubscriberEntity_ = Entities[0].info.id;
-        } else {
-            ProvObjects::Entity DefEntity;
-
-            DefEntity.info.name = "Default Subscriber Entity";
-            DefaultSubscriberEntity_ = DefEntity.info.id = MicroService::CreateUUID();
-            DefEntity.type = "subscriber";
-            DefEntity.defaultEntity = true;
-            DefEntity.info.created = DefEntity.info.modified = OpenWifi::Now();
-            DefEntity.rrm = "inherit";
-            EntityDB().CreateRecord(DefEntity);
-        }
-
-        //  To be backwards compatible, we need to assign all the subscribers that do not have an entity to
-        //  the default entity.
-        //  We also need to make sure that all entities have some type set.
-        std::vector<std::string>    Script{
-            "update entities set type='normal', defaultEntity=false where type is null ",
-            fmt::format("update inventory set entity='{}' where entity='' and subscriber!='' ", DefaultSubscriberEntity_)
-        };
-        EntityDB().RunScript(Script);
     }
 }
 

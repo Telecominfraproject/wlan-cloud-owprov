@@ -242,7 +242,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        auto RemoveSubscriber = GetParameter("removeSubscriber","");
+        auto RemoveSubscriber = GetParameter("removeSubscriber");
         if(!RemoveSubscriber.empty()) {
             if(Existing.subscriber == RemoveSubscriber) {
                 Logger().information(Poco::format("%s: removing subscriber (%s)", SerialNumber, RemoveSubscriber));
@@ -250,11 +250,13 @@ namespace OpenWifi{
                 if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
                     Logger().information(Poco::format("%s: removing configuration for subscriber (%s)", SerialNumber, RemoveSubscriber));
                     if(DC.subscriberOnly) {
-                        if(!StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration))
+                        if(!StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration)) {
                             Logger().debug("Could not delete the subscriber configuration");
+                        }
                     }
-                    else
+                    else {
                         Logger().debug("Configurations is not for a subscriber.");
+                    }
                     Existing.deviceConfiguration = "";
                 }
                 Existing.subscriber = "";
@@ -266,6 +268,7 @@ namespace OpenWifi{
                 state.stringify(OO);
                 Existing.state = OO.str();
                 StorageService()->InventoryDB().UpdateRecord("id",Existing.info.id,Existing);
+                RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::devices,"id",Existing.info.id);
                 Poco::JSON::Object  Answer;
                 Existing.to_json(Answer);
                 SDK::GW::Device::SetSubscriber(nullptr, SerialNumber, "");

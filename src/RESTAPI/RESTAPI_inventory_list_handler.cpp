@@ -77,12 +77,13 @@ namespace OpenWifi{
             }
             return SendList(Tags, SerialOnly);
         } else if(GetBoolParameter("subscribersOnly")) {
+
             if(QB_.CountOnly) {
                 auto C = DB_.Count(" devClass='subscriber' and subscriber!='' ");
                 return ReturnCountOnly( C);
             }
             ProvObjects::InventoryTagVec Tags;
-            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, " devClass='subscriber' and subscriber!='' ", OrderBy);
+            DB_.GetRecords(QB_.Offset, QB_.Limit, Tags," devClass='subscriber' and subscriber!='' ", OrderBy);
             return SendList(Tags, SerialOnly);
         } else if(GetBoolParameter("unassigned")) {
             if(QB_.CountOnly) {

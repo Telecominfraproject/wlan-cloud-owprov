@@ -136,7 +136,7 @@ add_executable(owprov
         src/storage/storage_variables.cpp src/storage/storage_variables.h
         src/RESTAPI/RESTAPI_variables_handler.cpp src/RESTAPI/RESTAPI_variables_handler.h
         src/RESTAPI/RESTAPI_variables_list_handler.cpp src/RESTAPI/RESTAPI_variables_list_handler.h
-        src/FileDownloader.cpp src/FileDownloader.h src/Tasks/VenueConfigUpdater.cpp src/Tasks/VenueConfigUpdater.h src/Kafka_ProvUpdater.cpp src/Kafka_ProvUpdater.h)
+        src/FileDownloader.cpp src/FileDownloader.h src/Tasks/VenueConfigUpdater.cpp src/Tasks/VenueConfigUpdater.h src/Kafka_ProvUpdater.cpp src/Kafka_ProvUpdater.h src/storage/storage_operataor.cpp src/storage/storage_operataor.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}

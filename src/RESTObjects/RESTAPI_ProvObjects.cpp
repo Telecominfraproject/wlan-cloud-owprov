@@ -98,8 +98,6 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"managementRoles", managementRoles);
         field_to_json( Obj,"maps", maps);
         field_to_json( Obj,"configurations", configurations);
-        field_to_json( Obj,"type", type);
-        field_to_json( Obj,"defaultEntity", defaultEntity);
     }
 
     bool Entity::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -120,8 +118,6 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"managementRoles", managementRoles);
             field_from_json( Obj,"maps", maps);
             field_from_json( Obj,"configurations", configurations);
-            field_from_json( Obj,"type", type);
-            field_from_json( Obj,"defaultEntity", defaultEntity);
             return true;
         } catch(...) {
 
@@ -193,6 +189,37 @@ namespace OpenWifi::ProvObjects {
             return true;
         } catch (...) {
 
+        }
+        return false;
+    }
+
+    void Operator::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json( Obj,"contact",contact);
+        field_to_json( Obj,"location",location);
+        field_to_json( Obj,"managementPolicy",managementPolicy);
+        field_to_json( Obj,"managementRoles",managementRoles);
+        field_to_json( Obj,"rrm",rrm);
+        field_to_json( Obj,"firmwareUpgrade",firmwareUpgrade);
+        field_to_json( Obj,"firmwareRCOnly",firmwareRCOnly);
+        field_to_json( Obj,"variables",variables);
+        field_to_json( Obj,"defaultOperator",defaultOperator);
+    }
+
+    bool Operator::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json( Obj,"contact",contact);
+            field_from_json( Obj,"location",location);
+            field_from_json( Obj,"managementPolicy",managementPolicy);
+            field_from_json( Obj,"managementRoles",managementRoles);
+            field_from_json( Obj,"rrm",rrm);
+            field_from_json( Obj,"firmwareUpgrade",firmwareUpgrade);
+            field_from_json( Obj,"firmwareRCOnly",firmwareRCOnly);
+            field_from_json( Obj,"variables",variables);
+            field_from_json( Obj,"defaultOperator",defaultOperator);
+            return true;
+        } catch(...) {
         }
         return false;
     }

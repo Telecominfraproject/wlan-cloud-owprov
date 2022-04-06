@@ -79,8 +79,6 @@ namespace OpenWifi::ProvObjects {
         Types::UUIDvec_t        managementRoles;
         Types::UUIDvec_t        maps;
         Types::UUIDvec_t        configurations;
-        std::string             type;
-        bool                    defaultEntity=false;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -295,6 +293,23 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
     typedef std::vector<DeviceConfiguration>      DeviceConfigurationVec;
+
+    struct Operator {
+        ObjectInfo                      info;
+        Types::UUID_t                   contact;
+        Types::UUID_t                   location;
+        Types::UUID_t                   managementPolicy;
+        Types::UUIDvec_t                managementRoles;
+        std::string                     rrm;
+        std::string                     firmwareUpgrade;
+        bool                            firmwareRCOnly=true;
+        Types::UUIDvec_t                variables;
+        bool                            defaultOperator=false;
+        Types::StringVec                sourceIP;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
 
     struct InventoryTag {
         ObjectInfo      info;

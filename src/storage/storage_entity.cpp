@@ -39,9 +39,7 @@ namespace OpenWifi {
         ORM::Field{"managementPolicies",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT},
         ORM::Field{"maps",ORM::FieldType::FT_TEXT},
-        ORM::Field{"configurations",ORM::FieldType::FT_TEXT},
-        ORM::Field{"type",ORM::FieldType::FT_TEXT},
-        ORM::Field{"defaultEntity",ORM::FieldType::FT_TEXT}
+        ORM::Field{"configurations",ORM::FieldType::FT_TEXT}
      };
 
     static  ORM::IndexVec    EntityDB_Indexes{
@@ -64,8 +62,6 @@ namespace OpenWifi {
                 "alter table " + TableName_ + " add column managementPolicies text",
                 "alter table " + TableName_ + " add column maps text",
                 "alter table " + TableName_ + " add column configurations text",
-                "alter table " + TableName_ + " add column type text",
-                "alter table " + TableName_ + " add column defaultEntity boolean",
                 "alter table " + TableName_ + " add column managementRoles text"
         };
 
@@ -234,8 +230,6 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<19>());
     Out.maps = OpenWifi::RESTAPI_utils::to_object_array(In.get<20>());
     Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<21>());
-    Out.type = In.get<22>();
-    Out.defaultEntity = In.get<23>();
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::ProvObjects::Entity &In, OpenWifi::EntityDBRecordType &Out) {
@@ -261,6 +255,4 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
     Out.set<20>(OpenWifi::RESTAPI_utils::to_string(In.maps));
     Out.set<21>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
-    Out.set<22>(In.type);
-    Out.set<23>(In.defaultEntity);
 }

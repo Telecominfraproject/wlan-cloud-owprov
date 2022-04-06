@@ -30,9 +30,9 @@ namespace OpenWifi {
             try {
                 std::string FileContent;
                 if (Utils::wgets(url, FileContent)) {
-                    std::ofstream OF(Daemon()->AssetDir() + "/" + filename,
+                    std::ofstream OutputStream(Daemon()->AssetDir() + "/" + filename,
                                      std::ios_base::out | std::ios_base::trunc);
-                    OF << FileContent;
+                    OutputStream << FileContent;
                     Logger().warning(Poco::format("File %s was downloaded",url));
                 }
             } catch(...) {

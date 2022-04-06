@@ -23,6 +23,7 @@
 #include "storage/storage_maps.h"
 #include "storage/storage_signup.h"
 #include "storage/storage_variables.h"
+#include "storage/storage_operataor.h"
 
 namespace OpenWifi {
 
@@ -52,6 +53,7 @@ namespace OpenWifi {
             OpenWifi::MapDB & MapDB() { return *MapDB_; };
             OpenWifi::SignupDB & SignupDB() { return *SignupDB_; };
             OpenWifi::VariablesDB & VariablesDB() { return *VariablesDB_; };
+            OpenWifi::OperatorDB & OperatorDB() { return *OperatorDB_; };
 
             bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
             bool Validate(const Types::StringVec &P, std::string &Error);
@@ -62,7 +64,7 @@ namespace OpenWifi {
 
             void onTimer(Poco::Timer & timer);
 
-            inline const std::string & DefaultSubscriberEntity() { return DefaultSubscriberEntity_; }
+            inline const std::string & DefaultOperator() { return DefaultOperator_; }
 
           private:
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
@@ -78,7 +80,8 @@ namespace OpenWifi {
             std::unique_ptr<OpenWifi::MapDB>                    MapDB_;
             std::unique_ptr<OpenWifi::SignupDB>                 SignupDB_;
             std::unique_ptr<OpenWifi::VariablesDB>              VariablesDB_;
-            std::string                                         DefaultSubscriberEntity_;
+            std::unique_ptr<OpenWifi::OperatorDB>               OperatorDB_;
+            std::string                                         DefaultOperator_;
 
 
             typedef std::function<bool(const char *FieldName, std::string &Value)>   exist_func;
@@ -89,7 +92,7 @@ namespace OpenWifi {
             std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
 
             void ConsistencyCheck();
-            void CreateDefaultSubscriberEntity();
+            void CreateDefaultSubscriberOperataor();
 
    };
 
