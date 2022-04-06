@@ -1072,6 +1072,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DeviceConfigurationElement'
+        serviceClass:
+          type: string
+          format: uuid
 
     SubscriberDeviceList:
       type: object
