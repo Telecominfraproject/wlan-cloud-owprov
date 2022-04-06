@@ -195,8 +195,8 @@ namespace OpenWifi::ProvObjects {
 
     void Operator::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        field_to_json( Obj,"contact",contact);
-        field_to_json( Obj,"location",location);
+        field_to_json( Obj,"contacts",contacts);
+        field_to_json( Obj,"locations",locations);
         field_to_json( Obj,"managementPolicy",managementPolicy);
         field_to_json( Obj,"managementRoles",managementRoles);
         field_to_json( Obj,"rrm",rrm);
@@ -204,13 +204,14 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"firmwareRCOnly",firmwareRCOnly);
         field_to_json( Obj,"variables",variables);
         field_to_json( Obj,"defaultOperator",defaultOperator);
+        field_to_json( Obj,"sourceIP",sourceIP);
     }
 
     bool Operator::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            field_from_json( Obj,"contact",contact);
-            field_from_json( Obj,"location",location);
+            field_from_json( Obj,"contacts",contacts);
+            field_from_json( Obj,"locations",locations);
             field_from_json( Obj,"managementPolicy",managementPolicy);
             field_from_json( Obj,"managementRoles",managementRoles);
             field_from_json( Obj,"rrm",rrm);
@@ -218,6 +219,63 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"firmwareRCOnly",firmwareRCOnly);
             field_from_json( Obj,"variables",variables);
             field_from_json( Obj,"defaultOperator",defaultOperator);
+            field_from_json( Obj,"sourceIP",sourceIP);
+            return true;
+        } catch(...) {
+        }
+        return false;
+    }
+
+    void OperatorList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json( Obj,"operators",operators);
+    }
+
+    bool OperatorList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json( Obj,"operators",operators);
+            return true;
+        } catch(...) {
+        }
+        return false;
+    }
+
+    void ServiceClass::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json( Obj,"operatorId",operatorId);
+        field_to_json( Obj,"managementPolicy",managementPolicy);
+        field_to_json( Obj,"cost",cost);
+        field_to_json( Obj,"currency",currency);
+        field_to_json( Obj,"period",period);
+        field_to_json( Obj,"billingCode",billingCode);
+        field_to_json( Obj,"variables",variables);
+        field_to_json( Obj,"defaultService",defaultService);
+    }
+
+    bool ServiceClass::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json( Obj,"operatorId",operatorId);
+            field_from_json( Obj,"managementPolicy",managementPolicy);
+            field_from_json( Obj,"cost",cost);
+            field_from_json( Obj,"currency",currency);
+            field_from_json( Obj,"period",period);
+            field_from_json( Obj,"billingCode",billingCode);
+            field_from_json( Obj,"variables",variables);
+            field_from_json( Obj,"defaultService",defaultService);
+            return true;
+        } catch(...) {
+        }
+        return false;
+
+    }
+
+    void ServiceClassList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json( Obj,"classes",classes);
+    }
+
+    bool ServiceClassList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json( Obj,"classes",classes);
             return true;
         } catch(...) {
         }
@@ -559,46 +617,16 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
-    void field_to_json(Poco::JSON::Object &Obj, const char * FieldName, ACLACCESS A) {
-        switch(A) {
-            case READ: Obj.set(FieldName,"read"); break;
-            case MODIFY: Obj.set(FieldName,"modify"); break;
-            case CREATE: Obj.set(FieldName,"create"); break;
-            case DELETE: Obj.set(FieldName,"delete"); break;
-            case NONE:
-                default:
-                    Obj.set(FieldName,"none");
-        }
-    }
-
-    void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char * FieldName, ACLACCESS &A) {
-        if(Obj->has(FieldName)) {
-            auto V = Obj->getValue<std::string>(FieldName);
-            if(V=="read")
-                A = READ;
-            else if(V=="modify")
-                A = MODIFY;
-            else if(V=="create")
-                A = CREATE;
-            else if(V=="delete")
-                A = DELETE;
-            else if(V=="none")
-                A = NONE;
-            else
-                throw Poco::Exception("invalid JSON");
-        }
-    }
-
     void ObjectACL::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj, "users", users);
-        RESTAPI_utils::field_to_json(Obj, "roles", roles);
+        field_to_json(Obj, "users", users);
+        field_to_json(Obj, "roles", roles);
         field_to_json(Obj, "access", access);
     }
 
     bool ObjectACL::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json(Obj, "users", users);
-            RESTAPI_utils::field_from_json(Obj, "roles", roles);
+            field_from_json(Obj, "users", users);
+            field_from_json(Obj, "roles", roles);
             field_from_json(Obj, "access", access);
             return true;
         } catch(...) {
@@ -608,12 +636,12 @@ namespace OpenWifi::ProvObjects {
     }
     
     void ObjectACLList::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj, "list", list);
+        field_to_json(Obj, "list", list);
     }
 
     bool ObjectACLList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json(Obj, "list", list);
+            field_from_json(Obj, "list", list);
             return true;
         } catch(...) {
 
@@ -621,46 +649,15 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
-    std::string to_string(VISIBILITY A) {
-        switch(A) {
-            case PUBLIC: return "public";
-            case SELECT: return "select";
-            case PRIVATE:
-            default:
-                return "private";
-        }
-    }
-
-    void field_to_json(Poco::JSON::Object &Obj, const char * FieldName, VISIBILITY A) {
-        Obj.set(FieldName,to_string(A));
-    }
-
-    VISIBILITY visibility_from_string(const std::string &V) {
-        if(V=="public")
-            return PUBLIC;
-        else if(V=="select")
-            return SELECT;
-        else if(V=="private")
-            return PRIVATE;
-        throw Poco::Exception("invalid json");
-    }
-
-    void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char * FieldName, VISIBILITY &A) {
-        if(Obj->has(FieldName)) {
-            auto V = Obj->getValue<std::string>(FieldName);
-            A = visibility_from_string(V);
-        }
-    }
-
     void Map::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        RESTAPI_utils::field_to_json( Obj,"data",data);
-        RESTAPI_utils::field_to_json( Obj,"entity",entity);
-        RESTAPI_utils::field_to_json( Obj,"creator",creator);
-        RESTAPI_utils::field_to_json( Obj,"visibility",visibility);
-        RESTAPI_utils::field_to_json( Obj,"access",access);
-        RESTAPI_utils::field_to_json( Obj,"managementPolicy", managementPolicy);
-        RESTAPI_utils::field_to_json( Obj,"venue", venue);
+        field_to_json( Obj,"data",data);
+        field_to_json( Obj,"entity",entity);
+        field_to_json( Obj,"creator",creator);
+        field_to_json( Obj,"visibility",visibility);
+        field_to_json( Obj,"access",access);
+        field_to_json( Obj,"managementPolicy", managementPolicy);
+        field_to_json( Obj,"venue", venue);
     }
 
     bool Map::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -710,31 +707,31 @@ namespace OpenWifi::ProvObjects {
 
     void SignupEntry::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        RESTAPI_utils::field_to_json( Obj,"email", email);
-        RESTAPI_utils::field_to_json( Obj,"userId", userId);
-        RESTAPI_utils::field_to_json( Obj,"macAddress", macAddress);
-        RESTAPI_utils::field_to_json( Obj,"serialNumber", serialNumber);
-        RESTAPI_utils::field_to_json( Obj,"submitted", submitted);
-        RESTAPI_utils::field_to_json( Obj,"completed", completed);
-        RESTAPI_utils::field_to_json( Obj,"status", status);
-        RESTAPI_utils::field_to_json( Obj,"error", error);
-        RESTAPI_utils::field_to_json( Obj,"statusCode", statusCode);
-        RESTAPI_utils::field_to_json( Obj,"deviceID", deviceID);
+        field_to_json( Obj,"email", email);
+        field_to_json( Obj,"userId", userId);
+        field_to_json( Obj,"macAddress", macAddress);
+        field_to_json( Obj,"serialNumber", serialNumber);
+        field_to_json( Obj,"submitted", submitted);
+        field_to_json( Obj,"completed", completed);
+        field_to_json( Obj,"status", status);
+        field_to_json( Obj,"error", error);
+        field_to_json( Obj,"statusCode", statusCode);
+        field_to_json( Obj,"deviceID", deviceID);
     }
 
     bool SignupEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            RESTAPI_utils::field_from_json( Obj,"email", email);
-            RESTAPI_utils::field_from_json( Obj,"userId", userId);
-            RESTAPI_utils::field_from_json( Obj,"macAddress", macAddress);
-            RESTAPI_utils::field_from_json( Obj,"serialNumber", serialNumber);
-            RESTAPI_utils::field_from_json( Obj,"submitted", submitted);
-            RESTAPI_utils::field_from_json( Obj,"completed", completed);
-            RESTAPI_utils::field_from_json( Obj,"status", status);
-            RESTAPI_utils::field_from_json( Obj,"error", error);
-            RESTAPI_utils::field_from_json( Obj,"statusCode", statusCode);
-            RESTAPI_utils::field_from_json( Obj,"deviceID", deviceID);
+            field_from_json( Obj,"email", email);
+            field_from_json( Obj,"userId", userId);
+            field_from_json( Obj,"macAddress", macAddress);
+            field_from_json( Obj,"serialNumber", serialNumber);
+            field_from_json( Obj,"submitted", submitted);
+            field_from_json( Obj,"completed", completed);
+            field_from_json( Obj,"status", status);
+            field_from_json( Obj,"error", error);
+            field_from_json( Obj,"statusCode", statusCode);
+            field_from_json( Obj,"deviceID", deviceID);
             return true;
         } catch(...) {
 
@@ -743,18 +740,18 @@ namespace OpenWifi::ProvObjects {
     }
 
     void Variable::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json( Obj,"type", type);
-        RESTAPI_utils::field_to_json( Obj,"weight", weight);
-        RESTAPI_utils::field_to_json( Obj,"prefix", prefix);
-        RESTAPI_utils::field_to_json( Obj,"value", value);
+        field_to_json( Obj,"type", type);
+        field_to_json( Obj,"weight", weight);
+        field_to_json( Obj,"prefix", prefix);
+        field_to_json( Obj,"value", value);
     }
 
     bool Variable::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json( Obj,"type", type);
-            RESTAPI_utils::field_from_json( Obj,"weight", weight);
-            RESTAPI_utils::field_from_json( Obj,"prefix", prefix);
-            RESTAPI_utils::field_from_json( Obj,"value", value);
+            field_from_json( Obj,"type", type);
+            field_from_json( Obj,"weight", weight);
+            field_from_json( Obj,"prefix", prefix);
+            field_from_json( Obj,"value", value);
             return true;
         } catch(...) {
 
@@ -763,12 +760,12 @@ namespace OpenWifi::ProvObjects {
     }
 
     void VariableList::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json( Obj,"variables", variables);
+        field_to_json( Obj,"variables", variables);
     }
 
     bool VariableList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json( Obj,"variables", variables);
+            field_from_json( Obj,"variables", variables);
             return true;
         } catch(...) {
 
@@ -778,25 +775,25 @@ namespace OpenWifi::ProvObjects {
 
     void VariableBlock::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        RESTAPI_utils::field_to_json( Obj,"variables", variables);
-        RESTAPI_utils::field_to_json( Obj,"entity", entity);
-        RESTAPI_utils::field_to_json( Obj,"venue", venue);
-        RESTAPI_utils::field_to_json( Obj,"subscriber", subscriber);
-        RESTAPI_utils::field_to_json( Obj,"inventory", inventory);
-        RESTAPI_utils::field_to_json( Obj,"configurations", configurations);
-        RESTAPI_utils::field_to_json( Obj,"managementPolicy", managementPolicy);
+        field_to_json( Obj,"variables", variables);
+        field_to_json( Obj,"entity", entity);
+        field_to_json( Obj,"venue", venue);
+        field_to_json( Obj,"subscriber", subscriber);
+        field_to_json( Obj,"inventory", inventory);
+        field_to_json( Obj,"configurations", configurations);
+        field_to_json( Obj,"managementPolicy", managementPolicy);
     }
 
     bool VariableBlock::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            RESTAPI_utils::field_from_json( Obj,"variables", variables);
-            RESTAPI_utils::field_from_json( Obj,"entity", entity);
-            RESTAPI_utils::field_from_json( Obj,"venue", venue);
-            RESTAPI_utils::field_from_json( Obj,"subscriber", subscriber);
-            RESTAPI_utils::field_from_json( Obj,"inventory", inventory);
-            RESTAPI_utils::field_from_json( Obj,"configurations", configurations);
-            RESTAPI_utils::field_from_json( Obj,"managementPolicy", managementPolicy);
+            field_from_json( Obj,"variables", variables);
+            field_from_json( Obj,"entity", entity);
+            field_from_json( Obj,"venue", venue);
+            field_from_json( Obj,"subscriber", subscriber);
+            field_from_json( Obj,"inventory", inventory);
+            field_from_json( Obj,"configurations", configurations);
+            field_from_json( Obj,"managementPolicy", managementPolicy);
             return true;
         } catch(...) {
         }
@@ -804,12 +801,72 @@ namespace OpenWifi::ProvObjects {
     }
 
     void VariableBlockList::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json( Obj,"variableBlocks", variableBlocks);
+        field_to_json( Obj,"variableBlocks", variableBlocks);
     }
 
     bool VariableBlockList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json( Obj,"variableBlocks", variableBlocks);
+            field_from_json( Obj,"variableBlocks", variableBlocks);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void SubscriberDevice::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json( Obj,"serialNumber", serialNumber);
+        field_to_json( Obj,"deviceType", deviceType);
+        field_to_json( Obj,"operatorId", operatorId);
+        field_to_json( Obj,"subscriber", subscriber);
+        field_to_json( Obj,"location", location);
+        field_to_json( Obj,"contact", contact);
+        field_to_json( Obj,"managementPolicy", managementPolicy);
+        field_to_json( Obj,"serviceClass", serviceClass);
+        field_to_json( Obj,"qrCode", qrCode);
+        field_to_json( Obj,"geoCode", geoCode);
+        field_to_json( Obj,"rrm", rrm);
+        field_to_json( Obj,"state", state);
+        field_to_json( Obj,"locale", locale);
+        field_to_json( Obj,"billingCode", billingCode);
+        field_to_json( Obj,"configuration", configuration);
+        field_to_json( Obj,"suspended", suspended);
+    }
+
+    bool SubscriberDevice::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json( Obj,"serialNumber", serialNumber);
+            field_from_json( Obj,"deviceType", deviceType);
+            field_from_json( Obj,"operatorId", operatorId);
+            field_from_json( Obj,"subscriber", subscriber);
+            field_from_json( Obj,"location", location);
+            field_from_json( Obj,"contact", contact);
+            field_from_json( Obj,"managementPolicy", managementPolicy);
+            field_from_json( Obj,"serviceClass", serviceClass);
+            field_from_json( Obj,"qrCode", qrCode);
+            field_from_json( Obj,"geoCode", geoCode);
+            field_from_json( Obj,"rrm", rrm);
+            field_from_json( Obj,"state", state);
+            field_from_json( Obj,"locale", locale);
+            field_from_json( Obj,"billingCode", billingCode);
+            field_from_json( Obj,"configuration", configuration);
+            field_from_json( Obj,"suspended", suspended);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void SubscriberDeviceList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json( Obj,"subscriberDevices", subscriberDevices);
+    }
+
+    bool SubscriberDeviceList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json( Obj,"subscriberDevices", subscriberDevices);
             return true;
         } catch(...) {
 
@@ -818,18 +875,18 @@ namespace OpenWifi::ProvObjects {
     }
 
     void VenueDeviceList::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj,"id",id);
-        RESTAPI_utils::field_to_json(Obj,"name",name);
-        RESTAPI_utils::field_to_json(Obj,"description",description);
-        RESTAPI_utils::field_to_json(Obj,"devices",devices);
+        field_to_json(Obj,"id",id);
+        field_to_json(Obj,"name",name);
+        field_to_json(Obj,"description",description);
+        field_to_json(Obj,"devices",devices);
     }
 
     bool VenueDeviceList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json(Obj,"id",id);
-            RESTAPI_utils::field_from_json(Obj,"name",name);
-            RESTAPI_utils::field_from_json(Obj,"description",description);
-            RESTAPI_utils::field_from_json(Obj,"devices",devices);
+            field_from_json(Obj,"id",id);
+            field_from_json(Obj,"name",name);
+            field_from_json(Obj,"description",description);
+            field_from_json(Obj,"devices",devices);
             return true;
         } catch(...) {
 
@@ -889,24 +946,24 @@ namespace OpenWifi::ProvObjects {
     }
 
     void WebSocketNotificationContent::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj,"title",title);
-        RESTAPI_utils::field_to_json(Obj,"type",type);
-        RESTAPI_utils::field_to_json(Obj,"success",success);
-        RESTAPI_utils::field_to_json(Obj,"errors",errors);
-        RESTAPI_utils::field_to_json(Obj,"warnings",warnings);
-        RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
-        RESTAPI_utils::field_to_json(Obj,"details",details);
+        field_to_json(Obj,"title",title);
+        field_to_json(Obj,"type",type);
+        field_to_json(Obj,"success",success);
+        field_to_json(Obj,"errors",errors);
+        field_to_json(Obj,"warnings",warnings);
+        field_to_json(Obj,"timeStamp",timeStamp);
+        field_to_json(Obj,"details",details);
     }
 
     bool WebSocketNotificationContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json(Obj,"title",title);
-            RESTAPI_utils::field_from_json(Obj,"type",type);
-            RESTAPI_utils::field_from_json(Obj,"success",success);
-            RESTAPI_utils::field_from_json(Obj,"errors",errors);
-            RESTAPI_utils::field_from_json(Obj,"warnings",warnings);
-            RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
-            RESTAPI_utils::field_from_json(Obj,"details",details);
+            field_from_json(Obj,"title",title);
+            field_from_json(Obj,"type",type);
+            field_from_json(Obj,"success",success);
+            field_from_json(Obj,"errors",errors);
+            field_from_json(Obj,"warnings",warnings);
+            field_from_json(Obj,"timeStamp",timeStamp);
+            field_from_json(Obj,"details",details);
             return true;
         } catch(...) {
 
@@ -915,14 +972,14 @@ namespace OpenWifi::ProvObjects {
     }
 
     void WebSocketNotification::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj,"notification_id",notification_id);
-        RESTAPI_utils::field_to_json(Obj,"content",content);
+        field_to_json(Obj,"notification_id",notification_id);
+        field_to_json(Obj,"content",content);
     }
 
     bool WebSocketNotification::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            RESTAPI_utils::field_from_json(Obj,"notification_id",notification_id);
-            RESTAPI_utils::field_from_json(Obj,"content",content);
+            field_from_json(Obj,"notification_id",notification_id);
+            field_from_json(Obj,"content",content);
             return true;
         } catch(...) {
 

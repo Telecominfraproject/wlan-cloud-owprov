@@ -954,6 +954,9 @@ components:
           type: string
           minLength: 3
           maxLength: 3
+        managementPolicy:
+          type: string
+          format: uuid
         period:
           type: string
           enum:
@@ -1036,7 +1039,7 @@ components:
           $ref: '#/components/schemas/ObjectInfo'
         serialNumber:
           type: string
-        operator:
+        operatorId:
           type: string
           format: uuid
         deviceType:

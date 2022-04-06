@@ -18,8 +18,8 @@ namespace OpenWifi {
             ORM::Field{"notes",ORM::FieldType::FT_TEXT},
             ORM::Field{"created",ORM::FieldType::FT_BIGINT},
             ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"contact",ORM::FieldType::FT_TEXT},
-            ORM::Field{"location",ORM::FieldType::FT_TEXT},
+            ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
+            ORM::Field{"locations",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT},
             ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
@@ -79,8 +79,8 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
-    Out.contact = In.get<6>();
-    Out.location = In.get<7>();
+    Out.contacts = OpenWifi::RESTAPI_utils::to_object_array(In.get<6>());
+    Out.locations = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
     Out.managementPolicy = In.get<8>();
     Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
     Out.rrm = In.get<10>();
@@ -98,8 +98,8 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.set<3>(OpenWifi::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
-    Out.set<6>(In.contact);
-    Out.set<7>(In.location);
+    Out.set<6>(OpenWifi::RESTAPI_utils::to_string(In.contacts));
+    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.locations));
     Out.set<8>(In.managementPolicy);
     Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
     Out.set<10>(In.rrm);

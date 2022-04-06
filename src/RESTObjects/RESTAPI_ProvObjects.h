@@ -296,8 +296,8 @@ namespace OpenWifi::ProvObjects {
 
     struct Operator {
         ObjectInfo                      info;
-        Types::UUID_t                   contact;
-        Types::UUID_t                   location;
+        Types::UUIDvec_t                contacts;
+        Types::UUIDvec_t                locations;
         Types::UUID_t                   managementPolicy;
         Types::UUIDvec_t                managementRoles;
         std::string                     rrm;
@@ -306,6 +306,13 @@ namespace OpenWifi::ProvObjects {
         Types::UUIDvec_t                variables;
         bool                            defaultOperator=false;
         Types::StringVec                sourceIP;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct OperatorList {
+        std::vector<Operator>            operators;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -386,20 +393,20 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct UuidList {
-        std::vector<std::string>    list;
+        Types::UUIDvec_t    list;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
     enum ACLACCESS {
-        NONE, READ, MODIFY, CREATE, DELETE
+        NONE = 0, READ=1, MODIFY=2, CREATE=3, DELETE=4
     };
 
     struct ObjectACL {
         UuidList        users;
         UuidList        roles;
-        ACLACCESS       access = NONE;
+        uint64_t        access = (uint64_t) NONE;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -411,13 +418,6 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
-
-    enum VISIBILITY {
-        PUBLIC, PRIVATE, SELECT
-    };
-
-    std::string to_string(VISIBILITY A);
-    VISIBILITY visibility_from_string(const std::string &V);
 
     struct Map {
         ObjectInfo          info;
@@ -510,6 +510,58 @@ namespace OpenWifi::ProvObjects {
         std::string         name;
         std::string         description;
         Types::UUIDvec_t    devices;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct ServiceClass {
+        ObjectInfo                      info;
+        Types::UUID_t                   operatorId;
+        Types::UUID_t                   managementPolicy;
+        double                          cost;
+        std::string                     currency;
+        std::string                     period;
+        std::string                     billingCode;
+        VariableBlockList               variables;
+        bool                            defaultService=false;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct ServiceClassList {
+        std::vector<ServiceClass>            classes;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct SubscriberDevice {
+        ObjectInfo                      info;
+        std::string                     serialNumber;
+        std::string                     deviceType;
+        Types::UUID_t                   operatorId;
+        Types::UUID_t                   subscriber;
+        Types::UUID_t                   location;
+        Types::UUID_t                   contact;
+        Types::UUID_t                   managementPolicy;
+        Types::UUID_t                   serviceClass;
+        std::string                     qrCode;
+        std::string                     geoCode;
+        std::string                     rrm;
+        std::string                     state;
+        std::string                     locale;
+        std::string                     billingCode;
+        DeviceConfigurationElementVec   configuration;
+        bool                            suspended=false;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct SubscriberDeviceList {
+        std::vector<SubscriberDevice>       subscriberDevices;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
