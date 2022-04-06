@@ -1050,9 +1050,6 @@ components:
         contact:
           type: string
           format: uuid
-        deviceConfiguration:
-          type: string
-          format: uuid
         rrm:
           type: string
           enum:
