@@ -940,6 +940,142 @@ components:
           items:
             $ref: '#/components/schemas/VariableBlock'
 
+    ServiceClass:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        operatorId:
+          type: string
+          format: uuid
+        cost:
+          type: number
+        period:
+          type: string
+          enum:
+            - hourly
+            - daily
+            - monthly
+            - yearly
+            - quarterly
+            - lifetime
+          default: monthly
+        billingCode:
+          type: string
+        variables:
+          $ref: '#/components/schemas/VariableBlockList'
+        defaultService:
+          type: boolean
+          default: false
+
+    ServiceClassList:
+      type: object
+      properties:
+        classes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceClass'
+
+    Operator:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+        defaultOperator:
+          type: boolean
+          default: false
+        location:
+          type: string
+          format: uuid
+        contact:
+          type: string
+          format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
+        firmwareUpgrade:
+          type: string
+          example: auto or a time string of the format DOW-HH:MM
+        firmwareRCOnly:
+          type: boolean
+        managementPolicy:
+          type: string
+          format: uuid
+        managementRoles:
+          $ref: '#/components/schemas/ManagementRoleList'
+        sourceIP:
+          $ref: '#/components/schemas/StringList'
+
+    OperatorList:
+      type: object
+      properties:
+        operators:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operator'
+
+    SubscriberDevice:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        serialNumber:
+          type: string
+        operator:
+          type: string
+          format: uuid
+        deviceType:
+          type: string
+        subscriber:
+          type: string
+          format: uuid
+        qrCode:
+          type: string
+        geoCode:
+          type: string
+        location:
+          type: string
+          format: uuid
+        contact:
+          type: string
+          format: uuid
+        deviceConfiguration:
+          type: string
+          format: uuid
+        rrm:
+          type: string
+          enum:
+            - off
+            - on
+            - inherit
+        state:
+          type: string
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 2
+        managementPolicy:
+          type: string
+          format: uuid
+        suspended:
+          type: boolean
+          default: false
+
+    SubscriberDeviceList:
+      type: object
+      properties:
+        subscriberDevices:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriberDevice'
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -1174,16 +1310,6 @@ paths:
           schema:
             type: boolean
           required: false
-        - in: query
-          decription: entity type
-          name: type
-          schema:
-            type: string
-            enum:
-              - subscriber
-              - normal
-            default: normal
-          required: false
 
       responses:
         200:
@@ -1194,7 +1320,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/EntityList'
                   - $ref: '#/components/schemas/CountAnswer'
-
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1218,6 +1345,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Entity'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1246,6 +1375,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Entity'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1274,6 +1405,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Entity'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1296,6 +1429,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1367,6 +1502,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ContactList'
                   - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1400,6 +1537,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Contact'
                   - $ref: '#/components/schemas/ExpandedUseEntryMapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1427,6 +1566,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Contact'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1454,6 +1595,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Contact'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1480,6 +1623,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1539,6 +1684,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/LocationList'
                   - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1572,6 +1719,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Location'
                   - $ref: '#/components/schemas/ExpandedUseEntryMapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1599,6 +1748,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Location'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1626,6 +1777,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/Location'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1652,6 +1805,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1800,6 +1955,12 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: subscriberEntity
+          schema:
+            type: string
+            format: uuid
+          required: false
       responses:
         200:
           description: Succesful retrieve configuratiopn or part of the configuration
@@ -1837,6 +1998,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/InventoryTag'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1859,7 +2022,7 @@ paths:
           schema:
             type: boolean
           required: false
-        - in: path
+        - in: query
           name: removeSubscriber
           schema:
             type: string
@@ -1880,6 +2043,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InventoryTag'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1901,6 +2066,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -1996,6 +2163,8 @@ paths:
                   - $ref: '#/components/schemas/VenueList'
                   - $ref: '#/components/schemas/CountAnswer'
                   - $ref: '#/components/schemas/VenueDeviceList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2100,13 +2269,16 @@ paths:
               $ref: '#/components/schemas/Venue'
 
       responses:
-        description: Return venue information or list of serial number updated
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: '#/components/schemas/Venue'
-                - $ref: '#/components/schemas/SerialNumberList'
+        200:
+          description: Return venue information or list of serial number updated
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Venue'
+                  - $ref: '#/components/schemas/SerialNumberList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2129,6 +2301,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2179,6 +2353,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2205,6 +2381,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Map'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2259,6 +2437,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2279,6 +2459,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2349,6 +2531,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ManagementPolicyList'
                   - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2382,6 +2566,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ManagementPolicy'
                   - $ref: '#/components/schemas/ExpandedUseEntryMapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2409,6 +2595,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2436,6 +2624,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2458,6 +2648,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2517,6 +2709,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ManagementRoleList'
                   - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2549,6 +2743,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ManagementRole'
                   - $ref: '#/components/schemas/ExpandedUseEntryMapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2576,6 +2772,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/ManagementRole'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2603,6 +2801,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/ManagementRole'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2622,6 +2822,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2687,7 +2889,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/DeviceConfigurationList'
                   - $ref: '#/components/schemas/CountAnswer'
-
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2722,6 +2925,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/DeviceConfiguration'
                   - $ref: '#/components/schemas/ExpandedUseEntryMapList'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2755,6 +2960,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/DeviceConfiguration'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2783,6 +2990,8 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/DeviceConfiguration'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2805,6 +3014,8 @@ paths:
       responses:
         204:
           $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -2838,6 +3049,8 @@ paths:
                     type: array
                     items:
                       type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -3072,6 +3285,319 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+
+  /operators:
+    get:
+      operationId: getOperators
+      tags:
+        - Operators
+      summary: Retrieve the list of currently configured operators
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of operators comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of operators
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: Successfully retrieved operator list
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/OperatorList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /operators/{uuid}:
+    get:
+      operationId: getOperator
+      tags:
+        - Operators
+      summary: Retrieve an operator
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/Operator'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteOperator
+      tags:
+        - Operators
+      summary: Delete an operator
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a new operator
+      operationId: createOperator
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example:
+              should be set to 0 when creating a new operator
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+      responses:
+        200:
+          description: successfully created an operator
+          $ref: '#/components/schemas/Operator'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update an existing operator
+      operationId: updateOperator
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+      responses:
+        200:
+          description: successfully created an operator
+          $ref: '#/components/schemas/Operator'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /serviceClasses:
+    get:
+      operationId: getServiceClasses
+      tags:
+        - ServiceClass
+      summary: Retrieve the list of currently configured service class
+      parameters:
+        - in: query
+          description: The operator
+          name: operatorId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of operators comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of operators
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: Successfully retrieved operator list
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ServiceClassList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /serviceClass/{uuid}:
+    get:
+      operationId: getServiceClass
+      tags:
+        - ServiceClass
+      summary: Retrieve a service class
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/ServiceClass'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteServiceClass
+      tags:
+        - ServiceClass
+      summary: Delete a service class
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a service class
+      tags:
+        - ServiceClass
+      operationId: createServiceClass
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example:
+              should be set to 0 when creating a new operator
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceClass'
+      responses:
+        200:
+          $ref: '#/components/schemas/ServiceClass'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a service class
+      tags:
+        - ServiceClass
+      operationId: updateServiceClass
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceClass'
+      responses:
+        200:
+          $ref: '#/components/schemas/ServiceClass'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+
+
+
 
   #########################################################################################
   ##
