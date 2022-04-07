@@ -40,13 +40,10 @@ namespace OpenWifi {
 
     class EntityDB : public ORM::DB<EntityDBRecordType, ProvObjects::Entity> {
     public:
-        static const std::string RootUUID_;
         EntityDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         virtual ~EntityDB() {};
-        inline bool RootExists() const { return RootExists_; };
         static inline bool IsRoot(const std::string &UUID) { return (UUID == RootUUID_); }
         static inline const std::string RootUUID() { return RootUUID_; }
-        bool CheckForRoot();
         void BuildTree(Poco::JSON::Object &Tree, const std::string & Node = RootUUID_ );
         void AddVenues(Poco::JSON::Object &Tree, const std::string & Venue );
         void ImportTree(const Poco::JSON::Object::Ptr &Ptr, const std::string & Node = RootUUID_ );
@@ -55,6 +52,6 @@ namespace OpenWifi {
         bool GetByIP(const std::string &IP, std::string & uuid);
         bool Upgrade(uint32_t from, uint32_t &to) override;
     private:
-        bool RootExists_=false;
+        inline static const std::string RootUUID_{"0000-0000-0000"};
     };
 }

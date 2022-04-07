@@ -14,8 +14,6 @@
 
 namespace OpenWifi {
 
-    const std::string EntityDB::RootUUID_{"0000-0000-0000"};
-
     static  ORM::FieldVec    EntityDB_Fields{
         // object info
         ORM::Field{"id",64, true},
@@ -51,8 +49,6 @@ namespace OpenWifi {
 
     EntityDB::EntityDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "entities", EntityDB_Fields, EntityDB_Indexes, P, L, "ent") {
-
-        CheckForRoot();
     }
 
     bool EntityDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
@@ -94,14 +90,6 @@ namespace OpenWifi {
             Logger().log(E);
         }
         return false;
-    }
-
-    inline bool EntityDB::CheckForRoot() {
-        ProvObjects::Entity E;
-        if(GetRecord("id",RootUUID(),E))
-            RootExists_=true;
-
-        return RootExists_;
     }
 
     void EntityDB::AddVenues(Poco::JSON::Object &Tree, const std::string & Node) {

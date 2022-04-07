@@ -58,8 +58,8 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        if(!DB_.RootExists() && UUID != EntityDB::RootUUID()) {
-            return BadRequest(RESTAPI::Errors::MustCreateRootFirst);
+        if(UUID==EntityDB::RootUUID()) {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         auto Obj = ParseStream();
@@ -99,11 +99,7 @@ namespace OpenWifi{
 
         if(DB_.CreateRecord(NewEntity)) {
             MoveUsage(StorageService()->PolicyDB(),DB_,"",NewEntity.managementPolicy,NewEntity.info.id);
-            if(UUID==EntityDB::RootUUID()) {
-                DB_.CheckForRoot();
-            } else {
-                DB_.AddChild("id",NewEntity.parent,NewEntity.info.id);
-            }
+            DB_.AddChild("id",NewEntity.parent,NewEntity.info.id);
 
             Poco::JSON::Object  Answer;
             NewEntity.to_json(Answer);

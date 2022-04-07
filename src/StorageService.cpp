@@ -84,11 +84,10 @@ namespace OpenWifi {
         ExpandFunc_[ServiceClassDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return ServiceClassDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SubscriberDeviceDB_->GetNameAndDescription(F,V, Name, Description); };
 
-        EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
 
         ConsistencyCheck();
-        CreateDefaultSubscriberOperator();
+        InitializeSystemDBs();
 
         TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
@@ -235,29 +234,37 @@ namespace OpenWifi {
 
     }
 
-    void Storage::CreateDefaultSubscriberOperator() {
-        auto Count = OperatorDB().Count();
-        if(Count>0) {
-            return;
+    void Storage::InitializeSystemDBs() {
+        if(!EntityDB().Exists("id",EntityDB::RootUUID())) {
+            ProvObjects::Entity Root;
+
+            Root.info.id = EntityDB::RootUUID();
+            Root.info.name = "Top Entity";
+            Root.info.created = Root.info.modified = OpenWifi::Now();
+            Root.rrm = "off";
+            EntityDB().CreateRecord(Root);
         }
 
-        ProvObjects::Operator   DefOp;
-        DefOp.info.id = MicroService::CreateUUID();
-        DefOp.info.name = "Default Operator";
-        DefOp.defaultOperator = true;
-        DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
-        DefOp.rrm = "inherit";
-        OperatorDB_->CreateRecord(DefOp);
+        auto OperatorCount = OperatorDB().Count();
+        if(OperatorCount==0) {
+            ProvObjects::Operator DefOp;
+            DefOp.info.id = MicroService::CreateUUID();
+            DefOp.info.name = "Default Operator";
+            DefOp.defaultOperator = true;
+            DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
+            DefOp.rrm = "inherit";
+            OperatorDB_->CreateRecord(DefOp);
 
-        ProvObjects::ServiceClass   DefSer;
-        DefSer.info.id = MicroService::CreateUUID();
-        DefSer.info.name = "Default Operator";
-        DefSer.defaultService = true;
-        DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
-        DefSer.operatorId = DefOp.info.id;
-        DefSer.period = "monthly";
-        DefSer.billingCode = "basic";
-        ServiceClassDB_->CreateRecord(DefSer);
+            ProvObjects::ServiceClass DefSer;
+            DefSer.info.id = MicroService::CreateUUID();
+            DefSer.info.name = "Default Operator";
+            DefSer.defaultService = true;
+            DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
+            DefSer.operatorId = DefOp.info.id;
+            DefSer.period = "monthly";
+            DefSer.billingCode = "basic";
+            ServiceClassDB_->CreateRecord(DefSer);
+        }
     }
 }
 
