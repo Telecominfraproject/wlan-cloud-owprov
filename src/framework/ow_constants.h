@@ -84,6 +84,14 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string VariableMustExist{"Specified variable does not exist."};
     static const std::string InvalidEntityType{"Invalid entity type."};
     static const std::string CannotDeleteSubEntity{"Cannot delete the default subscriber entity."};
+    static const std::string OperatorIdMustExist{"Missing or bad Operator ID"};
+    static const std::string CannotDeleteDefaultOperator{"Cannot delete the default operator."};
+    static const std::string CannotCreateDefaultOperator{"Cannot create the default operator."};
+    static const std::string InvalidRRM{"Invalid RRM value."};
+    static const std::string InvalidIPAddresses{"Invalid IP addresses."};
+    static const std::string InvalidBillingCode{"Empty of invalid billing code."};
+    static const std::string InvalidBillingPeriod{"Invalid billing period."};
+
 }
 
 namespace OpenWifi::RESTAPI::Protocol {

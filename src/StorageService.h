@@ -24,6 +24,8 @@
 #include "storage/storage_signup.h"
 #include "storage/storage_variables.h"
 #include "storage/storage_operataor.h"
+#include "storage/storage_service_class.h"
+#include "storage/storage_sub_devices.h"
 
 namespace OpenWifi {
 
@@ -54,6 +56,8 @@ namespace OpenWifi {
             OpenWifi::SignupDB & SignupDB() { return *SignupDB_; };
             OpenWifi::VariablesDB & VariablesDB() { return *VariablesDB_; };
             OpenWifi::OperatorDB & OperatorDB() { return *OperatorDB_; };
+            OpenWifi::ServiceClassDB & ServiceClassDB() { return *ServiceClassDB_; };
+            OpenWifi::SubscriberDeviceDB & SubscriberDeviceDB() { return *SubscriberDeviceDB_; };
 
             bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
             bool Validate(const Types::StringVec &P, std::string &Error);
@@ -81,6 +85,8 @@ namespace OpenWifi {
             std::unique_ptr<OpenWifi::SignupDB>                 SignupDB_;
             std::unique_ptr<OpenWifi::VariablesDB>              VariablesDB_;
             std::unique_ptr<OpenWifi::OperatorDB>               OperatorDB_;
+            std::unique_ptr<OpenWifi::ServiceClassDB>           ServiceClassDB_;
+            std::unique_ptr<OpenWifi::SubscriberDeviceDB>       SubscriberDeviceDB_;
             std::string                                         DefaultOperator_;
 
 
@@ -92,7 +98,7 @@ namespace OpenWifi {
             std::unique_ptr<Poco::TimerCallback<Storage>>       TimerCallback_;
 
             void ConsistencyCheck();
-            void CreateDefaultSubscriberOperataor();
+            void CreateDefaultSubscriberOperator();
 
    };
 

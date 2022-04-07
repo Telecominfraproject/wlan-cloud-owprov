@@ -30,6 +30,8 @@ namespace OpenWifi {
         SignupDB_ = std::make_unique<OpenWifi::SignupDB>(dbType_, *Pool_, Logger());
         VariablesDB_ = std::make_unique<OpenWifi::VariablesDB>(dbType_, *Pool_, Logger());
         OperatorDB_ = std::make_unique<OpenWifi::OperatorDB>(dbType_, *Pool_, Logger());
+        ServiceClassDB_ = std::make_unique<OpenWifi::ServiceClassDB>(dbType_, *Pool_, Logger());
+        SubscriberDeviceDB_ = std::make_unique<OpenWifi::SubscriberDeviceDB>(dbType_, *Pool_, Logger());
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -45,6 +47,8 @@ namespace OpenWifi {
         SignupDB_->Create();
         VariablesDB_->Create();
         OperatorDB_->Create();
+        ServiceClassDB_->Create();
+        SubscriberDeviceDB_->Create();
 
         ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
         ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
@@ -60,6 +64,8 @@ namespace OpenWifi {
         ExistFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return SignupDB_->Exists(F,V); };
         ExistFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return VariablesDB_->Exists(F,V); };
         ExistFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OperatorDB_->Exists(F,V); };
+        ExistFunc_[ServiceClassDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return ServiceClassDB_->Exists(F,V); };
+        ExistFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return SubscriberDeviceDB_->Exists(F,V); };
 
         ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
@@ -75,12 +81,14 @@ namespace OpenWifi {
         ExpandFunc_[SignupDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return SignupDB_->Exists(F,V);; };
         ExpandFunc_[VariablesDB_->Prefix()] = [=](const char *F, std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return VariablesDB_->Exists(F,V);; };
         ExpandFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OperatorDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[ServiceClassDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return ServiceClassDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SubscriberDeviceDB_->GetNameAndDescription(F,V, Name, Description); };
 
         EntityDB_->CheckForRoot();
         InventoryDB_->InitializeSerialCache();
 
         ConsistencyCheck();
-        CreateDefaultSubscriberOperataor();
+        CreateDefaultSubscriberOperator();
 
         TimerCallback_ = std::make_unique<Poco::TimerCallback<Storage>>(*this,&Storage::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
@@ -227,8 +235,29 @@ namespace OpenWifi {
 
     }
 
-    void Storage::CreateDefaultSubscriberOperataor() {
+    void Storage::CreateDefaultSubscriberOperator() {
+        auto Count = OperatorDB().Count();
+        if(Count>0) {
+            return;
+        }
 
+        ProvObjects::Operator   DefOp;
+        DefOp.info.id = MicroService::CreateUUID();
+        DefOp.info.name = "Default Operator";
+        DefOp.defaultOperator = true;
+        DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
+        DefOp.rrm = "inherit";
+        OperatorDB_->CreateRecord(DefOp);
+
+        ProvObjects::ServiceClass   DefSer;
+        DefSer.info.id = MicroService::CreateUUID();
+        DefSer.info.name = "Default Operator";
+        DefSer.defaultService = true;
+        DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
+        DefSer.operatorId = DefOp.info.id;
+        DefSer.period = "monthly";
+        DefSer.billingCode = "basic";
+        ServiceClassDB_->CreateRecord(DefSer);
     }
 }
 

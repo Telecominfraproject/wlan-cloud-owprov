@@ -270,12 +270,12 @@ namespace OpenWifi::ProvObjects {
     }
 
     void ServiceClassList::to_json(Poco::JSON::Object &Obj) const {
-        field_to_json( Obj,"classes",classes);
+        field_to_json( Obj,"serviceClasses",serviceClasses);
     }
 
     bool ServiceClassList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            field_from_json( Obj,"classes",classes);
+            field_from_json( Obj,"serviceClasses",serviceClasses);
             return true;
         } catch(...) {
         }

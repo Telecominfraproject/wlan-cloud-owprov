@@ -294,29 +294,6 @@ namespace OpenWifi::ProvObjects {
     };
     typedef std::vector<DeviceConfiguration>      DeviceConfigurationVec;
 
-    struct Operator {
-        ObjectInfo                      info;
-        Types::UUIDvec_t                contacts;
-        Types::UUIDvec_t                locations;
-        Types::UUID_t                   managementPolicy;
-        Types::UUIDvec_t                managementRoles;
-        std::string                     rrm;
-        std::string                     firmwareUpgrade;
-        bool                            firmwareRCOnly=true;
-        Types::UUIDvec_t                variables;
-        bool                            defaultOperator=false;
-        Types::StringVec                sourceIP;
-
-        void to_json(Poco::JSON::Object &Obj) const;
-        bool from_json(const Poco::JSON::Object::Ptr &Obj);
-    };
-
-    struct OperatorList {
-        std::vector<Operator>            operators;
-
-        void to_json(Poco::JSON::Object &Obj) const;
-        bool from_json(const Poco::JSON::Object::Ptr &Obj);
-    };
 
     struct InventoryTag {
         ObjectInfo      info;
@@ -505,6 +482,30 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct Operator {
+        ObjectInfo                      info;
+        Types::UUIDvec_t                contacts;
+        Types::UUIDvec_t                locations;
+        Types::UUID_t                   managementPolicy;
+        Types::UUIDvec_t                managementRoles;
+        std::string                     rrm;
+        std::string                     firmwareUpgrade;
+        bool                            firmwareRCOnly=true;
+        std::vector<Variable>           variables;
+        bool                            defaultOperator=false;
+        Types::StringVec                sourceIP;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct OperatorList {
+        std::vector<Operator>            operators;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
     struct VenueDeviceList {
         std::string         id;
         std::string         name;
@@ -523,7 +524,7 @@ namespace OpenWifi::ProvObjects {
         std::string                     currency;
         std::string                     period;
         std::string                     billingCode;
-        VariableBlockList               variables;
+        std::vector<Variable>           variables;
         bool                            defaultService=false;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -531,7 +532,7 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct ServiceClassList {
-        std::vector<ServiceClass>            classes;
+        std::vector<ServiceClass>            serviceClasses;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);

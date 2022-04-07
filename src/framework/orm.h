@@ -33,7 +33,8 @@ namespace ORM {
         FT_TEXT,
         FT_VARCHAR,
         FT_BLOB,
-        FT_BOOLEAN
+        FT_BOOLEAN,
+        FT_REAL
     };
 
     enum Indextype {
@@ -110,6 +111,8 @@ namespace ORM {
                     return "BYTEA";
                 else
                     return "BLOB";
+            case FT_REAL:
+                return "REAL";
             default:
                 assert(false);
 

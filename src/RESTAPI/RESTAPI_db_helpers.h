@@ -11,7 +11,7 @@
 
 namespace OpenWifi {
 
-    static void AddInfoBlock(const ProvObjects::ObjectInfo & O, Poco::JSON::Object &J) {
+    inline static void AddInfoBlock(const ProvObjects::ObjectInfo & O, Poco::JSON::Object &J) {
         J.set("name", O.name);
         J.set("description", O.description);
         J.set("id", O.id);
@@ -303,6 +303,25 @@ namespace OpenWifi {
         }
     }
 
+    template <typename DB> void ListHandlerForOperator(const char *BlockName,DB & DBInstance, RESTAPIHandler & R, const Types::UUID_t & OperatorId ) {
+        typedef typename DB::RecordVec      RecVec;
+        typedef typename DB::RecordName     RecType;
+
+        if(R.QB_.CountOnly) {
+            auto Count = DBInstance.Count( fmt::format(" operatorId='{}'", OperatorId) );
+            return R.ReturnCountOnly(Count);
+        }
+
+        if(!R.QB_.Select.empty()) {
+            return ReturnRecordList<decltype(DBInstance),
+                    RecType>(BlockName, DBInstance, R);
+        }
+
+        RecVec  Entries;
+        DBInstance.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries,fmt::format(" operatorId='{}'", OperatorId));
+        return MakeJSONObjectArray(BlockName, Entries, R);
+    }
+
     template <typename DBUsage, typename ObjectDB> void MoveUsage(DBUsage &DB_InUse, ObjectDB & DB, const std::string & From, const std::string & To, const std::string &Id) {
         if(From!=To) {
             if(!From.empty())
@@ -447,6 +466,18 @@ namespace OpenWifi {
                                     Result["location"] = LC.info.id;
                                 }
                             }
+                            if constexpr(std::is_same_v<Type,ProvObjects::Operator>) {
+                                std::cout << "Location decoded: " << LC.info.name << std::endl;
+                                std::string ParentEntity = FindParentEntity(NewObject);
+                                ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, LC.info);
+                                LC.entity = ParentEntity;
+                                if (StorageService()->LocationDB().CreateRecord(LC)) {
+                                    NewObject.location = LC.info.id;
+                                    AddMembership(StorageService()->EntityDB(), &ProvObjects::Entity::locations,
+                                                  ParentEntity, LC.info.id);
+                                    Result["location"] = LC.info.id;
+                                }
+                            }
                         } else {
                             ErrorText = RESTAPI::Errors::InvalidJSONDocument;
                             break;
@@ -486,7 +517,17 @@ namespace OpenWifi {
         return Result;
     }
 
-    inline bool ValidEntityType(const std::string &v) {
-        return (v=="normal" || v=="subscriber");
+    inline bool ValidRRM(const std::string &V) {
+        return (V=="on" || V=="off" || V=="inherit");
+    }
+
+    inline bool ValidSourceIP([[maybe_unused]] const std::vector<std::string> & IPs) {
+        return true;
+    }
+
+    inline bool ValidPeriod(const std::string &P) {
+        return (P=="hourly" || P=="daily" || P=="monthly" || P=="yearly" ||
+                P=="quarterly" || P=="lifetime" || P=="custom1" ||
+                P=="custom2"|| P=="custom3"|| P=="custom4");
     }
 }

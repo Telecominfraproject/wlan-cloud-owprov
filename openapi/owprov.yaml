@@ -966,11 +966,17 @@ components:
             - yearly
             - quarterly
             - lifetime
+            - custom1
+            - custom2
+            - custom3
+            - custom4
           default: monthly
         billingCode:
           type: string
         variables:
-          $ref: '#/components/schemas/VariableBlockList'
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
         defaultService:
           type: boolean
           default: false
@@ -978,7 +984,7 @@ components:
     ServiceClassList:
       type: object
       properties:
-        classes:
+        serviceClasses:
           type: array
           items:
             $ref: '#/components/schemas/ServiceClass'
@@ -3516,7 +3522,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /serviceClass/{uuid}:
+  /serviceClasses/{uuid}:
     get:
       operationId: getServiceClass
       tags:
@@ -3614,8 +3620,164 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /subscriberDevices:
+    get:
+      operationId: getsubscriberDevices
+      tags:
+        - Subscriber Devices
+      summary: Retrieve the list of subscriber devices
+      parameters:
+        - in: query
+          description: The operator
+          name: operatorId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of operators comma separated
+          name: select
+          schema:
+            type: string
+            example: serial1,serial2,serial3
+          required: false
+        - in: query
+          description: return the number of operators
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: list of subscriber devices
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SubscriberDeviceList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
-
+  /subscriberDevices/{uuid}:
+    get:
+      operationId: getSubscriberDevice
+      tags:
+        - Subscriber Devices
+      summary: Retrieve a subscriber device
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/SubscriberDevice'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteSubscriberDevice
+      tags:
+        - Subscriber Devices
+      summary: Delete a subscriber device
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a subscriber device
+      tags:
+        - Subscriber Devices
+      operationId: createSubscriberDevice
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+            example:
+              should be set to 0 when creating a new operator
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriberDevice'
+      responses:
+        200:
+          $ref: '#/components/schemas/SubscriberDevice'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a subscriber device
+      tags:
+        - Subscriber Devices
+      operationId: updateSubscriberDevice
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriberDevice'
+      responses:
+        200:
+          $ref: '#/components/schemas/SubscriberDevice'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
 
   #########################################################################################

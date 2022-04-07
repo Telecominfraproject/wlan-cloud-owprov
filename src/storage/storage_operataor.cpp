@@ -86,7 +86,7 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.rrm = In.get<10>();
     Out.firmwareUpgrade = In.get<11>();
     Out.firmwareRCOnly = In.get<12>();
-    Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
+    Out.variables = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::Variable>(In.get<13>());
     Out.defaultOperator = In.get<14>();
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<15>());
 }
