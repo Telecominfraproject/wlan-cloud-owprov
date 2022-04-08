@@ -292,7 +292,7 @@ locationcount() {
 
 addconfig() {
     payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios\" , \"weight\" : 100, \"configuration\" : { \"radios\": [{ \"band\": \"5G\", \"channel\": 52, \"channel-mode\": \"HE\", \"channel-width\": 80, \"country\": \"CA\" }, { \"band\": \"2G\", \"channel\": 11, \"channel-mode\": \"HE\", \"channel-width\": 20, \"country\": \"CA\" } ] } }] }"
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
@@ -303,7 +303,7 @@ addconfig() {
 
 addconfigtx() {
     payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"radios TX\" , \"weight\" : 0, \"configuration\" : { \"radios\": [{ \"band\": \"2G\", \"tx-power\": 45 } ] } }] }"
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
@@ -314,7 +314,7 @@ addconfigtx() {
 
 addconfigmetrics() {
     payload="{ \"name\" : \"$1\", \"deviceTypes\" : [\"*\"], \"configuration\" : [ { \"name\" : \"metrics gen\" , \"weight\" : 0, \"configuration\" : { \"metrics\":  { \"statistics\": { \"interval\": 120, \"types\": [ \"ssids\", \"lldp\", \"clients\" ] } } } }] }"
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
@@ -324,7 +324,7 @@ addconfigmetrics() {
 }
 
 addconfigfile() {
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
@@ -333,7 +333,7 @@ addconfigfile() {
 }
 
 getconfig() {
-    curl    ${FLAGS}  "https://${OWPROV}/api/v1/configurations/$1" \
+    curl    ${FLAGS}  "https://${OWPROV}/api/v1/configuration/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}
@@ -341,7 +341,7 @@ getconfig() {
 }
 
 deleteconfig() {
-    curl    ${FLAGS} -X DELETE  "https://${OWPROV}/api/v1/configurations/$1" \
+    curl    ${FLAGS} -X DELETE  "https://${OWPROV}/api/v1/configuration/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}
@@ -359,7 +359,7 @@ setentityconfig() {
 }
 
 listconfigs() {
-    curl    ${FLAGS}  "https://${OWPROV}/api/v1/configurations" \
+    curl    ${FLAGS}  "https://${OWPROV}/api/v1/configuration" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}
@@ -393,7 +393,7 @@ adddeviceconfig() {
 }
 
 validateconfig() {
-    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configurations/1?validateOnly=true" \
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1?validateOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" \
@@ -461,7 +461,7 @@ addresscheck() {
 }
 
 affecteddevices() {
-    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/configurations/${1}?computedAffected=true" \
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/configuration/${1}?computedAffected=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -H "accept: application/json" > ${result_file}

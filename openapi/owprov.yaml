@@ -1477,7 +1477,6 @@ paths:
             format: uuid
             example: When looking for the root entity, the uuid 0000-0000-0000 must be entered.
           required: true
-
       responses:
         200:
           $ref: '#/components/schemas/Entity'
@@ -1487,7 +1486,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Entities
@@ -1507,7 +1505,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Entity'
-
       responses:
         200:
           $ref: '#/components/schemas/Entity'
@@ -1517,7 +1514,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Entities
@@ -1537,7 +1533,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Entity'
-
       responses:
         200:
           $ref: '#/components/schemas/Entity'
@@ -1547,7 +1542,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Entities
@@ -1561,7 +1555,6 @@ paths:
             format: uuid
             example: The root entity cannot be deleted.
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -1628,7 +1621,6 @@ paths:
             type: string
             format: uuid
           required: false
-
       responses:
         200:
           description: Return a list of contacts
@@ -1679,7 +1671,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Contacts
@@ -1698,7 +1689,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Contact'
-
       responses:
         200:
           $ref: '#/components/schemas/Contact'
@@ -1708,7 +1698,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Contacts
@@ -1727,7 +1716,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Contact'
-
       responses:
         200:
           $ref: '#/components/schemas/Contact'
@@ -1737,7 +1725,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Contacts
@@ -1755,7 +1742,6 @@ paths:
           schema:
             type: boolean
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -1810,7 +1796,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Return a list of Locations
@@ -1845,7 +1830,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Success
@@ -1861,7 +1845,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Locations
@@ -1880,7 +1863,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Location'
-
       responses:
         200:
           $ref: '#/components/schemas/Location'
@@ -1890,7 +1872,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Locations
@@ -1909,7 +1890,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Location'
-
       responses:
         200:
           $ref: '#/components/schemas/Location'
@@ -1919,7 +1899,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Locations
@@ -1937,7 +1916,6 @@ paths:
           schema:
             type: boolean
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -2140,7 +2118,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Inventory
@@ -2185,7 +2162,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Inventory
@@ -2327,7 +2303,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Venues
@@ -2372,7 +2347,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Venues
@@ -2419,7 +2393,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Venues
@@ -2433,7 +2406,6 @@ paths:
             format: uuid
             example: The root entity cannot be deleted.
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -2481,7 +2453,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Return a list of Venues
@@ -2509,7 +2480,6 @@ paths:
             type: string
             format: uuid
           required: true
-
       responses:
         200:
           description: Successfull retrieval of a map
@@ -2523,7 +2493,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Maps
@@ -2542,7 +2511,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Map'
-
       responses:
         200:
           $ref: '#/components/schemas/Map'
@@ -2550,7 +2518,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Maps
@@ -2569,7 +2536,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Map'
-
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
@@ -2579,7 +2545,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Maps
@@ -2657,7 +2622,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Return a list of Venues
@@ -2692,7 +2656,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Succesful retrieve a management policy
@@ -2708,7 +2671,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Management Policies
@@ -2727,7 +2689,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ManagementPolicy'
-
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
@@ -2737,7 +2698,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Management Policies
@@ -2756,7 +2716,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ManagementPolicy'
-
       responses:
         200:
           $ref: '#/components/schemas/ManagementPolicy'
@@ -2766,7 +2725,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Management Policies
@@ -2780,7 +2738,6 @@ paths:
             format: uuid
             example: The root entity cannot be deleted.
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -2835,7 +2792,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Return a list of elements
@@ -2914,7 +2870,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Management Roles
@@ -2933,7 +2888,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ManagementRole'
-
       responses:
         200:
           $ref: '#/components/schemas/ManagementRole'
@@ -3015,7 +2969,6 @@ paths:
             type: string
             format: uuid
           required: false
-
       responses:
         200:
           description: Return a list of elements
@@ -3051,7 +3004,6 @@ paths:
           schema:
             type: boolean
           required: false
-
       responses:
         200:
           description: Success
@@ -3067,7 +3019,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Configurations
@@ -3092,7 +3043,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeviceConfiguration'
-
       responses:
         200:
           $ref: '#/components/schemas/DeviceConfiguration'
@@ -3102,7 +3052,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Configurations
@@ -3122,7 +3071,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeviceConfiguration'
-
       responses:
         200:
           $ref: '#/components/schemas/DeviceConfiguration'
@@ -3132,7 +3080,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Configurations
@@ -3146,7 +3093,6 @@ paths:
             format: uuid
             example: The root entity cannot be deleted.
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -3242,7 +3188,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Subscriber Registration
@@ -3280,7 +3225,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     post:
       tags:
         - Subscriber Registration
@@ -3312,7 +3256,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Subscriber Registration
@@ -3351,7 +3294,6 @@ paths:
                 status:
                   type: string
         required: false
-
       responses:
         200:
           $ref: '#/components/schemas/SignupEntry'
@@ -3998,7 +3940,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OperatorLocation'
-
       responses:
         200:
           $ref: '#/components/schemas/OperatorLocation'
@@ -4008,7 +3949,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     put:
       tags:
         - Operator Locations
@@ -4036,7 +3976,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Operator Locations
@@ -4054,7 +3993,6 @@ paths:
           schema:
             type: boolean
           required: true
-
       responses:
         204:
           $ref: '#/components/responses/Success'
@@ -4299,7 +4237,6 @@ paths:
             enum:
               - info
           required: true
-
       responses:
         200:
           description: Successful command execution
