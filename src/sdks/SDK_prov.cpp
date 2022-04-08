@@ -29,7 +29,7 @@ namespace OpenWifi::SDK::Prov {
 
     namespace Configuration {
         bool Get( RESTAPIHandler *client, const std::string &ConfigUUID, ProvObjects::DeviceConfiguration & Config) {
-            std::string         EndPoint = "/api/v1/configurations/" + ConfigUUID ;
+            std::string         EndPoint = "/api/v1/configuration/" + ConfigUUID ;
             auto API = OpenAPIRequestGet(uSERVICE_PROVISIONING, EndPoint, {}, 60000);
             auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
             auto ResponseStatus = API.Do(CallResponse, client->UserInfo_.webtoken.access_token_);
@@ -44,7 +44,7 @@ namespace OpenWifi::SDK::Prov {
         }
 
         bool Delete( RESTAPIHandler *client, const std::string &ConfigUUID) {
-            std::string         EndPoint = "/api/v1/configurations/" + ConfigUUID ;
+            std::string         EndPoint = "/api/v1/configuration/" + ConfigUUID ;
             auto API = OpenAPIRequestDelete(uSERVICE_PROVISIONING, EndPoint, {}, 60000);
             auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
             auto ResponseStatus = API.Do(client->UserInfo_.webtoken.access_token_);
@@ -55,7 +55,7 @@ namespace OpenWifi::SDK::Prov {
         }
 
         bool Create( RESTAPIHandler *client, const std::string & Mac, const ProvObjects::DeviceConfiguration & Config , std::string & ConfigUUID) {
-            std::string         EndPoint = "/api/v1/configurations/0" ;
+            std::string         EndPoint = "/api/v1/configuration/0" ;
             Poco::JSON::Object  Body;
             Config.to_json(Body);
             auto API = OpenAPIRequestPost(uSERVICE_PROVISIONING, EndPoint, {}, Body, 10000);
