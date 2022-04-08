@@ -110,29 +110,37 @@ namespace OpenWifi{
     }
 
     void RESTAPI_location_handler::DoPut() {
-        std::string UUID = GetBinding(RESTAPI::Protocol::UUID,"");
+
+        std::string UUID = GetBinding(RESTAPI::Protocol::UUID);
         ProvObjects::Location   Existing;
         if(UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
             return NotFound();
         }
 
+        std::cout << __LINE__ << std::endl;
         auto RawObject = ParseStream();
+        std::cout << __LINE__ << std::endl;
         ProvObjects::Location NewObject;
+        std::cout << __LINE__ << std::endl;
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
+        std::cout << __LINE__ << std::endl;
 
         std::string FromPolicy, ToPolicy;
         if(!CreateMove(RawObject,"managementPolicy",&LocationDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
             return BadRequest(RESTAPI::Errors::EntityMustExist);
+        std::cout << __LINE__ << std::endl;
 
         std::string FromEntity, ToEntity;
         if(!CreateMove(RawObject,"entity",&LocationDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
             return BadRequest(RESTAPI::Errors::EntityMustExist);
+        std::cout << __LINE__ << std::endl;
 
         AssignIfPresent(RawObject, "buildingName", Existing.buildingName);
         AssignIfPresent(RawObject, "city", Existing.city);
@@ -140,8 +148,10 @@ namespace OpenWifi{
         AssignIfPresent(RawObject, "postal", Existing.postal);
         AssignIfPresent(RawObject, "country", Existing.country);
         AssignIfPresent(RawObject, "geoCode", Existing.geoCode);
+        std::cout << __LINE__ << std::endl;
         if(RawObject->has("addressLines"))
             Existing.addressLines = NewObject.addressLines;
+        std::cout << __LINE__ << std::endl;
         if(RawObject->has("phones"))
             Existing.phones = NewObject.phones;
         if(RawObject->has("mobiles"))
@@ -150,14 +160,20 @@ namespace OpenWifi{
         if(RawObject->has("type"))
             Existing.type = NewObject.type;
 
+        std::cout << __LINE__ << std::endl;
         if(DB_.UpdateRecord("id", UUID, Existing)) {
+            std::cout << __LINE__ << std::endl;
             MoveUsage(StorageService()->PolicyDB(), DB_, FromPolicy, ToPolicy, Existing.info.id);
+            std::cout << __LINE__ << std::endl;
             ManageMembership(Storage().EntityDB(),&ProvObjects::Entity::locations,FromEntity, ToEntity, Existing.info.id);
+            std::cout << __LINE__ << std::endl;
 
+            std::cout << __LINE__ << std::endl;
             ProvObjects::Location    NewObjectAdded;
             DB_.GetRecord("id", UUID, NewObjectAdded);
             Poco::JSON::Object  Answer;
             NewObjectAdded.to_json(Answer);
+            std::cout << __LINE__ << std::endl;
             return ReturnObject(Answer);
         }
         InternalError(RESTAPI::Errors::RecordNotUpdated);
