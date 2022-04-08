@@ -536,7 +536,7 @@ components:
         operatorId:
           type: string
           format: uuid
-        subscriberId:
+        subscriberDeviceId:
           type: string
           format: uuid
         geoCode:
@@ -658,7 +658,7 @@ components:
         operatorId:
           type: string
           format: uuid
-        subscriberId:
+        subscriberDeviceId:
           type: string
           format: uuid
 

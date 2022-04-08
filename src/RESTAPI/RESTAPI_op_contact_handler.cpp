@@ -34,7 +34,7 @@ namespace OpenWifi {
         }
 
         // see if anyone is still using this thing
-        if(!Existing.subscriberId.empty()){
+        if(!Existing.subscriberDeviceId.empty()){
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
 
@@ -51,21 +51,14 @@ namespace OpenWifi {
         }
 
         if( !ValidDbId(NewObject.operatorId,StorageService()->OperatorDB(), false, RESTAPI::Errors::InvalidOperatorId, *this ) ||
-            !ValidDbId(NewObject.managementPolicy,StorageService()->PolicyDB(), false, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
-            !ValidContactType(NewObject.type,*this) ||
-            !ValidSubscriberId(NewObject.subscriberId,true,NewObject.primaryEmail,*this)) {
+            !ValidDbId(NewObject.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
+            !ValidDbId(NewObject.subscriberDeviceId,StorageService()->SubscriberDeviceDB(), true, RESTAPI::Errors::InvalidSubscriberDeviceId, *this ) ||
+            !ValidContactType(NewObject.type,*this) ) {
             return;
         }
 
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
-        if(DB_.CreateRecord(NewObject)) {
-            OpContactDB::RecordName   New;
-            StorageService()->OpContactDB().GetRecord("id", NewObject.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Contact could not be created.");
+        return ReturnCreatedObject(DB_,NewObject,*this);
     }
 
     void RESTAPI_op_contact_handler::DoPut() {
@@ -84,7 +77,7 @@ namespace OpenWifi {
 
         if( !ValidContactType(UpdateObj.type,*this)     ||
             !ValidDbId(UpdateObj.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
-            !ValidSubscriberId(UpdateObj.subscriberId,true,Existing.primaryEmail,*this)
+            !ValidDbId(UpdateObj.subscriberDeviceId,StorageService()->SubscriberDeviceDB(), true, RESTAPI::Errors::InvalidSubscriberDeviceId, *this )
                 ) {
             return;
         }
@@ -101,14 +94,10 @@ namespace OpenWifi {
         AssignIfPresent(RawObject,"phones",Existing.phones);
         AssignIfPresent(RawObject,"accessPIN",Existing.accessPIN);
         AssignIfPresent(RawObject,"secondaryEmail",Existing.secondaryEmail);
+        AssignIfPresent(RawObject,"primaryEmail",Existing.primaryEmail);
+        AssignIfPresent(RawObject,"subscriberDeviceId",Existing.subscriberDeviceId);
+        AssignIfPresent(RawObject,"managementPolicy",Existing.managementPolicy);
 
-        if(DB_.UpdateRecord("id",uuid,Existing)) {
-            OpContactDB::RecordName   New;
-            StorageService()->OpContactDB().GetRecord("id", Existing.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Contact could not be updated.");
+        return ReturnUpdatedObject(DB_,Existing,*this);
     }
 }

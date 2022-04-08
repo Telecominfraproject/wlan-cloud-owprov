@@ -148,16 +148,7 @@ namespace OpenWifi {
         AssignIfPresent(RawObject, "firmwareUpgrade", Existing.firmwareUpgrade);
         AssignIfPresent(RawObject, "firmwareRCOnly", Existing.firmwareRCOnly);
 
-        if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
-            ProvObjects::Operator   New;
-            DB_.GetRecord("id",Existing.info.id,New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-
-        return InternalError("Failed updating operatpr.");
-
+        return ReturnUpdatedObject(DB_, Existing, *this);
     }
 
 }

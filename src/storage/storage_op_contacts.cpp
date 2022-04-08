@@ -33,7 +33,7 @@ namespace OpenWifi {
             ORM::Field{"operatorId",ORM::FieldType::FT_TEXT},
             ORM::Field{"tags",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
-            ORM::Field{"subscriberId",ORM::FieldType::FT_TEXT}
+            ORM::Field{"subscriberDeviceId",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    OpContactDB_Indexes{
@@ -70,7 +70,7 @@ template<> void ORM::DB<OpenWifi::OpContactDBRecordType, OpenWifi::ProvObjects::
     Out.operatorId = In.get<18>();
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<19>());
     Out.managementPolicy = In.get<20>();
-    Out.subscriberId = In.get<21>();
+    Out.subscriberDeviceId = In.get<21>();
 }
 
 template<> void ORM::DB<OpenWifi::OpContactDBRecordType, OpenWifi::ProvObjects::OperatorContact>::Convert(const OpenWifi::ProvObjects::OperatorContact &In, OpenWifi::OpContactDBRecordType &Out) {
@@ -95,5 +95,5 @@ template<> void ORM::DB<OpenWifi::OpContactDBRecordType, OpenWifi::ProvObjects::
     Out.set<18>(In.operatorId);
     Out.set<19>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<20>(In.managementPolicy);
-    Out.set<21>(In.subscriberId);
+    Out.set<21>(In.subscriberDeviceId);
 }

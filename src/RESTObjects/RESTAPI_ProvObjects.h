@@ -213,7 +213,7 @@ namespace OpenWifi::ProvObjects {
         Types::StringVec    mobiles;
         std::string         geoCode;
         Types::UUID_t       operatorId;
-        Types::UUID_t       subscriberId;
+        Types::UUID_t       subscriberDeviceId;
         Types::UUID_t       managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -307,7 +307,7 @@ namespace OpenWifi::ProvObjects {
         std::string     secondaryEmail;
         std::string     accessPIN;
         Types::UUID_t   operatorId;
-        Types::UUID_t   subscriberId;
+        Types::UUID_t   subscriberDeviceId;
         Types::UUID_t   managementPolicy;
 
         void to_json(Poco::JSON::Object &Obj) const;

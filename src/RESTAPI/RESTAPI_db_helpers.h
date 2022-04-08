@@ -626,7 +626,31 @@ namespace OpenWifi {
             H.BadRequest(RESTAPI::Errors::InvalidSerialNumber);
             return false;
         }
-
         return true;
     }
+
+    template <typename DBType, typename DBRecordType> void ReturnUpdatedObject( DBType & DB, const DBRecordType & R, RESTAPIHandler &H) {
+        if(DB.UpdateRecord("id",R.info.id,R)) {
+            DBRecordType    Updated;
+            DB.GetRecord("id",R.info.id,Updated);
+            Poco::JSON::Object  Answer;
+            Updated.to_json(Answer);
+            return H.ReturnObject(Answer);
+        } else {
+            H.InternalError("Record could not be updated.");
+        }
+    }
+
+    template <typename DBType, typename DBRecordType> void ReturnCreatedObject( DBType & DB, const DBRecordType & R, RESTAPIHandler &H) {
+        if(DB.CreateRecord(R)) {
+            DBRecordType    Updated;
+            DB.GetRecord("id",R.info.id,Updated);
+            Poco::JSON::Object  Answer;
+            Updated.to_json(Answer);
+            return H.ReturnObject(Answer);
+        } else {
+            H.InternalError("Record could not be created.");
+        }
+    }
+
 }

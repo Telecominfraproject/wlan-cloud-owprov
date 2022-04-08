@@ -371,7 +371,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"mobiles",mobiles);
         field_to_json( Obj,"geoCode",geoCode);
         field_to_json( Obj,"operatorId",operatorId);
-        field_to_json( Obj,"subscriberId",subscriberId);
+        field_to_json( Obj,"subscriberDeviceId",subscriberDeviceId);
         field_to_json( Obj,"managementPolicy",managementPolicy);
     }
 
@@ -389,7 +389,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"mobiles",mobiles);
             field_from_json( Obj,"geoCode",geoCode);
             field_from_json( Obj,"operatorId",operatorId);
-            field_from_json( Obj,"subscriberId",subscriberId);
+            field_from_json( Obj,"subscriberDeviceId",subscriberDeviceId);
             field_from_json( Obj,"managementPolicy",managementPolicy);
             return true;
         } catch (...) {
@@ -473,7 +473,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"secondaryEmail",secondaryEmail);
         field_to_json( Obj,"accessPIN",accessPIN);
         field_to_json( Obj,"operatorId",operatorId);
-        field_to_json( Obj,"subscriberId",subscriberId);
+        field_to_json( Obj,"subscriberDeviceId",subscriberDeviceId);
         field_to_json( Obj,"managementPolicy",managementPolicy);
     }
 
@@ -493,7 +493,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"secondaryEmail",secondaryEmail);
             field_from_json( Obj,"accessPIN",accessPIN);
             field_from_json( Obj,"operatorId",operatorId);
-            field_from_json( Obj,"subscriberId",subscriberId);
+            field_from_json( Obj,"subscriberDeviceId",subscriberDeviceId);
             field_from_json( Obj,"managementPolicy",managementPolicy);
             return true;
         } catch (...) {

@@ -59,15 +59,7 @@ namespace OpenWifi {
         }
 
         ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info);
-        if(DB_.CreateRecord(NewObject)) {
-            SubscriberDeviceDB::RecordName New;
-            DB_.GetRecord("id",NewObject.info.id,New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Count not create record.");
-
+        return ReturnCreatedObject(DB_,NewObject,*this);
     }
 
     void RESTAPI_sub_devices_handler::DoPut() {
@@ -84,7 +76,37 @@ namespace OpenWifi {
             return NotFound();
         }
 
+        if( !ValidDbId(UpdateObj.managementPolicy, StorageService()->PolicyDB(), true , RESTAPI::Errors::UnknownManagementPolicyUUID, *this) ||
+            !ValidDbId(UpdateObj.contact, StorageService()->OpContactDB(), true, RESTAPI::Errors::InvalidContactId, *this)                   ||
+            !ValidDbId(UpdateObj.location, StorageService()->OpLocationDB(), true, RESTAPI::Errors::InvalidLocationId, *this)                ||
+            !ValidDbId(UpdateObj.operatorId, StorageService()->OperatorDB(), true, RESTAPI::Errors::InvalidOperatorId, *this)                ||
+            !ValidDbId(UpdateObj.serviceClass, StorageService()->ServiceClassDB(), true, RESTAPI::Errors::InvalidServiceClassId, *this)      ||
+            !ValidSubscriberId(UpdateObj.subscriberId, true, *this) ||
+            !ValidRRM(UpdateObj.rrm,*this) ||
+            !ValidSerialNumber(UpdateObj.serialNumber,false,*this)
+                ) {
+            return;
+        }
 
+        ProvObjects::UpdateObjectInfo(RawObject,UserInfo_.userinfo,Existing.info);
+        AssignIfPresent(RawObject, "deviceType", Existing.deviceType);
+        AssignIfPresent(RawObject, "subscriberId", Existing.subscriberId);
+        AssignIfPresent(RawObject, "location", Existing.location);
+        AssignIfPresent(RawObject, "contact", Existing.contact);
+        AssignIfPresent(RawObject, "managementPolicy", Existing.managementPolicy);
+        AssignIfPresent(RawObject, "serviceClass", Existing.serviceClass);
+        AssignIfPresent(RawObject, "qrCode", Existing.qrCode);
+        AssignIfPresent(RawObject, "geoCode", Existing.geoCode);
+        AssignIfPresent(RawObject, "rrm", Existing.rrm);
+        AssignIfPresent(RawObject, "state", Existing.state);
+        AssignIfPresent(RawObject, "locale", Existing.locale);
+        AssignIfPresent(RawObject, "billingCode", Existing.billingCode);
+        AssignIfPresent(RawObject, "realMacAddress", Existing.realMacAddress);
+
+        if(RawObject->has("configuration")) {
+            Existing.configuration = UpdateObj.configuration;
+        }
+        return ReturnUpdatedObject(DB_,Existing,*this);
     }
 
 }

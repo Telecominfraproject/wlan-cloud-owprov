@@ -74,14 +74,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidBillingPeriod);
         }
 
-        if(DB_.CreateRecord(NewObject)) {
-            ProvObjects::ServiceClass   New;
-            StorageService()->ServiceClassDB().GetRecord("id", NewObject.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Service Class could not be created.");
+        return ReturnCreatedObject(DB_, NewObject, *this);
     }
 
     void RESTAPI_service_class_handler::DoPut() {
@@ -114,13 +107,6 @@ namespace OpenWifi {
             Existing.variables = UpdateObj.variables;
         }
 
-        if(DB_.UpdateRecord("id",uuid,Existing)) {
-            ProvObjects::ServiceClass   New;
-            StorageService()->ServiceClassDB().GetRecord("id", Existing.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Service Class could not be updated.");
+        return ReturnUpdatedObject(DB_, Existing, *this);
     }
 }

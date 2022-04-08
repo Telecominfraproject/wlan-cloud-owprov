@@ -34,7 +34,7 @@ namespace OpenWifi {
         }
 
         // see if anyone is still using this thing
-        if(!Existing.subscriberId.empty()){
+        if(!Existing.subscriberDeviceId.empty()){
             return BadRequest(RESTAPI::Errors::StillInUse);
         }
         DB_.DeleteRecord("id", uuid);
@@ -51,20 +51,13 @@ namespace OpenWifi {
 
         if( !ValidDbId(NewObject.operatorId,StorageService()->OperatorDB(), false, RESTAPI::Errors::InvalidOperatorId, *this ) ||
             !ValidDbId(NewObject.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
-            !ValidSubscriberId(NewObject.subscriberId,true, *this)  ||
+            !ValidDbId(NewObject.subscriberDeviceId,StorageService()->SubscriberDeviceDB(), true, RESTAPI::Errors::InvalidSubscriberDeviceId, *this ) ||
             !ValidLocationType(NewObject.type,*this)) {
             return;
         }
 
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
-        if(DB_.CreateRecord(NewObject)) {
-            OpLocationDB::RecordName   New;
-            StorageService()->OpLocationDB().GetRecord("id", NewObject.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Location could not be created.");
+        return ReturnCreatedObject(DB_, NewObject, *this);
     }
 
     void RESTAPI_op_location_handler::DoPut() {
@@ -83,14 +76,14 @@ namespace OpenWifi {
 
         if( !ValidLocationType(UpdateObj.type,*this)     ||
             !ValidDbId(UpdateObj.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
-            !ValidSubscriberId(UpdateObj.subscriberId,true,*this)
+            !ValidDbId(UpdateObj.subscriberDeviceId,StorageService()->SubscriberDeviceDB(), true, RESTAPI::Errors::InvalidSubscriberDeviceId, *this )
             ) {
             return;
         }
 
         ProvObjects::UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
         AssignIfPresent(RawObject,"type",Existing.type);
-        AssignIfPresent(RawObject,"subscriberId", Existing.subscriberId);
+        AssignIfPresent(RawObject,"subscriberDeviceId", Existing.subscriberDeviceId);
         AssignIfPresent(RawObject,"managementPolicy", Existing.managementPolicy);
         AssignIfPresent(RawObject,"buildingName",Existing.buildingName);
         AssignIfPresent(RawObject,"addressLines",Existing.addressLines);
@@ -102,13 +95,6 @@ namespace OpenWifi {
         AssignIfPresent(RawObject,"phones",Existing.phones);
         AssignIfPresent(RawObject,"geoCode",Existing.geoCode);
 
-        if(DB_.UpdateRecord("id",uuid,Existing)) {
-            OpLocationDB::RecordName   New;
-            StorageService()->OpLocationDB().GetRecord("id", Existing.info.id, New);
-            Poco::JSON::Object  Answer;
-            New.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return InternalError("Location could not be updated.");
+        return ReturnUpdatedObject(DB_,Existing,*this);
     }
 }

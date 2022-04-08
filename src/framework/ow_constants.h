@@ -98,6 +98,7 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string InvalidLocationType{"Invalid location type"};
     static const std::string InvalidOperatorId{"Invalid operator ID"};
     static const std::string InvalidServiceClassId{"Invalid service class ID"};
+    static const std::string InvalidSubscriberDeviceId{"Invalid subscriber device ID"};
 }
 
 namespace OpenWifi::RESTAPI::Protocol {
