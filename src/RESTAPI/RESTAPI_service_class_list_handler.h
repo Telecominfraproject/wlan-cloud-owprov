@@ -20,7 +20,7 @@ namespace OpenWifi {
                                  TransactionId,
                                  Internal) {
         }
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/operatorLocations"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/serviceClass"}; };
     private:
         ServiceClassDB    &DB_=StorageService()->ServiceClassDB();
         void DoGet() final;

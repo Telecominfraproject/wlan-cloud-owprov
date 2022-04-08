@@ -3362,7 +3362,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /variables:
+  /variable:
     get:
       tags:
         - Variable Configuration Blocks
@@ -3422,7 +3422,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /operators:
+  /operator:
     get:
       operationId: getOperators
       tags:
@@ -3476,7 +3476,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /operators/{uuid}:
+  /operator/{uuid}:
     get:
       operationId: getOperator
       tags:
@@ -3574,7 +3574,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /serviceClasses:
+  /serviceClass:
     get:
       operationId: getServiceClasses
       tags:
@@ -3635,7 +3635,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /serviceClasses/{uuid}:
+  /serviceClass/{uuid}:
     get:
       operationId: getServiceClass
       tags:
@@ -3733,7 +3733,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /subscriberDevices:
+  /subscriberDevice:
     get:
       operationId: getsubscriberDevices
       tags:
@@ -3794,7 +3794,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /subscriberDevices/{uuid}:
+  /subscriberDevice/{uuid}:
     get:
       operationId: getSubscriberDevice
       tags:
@@ -3958,7 +3958,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /operatorLocations/{uuid}:
+  /operatorLocation/{uuid}:
     get:
       tags:
         - Operator Locations
@@ -4131,7 +4131,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /operatorContacts/{uuid}:
+  /operatorContact/{uuid}:
     get:
       tags:
         - Operator Contacts
