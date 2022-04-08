@@ -1933,7 +1933,7 @@ namespace OpenWifi {
 	        return true;
 	    }
 
-	    [[nodiscard]] inline const std::string & GetBinding(const std::string &Name, const std::string &Default) {
+	    [[nodiscard]] inline const std::string & GetBinding(const std::string &Name, const std::string &Default="") {
 	        auto E = Bindings_.find(Poco::toLower(Name));
 	        if (E == Bindings_.end())
 	            return Default;

@@ -8,6 +8,7 @@
 #include "StorageService.h"
 #include "framework/MicroService.h"
 #include "framework/ConfigurationValidator.h"
+#include "sdks/SDK_sec.h"
 
 namespace OpenWifi {
 
@@ -521,6 +522,13 @@ namespace OpenWifi {
         return (V=="on" || V=="off" || V=="inherit");
     }
 
+    inline bool ValidRRM(const std::string &V, RESTAPIHandler &H) {
+        if(V=="on" || V=="off" || V=="inherit")
+            return true;
+        H.BadRequest(RESTAPI::Errors::InvalidRRM);
+        return false;
+    }
+
     inline bool ValidSourceIP([[maybe_unused]] const std::vector<std::string> & IPs) {
         return true;
     }
@@ -538,9 +546,87 @@ namespace OpenWifi {
                 C=="corporate");
     }
 
+    inline bool ValidContactType(const std::string &contact, RESTAPIHandler &H) {
+        auto C = Poco::toLower(contact);
+        if (C=="subscriber" || C=="user" || C=="installer" || C=="csr" ||
+                C=="manager" || C=="businessowner" || C=="technician" ||
+                C=="corporate")
+            return true;
+        H.BadRequest(RESTAPI::Errors::InvalidContactType);
+        return false;
+    }
+
     inline bool ValidLocationType(const std::string &location) {
         auto C = Poco::toLower(location);
         return (C=="service" || C=="equipment" || C=="auto" || C=="manual" ||
                 C=="special" || C=="unknown" || C=="corporate");
+    }
+
+    inline bool ValidLocationType(const std::string &location, RESTAPIHandler &H) {
+        auto C = Poco::toLower(location);
+        if((C=="service" || C=="equipment" || C=="auto" || C=="manual" ||
+                C=="special" || C=="unknown" || C=="corporate"))
+            return true;
+        H.BadRequest(RESTAPI::Errors::InvalidLocationType);
+        return false;
+    }
+
+    template <typename DBType> bool ValidDbId(const Types::UUID_t &uuid, DBType & DB, bool AllowEmpty , const std::string &Error , RESTAPIHandler & H) {
+        if(!AllowEmpty && uuid.empty()) {
+            H.BadRequest(Error);
+            return false;
+        }
+        if(uuid.empty())
+            return true;
+        if(!DB.Exists("id",uuid)) {
+            H.BadRequest(Error);
+            return false;
+        }
+        return true;
+    }
+
+    inline bool ValidSubscriberId( const Types::UUID_t & uuid, bool AllowEmpty, RESTAPIHandler &H ) {
+        if(!AllowEmpty && uuid.empty()) {
+            H.BadRequest(RESTAPI::Errors::InvalidSubscriberId);
+            return false;
+        }
+        if(uuid.empty())
+            return true;
+        SecurityObjects::UserInfo   NewSubInfo;
+        if(!SDK::Sec::Subscriber::Get(&H, uuid, NewSubInfo)) {
+            H.BadRequest(RESTAPI::Errors::InvalidSubscriberId);
+            return false;
+        }
+        return true;
+    }
+
+    inline bool ValidSubscriberId( const Types::UUID_t & uuid, bool AllowEmpty, std::string & email, RESTAPIHandler &H ) {
+        if(!AllowEmpty && uuid.empty()) {
+            H.BadRequest(RESTAPI::Errors::InvalidSubscriberId);
+            return false;
+        }
+        if(uuid.empty())
+            return true;
+        SecurityObjects::UserInfo   NewSubInfo;
+        if(!SDK::Sec::Subscriber::Get(&H, uuid, NewSubInfo)) {
+            H.BadRequest(RESTAPI::Errors::InvalidSubscriberId);
+            return false;
+        }
+        email = NewSubInfo.email;
+        return true;
+    }
+
+    inline bool ValidSerialNumber(const std::string &serialNumber, bool AllowEmpty, RESTAPIHandler &H) {
+        if(!AllowEmpty && serialNumber.empty()) {
+            H.BadRequest(RESTAPI::Errors::InvalidSerialNumber);
+            return false;
+        }
+
+        if(!Utils::ValidSerialNumber(serialNumber)) {
+            H.BadRequest(RESTAPI::Errors::InvalidSerialNumber);
+            return false;
+        }
+
+        return true;
     }
 }

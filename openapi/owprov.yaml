@@ -1156,12 +1156,14 @@ components:
           $ref: '#/components/schemas/ObjectInfo'
         serialNumber:
           type: string
+        realMacAddress:
+          type: string
         operatorId:
           type: string
           format: uuid
         deviceType:
           type: string
-        subscriber:
+        subscriberId:
           type: string
           format: uuid
         qrCode:

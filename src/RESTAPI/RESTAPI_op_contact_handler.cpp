@@ -50,33 +50,11 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RawObject->has("type")) {
-            if(!NewObject.type.empty()) {
-                if (ValidContactType(NewObject.type)) {
-                    return BadRequest(RESTAPI::Errors::InvalidContactType);
-                }
-                NewObject.type = Poco::toLower(NewObject.type);
-            } else {
-                NewObject.type.clear();
-            }
-        }
-
-        if(NewObject.operatorId.empty() || !StorageService()->OperatorDB().Exists("id",NewObject.operatorId)) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
-
-        if(!NewObject.subscriberId.empty()) {
-            SecurityObjects::UserInfo   NewSubInfo;
-            if(!SDK::Sec::Subscriber::Get(this, NewObject.subscriberId, NewSubInfo)) {
-                return BadRequest(RESTAPI::Errors::InvalidSubscriberId);
-            }
-            NewObject.primaryEmail = NewSubInfo.email;
-        } else {
-            NewObject.primaryEmail.clear();
-        }
-
-        if(RawObject->has("managementPolicy") && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+        if( !ValidDbId(NewObject.operatorId,StorageService()->OperatorDB(), false, RESTAPI::Errors::InvalidOperatorId, *this ) ||
+            !ValidDbId(NewObject.managementPolicy,StorageService()->PolicyDB(), false, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
+            !ValidContactType(NewObject.type,*this) ||
+            !ValidSubscriberId(NewObject.subscriberId,true,NewObject.primaryEmail,*this)) {
+            return;
         }
 
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
@@ -104,33 +82,14 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RawObject->has("managementPolicy") && !StorageService()->PolicyDB().Exists("id",UpdateObj.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-        }
-
-        if(!UpdateObj.subscriberId.empty()) {
-            SecurityObjects::UserInfo   NewSubInfo;
-            if(!SDK::Sec::Subscriber::Get(this, UpdateObj.subscriberId, NewSubInfo)) {
-                return BadRequest(RESTAPI::Errors::InvalidSubscriberId);
-            }
-            UpdateObj.primaryEmail = NewSubInfo.email;
-        } else {
-            UpdateObj.primaryEmail.clear();
-        }
-
-        if(RawObject->has("type")) {
-            if(!UpdateObj.type.empty()) {
-                if (ValidContactType(UpdateObj.type)) {
-                    return BadRequest(RESTAPI::Errors::InvalidContactType);
-                }
-                Existing.type = Poco::toLower(UpdateObj.type);
-            } else {
-                Existing.type.clear();
-            }
+        if( !ValidContactType(UpdateObj.type,*this)     ||
+            !ValidDbId(UpdateObj.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
+            !ValidSubscriberId(UpdateObj.subscriberId,true,Existing.primaryEmail,*this)
+                ) {
+            return;
         }
 
         ProvObjects::UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
-
         AssignIfPresent(RawObject,"type",Existing.type);
         AssignIfPresent(RawObject,"title",Existing.title);
         AssignIfPresent(RawObject,"salutation",Existing.salutation);

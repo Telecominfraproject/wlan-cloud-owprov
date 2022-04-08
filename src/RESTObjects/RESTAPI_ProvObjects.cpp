@@ -927,7 +927,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"serialNumber", serialNumber);
         field_to_json( Obj,"deviceType", deviceType);
         field_to_json( Obj,"operatorId", operatorId);
-        field_to_json( Obj,"subscriber", subscriber);
+        field_to_json( Obj,"subscriberId", subscriberId);
         field_to_json( Obj,"location", location);
         field_to_json( Obj,"contact", contact);
         field_to_json( Obj,"managementPolicy", managementPolicy);
@@ -940,6 +940,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"billingCode", billingCode);
         field_to_json( Obj,"configuration", configuration);
         field_to_json( Obj,"suspended", suspended);
+        field_to_json( Obj,"realMacAddress", realMacAddress);
     }
 
     bool SubscriberDevice::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -948,7 +949,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"serialNumber", serialNumber);
             field_from_json( Obj,"deviceType", deviceType);
             field_from_json( Obj,"operatorId", operatorId);
-            field_from_json( Obj,"subscriber", subscriber);
+            field_from_json( Obj,"subscriberId", subscriberId);
             field_from_json( Obj,"location", location);
             field_from_json( Obj,"contact", contact);
             field_from_json( Obj,"managementPolicy", managementPolicy);
@@ -961,6 +962,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"billingCode", billingCode);
             field_from_json( Obj,"configuration", configuration);
             field_from_json( Obj,"suspended", suspended);
+            field_from_json( Obj,"realMacAddress", realMacAddress);
             return true;
         } catch(...) {
 

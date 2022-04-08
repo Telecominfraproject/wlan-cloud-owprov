@@ -49,30 +49,11 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RawObject->has("type")) {
-            if(!NewObject.type.empty()) {
-                if (ValidLocationType(NewObject.type)) {
-                    return BadRequest(RESTAPI::Errors::InvalidLocationType);
-                }
-                NewObject.type = Poco::toLower(NewObject.type);
-            } else {
-                NewObject.type.clear();
-            }
-        }
-
-        if(NewObject.operatorId.empty() || !StorageService()->OperatorDB().Exists("id",NewObject.operatorId)) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
-
-        if(!NewObject.subscriberId.empty()) {
-            SecurityObjects::UserInfo   NewSubInfo;
-            if(!SDK::Sec::Subscriber::Get(this, NewObject.subscriberId, NewSubInfo)) {
-                return BadRequest(RESTAPI::Errors::InvalidSubscriberId);
-            }
-        }
-
-        if(RawObject->has("managementPolicy") && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+        if( !ValidDbId(NewObject.operatorId,StorageService()->OperatorDB(), false, RESTAPI::Errors::InvalidOperatorId, *this ) ||
+            !ValidDbId(NewObject.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
+            !ValidSubscriberId(NewObject.subscriberId,true, *this)  ||
+            !ValidLocationType(NewObject.type,*this)) {
+            return;
         }
 
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
@@ -100,33 +81,17 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RawObject->has("type")) {
-            if(!UpdateObj.type.empty()) {
-                if (ValidLocationType(UpdateObj.type)) {
-                    return BadRequest(RESTAPI::Errors::InvalidLocationType);
-                }
-                Existing.type = Poco::toLower(UpdateObj.type);
-            } else {
-                Existing.type.clear();
-            }
-        }
-
-        if(RawObject->has("managementPolicy") && !StorageService()->PolicyDB().Exists("id",UpdateObj.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-        }
-
-        if(!UpdateObj.subscriberId.empty()) {
-            SecurityObjects::UserInfo   NewSubInfo;
-            if(!SDK::Sec::Subscriber::Get(this, UpdateObj.subscriberId, NewSubInfo)) {
-                return BadRequest(RESTAPI::Errors::InvalidSubscriberId);
-            }
-        } else {
-            if(RawObject->has("subscriberId") && UpdateObj.subscriberId.empty())
-                Existing.subscriberId.clear();
+        if( !ValidLocationType(UpdateObj.type,*this)     ||
+            !ValidDbId(UpdateObj.managementPolicy,StorageService()->PolicyDB(), true, RESTAPI::Errors::UnknownManagementPolicyUUID, *this ) ||
+            !ValidSubscriberId(UpdateObj.subscriberId,true,*this)
+            ) {
+            return;
         }
 
         ProvObjects::UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
-
+        AssignIfPresent(RawObject,"type",Existing.type);
+        AssignIfPresent(RawObject,"subscriberId", Existing.subscriberId);
+        AssignIfPresent(RawObject,"managementPolicy", Existing.managementPolicy);
         AssignIfPresent(RawObject,"buildingName",Existing.buildingName);
         AssignIfPresent(RawObject,"addressLines",Existing.addressLines);
         AssignIfPresent(RawObject,"city",Existing.city);

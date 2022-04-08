@@ -41,7 +41,8 @@ namespace OpenWifi {
             std::string,
             std::string,
             std::string,
-            bool
+            bool,
+            std::string
     > SubDeviceDBRecordType;
 
     class SubscriberDeviceDB : public ORM::DB<SubDeviceDBRecordType, ProvObjects::SubscriberDevice> {

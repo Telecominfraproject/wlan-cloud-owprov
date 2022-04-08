@@ -601,7 +601,7 @@ namespace OpenWifi::ProvObjects {
         std::string                     serialNumber;
         std::string                     deviceType;
         Types::UUID_t                   operatorId;
-        Types::UUID_t                   subscriber;
+        Types::UUID_t                   subscriberId;
         Types::UUID_t                   location;
         Types::UUID_t                   contact;
         Types::UUID_t                   managementPolicy;
@@ -614,6 +614,7 @@ namespace OpenWifi::ProvObjects {
         std::string                     billingCode;
         DeviceConfigurationElementVec   configuration;
         bool                            suspended=false;
+        std::string                     realMacAddress;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
