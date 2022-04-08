@@ -355,13 +355,17 @@ namespace OpenWifi {
     }
 
     template <typename DB, typename Member> void RemoveMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+        std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
             TheDB.ManipulateVectorMember(T, "id", Obj, Id, false);
+        std::cout << __LINE__ << std::endl;
     }
 
     template <typename DB, typename Member> void AddMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+        std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
             TheDB.ManipulateVectorMember(T, "id", Obj, Id, true);
+        std::cout << __LINE__ << std::endl;
     }
 
     template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const std::string & From, const std::string & To, const std::string &Id) {
@@ -370,12 +374,22 @@ namespace OpenWifi {
     }
 
     template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
+        std::cout << __LINE__ << std::endl;
         if(From!=To) {
-            for (const auto &i: From)
+            std::cout << __LINE__ << std::endl;
+            for (const auto &i: From) {
+                std::cout << __LINE__ << std::endl;
                 RemoveMembership(TheDB, T, i, Id);
-            for (const auto &i: To)
+                std::cout << __LINE__ << std::endl;
+            }
+            for (const auto &i: To) {
+                std::cout << __LINE__ << std::endl;
                 AddMembership(TheDB, T, i, Id);
+                std::cout << __LINE__ << std::endl;
+            }
+            std::cout << __LINE__ << std::endl;
         }
+        std::cout << __LINE__ << std::endl;
     }
 
     template <typename Member, typename Rec, typename DB > bool CreateMove(const Poco::JSON::Object::Ptr & RawObj, const char *fieldname, Member T, Rec & Existing, std::string &From, std::string &To, DB & TheDB) {
