@@ -19,7 +19,7 @@ namespace OpenWifi {
             Server,
             TransactionId,
             Internal){}
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/configurations"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/configuration"}; };
     private:
         ConfigurationDB & DB_=StorageService()->ConfigurationDB();
         void DoGet() final;

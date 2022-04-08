@@ -2965,7 +2965,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /configurations:
+  /configuration:
     get:
       tags:
         - Configurations
@@ -3032,7 +3032,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /configurations/{uuid}:
+  /configuration/{uuid}:
     get:
       tags:
         - Configurations
