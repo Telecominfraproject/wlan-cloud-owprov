@@ -1,5 +1,5 @@
 //
-// Created by stephane bourque on 2022-04-06.
+// Created by stephane bourque on 2022-04-07.
 //
 
 #pragma once
@@ -9,9 +9,9 @@
 
 namespace OpenWifi {
 
-    class RESTAPI_service_class_list_handler : public RESTAPIHandler {
+    class RESTAPI_op_location_list_handler : public RESTAPIHandler {
     public:
-        RESTAPI_service_class_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, uint64_t TransactionId, bool Internal)
+        RESTAPI_op_location_list_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer & Server, uint64_t TransactionId, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>{
                                          Poco::Net::HTTPRequest::HTTP_GET,
@@ -20,9 +20,9 @@ namespace OpenWifi {
                                  TransactionId,
                                  Internal) {
         }
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/operatorLocations"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/operatorLocation"}; };
     private:
-        ServiceClassDB    &DB_=StorageService()->ServiceClassDB();
+        OpLocationDB    &DB_=StorageService()->OpLocationDB();
         void DoGet() final;
         void DoPost() final {};
         void DoPut() final {};

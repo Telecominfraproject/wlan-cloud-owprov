@@ -195,8 +195,6 @@ namespace OpenWifi::ProvObjects {
 
     void Operator::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
-        field_to_json( Obj,"contacts",contacts);
-        field_to_json( Obj,"locations",locations);
         field_to_json( Obj,"managementPolicy",managementPolicy);
         field_to_json( Obj,"managementRoles",managementRoles);
         field_to_json( Obj,"rrm",rrm);
@@ -210,8 +208,6 @@ namespace OpenWifi::ProvObjects {
     bool Operator::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             info.from_json(Obj);
-            field_from_json( Obj,"contacts",contacts);
-            field_from_json( Obj,"locations",locations);
             field_from_json( Obj,"managementPolicy",managementPolicy);
             field_from_json( Obj,"managementRoles",managementRoles);
             field_from_json( Obj,"rrm",rrm);
@@ -362,6 +358,60 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void OperatorLocation::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json( Obj,"type",type);
+        field_to_json( Obj,"buildingName",buildingName);
+        field_to_json( Obj,"addressLines",addressLines);
+        field_to_json( Obj,"city",city);
+        field_to_json( Obj,"state",state);
+        field_to_json( Obj,"postal",postal);
+        field_to_json( Obj,"country",country);
+        field_to_json( Obj,"phones",phones);
+        field_to_json( Obj,"mobiles",mobiles);
+        field_to_json( Obj,"geoCode",geoCode);
+        field_to_json( Obj,"operatorId",operatorId);
+        field_to_json( Obj,"subscriberId",subscriberId);
+        field_to_json( Obj,"managementPolicy",managementPolicy);
+    }
+
+    bool OperatorLocation::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json( Obj,"type", type);
+            field_from_json( Obj,"buildingName",buildingName);
+            field_from_json( Obj,"addressLines",addressLines);
+            field_from_json( Obj,"city",city);
+            field_from_json( Obj,"state",state);
+            field_from_json( Obj,"postal",postal);
+            field_from_json( Obj,"country",country);
+            field_from_json( Obj,"phones",phones);
+            field_from_json( Obj,"mobiles",mobiles);
+            field_from_json( Obj,"geoCode",geoCode);
+            field_from_json( Obj,"operatorId",operatorId);
+            field_from_json( Obj,"subscriberId",subscriberId);
+            field_from_json( Obj,"managementPolicy",managementPolicy);
+            return true;
+        } catch (...) {
+
+        }
+        return false;
+    }
+
+    void OperatorLocationList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json( Obj, "locations", locations);
+    }
+
+    bool OperatorLocationList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json( Obj, "locations", locations);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
     void Contact::to_json(Poco::JSON::Object &Obj) const {
         info.to_json(Obj);
         field_to_json( Obj,"type", to_string(type));
@@ -403,6 +453,64 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"managementPolicy",managementPolicy);
             return true;
         } catch (...) {
+
+        }
+        return false;
+    }
+
+    void OperatorContact::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json( Obj,"type", type);
+        field_to_json( Obj,"title",title);
+        field_to_json( Obj,"salutation",salutation);
+        field_to_json( Obj,"firstname",firstname);
+        field_to_json( Obj,"lastname",lastname);
+        field_to_json( Obj,"initials",initials);
+        field_to_json( Obj,"visual",visual);
+        field_to_json( Obj,"mobiles",mobiles);
+        field_to_json( Obj,"phones",phones);
+        field_to_json( Obj,"primaryEmail",primaryEmail);
+        field_to_json( Obj,"secondaryEmail",secondaryEmail);
+        field_to_json( Obj,"accessPIN",accessPIN);
+        field_to_json( Obj,"operatorId",operatorId);
+        field_to_json( Obj,"subscriberId",subscriberId);
+        field_to_json( Obj,"managementPolicy",managementPolicy);
+    }
+
+    bool OperatorContact::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json( Obj,"type", type);
+            field_from_json( Obj,"title",title);
+            field_from_json( Obj,"salutation",salutation);
+            field_from_json( Obj,"firstname",firstname);
+            field_from_json( Obj,"lastname",lastname);
+            field_from_json( Obj,"initials",initials);
+            field_from_json( Obj,"visual",visual);
+            field_from_json( Obj,"mobiles",mobiles);
+            field_from_json( Obj,"phones",phones);
+            field_from_json( Obj,"primaryEmail",primaryEmail);
+            field_from_json( Obj,"secondaryEmail",secondaryEmail);
+            field_from_json( Obj,"accessPIN",accessPIN);
+            field_from_json( Obj,"operatorId",operatorId);
+            field_from_json( Obj,"subscriberId",subscriberId);
+            field_from_json( Obj,"managementPolicy",managementPolicy);
+            return true;
+        } catch (...) {
+
+        }
+        return false;
+    }
+
+    void OperatorContactList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json( Obj, "contacts", contacts);
+    }
+
+    bool OperatorContactList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json( Obj, "contacts", contacts);
+            return true;
+        } catch(...) {
 
         }
         return false;

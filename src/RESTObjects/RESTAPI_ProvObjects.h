@@ -200,6 +200,35 @@ namespace OpenWifi::ProvObjects {
     };
     typedef std::vector<Location>      LocationVec;
 
+    struct OperatorLocation {
+        ObjectInfo          info;
+        std::string         type;
+        std::string         buildingName;
+        Types::StringVec    addressLines;
+        std::string         city;
+        std::string         state;
+        std::string         postal;
+        std::string         country;
+        Types::StringVec    phones;
+        Types::StringVec    mobiles;
+        std::string         geoCode;
+        Types::UUID_t       operatorId;
+        Types::UUID_t       subscriberId;
+        Types::UUID_t       managementPolicy;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+    typedef std::vector<Location>      LocationVec;
+
+    struct OperatorLocationList {
+        std::vector<OperatorLocation>    locations;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+
     enum ContactType {
         CT_SUBSCRIBER, CT_USER, CT_INSTALLER, CT_CSR, CT_MANAGER,
         CT_BUSINESSOWNER, CT_TECHNICIAN, CT_CORPORATE, CT_UNKNOWN
@@ -262,6 +291,37 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
     typedef std::vector<Contact>      ContactVec;
+
+    struct OperatorContact {
+        ObjectInfo      info;
+        std::string     type;
+        std::string     title;
+        std::string     salutation;
+        std::string     firstname;
+        std::string     lastname;
+        std::string     initials;
+        std::string     visual;
+        Types::StringVec mobiles;
+        Types::StringVec phones;
+        std::string     primaryEmail;
+        std::string     secondaryEmail;
+        std::string     accessPIN;
+        Types::UUID_t   operatorId;
+        Types::UUID_t   subscriberId;
+        Types::UUID_t   managementPolicy;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct OperatorContactList {
+        std::vector<OperatorContact>    contacts;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    typedef std::vector<OperatorContact>      OperatorContactVec;
 
     struct DeviceConfigurationElement {
         std::string name;
@@ -484,8 +544,6 @@ namespace OpenWifi::ProvObjects {
 
     struct Operator {
         ObjectInfo                      info;
-        Types::UUIDvec_t                contacts;
-        Types::UUIDvec_t                locations;
         Types::UUID_t                   managementPolicy;
         Types::UUIDvec_t                managementRoles;
         std::string                     rrm;

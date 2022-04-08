@@ -78,6 +78,19 @@ namespace OpenWifi {
 
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
         if(DB_.CreateRecord(NewObject)) {
+
+            // Create the default service...
+
+            ProvObjects::ServiceClass DefSer;
+            DefSer.info.id = MicroService::CreateUUID();
+            DefSer.info.name = "Default Service Class";
+            DefSer.defaultService = true;
+            DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
+            DefSer.operatorId = NewObject.info.id;
+            DefSer.period = "monthly";
+            DefSer.billingCode = "basic";
+            StorageService()->ServiceClassDB().CreateRecord(DefSer);
+
             ProvObjects::Operator   New;
             DB_.GetRecord("id",NewObject.info.id,New);
             Poco::JSON::Object  Answer;

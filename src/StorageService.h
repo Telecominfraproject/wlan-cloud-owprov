@@ -15,7 +15,9 @@
 #include "storage/storage_policies.h"
 #include "storage/storage_venue.h"
 #include "storage/storage_location.h"
+#include "storage/storage_op_locations.h"
 #include "storage/storage_contact.h"
+#include "storage/storage_op_contacts.h"
 #include "storage/storage_inventory.h"
 #include "storage/storage_management_roles.h"
 #include "storage/storage_configurations.h"
@@ -58,6 +60,8 @@ namespace OpenWifi {
             OpenWifi::OperatorDB & OperatorDB() { return *OperatorDB_; };
             OpenWifi::ServiceClassDB & ServiceClassDB() { return *ServiceClassDB_; };
             OpenWifi::SubscriberDeviceDB & SubscriberDeviceDB() { return *SubscriberDeviceDB_; };
+            OpenWifi::OpLocationDB & OpLocationDB() { return *OpLocationDB_; };
+            OpenWifi::OpContactDB & OpContactDB() { return *OpContactDB_; };
 
             bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
             bool Validate(const Types::StringVec &P, std::string &Error);
@@ -87,6 +91,8 @@ namespace OpenWifi {
             std::unique_ptr<OpenWifi::OperatorDB>               OperatorDB_;
             std::unique_ptr<OpenWifi::ServiceClassDB>           ServiceClassDB_;
             std::unique_ptr<OpenWifi::SubscriberDeviceDB>       SubscriberDeviceDB_;
+            std::unique_ptr<OpenWifi::OpLocationDB>             OpLocationDB_;
+            std::unique_ptr<OpenWifi::OpContactDB>              OpContactDB_;
             std::string                                         DefaultOperator_;
 
 

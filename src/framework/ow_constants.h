@@ -91,7 +91,9 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string InvalidIPAddresses{"Invalid IP addresses."};
     static const std::string InvalidBillingCode{"Empty of invalid billing code."};
     static const std::string InvalidBillingPeriod{"Invalid billing period."};
-
+    static const std::string InvalidSubscriberId{"Invalid subscriber ID"};
+    static const std::string InvalidContactType{"Invalid contact type"};
+    static const std::string InvalidLocationType{"Invalid location type"};
 }
 
 namespace OpenWifi::RESTAPI::Protocol {

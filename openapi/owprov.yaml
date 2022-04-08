@@ -496,6 +496,60 @@ components:
           items:
             $ref: '#/components/schemas/Location'
 
+    OperatorLocation:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        type:
+          type: string
+          enum:
+            - SERVICE
+            - EQUIPMENT
+            - AUTO
+            - MANUAL
+            - SPECIAL
+            - UNKNOWN
+            - CORPORATE
+        buildingName:
+          type: string
+        addressLines:
+          type: array
+          items:
+            type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal:
+          type: string
+        country:
+          type: string
+        phones:
+          type: array
+          items:
+            type: string
+        mobiles:
+          type: array
+          items:
+            type: string
+        operatorId:
+          type: string
+          format: uuid
+        subscriberId:
+          type: string
+          format: uuid
+        geoCode:
+          type: string
+
+    OperatorLocationList:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatorLocation'
+
     # uuids: con:<uuid>
     Contact:
       type: object
@@ -558,6 +612,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Contact'
+
+    OperatorContact:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/ObjectInfo'
+        type:
+          type: string
+          enum:
+            - SUBSCRIBER
+            - USER
+            - INSTALLER
+            - CSR
+            - MANAGER
+            - BUSINESSOWNER
+            - TECHNICIAN
+            - CORPORATE
+        title:
+          type: string
+        salutation:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        initials:
+          type: string
+        visual:
+          type: string
+        phones:
+          type: array
+          items:
+            type: string
+        mobiles:
+          type: array
+          items:
+            type: string
+        primaryEmail:
+          type: string
+        secondaryEmail:
+          type: string
+        accessPIN:
+          type: string
+        operatorId:
+          type: string
+          format: uuid
+        subscriberId:
+          type: string
+          format: uuid
+
+    OperatorContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatorContact'
 
     DeviceConfigurationElement:
       type: object
@@ -3772,6 +3883,348 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/SubscriberDevice'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /operatorLocation:
+    get:
+      tags:
+        - Operator Locations
+      operationId: getOperatorLocations
+      summary: Retrieve a list of locations.
+      parameters:
+        - in: query
+          name: operatorId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of Locations comma separated
+          name: select
+          schema:
+            type: string
+            example: uuid1,uuid2,uuid3
+          required: false
+        - in: query
+          description: return the number of Locations
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: return only the UUIDs of Locations
+          name: uuidOnly
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: Return a list of Locations
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/OperatorLocationList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /operatorLocations/{uuid}:
+    get:
+      tags:
+        - Operator Locations
+      operationId: getOperatorLocation
+      summary: Retrieve a specific location.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorLocation'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Operator Locations
+      operationId: createOperatorLocation
+      summary: Create a specific location.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorLocation'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorLocation'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Operator Locations
+      operationId: modifyOperatorLocation
+      summary: Modify a specific location.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorLocation'
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorLocation'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Operator Locations
+      operationId: deleteOperatorLocation
+      summary: Delete a specific location.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: force
+          schema:
+            type: boolean
+          required: true
+
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /operatorContact:
+    get:
+      tags:
+        - Operator Contacts
+      operationId: getOperatorContacts
+      summary: Retrieve a list of operator contacts.
+      parameters:
+        - in: query
+          name: operatorId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Filter the results
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Supply a list of operator contacts comma separated
+          name: select
+          schema:
+            type: string
+            example: uuid1,uuid2,uuid3
+          required: false
+        - in: query
+          description: return the number of operator contacts
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: return only the UUIDs of operator contacts
+          name: uuidOnly
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: Return a list of operator contacts
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/OperatorContactList'
+                  - $ref: '#/components/schemas/CountAnswer'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /operatorContacts/{uuid}:
+    get:
+      tags:
+        - Operator Contacts
+      operationId: getOperatorContact
+      summary: Retrieve a specific operator contact.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorContact'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Operator Contacts
+      operationId: createOperatorContact
+      summary: Create a specific operator contact.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to create the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorContact'
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorContact'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Operator Contacts
+      operationId: modifyOperatorContact
+      summary: Modify a specific operator contact.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: Information used to modify the new entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorContact'
+      responses:
+        200:
+          $ref: '#/components/schemas/OperatorContact'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Operator Contacts
+      operationId: deleteOperatorContact
+      summary: Delete a specific operator contact.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: force
+          schema:
+            type: boolean
+          required: true
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

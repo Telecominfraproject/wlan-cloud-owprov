@@ -18,8 +18,6 @@ namespace OpenWifi {
             ORM::Field{"notes",ORM::FieldType::FT_TEXT},
             ORM::Field{"created",ORM::FieldType::FT_BIGINT},
             ORM::Field{"modified",ORM::FieldType::FT_BIGINT},
-            ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
-            ORM::Field{"locations",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
             ORM::Field{"managementRoles",ORM::FieldType::FT_TEXT},
             ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
@@ -79,16 +77,14 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.info.notes = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::SecurityObjects::NoteInfo>(In.get<3>());
     Out.info.created = In.get<4>();
     Out.info.modified = In.get<5>();
-    Out.contacts = OpenWifi::RESTAPI_utils::to_object_array(In.get<6>());
-    Out.locations = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
-    Out.managementPolicy = In.get<8>();
-    Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
-    Out.rrm = In.get<10>();
-    Out.firmwareUpgrade = In.get<11>();
-    Out.firmwareRCOnly = In.get<12>();
-    Out.variables = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::Variable>(In.get<13>());
-    Out.defaultOperator = In.get<14>();
-    Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<15>());
+    Out.managementPolicy = In.get<6>();
+    Out.managementRoles = OpenWifi::RESTAPI_utils::to_object_array(In.get<7>());
+    Out.rrm = In.get<8>();
+    Out.firmwareUpgrade = In.get<9>();
+    Out.firmwareRCOnly = In.get<10>();
+    Out.variables = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::Variable>(In.get<11>());
+    Out.defaultOperator = In.get<12>();
+    Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
 }
 
 template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObjects::Operator>::Convert(const OpenWifi::ProvObjects::Operator &In, OpenWifi::OperatorDBRecordType &Out) {
@@ -98,14 +94,12 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.set<3>(OpenWifi::RESTAPI_utils::to_string(In.info.notes));
     Out.set<4>(In.info.created);
     Out.set<5>(In.info.modified);
-    Out.set<6>(OpenWifi::RESTAPI_utils::to_string(In.contacts));
-    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.locations));
-    Out.set<8>(In.managementPolicy);
-    Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
-    Out.set<10>(In.rrm);
-    Out.set<11>(In.firmwareUpgrade);
-    Out.set<12>(In.firmwareRCOnly);
-    Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.variables));
-    Out.set<14>(In.defaultOperator);
-    Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
+    Out.set<6>(In.managementPolicy);
+    Out.set<7>(OpenWifi::RESTAPI_utils::to_string(In.managementRoles));
+    Out.set<8>(In.rrm);
+    Out.set<9>(In.firmwareUpgrade);
+    Out.set<10>(In.firmwareRCOnly);
+    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.variables));
+    Out.set<12>(In.defaultOperator);
+    Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
 }

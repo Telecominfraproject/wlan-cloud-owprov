@@ -32,6 +32,8 @@ namespace OpenWifi {
         OperatorDB_ = std::make_unique<OpenWifi::OperatorDB>(dbType_, *Pool_, Logger());
         ServiceClassDB_ = std::make_unique<OpenWifi::ServiceClassDB>(dbType_, *Pool_, Logger());
         SubscriberDeviceDB_ = std::make_unique<OpenWifi::SubscriberDeviceDB>(dbType_, *Pool_, Logger());
+        OpLocationDB_ = std::make_unique<OpenWifi::OpLocationDB>(dbType_, *Pool_, Logger());
+        OpContactDB_ = std::make_unique<OpenWifi::OpContactDB>(dbType_, *Pool_, Logger());
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -49,6 +51,8 @@ namespace OpenWifi {
         OperatorDB_->Create();
         ServiceClassDB_->Create();
         SubscriberDeviceDB_->Create();
+        OpLocationDB_->Create();
+        OpContactDB_->Create();
 
         ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
         ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
@@ -66,6 +70,8 @@ namespace OpenWifi {
         ExistFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OperatorDB_->Exists(F,V); };
         ExistFunc_[ServiceClassDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return ServiceClassDB_->Exists(F,V); };
         ExistFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return SubscriberDeviceDB_->Exists(F,V); };
+        ExistFunc_[OpLocationDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OpLocationDB_->Exists(F,V); };
+        ExistFunc_[OpContactDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OpContactDB_->Exists(F,V); };
 
         ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
@@ -83,6 +89,8 @@ namespace OpenWifi {
         ExpandFunc_[OperatorDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OperatorDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[ServiceClassDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return ServiceClassDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SubscriberDeviceDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[OpLocationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OpLocationDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[OpContactDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OpContactDB_->GetNameAndDescription(F,V, Name, Description); };
 
         InventoryDB_->InitializeSerialCache();
 
@@ -257,7 +265,7 @@ namespace OpenWifi {
 
             ProvObjects::ServiceClass DefSer;
             DefSer.info.id = MicroService::CreateUUID();
-            DefSer.info.name = "Default Operator";
+            DefSer.info.name = "Default Service Class";
             DefSer.defaultService = true;
             DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
             DefSer.operatorId = DefOp.info.id;

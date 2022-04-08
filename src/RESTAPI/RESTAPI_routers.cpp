@@ -33,6 +33,11 @@
 #include "RESTAPI/RESTAPI_operators_list_handler.h"
 #include "RESTAPI/RESTAPI_sub_devices_handler.h"
 #include "RESTAPI/RESTAPI_sub_devices_list_handler.h"
+#include "RESTAPI/RESTAPI_op_contact_handler.h"
+#include "RESTAPI/RESTAPI_op_contact_list_handler.h"
+#include "RESTAPI/RESTAPI_op_location_handler.h"
+#include "RESTAPI/RESTAPI_op_location_list_handler.h"
+
 
 namespace OpenWifi {
 
@@ -68,6 +73,10 @@ namespace OpenWifi {
                     RESTAPI_operators_list_handler,
                     RESTAPI_service_class_handler,
                     RESTAPI_service_class_list_handler,
+                    RESTAPI_op_contact_handler,
+                    RESTAPI_op_contact_list_handler,
+                    RESTAPI_op_location_handler,
+                    RESTAPI_op_location_list_handler,
                     RESTAPI_asset_server
                 >(Path,Bindings,L, S, TransactionId);
     }
@@ -103,7 +112,11 @@ namespace OpenWifi {
                 RESTAPI_operators_handler,
                 RESTAPI_operators_list_handler,
                 RESTAPI_service_class_handler,
-                RESTAPI_service_class_list_handler
+                RESTAPI_service_class_list_handler,
+                RESTAPI_op_contact_handler,
+                RESTAPI_op_contact_list_handler,
+                RESTAPI_op_location_handler,
+                RESTAPI_op_location_list_handler
         >(Path, Bindings, L, S, TransactionId);
     }
 }

@@ -530,4 +530,17 @@ namespace OpenWifi {
                 P=="quarterly" || P=="lifetime" || P=="custom1" ||
                 P=="custom2"|| P=="custom3"|| P=="custom4");
     }
+
+    inline bool ValidContactType(const std::string &contact) {
+        auto C = Poco::toLower(contact);
+        return (C=="subscriber" || C=="user" || C=="installer" || C=="csr" ||
+                C=="manager" || C=="businessowner" || C=="technician" ||
+                C=="corporate");
+    }
+
+    inline bool ValidLocationType(const std::string &location) {
+        auto C = Poco::toLower(location);
+        return (C=="service" || C=="equipment" || C=="auto" || C=="manual" ||
+                C=="special" || C=="unknown" || C=="corporate");
+    }
 }
