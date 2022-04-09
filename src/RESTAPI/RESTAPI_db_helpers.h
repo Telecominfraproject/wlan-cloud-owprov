@@ -304,26 +304,26 @@ namespace OpenWifi {
         }
     }
 
-    template <typename DB> void ListHandlerForOperator(const char *BlockName,DB & DBInstance, RESTAPIHandler & R, const Types::UUID_t & OperatorId ) {
-        typedef typename DB::RecordVec      RecVec;
-        typedef typename DB::RecordName     RecType;
+    template <typename db_type> void ListHandlerForOperator(const char *BlockName,db_type & DB, RESTAPIHandler & R, const Types::UUID_t & OperatorId ) {
+        typedef typename db_type::RecordVec      RecVec;
+        typedef typename db_type::RecordName     RecType;
 
         if(R.QB_.CountOnly) {
-            auto Count = DBInstance.Count( fmt::format(" operatorId='{}'", OperatorId) );
+            auto Count = DB.Count( fmt::format(" operatorId='{}'", OperatorId) );
             return R.ReturnCountOnly(Count);
         }
 
         if(!R.QB_.Select.empty()) {
-            return ReturnRecordList<decltype(DBInstance),
-                    RecType>(BlockName, DBInstance, R);
+            return ReturnRecordList<decltype(DB),
+                    RecType>(BlockName, DB, R);
         }
 
         RecVec  Entries;
-        DBInstance.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries,fmt::format(" operatorId='{}'", OperatorId));
+        DB.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries,fmt::format(" operatorId='{}'", OperatorId));
         return MakeJSONObjectArray(BlockName, Entries, R);
     }
 
-    template <typename DBUsage, typename ObjectDB> void MoveUsage(DBUsage &DB_InUse, ObjectDB & DB, const std::string & From, const std::string & To, const std::string &Id) {
+    template <typename db_type, typename ObjectDB> void MoveUsage(db_type &DB_InUse, ObjectDB & DB, const std::string & From, const std::string & To, const std::string &Id) {
         if(From!=To) {
             if(!From.empty())
                 DB_InUse.DeleteInUse("id",From,DB.Prefix(),Id);
@@ -332,7 +332,7 @@ namespace OpenWifi {
         }
     }
 
-    template <typename DBUsage, typename ObjectDB> void MoveUsage(DBUsage &DB_InUse, ObjectDB & DB, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
+    template <typename db_type, typename ObjectDB> void MoveUsage(db_type &DB_InUse, ObjectDB & DB, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
         if(From!=To) {
             if(!From.empty()) {
                 for(const auto &i:From)
@@ -345,46 +345,46 @@ namespace OpenWifi {
         }
     }
 
-    template <typename DB> void MoveChild(DB &TheDB, const std::string & Parent, const std::string & Child, const std::string &Id) {
+    template <typename db_type> void MoveChild(db_type &DB, const std::string & Parent, const std::string & Child, const std::string &Id) {
         if(Parent!=Child) {
             if(!Parent.empty())
-                TheDB.InUse.DeleteInUse("id",Parent,Id);
+                DB.InUse.DeleteInUse("id",Parent,Id);
             if(!Child.empty())
-                TheDB.AddInUse("id",Child,Id);
+                DB.AddInUse("id",Child,Id);
         }
     }
 
-    template <typename DB, typename Member> void RemoveMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+    template <typename db_type, typename Member> void RemoveMembership( db_type & DB, Member T, const std::string & Obj, const std::string &Id) {
         std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
-            TheDB.ManipulateVectorMember(T, "id", Obj, Id, false);
+            DB.ManipulateVectorMember(T, "id", Obj, Id, false);
         std::cout << __LINE__ << std::endl;
     }
 
-    template <typename DB, typename Member> void AddMembership( DB & TheDB, Member T, const std::string & Obj, const std::string &Id) {
+    template <typename db_type, typename Member> void AddMembership( db_type & DB, Member T, const std::string & Obj, const std::string &Id) {
         std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
-            TheDB.ManipulateVectorMember(T, "id", Obj, Id, true);
+            DB.ManipulateVectorMember(T, "id", Obj, Id, true);
         std::cout << __LINE__ << std::endl;
     }
 
-    template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const std::string & From, const std::string & To, const std::string &Id) {
-        RemoveMembership(TheDB,T,From,Id);
-        AddMembership(TheDB,T,To,Id);
+    template <typename db_type, typename Member> void ManageMembership( db_type & DB, Member T, const std::string & From, const std::string & To, const std::string &Id) {
+        RemoveMembership(DB,T,From,Id);
+        AddMembership(DB,T,To,Id);
     }
 
-    template <typename DB, typename Member> void ManageMembership( DB & TheDB, Member T, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
+    template <typename db_type, typename Member> void ManageMembership( db_type & DB, Member T, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
         std::cout << __LINE__ << std::endl;
         if(From!=To) {
             std::cout << __LINE__ << std::endl;
             for (const auto &i: From) {
                 std::cout << __LINE__ << std::endl;
-                RemoveMembership(TheDB, T, i, Id);
+                RemoveMembership(DB, T, i, Id);
                 std::cout << __LINE__ << std::endl;
             }
             for (const auto &i: To) {
                 std::cout << __LINE__ << std::endl;
-                AddMembership(TheDB, T, i, Id);
+                AddMembership(DB, T, i, Id);
                 std::cout << __LINE__ << std::endl;
             }
             std::cout << __LINE__ << std::endl;
@@ -392,7 +392,7 @@ namespace OpenWifi {
         std::cout << __LINE__ << std::endl;
     }
 
-    template <typename Member, typename Rec, typename DB > bool CreateMove(const Poco::JSON::Object::Ptr & RawObj, const char *fieldname, Member T, Rec & Existing, std::string &From, std::string &To, DB & TheDB) {
+    template <typename Member, typename Rec, typename db_type > bool CreateMove(const Poco::JSON::Object::Ptr & RawObj, const char *fieldname, Member T, Rec & Existing, std::string &From, std::string &To, db_type & TheDB) {
         if(RawObj->has(fieldname)) {
             From = Existing.*T;
             To = RawObj->get(fieldname).toString();

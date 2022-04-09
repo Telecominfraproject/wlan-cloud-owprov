@@ -165,7 +165,7 @@ namespace OpenWifi{
             std::cout << __LINE__ << std::endl;
             MoveUsage(StorageService()->PolicyDB(), DB_, FromPolicy, ToPolicy, Existing.info.id);
             std::cout << __LINE__ << std::endl;
-            ManageMembership(Storage().EntityDB(),&ProvObjects::Entity::locations,FromEntity, ToEntity, Existing.info.id);
+            ManageMembership(StorageService()->EntityDB(),&ProvObjects::Entity::locations,FromEntity, ToEntity, Existing.info.id);
             std::cout << __LINE__ << std::endl;
 
             std::cout << __LINE__ << std::endl;
