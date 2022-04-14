@@ -155,6 +155,16 @@ namespace ORM {
         return S;
     }
 
+    inline std::string to_string(const Poco::Data::BLOB &blob) {
+        auto Content = blob.content();
+        std::string result;
+        result.reserve(Content.size());
+        for(const auto &c:Content) {
+            result += (char) c;
+        }
+        return result;
+    }
+
     inline std::string to_string(const char * S) {
         return S;
     }
