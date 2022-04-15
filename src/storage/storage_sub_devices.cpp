@@ -110,3 +110,12 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.set<21>(In.suspended);
     Out.set<22>(In.realMacAddress);
 }
+
+
+/*
+
+$ cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DLibCrypto_INCLUDE_DIR=/usr/include -DLibCrypto_LIBRARY=/usr/lib64/libcrypto.so ..
+
+
+
+ */

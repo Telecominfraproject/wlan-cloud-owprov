@@ -1112,16 +1112,6 @@ components:
         defaultOperator:
           type: boolean
           default: false
-        locations:
-          type: array
-          items:
-            type: string
-            format: uuid
-        contacts:
-          type: array
-          items:
-            type: string
-            format: uuid
         rrm:
           type: string
           enum:

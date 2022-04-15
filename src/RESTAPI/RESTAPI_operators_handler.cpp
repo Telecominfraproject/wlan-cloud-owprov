@@ -98,7 +98,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        return InternalError("Failed creating operatpr.");
+        return InternalError("Failed creating operator.");
     }
 
     void RESTAPI_operators_handler::DoPut() {

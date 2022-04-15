@@ -61,10 +61,9 @@ namespace OpenWifi {
     }
 
     void RESTAPI_op_location_handler::DoPut() {
-        auto uuid = GetBinding("uuid","");
-
+        auto uuid = GetBinding("uuid");
         OpLocationDB::RecordName   Existing;
-        if(uuid.empty() || DB_.GetRecord("id",uuid,Existing)) {
+        if(uuid.empty() || !DB_.GetRecord("id",uuid,Existing)) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
