@@ -304,12 +304,16 @@ namespace OpenWifi {
         }
     }
 
-    template <typename db_type> void ListHandlerForOperator(const char *BlockName,db_type & DB, RESTAPIHandler & R, const Types::UUID_t & OperatorId ) {
+    template <typename db_type> void ListHandlerForOperator(const char *BlockName,db_type & DB, RESTAPIHandler & R, const Types::UUID_t & OperatorId, const Types::UUID_t & subscriberId="") {
         typedef typename db_type::RecordVec      RecVec;
         typedef typename db_type::RecordName     RecType;
 
+        auto whereClause = subscriberId.empty() ?
+                            fmt::format(" operatorId='{}'", OperatorId) :
+                            fmt::format(" operatorId='{}' and subscriberId='{}' ", OperatorId, subscriberId);
+
         if(R.QB_.CountOnly) {
-            auto Count = DB.Count( fmt::format(" operatorId='{}'", OperatorId) );
+            auto Count = DB.Count( whereClause );
             return R.ReturnCountOnly(Count);
         }
 
@@ -319,7 +323,7 @@ namespace OpenWifi {
         }
 
         RecVec  Entries;
-        DB.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries,fmt::format(" operatorId='{}'", OperatorId));
+        DB.GetRecords(R.QB_.Offset,R.QB_.Limit,Entries,whereClause);
         return MakeJSONObjectArray(BlockName, Entries, R);
     }
 
