@@ -81,7 +81,7 @@ namespace OpenWifi {
         auto uuid = GetBinding("uuid","");
 
         ProvObjects::ServiceClass   Existing;
-        if(uuid.empty() || DB_.GetRecord("id",uuid,Existing)) {
+        if(uuid.empty() || !DB_.GetRecord("id",uuid,Existing)) {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
