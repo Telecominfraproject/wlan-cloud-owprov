@@ -89,6 +89,7 @@ namespace OpenWifi {
             DefSer.operatorId = NewObject.info.id;
             DefSer.period = "monthly";
             DefSer.billingCode = "basic";
+            DefSer.currency = "USD";
             StorageService()->ServiceClassDB().CreateRecord(DefSer);
 
             ProvObjects::Operator   New;

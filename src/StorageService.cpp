@@ -271,6 +271,8 @@ namespace OpenWifi {
             DefSer.operatorId = DefOp.info.id;
             DefSer.period = "monthly";
             DefSer.billingCode = "basic";
+            DefSer.currency = "USD";
+            DefSer.cost = 0.0;
             ServiceClassDB_->CreateRecord(DefSer);
         }
     }
