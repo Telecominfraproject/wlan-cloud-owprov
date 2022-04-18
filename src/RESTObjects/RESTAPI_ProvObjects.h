@@ -578,7 +578,7 @@ namespace OpenWifi::ProvObjects {
         ObjectInfo                      info;
         Types::UUID_t                   operatorId;
         Types::UUID_t                   managementPolicy;
-        double                          cost;
+        double                          cost=0.0;
         std::string                     currency;
         std::string                     period;
         std::string                     billingCode;
