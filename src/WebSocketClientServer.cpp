@@ -4,6 +4,7 @@
 
 #include "WebSocketClientServer.h"
 #include "SerialNumberCache.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
     void WebSocketClientServer::run() {
@@ -145,6 +146,74 @@ namespace OpenWifi {
         delete this;
     }
 
+    void WebSocketClient::ws_command_serial_number_search(const Poco::JSON::Object::Ptr &O,
+                                                          bool &Done, std::string &Answer) {
+        Done = false;
+        auto Prefix = O->get("serial_prefix").toString();
+        Logger().information(Poco::format("serial_number_search: %s", Prefix));
+        if (!Prefix.empty() && Prefix.length() < 13) {
+            std::vector<uint64_t> Numbers;
+            SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
+            Poco::JSON::Array A;
+            for (const auto &i : Numbers)
+                A.add(Utils::int_to_hex(i));
+            Poco::JSON::Object A0;
+            A0.set("serialNumbers", A0);
+            std::ostringstream SS;
+            Poco::JSON::Stringifier::stringify(A, SS);
+            Answer = SS.str();
+        }
+    }
+
+    void
+    WebSocketClient::ws_command_address_completion(const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
+        Done = false;
+        auto Address = O->get("address").toString();
+        Answer = GoogleGeoCodeCall(Address);
+    }
+
+    void WebSocketClient::ws_command_exit([[maybe_unused]] const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
+        Done = true;
+        Answer = R"lit({ "closing" : "Goodbye! Aurevoir! Hasta la vista!" })lit";
+    }
+
+    void WebSocketClient::ws_command_invalid([[maybe_unused]] const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
+        Done = false;
+        Answer = std::string{R"lit({ "error" : "invalid command" })lit"};
+    }
+
+    void WebSocketClient::ws_command_subuser_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
+        Done = false;
+        auto operatorId = O->get("operatorId").toString();
+        Answer = std::string{R"lit({ "error" : "not implemented" })lit"};
+    }
+
+    void WebSocketClient::ws_command_subdevice_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
+        Done = false;
+        auto operatorId = O->get("operatorId").toString();
+        auto Prefix = O->get("serial_prefix").toString();
+        std::string Query;
+
+        if(Prefix[0]=='*') {
+            Query = fmt::format(" operatorId={} and right(serialNumber,{})='{}' ", operatorId, Prefix.size()-1, Prefix.substr(1));
+        } else {
+            Query = fmt::format(" operatorId={} and left(serialNumber,{})='{}' ", operatorId, Prefix.size(), Prefix);
+        }
+
+        std::vector<ProvObjects::SubscriberDevice>  SubDevices;
+
+        StorageService()->SubscriberDeviceDB().GetRecords(0,200,SubDevices,Query);
+        Poco::JSON::Array   Arr;
+        for(const auto &i:SubDevices) {
+            Arr.add(i.serialNumber);
+        }
+        Poco::JSON::Object  RetObj;
+        RetObj.set("serialNumbers", Arr);
+        std::ostringstream SS;
+        Poco::JSON::Stringifier::stringify(RetObj, SS);
+        Answer = SS.str();
+    }
+
     void WebSocketClient::Process(const Poco::JSON::Object::Ptr &O, std::string &Result, bool &Done ) {
         try {
             if (O->has("command") && O->has("id")) {
@@ -152,28 +221,17 @@ namespace OpenWifi {
                 std::string Answer;
                 auto Command = O->get("command").toString();
                 if (Command == "serial_number_search" && O->has("serial_prefix")) {
-                    auto Prefix = O->get("serial_prefix").toString();
-                    Logger().information(Poco::format("serial_number_search: %s", Prefix));
-                    if (!Prefix.empty() && Prefix.length() < 13) {
-                        std::vector<uint64_t> Numbers;
-                        SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
-                        Poco::JSON::Array A;
-                        for (const auto &i : Numbers)
-                            A.add(Utils::int_to_hex(i));
-                        Poco::JSON::Object A0;
-                        A0.set("serialNumbers", A0);
-                        std::ostringstream SS;
-                        Poco::JSON::Stringifier::stringify(A, SS);
-                        Answer = SS.str();
-                    }
+                    ws_command_serial_number_search(O,Done,Answer);
                 } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "address_completion" && O->has("address")) {
-                    auto Address = O->get("address").toString();
-                    Answer = GoogleGeoCodeCall(Address);
+                    ws_command_address_completion(O,Done,Answer);
+                } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "subuser_search" && O->has("operatorId")) {
+                    ws_command_subuser_search(O,Done,Answer);
+                } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "subdevice_search" && O->has("operatorId") && O->has("serial_prefix")) {
+                    ws_command_subdevice_search(O,Done,Answer);
                 } else if (Command=="exit") {
-                    Answer = R"lit({ "closing" : "Goodbye! Aurevoir! Hasta la vista!" })lit";
-                    Done = true;
+                    ws_command_exit(O,Done,Answer);
                 } else {
-                    Answer = std::string{R"lit({ "error" : "invalid command" })lit"};
+                    ws_command_invalid(O,Done,Answer);
                 }
 
                 Result = fmt::format("{{ \"command_response_id\" : {} , \"response\" : {}  }}" , id, Answer);

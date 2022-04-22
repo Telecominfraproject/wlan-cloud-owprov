@@ -84,7 +84,7 @@ namespace OpenWifi {
             [[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
             [[nodiscard]] bool SendUserNotification(const std::string &userName, const ProvObjects::WebSocketNotification & Notification);
 
-        private:
+    private:
             std::atomic_bool                            Running_=false;
             Poco::Thread                                Thr_;
             std::unique_ptr<MyParallelSocketReactor>    ReactorPool_;
@@ -143,6 +143,13 @@ namespace OpenWifi {
 
             }
         }
+
+        void ws_command_serial_number_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
+        void ws_command_address_completion( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
+        void ws_command_exit( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
+        void ws_command_invalid( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
+        void ws_command_subuser_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
+        void ws_command_subdevice_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
 
         [[nodiscard]] inline const std::string & Id() { return Id_; };
 
