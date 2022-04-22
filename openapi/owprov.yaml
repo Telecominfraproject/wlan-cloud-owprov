@@ -550,6 +550,50 @@ components:
           items:
             $ref: '#/components/schemas/OperatorLocation'
 
+    SubLocation:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - SERVICE
+            - EQUIPMENT
+            - AUTO
+            - MANUAL
+            - SPECIAL
+            - UNKNOWN
+            - CORPORATE
+        buildingName:
+          type: string
+        addressLines:
+          type: array
+          items:
+            type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal:
+          type: string
+        country:
+          type: string
+        phones:
+          type: array
+          items:
+            type: string
+        mobiles:
+          type: array
+          items:
+            type: string
+        operatorId:
+          type: string
+          format: uuid
+        subscriberDeviceId:
+          type: string
+          format: uuid
+        geoCode:
+          type: string
+
     # uuids: con:<uuid>
     Contact:
       type: object
@@ -669,6 +713,53 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OperatorContact'
+
+    SubContact:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - SUBSCRIBER
+            - USER
+            - INSTALLER
+            - CSR
+            - MANAGER
+            - BUSINESSOWNER
+            - TECHNICIAN
+            - CORPORATE
+        title:
+          type: string
+        salutation:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        initials:
+          type: string
+        visual:
+          type: string
+        phones:
+          type: array
+          items:
+            type: string
+        mobiles:
+          type: array
+          items:
+            type: string
+        primaryEmail:
+          type: string
+        secondaryEmail:
+          type: string
+        accessPIN:
+          type: string
+        operatorId:
+          type: string
+          format: uuid
+        subscriberDeviceId:
+          type: string
+          format: uuid
 
     DeviceConfigurationElement:
       type: object
@@ -1161,11 +1252,9 @@ components:
         geoCode:
           type: string
         location:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/SubLocation'
         contact:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/SubContact'
         rrm:
           type: string
           enum:
