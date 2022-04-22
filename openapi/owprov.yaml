@@ -585,12 +585,6 @@ components:
           type: array
           items:
             type: string
-        operatorId:
-          type: string
-          format: uuid
-        subscriberDeviceId:
-          type: string
-          format: uuid
         geoCode:
           type: string
 
@@ -754,12 +748,6 @@ components:
           type: string
         accessPIN:
           type: string
-        operatorId:
-          type: string
-          format: uuid
-        subscriberDeviceId:
-          type: string
-          format: uuid
 
     DeviceConfigurationElement:
       type: object

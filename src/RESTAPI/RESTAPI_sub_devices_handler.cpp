@@ -47,8 +47,6 @@ namespace OpenWifi {
         }
 
         if( !ValidDbId(NewObject.managementPolicy, StorageService()->PolicyDB(), true , RESTAPI::Errors::UnknownManagementPolicyUUID, *this) ||
-            !ValidDbId(NewObject.contact, StorageService()->OpContactDB(), true, RESTAPI::Errors::InvalidContactId, *this)                   ||
-            !ValidDbId(NewObject.location, StorageService()->OpLocationDB(), true, RESTAPI::Errors::InvalidLocationId, *this)                ||
             !ValidDbId(NewObject.operatorId, StorageService()->OperatorDB(), true, RESTAPI::Errors::InvalidOperatorId, *this)                ||
             !ValidDbId(NewObject.serviceClass, StorageService()->ServiceClassDB(), true, RESTAPI::Errors::InvalidServiceClassId, *this)      ||
             !ValidSubscriberId(NewObject.subscriberId, true, *this) ||
@@ -77,8 +75,6 @@ namespace OpenWifi {
         }
 
         if( !ValidDbId(UpdateObj.managementPolicy, StorageService()->PolicyDB(), true , RESTAPI::Errors::UnknownManagementPolicyUUID, *this) ||
-            !ValidDbId(UpdateObj.contact, StorageService()->OpContactDB(), true, RESTAPI::Errors::InvalidContactId, *this)                   ||
-            !ValidDbId(UpdateObj.location, StorageService()->OpLocationDB(), true, RESTAPI::Errors::InvalidLocationId, *this)                ||
             !ValidDbId(UpdateObj.operatorId, StorageService()->OperatorDB(), true, RESTAPI::Errors::InvalidOperatorId, *this)                ||
             !ValidDbId(UpdateObj.serviceClass, StorageService()->ServiceClassDB(), true, RESTAPI::Errors::InvalidServiceClassId, *this)      ||
             !ValidSubscriberId(UpdateObj.subscriberId, true, *this) ||
@@ -91,8 +87,6 @@ namespace OpenWifi {
         ProvObjects::UpdateObjectInfo(RawObject,UserInfo_.userinfo,Existing.info);
         AssignIfPresent(RawObject, "deviceType", Existing.deviceType);
         AssignIfPresent(RawObject, "subscriberId", Existing.subscriberId);
-        AssignIfPresent(RawObject, "location", Existing.location);
-        AssignIfPresent(RawObject, "contact", Existing.contact);
         AssignIfPresent(RawObject, "managementPolicy", Existing.managementPolicy);
         AssignIfPresent(RawObject, "serviceClass", Existing.serviceClass);
         AssignIfPresent(RawObject, "qrCode", Existing.qrCode);
@@ -102,6 +96,8 @@ namespace OpenWifi {
         AssignIfPresent(RawObject, "locale", Existing.locale);
         AssignIfPresent(RawObject, "billingCode", Existing.billingCode);
         AssignIfPresent(RawObject, "realMacAddress", Existing.realMacAddress);
+        AssignIfPresent(RawObject, "contact", UpdateObj.contact, Existing.contact);
+        AssignIfPresent(RawObject, "location", UpdateObj.location, Existing.location);
 
         if(RawObject->has("configuration")) {
             Existing.configuration = UpdateObj.configuration;

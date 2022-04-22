@@ -38,16 +38,16 @@ namespace OpenWifi {
     };
 
     static  ORM::IndexVec    SubscriberDeviceDB_Indexes{
-            { std::string("subscriber_device_name_index"),
+            { std::string("subscriber_device_name_index2"),
               ORM::IndexEntryVec{ {std::string("name"), ORM::Indextype::ASC} } },
-            { std::string("subscriber_device_serialNumber_index"),
+            { std::string("subscriber_device_serialNumber_index2"),
               ORM::IndexEntryVec{ {std::string("serialNumber"), ORM::Indextype::ASC} } } ,
-            { std::string("subscriber_device_realMacAddress_index"),
+            { std::string("subscriber_device_realMacAddress_index2"),
               ORM::IndexEntryVec{ {std::string("realMacAddress"), ORM::Indextype::ASC} } }
     };
 
     SubscriberDeviceDB::SubscriberDeviceDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-            DB(T, "sub_devices", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
+            DB(T, "sub_devices2", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
     }
 
     bool SubscriberDeviceDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
@@ -70,8 +70,8 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.deviceType = In.get<7>();
     Out.operatorId = In.get<8>();
     Out.subscriberId = In.get<9>();
-    Out.location = In.get<10>();
-    Out.contact = In.get<11>();
+    Out.location = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::SubLocation>(In.get<10>());
+    Out.contact = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::SubContact>(In.get<11>());
     Out.managementPolicy = In.get<12>();
     Out.serviceClass = In.get<13>();
     Out.qrCode = In.get<14>();
@@ -96,8 +96,8 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.set<7>(In.deviceType);
     Out.set<8>(In.operatorId);
     Out.set<9>(In.subscriberId);
-    Out.set<10>(In.location);
-    Out.set<11>(In.contact);
+    Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.location));
+    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.contact));
     Out.set<12>(In.managementPolicy);
     Out.set<13>(In.serviceClass);
     Out.set<14>(In.qrCode);
@@ -110,12 +110,3 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.set<21>(In.suspended);
     Out.set<22>(In.realMacAddress);
 }
-
-
-/*
-
-$ cmake3 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DLibCrypto_INCLUDE_DIR=/usr/include -DLibCrypto_LIBRARY=/usr/lib64/libcrypto.so ..
-
-
-
- */

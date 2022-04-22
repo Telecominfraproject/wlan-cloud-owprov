@@ -221,6 +221,22 @@ namespace OpenWifi::ProvObjects {
     };
     typedef std::vector<Location>      LocationVec;
 
+    struct SubLocation {
+        std::string         type;
+        std::string         buildingName;
+        Types::StringVec    addressLines;
+        std::string         city;
+        std::string         state;
+        std::string         postal;
+        std::string         country;
+        Types::StringVec    phones;
+        Types::StringVec    mobiles;
+        std::string         geoCode;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
     struct OperatorLocationList {
         std::vector<OperatorLocation>    locations;
 
@@ -309,6 +325,24 @@ namespace OpenWifi::ProvObjects {
         Types::UUID_t   operatorId;
         Types::UUID_t   subscriberDeviceId;
         Types::UUID_t   managementPolicy;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct SubContact {
+        std::string     type;
+        std::string     title;
+        std::string     salutation;
+        std::string     firstname;
+        std::string     lastname;
+        std::string     initials;
+        std::string     visual;
+        Types::StringVec mobiles;
+        Types::StringVec phones;
+        std::string     primaryEmail;
+        std::string     secondaryEmail;
+        std::string     accessPIN;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -602,8 +636,8 @@ namespace OpenWifi::ProvObjects {
         std::string                     deviceType;
         Types::UUID_t                   operatorId;
         Types::UUID_t                   subscriberId;
-        Types::UUID_t                   location;
-        Types::UUID_t                   contact;
+        SubLocation                     location;
+        SubContact                      contact;
         Types::UUID_t                   managementPolicy;
         Types::UUID_t                   serviceClass;
         std::string                     qrCode;
