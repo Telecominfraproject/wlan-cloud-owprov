@@ -2,9 +2,11 @@
 // Created by stephane bourque on 2021-11-01.
 //
 
+#include "framework/MicroService.h"
 #include "WebSocketClientServer.h"
 #include "SerialNumberCache.h"
 #include "StorageService.h"
+#include "sdks/SDK_sec.h"
 
 namespace OpenWifi {
     void WebSocketClientServer::run() {
@@ -185,7 +187,26 @@ namespace OpenWifi {
     void WebSocketClient::ws_command_subuser_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
         Done = false;
         auto operatorId = O->get("operatorId").toString();
-        Answer = std::string{R"lit({ "error" : "not implemented" })lit"};
+        std::string nameSearch, emailSearch;
+        OpenWifi::RESTAPIHandler::AssignIfPresent(O,"nameSearch",nameSearch);
+        OpenWifi::RESTAPIHandler::AssignIfPresent(O,"emailSearch",emailSearch);
+        SecurityObjects::UserInfoList   Users;
+        SDK::Sec::Subscriber::Search(nullptr,operatorId,nameSearch,emailSearch,Users);
+
+        Poco::JSON::Array   Arr;
+        for(const auto &i:Users.users) {
+            Poco::JSON::Object  OO;
+            OO.set("name", i.name);
+            OO.set("email", i.email);
+            OO.set("id", i.id);
+            i.to_json(OO);
+            Arr.add(OO);
+        }
+        Poco::JSON::Object  ObjAnswer;
+        ObjAnswer.set("users", Arr);
+        std::ostringstream SS;
+        Poco::JSON::Stringifier::stringify(ObjAnswer, SS);
+        Answer = SS.str();
     }
 
     void WebSocketClient::ws_command_subdevice_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {

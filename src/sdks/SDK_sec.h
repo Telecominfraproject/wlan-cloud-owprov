@@ -18,6 +18,8 @@ namespace OpenWifi::SDK::Sec {
         bool Exists(RESTAPIHandler *client, const Types::UUID_t & User);
         bool Get(RESTAPIHandler *client, const Types::UUID_t & User, SecurityObjects::UserInfo & UserInfo);
         bool Delete(RESTAPIHandler *client, const Types::UUID_t & User);
+        bool Search(RESTAPIHandler *client, const std::string &OperatorId, const std::string &Name,
+                    const std::string &EMail, SecurityObjects::UserInfoList &Users);
     }
 
 }

@@ -79,6 +79,25 @@ namespace OpenWifi::SDK::Sec {
             }
             return false;
         }
+
+        bool Search([[maybe_unused]] RESTAPIHandler *client, const std::string &OperatorId,
+                    const std::string &Name, const std::string &EMail, SecurityObjects::UserInfoList &Users) {
+            OpenAPIRequestGet	Req(    uSERVICE_SECURITY,
+                                            "/api/v1/subusers",
+                                            {
+                                                {"operatorId", OperatorId} ,
+                                                {"nameSearch", Name} ,
+                                                {"emailSearch", EMail}
+                                            },
+                                            5000);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto StatusCode = Req.Do(CallResponse);
+            if( StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+                return Users.from_json(CallResponse);
+            }
+            return false;
+        }
+
     }
 
 }
