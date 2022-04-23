@@ -83,6 +83,13 @@ namespace OpenWifi {
                             IT.state = OS.str();
                             StorageService()->InventoryDB().UpdateRecord("id", IT.info.id, IT);
 
+                            // we need to move this device to the SubscriberDevice DB
+                            ProvObjects::SubscriberDevice   SD;
+                            SD.serialNumber = SerialNumber;
+                            SD.realMacAddress = SE.macAddress;
+                            SD.locale = IT.locale;
+                            SD.deviceType = IT.deviceType;
+
                             SE.status = "signup completed";
                             SE.serialNumber = SerialNumber;
                             SE.statusCode = ProvObjects::SignupStatusCodes::SignupSuccess;

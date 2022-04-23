@@ -25,18 +25,19 @@ namespace OpenWifi {
             ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_BOOLEAN},
             ORM::Field{"variables",ORM::FieldType::FT_TEXT},
             ORM::Field{"defaultOperator",ORM::FieldType::FT_BOOLEAN},
-            ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT}
+            ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
+            ORM::Field{"registrationId",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    OperatorDB_Indexes{
-            { std::string("operator_name_index"),
+            { std::string("operator2_name_index"),
               ORM::IndexEntryVec{
                       {std::string("name"),
                        ORM::Indextype::ASC} } }
     };
 
     OperatorDB::OperatorDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-            DB(T, "operators", OperatorDB_Fields, OperatorDB_Indexes, P, L, "opr") {
+            DB(T, "operators2", OperatorDB_Fields, OperatorDB_Indexes, P, L, "opr") {
     }
 
     bool OperatorDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
@@ -85,6 +86,7 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.variables = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::Variable>(In.get<11>());
     Out.defaultOperator = In.get<12>();
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
+    Out.registrationId = In.get<14>();
 }
 
 template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObjects::Operator>::Convert(const OpenWifi::ProvObjects::Operator &In, OpenWifi::OperatorDBRecordType &Out) {
@@ -102,4 +104,5 @@ template<> void ORM::DB<    OpenWifi::OperatorDBRecordType, OpenWifi::ProvObject
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.variables));
     Out.set<12>(In.defaultOperator);
     Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
+    Out.set<14>(In.registrationId);
 }

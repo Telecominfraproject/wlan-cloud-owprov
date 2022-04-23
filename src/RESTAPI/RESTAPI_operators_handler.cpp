@@ -76,11 +76,15 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidIPAddresses);
         }
 
+        Poco::toLowerInPlace(NewObject.registrationId);
+        if(NewObject.registrationId.empty() || DB_.Exists("registrationId",NewObject.registrationId)) {
+            return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
+        }
+
         ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info);
         if(DB_.CreateRecord(NewObject)) {
 
             // Create the default service...
-
             ProvObjects::ServiceClass DefSer;
             DefSer.info.id = MicroService::CreateUUID();
             DefSer.info.name = "Default Service Class";

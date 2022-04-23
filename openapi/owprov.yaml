@@ -1066,6 +1066,10 @@ components:
         statusCode:
           type: integer
           format: int64
+        registrationId:
+          type: string
+          minLength: 4
+          maxLength: 16
 
     Variable:
       type: object
@@ -1209,6 +1213,10 @@ components:
           $ref: '#/components/schemas/ManagementRoleList'
         sourceIP:
           $ref: '#/components/schemas/StringList'
+        registrationId:
+          type: string
+          minLength: 4
+          maxLength: 16
 
     OperatorList:
       type: object
@@ -3314,6 +3322,11 @@ paths:
           schema:
             type: string
           required: false
+        - in: query
+          name: registrationId
+          schema:
+            type: string
+          required: true
       responses:
         200:
           $ref: '#/components/schemas/SignupEntry'

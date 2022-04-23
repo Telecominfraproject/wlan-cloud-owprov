@@ -9,13 +9,15 @@
 namespace OpenWifi {
 
     void RESTAPI_signup_handler::DoPost() {
-        auto UserName = GetParameter("email","");
+        auto UserName = GetParameter("email");
         Poco::toLowerInPlace(UserName);
-        auto macAddress = GetParameter("macAddress","");
+        auto macAddress = GetParameter("macAddress");
         Poco::toLowerInPlace(macAddress);
-        auto deviceID = GetParameter("deviceID","");
+        auto deviceID = GetParameter("deviceID");
+        auto registrationId = GetParameter("registrationId");
+        Poco::toLowerInPlace(registrationId);
 
-        if(UserName.empty() || macAddress.empty()) {
+        if(UserName.empty() || macAddress.empty() || registrationId.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
@@ -25,6 +27,10 @@ namespace OpenWifi {
 
         if(!Utils::ValidSerialNumber(macAddress)) {
             return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
+        }
+
+        if(registrationId.empty()) {
+            return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
         }
 
         //  if a signup already exists for this user, we should just return its value completion
@@ -45,6 +51,10 @@ namespace OpenWifi {
                     return ReturnObject(Answer);
                 }
             }
+        }
+
+        if(!StorageService()->OperatorDB().Exists("registrationId",registrationId)) {
+            return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
         }
 
         //  So we do not have an outstanding signup...
@@ -101,6 +111,7 @@ namespace OpenWifi {
             SE.userId = UI.id;
             SE.email = UserName;
             SE.deviceID = deviceID;
+            SE.registrationId = registrationId;
             SE.status = "waiting-for-email-verification";
             SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForEmail;
             StorageService()->SignupDB().CreateRecord(SE);
@@ -133,8 +144,8 @@ namespace OpenWifi {
 
     //  this will be called by the SEC backend once the password has been verified.
     void RESTAPI_signup_handler::DoPut() {
-        auto SignupUUID = GetParameter("signupUUID","");
-        auto Operation = GetParameter("operation","");
+        auto SignupUUID = GetParameter("signupUUID");
+        auto Operation = GetParameter("operation");
 
         if(SignupUUID.empty() || Operation.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
@@ -161,9 +172,9 @@ namespace OpenWifi {
     }
 
     void RESTAPI_signup_handler::DoGet() {
-        auto EMail = GetParameter("email", "");
-        auto SignupUUID = GetParameter("signupUUID", "");
-        auto macAddress = GetParameter("macAddress", "");
+        auto EMail = GetParameter("email");
+        auto SignupUUID = GetParameter("signupUUID");
+        auto macAddress = GetParameter("macAddress");
         auto List = GetBoolParameter("listOnly",false);
 
         Poco::JSON::Object          Answer;
