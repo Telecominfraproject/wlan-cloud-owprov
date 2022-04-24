@@ -18,7 +18,7 @@ namespace OpenWifi {
                                           Server,
                                           TransactionId,
                                           Internal, false) {}
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/wwwassets/{id}"}; };
+        static auto PathName() { return std::list<std::string>{"/wwwassets/{id}"}; };
         void DoGet() final;
         void DoPost() final {};
         void DoDelete() final {};

@@ -19,7 +19,7 @@ namespace OpenWifi {
             Server,
             TransactionId,
             Internal){}
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/location"}; };
+        static auto PathName() { return std::list<std::string>{"/api/v1/location"}; };
     private:
         LocationDB  & DB_=StorageService()->LocationDB();
         void DoGet() final;

@@ -23,7 +23,7 @@ namespace OpenWifi {
             Server,
             TransactionId,
             Internal){}
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/inventory/{serialNumber}"}; };
+        static auto PathName() { return std::list<std::string>{"/api/v1/inventory/{serialNumber}"}; };
 
     private:
         InventoryDB     &DB_=StorageService()->InventoryDB();

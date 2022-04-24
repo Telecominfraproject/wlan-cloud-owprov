@@ -17,7 +17,7 @@ namespace OpenWifi {
             Server,
             TransactionId,
             Internal){}
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/managementRole/{uuid}"}; };
+        static auto PathName() { return std::list<std::string>{"/api/v1/managementRole/{uuid}"}; };
     private:
         ManagementRoleDB    &DB_=StorageService()->RolesDB();
         void DoGet() final ;
