@@ -216,10 +216,10 @@ namespace OpenWifi {
         std::string Query;
 
         if(Prefix[0]=='*') {
-            Query = fmt::format(" operatorId={} and (right(serialNumber,{})='{}' or right(realMacAddress,{})='{}' ) ",
+            Query = fmt::format(" operatorId='{}' and (right(serialNumber,{})='{}' or right(realMacAddress,{})='{}' ) ",
                                 operatorId, Prefix.size()-1, Prefix.substr(1), Prefix.size()-1, Prefix.substr(1));
         } else {
-            Query = fmt::format(" operatorId={} and (left(serialNumber,{})='{}'  or right(realMacAddress,{})='{}' ) ",
+            Query = fmt::format(" operatorId='{}' and (left(serialNumber,{})='{}'  or right(realMacAddress,{})='{}' ) ",
                                 operatorId, Prefix.size(), Prefix, Prefix.size(), Prefix);
         }
 
