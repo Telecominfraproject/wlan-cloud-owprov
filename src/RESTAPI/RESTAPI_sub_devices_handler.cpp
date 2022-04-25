@@ -15,8 +15,16 @@ namespace OpenWifi {
         }
 
         ProvObjects::SubscriberDevice   SD;
-        if(!DB_.GetRecord("id",uuid,SD)) {
-            return NotFound();
+        if(Utils::ValidUUID(uuid)) {
+            if (!DB_.GetRecord("id", uuid, SD)) {
+                return NotFound();
+            }
+        } else if(Utils::ValidSerialNumber(uuid)) {
+            if (!DB_.GetRecord("serialNumber", uuid, SD)) {
+                return NotFound();
+            }
+        } else {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         Poco::JSON::Object  Answer;
