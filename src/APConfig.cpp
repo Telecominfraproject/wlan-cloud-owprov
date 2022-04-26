@@ -129,7 +129,7 @@ namespace OpenWifi {
         std::cout << __LINE__ << std::endl;
         auto Names = Original->getNames();
         for(const auto &i:Names) {
-            std::cout << __LINE__ << ": " << i << std::endl;
+            std::cout << __LINE__ << "  Variable: " << i << std::endl;
             if(i=="__variableBlock") {
                 std::cout << __LINE__ << std::endl;
                 if(Original->isArray(i)) {
@@ -216,9 +216,12 @@ namespace OpenWifi {
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
             for(const auto &SectionName:Names) {
+                std::cout << __LINE__ << "Section: " << SectionName << std::endl;
                 auto InsertInfo = Sections.insert(SectionName);
                 if (InsertInfo.second) {
+                    std::cout << __LINE__ << std::endl;
                     if (O->isArray(SectionName)) {
+                        std::cout << __LINE__ << std::endl;
                         auto OriginalArray = O->getArray(SectionName);
                         if (Explain_) {
                             Poco::JSON::Object ExObj;
@@ -228,10 +231,12 @@ namespace OpenWifi {
                             ExObj.set("element", OriginalArray);
                             Explanation_.add(ExObj);
                         }
+                        std::cout << __LINE__ << std::endl;
                         auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
                         ReplaceVariablesInArray(OriginalArray, ExpandedArray);
                         Configuration->set(SectionName, ExpandedArray);
                     } else if (O->isObject(SectionName)) {
+                        std::cout << __LINE__ << std::endl;
                         auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
                         if (Explain_) {
                             Poco::JSON::Object ExObj;
@@ -245,7 +250,7 @@ namespace OpenWifi {
                         ReplaceVariablesInObject(OriginalSection, ExpandedSection);
                         Configuration->set(SectionName, ExpandedSection);
                     } else {
-
+                        std::cout << __LINE__ << std::endl;
                     }
                 } else {
                     if (Explain_) {
