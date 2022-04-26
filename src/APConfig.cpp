@@ -170,7 +170,7 @@ namespace OpenWifi {
         return true;
     }
 
-    bool APConfig::ReplaceVariablesInArray( Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
+    bool APConfig::ReplaceVariablesInArray( const Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
         for(const auto &element:*Original) {
             std::cout << __LINE__ << "ELEMENT: " << element.toString() << std::endl;
             if(element.isArray()) {
