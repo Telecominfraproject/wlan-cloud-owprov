@@ -172,20 +172,25 @@ namespace OpenWifi {
 
     bool APConfig::ReplaceVariablesInArray( Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
         for(const auto &element:*Original) {
+            std::cout << __LINE__ << std::endl;
             if(element.isArray()) {
+                std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Array>();
                 auto Object = element.extract<Poco::JSON::Array::Ptr>();
                 ReplaceVariablesInArray(Object,Expanded);
                 ResultArray->add(Expanded);
             } else if(element.isStruct()) {
+                std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
                 auto Obj = element.extract<Poco::JSON::Object::Ptr>();
                 ReplaceVariablesInObject(Obj,Expanded);
                 ResultArray->add(Expanded);
             } else {
+                std::cout << __LINE__ << std::endl;
                 ResultArray->add(element);
             }
         }
+        std::cout << __LINE__ << std::endl;
         return true;
     }
 
@@ -233,8 +238,11 @@ namespace OpenWifi {
                         }
                         std::cout << __LINE__ << std::endl;
                         auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
+                        std::cout << __LINE__ << std::endl;
                         ReplaceVariablesInArray(OriginalArray, ExpandedArray);
+                        std::cout << __LINE__ << std::endl;
                         Configuration->set(SectionName, ExpandedArray);
+                        std::cout << __LINE__ << std::endl;
                     } else if (O->isObject(SectionName)) {
                         std::cout << __LINE__ << std::endl;
                         auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
