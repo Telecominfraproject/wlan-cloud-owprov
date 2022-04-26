@@ -85,10 +85,18 @@ namespace OpenWifi {
 
                             // we need to move this device to the SubscriberDevice DB
                             ProvObjects::SubscriberDevice   SD;
+                            SD.info.id = MicroService::CreateUUID();
+                            SD.info.modified = SD.info.created = OpenWifi::Now();
+                            SD.info.name = IT.realMacAddress;
+                            SD.operatorId = SE.operatorId;
                             SD.serialNumber = SerialNumber;
                             SD.realMacAddress = SE.macAddress;
                             SD.locale = IT.locale;
                             SD.deviceType = IT.deviceType;
+                            SD.state = OS.str();
+                            SD.subscriberId = SE.userId;
+                            StorageService()->SubscriberDeviceDB().DeleteRecord("serialNumber", SD.serialNumber);
+                            StorageService()->SubscriberDeviceDB().CreateRecord(SD);
 
                             SE.status = "signup completed";
                             SE.serialNumber = SerialNumber;

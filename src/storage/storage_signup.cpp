@@ -31,18 +31,19 @@ namespace OpenWifi {
             ORM::Field{"statusCode",ORM::FieldType::FT_BIGINT},
             ORM::Field{"macAddress",ORM::FieldType::FT_TEXT},
             ORM::Field{"deviceID",ORM::FieldType::FT_TEXT},
-            ORM::Field{"registrationId",ORM::FieldType::FT_TEXT}
+            ORM::Field{"registrationId",ORM::FieldType::FT_TEXT},
+            ORM::Field{"operatorId",ORM::FieldType::FT_TEXT}
     };
 
     const static  ORM::IndexVec    SignupDB_Indexes{
-            { std::string("signup4_email_index"),
+            { std::string("signup5_email_index"),
               ORM::IndexEntryVec{
                       {std::string("email"),
                        ORM::Indextype::ASC} } }
     };
 
     SignupDB::SignupDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) noexcept :
-            DB(T, "signups4", SignupDB_Fields, SignupDB_Indexes, P, L, "sig") {
+            DB(T, "signups5", SignupDB_Fields, SignupDB_Indexes, P, L, "sig") {
     }
 
     bool SignupDB::GetIncompleteSignups(SignupDB::RecordVec &Signups) {
@@ -137,6 +138,7 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.macAddress = In.get<14>();
     Out.deviceID = In.get<15>();
     Out.registrationId = In.get<16>();
+    Out.operatorId = In.get<17>();
 }
 
 template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects::SignupEntry>::Convert(const OpenWifi::ProvObjects::SignupEntry &In, OpenWifi::SignupDBRecordType &Out) {
@@ -157,4 +159,5 @@ template<> void ORM::DB<    OpenWifi::SignupDBRecordType, OpenWifi::ProvObjects:
     Out.set<14>(In.macAddress);
     Out.set<15>(In.deviceID);
     Out.set<16>(In.registrationId);
+    Out.set<17>(In.operatorId);
 }

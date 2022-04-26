@@ -1048,6 +1048,9 @@ components:
         userId:
           type: string
           format: uuid
+        operatorId:
+          type: string
+          format: uuid
         macAddress:
           type: string
         serialNumber:

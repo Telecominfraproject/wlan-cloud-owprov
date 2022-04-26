@@ -896,6 +896,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"statusCode", statusCode);
         field_to_json( Obj,"deviceID", deviceID);
         field_to_json( Obj,"registrationId",registrationId);
+        field_to_json( Obj,"operatorId",operatorId);
     }
 
     bool SignupEntry::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -912,6 +913,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"statusCode", statusCode);
             field_from_json( Obj,"deviceID", deviceID);
             field_from_json( Obj,"registrationId",registrationId);
+            field_from_json( Obj,"operatorId",operatorId);
             return true;
         } catch(...) {
 

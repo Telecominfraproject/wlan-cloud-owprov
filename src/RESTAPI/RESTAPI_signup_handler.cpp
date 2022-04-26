@@ -33,6 +33,12 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
         }
 
+        // find the operator id
+        ProvObjects::Operator   SignupOperator;
+        if(!StorageService()->OperatorDB().GetRecord("registrationId", registrationId, SignupOperator)) {
+            return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
+        }
+
         //  if a signup already exists for this user, we should just return its value completion
         SignupDB::RecordVec SEs;
         if(StorageService()->SignupDB().GetRecords(0,100, SEs, " email='" + UserName + "' and serialNumber='"+macAddress+"' ")) {
@@ -113,6 +119,7 @@ namespace OpenWifi {
             SE.deviceID = deviceID;
             SE.registrationId = registrationId;
             SE.status = "waiting-for-email-verification";
+            SE.operatorId = SignupOperator.info.id;
             SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForEmail;
             StorageService()->SignupDB().CreateRecord(SE);
             Signup()->AddOutstandingSignup(SE);
