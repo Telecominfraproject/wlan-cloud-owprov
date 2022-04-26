@@ -129,7 +129,7 @@ namespace OpenWifi {
         std::cout << __LINE__ << std::endl;
         auto Names = Original->getNames();
         for(const auto &i:Names) {
-            std::cout << __LINE__ << std::endl;
+            std::cout << __LINE__ << ": " << i << std::endl;
             if(i=="__variableBlock") {
                 std::cout << __LINE__ << std::endl;
                 if(Original->isArray(i)) {
