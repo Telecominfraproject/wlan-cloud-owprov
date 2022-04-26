@@ -172,7 +172,7 @@ namespace OpenWifi {
 
     bool APConfig::ReplaceVariablesInArray( Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
         for(const auto &element:*Original) {
-            std::cout << __LINE__ << std::endl;
+            std::cout << __LINE__ << "ELEMENT: " << element.toString() << std::endl;
             if(element.isArray()) {
                 std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
@@ -190,16 +190,16 @@ namespace OpenWifi {
             } else {
                 std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
-//                ResultArray->add(element);
-
+                ResultArray->add(element);
+/*
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
                 auto Obj = element.extract<Poco::JSON::Object::Ptr>();
                 std::cout << __LINE__ << std::endl;
-                ReplaceVariablesInObject(Obj,Expanded);
+                ReplaceVariablesInObject(element,Expanded);
                 std::cout << __LINE__ << std::endl;
                 ResultArray->add(Expanded);
                 std::cout << __LINE__ << std::endl;
-            }
+*/            }
         }
         std::cout << __LINE__ << std::endl;
         return true;
