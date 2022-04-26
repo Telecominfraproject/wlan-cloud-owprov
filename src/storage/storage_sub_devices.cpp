@@ -35,7 +35,7 @@ namespace OpenWifi {
             ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
             ORM::Field{"suspended",ORM::FieldType::FT_BOOLEAN},
             ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT},
-            ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_BOOLEAN},
+            ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_TEXT},
             ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT}
     };
 

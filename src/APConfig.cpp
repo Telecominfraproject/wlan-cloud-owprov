@@ -126,19 +126,27 @@ namespace OpenWifi {
 
     bool APConfig::ReplaceVariablesInObject( Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
         // get all the names and expand
+        std::cout << __LINE__ << std::endl;
         auto Names = Original->getNames();
         for(const auto &i:Names) {
+            std::cout << __LINE__ << std::endl;
             if(i=="__variableBlock") {
+                std::cout << __LINE__ << std::endl;
                 if(Original->isArray(i)) {
+                    std::cout << __LINE__ << std::endl;
                     auto UUIDs = Original->getArray(i);
                     for(const auto &uuid:*UUIDs) {
+                        std::cout << __LINE__ << std::endl;
                         ProvObjects::VariableBlock  VB;
                         if(StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+                            std::cout << __LINE__ << std::endl;
                             for(const auto &var:VB.variables) {
+                                std::cout << __LINE__ << std::endl;
                                 Poco::JSON::Parser P;
                                 auto VariableBlockInfo = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for(const auto &j:VarNames) {
+                                    std::cout << __LINE__ << std::endl;
                                     Result->set(j,VariableBlockInfo->get(j));
                                 }
                             }
