@@ -124,7 +124,7 @@ namespace OpenWifi {
         return true;
     }
 
-    bool APConfig::ReplaceVariablesInObject( Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
+    bool APConfig::ReplaceVariablesInObject( const Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
         // get all the names and expand
         std::cout << __LINE__ << std::endl;
         auto Names = Original->getNames();
@@ -187,19 +187,21 @@ namespace OpenWifi {
                 auto Obj = element.extract<Poco::JSON::Object::Ptr>();
                 ReplaceVariablesInObject(Obj,Expanded);
                 ResultArray->add(Expanded);
+            } else if(element.isString()) {
+                std::cout << "Element type STRING: " << element.type().name() << std::endl;
             } else {
-                std::cout << "Element type UNKNOWN: " << element.type().name() << std::endl;
+/*                std::cout << "Element type UNKNOWN: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
                 ResultArray->add(element);
-/*
+*/
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
                 auto Obj = element.extract<Poco::JSON::Object::Ptr>();
                 std::cout << __LINE__ << std::endl;
-                ReplaceVariablesInObject(element,Expanded);
+                ReplaceVariablesInObject(Obj,Expanded);
                 std::cout << __LINE__ << std::endl;
                 ResultArray->add(Expanded);
                 std::cout << __LINE__ << std::endl;
-*/            }
+            }
         }
         std::cout << __LINE__ << std::endl;
         return true;
