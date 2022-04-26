@@ -180,6 +180,9 @@ namespace OpenWifi {
             if(element->isList()) std::cout << "ELEMENT TYPE LIST" << std::endl;
             if(element->isOrdered()) std::cout << "ELEMENT TYPE ORDERED" << std::endl;
             if(element->isStruct()) std::cout << "ELEMENT TYPE STRUCT" << std::endl;
+            if(element->isDeque()) std::cout  << "ELEMENT TYPE DEQUE" << std::endl;
+            if(element->isEmpty()) std::cout  << "ELEMENT TYPE EMPTY" << std::endl;
+            if(element->isVector()) std::cout  << "ELEMENT TYPE VECTOR" << std::endl;
 
             if(element->isArray()) {
                 std::cout << "Element type ARRAY: " << element->type().name() << std::endl;
