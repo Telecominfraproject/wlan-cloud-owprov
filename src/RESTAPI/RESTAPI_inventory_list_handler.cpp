@@ -77,7 +77,6 @@ namespace OpenWifi{
             }
             return SendList(Tags, SerialOnly);
         } else if(GetBoolParameter("subscribersOnly")) {
-
             if(QB_.CountOnly) {
                 auto C = DB_.Count(" devClass='subscriber' and subscriber!='' ");
                 return ReturnCountOnly( C);
