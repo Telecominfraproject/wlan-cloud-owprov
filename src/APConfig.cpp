@@ -186,6 +186,7 @@ namespace OpenWifi {
                 ReplaceVariablesInObject(Obj,Expanded);
                 ResultArray->add(Expanded);
             } else {
+                std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
                 ResultArray->add(element);
             }
