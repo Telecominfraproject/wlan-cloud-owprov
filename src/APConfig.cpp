@@ -189,6 +189,7 @@ namespace OpenWifi {
                 ResultArray->add(Expanded);
             } else if(element.isString()) {
                 std::cout << "Element type STRING: " << element.type().name() << std::endl;
+                ResultArray->add(element);
             } else {
 /*                std::cout << "Element type UNKNOWN: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
