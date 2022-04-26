@@ -190,7 +190,15 @@ namespace OpenWifi {
             } else {
                 std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
-                ResultArray->add(element);
+//                ResultArray->add(element);
+
+                auto Expanded = Poco::makeShared<Poco::JSON::Object>();
+                auto Obj = element.extract<Poco::JSON::Object::Ptr>();
+                std::cout << __LINE__ << std::endl;
+                ReplaceVariablesInObject(Obj,Expanded);
+                std::cout << __LINE__ << std::endl;
+                ResultArray->add(Expanded);
+                std::cout << __LINE__ << std::endl;
             }
         }
         std::cout << __LINE__ << std::endl;
