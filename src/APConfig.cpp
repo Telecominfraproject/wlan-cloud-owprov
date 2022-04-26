@@ -174,12 +174,14 @@ namespace OpenWifi {
         for(const auto &element:*Original) {
             std::cout << __LINE__ << std::endl;
             if(element.isArray()) {
+                std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Array>();
                 auto Object = element.extract<Poco::JSON::Array::Ptr>();
                 ReplaceVariablesInArray(Object,Expanded);
                 ResultArray->add(Expanded);
             } else if(element.isStruct()) {
+                std::cout << "Element type: " << element.type().name() << std::endl;
                 std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
                 auto Obj = element.extract<Poco::JSON::Object::Ptr>();
