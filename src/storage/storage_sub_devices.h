@@ -42,6 +42,8 @@ namespace OpenWifi {
             std::string,
             std::string,
             bool,
+            std::string,
+            bool,
             std::string
     > SubDeviceDBRecordType;
 

@@ -12,7 +12,7 @@ namespace OpenWifi {
         auto operatorId=GetParameter("operatorId");
         auto subscriberId=GetParameter("subscriberId");
 
-        if(operatorId.empty() || !StorageService()->OperatorDB().Exists("id",operatorId)) {
+        if(!operatorId.empty() && !StorageService()->OperatorDB().Exists("id",operatorId)) {
             return BadRequest(RESTAPI::Errors::OperatorIdMustExist);
         }
 

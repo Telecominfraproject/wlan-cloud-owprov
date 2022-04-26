@@ -34,20 +34,22 @@ namespace OpenWifi {
             ORM::Field{"billingCode",ORM::FieldType::FT_TEXT},
             ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
             ORM::Field{"suspended",ORM::FieldType::FT_BOOLEAN},
-            ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT}
+            ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT},
+            ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_BOOLEAN},
+            ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    SubscriberDeviceDB_Indexes{
-            { std::string("subscriber_device_name_index2"),
+            { std::string("subscriber_device_name_index3"),
               ORM::IndexEntryVec{ {std::string("name"), ORM::Indextype::ASC} } },
-            { std::string("subscriber_device_serialNumber_index2"),
+            { std::string("subscriber_device_serialNumber_index3"),
               ORM::IndexEntryVec{ {std::string("serialNumber"), ORM::Indextype::ASC} } } ,
-            { std::string("subscriber_device_realMacAddress_index2"),
+            { std::string("subscriber_device_realMacAddress_index3"),
               ORM::IndexEntryVec{ {std::string("realMacAddress"), ORM::Indextype::ASC} } }
     };
 
     SubscriberDeviceDB::SubscriberDeviceDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-            DB(T, "sub_devices2", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
+            DB(T, "sub_devices3", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
     }
 
     bool SubscriberDeviceDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
@@ -83,6 +85,8 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<20>());
     Out.suspended = In.get<21>();
     Out.realMacAddress = In.get<22>();
+    Out.firmwareRCOnly = In.get<23>();
+    Out.firmwareUpgrade = In.get<24>();
 }
 
 template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjects::SubscriberDevice>::Convert(const OpenWifi::ProvObjects::SubscriberDevice &In, OpenWifi::SubDeviceDBRecordType &Out) {
@@ -109,4 +113,6 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.set<20>(OpenWifi::RESTAPI_utils::to_string(In.configuration));
     Out.set<21>(In.suspended);
     Out.set<22>(In.realMacAddress);
+    Out.set<23>(In.firmwareRCOnly);
+    Out.set<24>(In.firmwareUpgrade);
 }
