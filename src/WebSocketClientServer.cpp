@@ -45,7 +45,7 @@ namespace OpenWifi {
         std::ostringstream OO;
         Msg.stringify(OO);
 
-        std::cout << std::endl << OO.str() << std::endl;
+//        std::cout << std::endl << OO.str() << std::endl;
 
         return SendToUser(userName,OO.str());
     }
@@ -68,7 +68,6 @@ namespace OpenWifi {
         uint64_t Sent=0;
 
         for(const auto &client:Clients_) {
-            std::cout << "WebSocket notification: " << Payload << std::endl ;
             if(client.second.second == UserName) {
                  if(client.second.first->Send(Payload))
                      Sent++;
