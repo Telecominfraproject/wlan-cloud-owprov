@@ -40,8 +40,10 @@ namespace OpenWifi {
 
         Poco::JSON::Object  Payload;
         Notification.to_json(Payload);
+        Poco::JSON::Object  Msg;
+        Msg.set("notification",Payload);
         std::ostringstream OO;
-        Payload.stringify(OO);
+        Msg.stringify(OO);
         return SendToUser(userName,OO.str());
     }
 

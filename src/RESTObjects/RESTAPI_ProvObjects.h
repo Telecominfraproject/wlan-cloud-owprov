@@ -681,8 +681,8 @@ namespace OpenWifi::ProvObjects {
                                     type,
                                     details;
         std::vector<std::string>    success,
-                errors,
-                warnings;
+                                    error,
+                                    warning;
         uint64_t                    timeStamp=std::time(nullptr);
 
         void to_json(Poco::JSON::Object &Obj) const;

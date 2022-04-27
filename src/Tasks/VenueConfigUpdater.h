@@ -38,6 +38,7 @@ namespace OpenWifi {
             ProvObjects::InventoryTag   Device;
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
+                SerialNumber = Device.serialNumber;
                 std::cout << "Starting push for " << Device.serialNumber << std::endl;
                 Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                 auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
@@ -70,6 +71,7 @@ namespace OpenWifi {
         uint64_t        updated_=0, failed_=0, bad_config_=0;
         bool            started_ = false,
                         done_ = false;
+        std::string     SerialNumber;
 
     private:
         std::string     uuid_;
@@ -173,9 +175,16 @@ namespace OpenWifi {
                             }
                             if(!cur_task.thr_.isRunning() && cur_task.task->done_) {
                                 cur_task.thr_.join();
-                                Updated += cur_task.task->updated_;
-                                Failed += cur_task.task->failed_;
-                                BadConfigs += cur_task.task->bad_config_;
+                                if(cur_task.task->updated_) {
+                                    Updated++;
+                                    N.content.success.push_back(cur_task.task->SerialNumber);
+                                } else if(cur_task.task->failed_) {
+                                    Failed++;
+                                    N.content.warning.push_back(cur_task.task->SerialNumber);
+                                } else {
+                                    BadConfigs++;
+                                    N.content.error.push_back(cur_task.task->SerialNumber);
+                                }
                                 cur_task.task->started_ = cur_task.task->done_ = false;
                                 delete cur_task.task;
                                 cur_task.task = nullptr;
