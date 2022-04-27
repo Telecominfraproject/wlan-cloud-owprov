@@ -12,7 +12,7 @@
 
 namespace OpenWifi {
 
-    static void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
+    [[maybe_unused]] static void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
         try {
             if(Response->has("results")) {
                 auto Results = Response->get("results").extract<Poco::JSON::Object::Ptr>();
@@ -36,45 +36,35 @@ namespace OpenWifi {
 
         void run() final {
             ProvObjects::InventoryTag   Device;
-            ProvObjects::WebSocketNotification N;
-            N.content.type = "configuration_update";
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
-                N.content.title = "Venue Configuration Updater: " + venue_;
-                std::cout << "Starting push for " << uuid_ << std::endl;
+                std::cout << "Starting push for " << Device.serialNumber << std::endl;
                 Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                 auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                 auto Configuration = Poco::makeShared<Poco::JSON::Object>();
-                Poco::JSON::Object ErrorsObj, WarningsObj;
-                ProvObjects::InventoryConfigApplyResult Results;
                 if (DeviceConfig->Get(Configuration)) {
                     std::ostringstream OS;
                     Configuration->stringify(OS);
-                    Results.appliedConfiguration = OS.str();
                     auto Response=Poco::makeShared<Poco::JSON::Object>();
                     Logger().debug(fmt::format("{}: Pushing configuration.",Device.serialNumber));
                     if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
                         Logger().debug(fmt::format("{}: Configuration pushed.",Device.serialNumber));
-                        GetRejectedLines(Response, Results.warnings);
-                        Results.errorCode = 0;
                         Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
+                        std::cout << Device.serialNumber << ": Updated" << std::endl;
                         updated_++;
-                        N.content.success.push_back(Device.serialNumber);
                     } else {
                         Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
-                        Results.errorCode = 1;
+                        std::cout << Device.serialNumber << ": Failed" << std::endl;
                         failed_++;
-                        N.content.warnings.push_back(Device.serialNumber);
                     }
                 } else {
                     Logger().debug(fmt::format("{}: Configuration is bad.",Device.serialNumber));
-                    Results.errorCode = 1;
-                    N.content.errors.push_back(Device.serialNumber);
                     bad_config_++;
+                    std::cout << Device.serialNumber << ": Bad config" << std::endl;
                 }
             }
             done_ = true;
-            std::cout << "Done push for " << uuid_ << std::endl;
+            std::cout << "Done push for " << Device.serialNumber << std::endl;
         }
 
         uint64_t        updated_=0, failed_=0, bad_config_=0;

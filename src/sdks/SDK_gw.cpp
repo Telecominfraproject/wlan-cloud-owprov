@@ -176,24 +176,24 @@ namespace OpenWifi::SDK::GW {
             return false;
         }
 
-        bool Configure(RESTAPIHandler *client, const std::string &Mac, Poco::JSON::Object::Ptr & Configuration, Poco::JSON::Object::Ptr & Response) {
+        bool Configure(RESTAPIHandler *client, const std::string &SerialNumber, Poco::JSON::Object::Ptr & Configuration, Poco::JSON::Object::Ptr & Response) {
 
             Poco::JSON::Object      Body;
 
             Poco::JSON::Parser P;
-            uint64_t Now = std::time(nullptr);
+            uint64_t now = OpenWifi::Now();
 
-            Configuration->set("uuid", Now);
-            Body.set("serialNumber", Mac);
-            Body.set("UUID", Now);
+            Configuration->set("uuid", now);
+            Body.set("serialNumber", SerialNumber);
+            Body.set("UUID", now);
             Body.set("when",0);
             Body.set("configuration", Configuration);
 
             OpenWifi::OpenAPIRequestPost R(OpenWifi::uSERVICE_GATEWAY,
-                                           "/api/v1/device/" + Mac + "/configure",
+                                           "/api/v1/device/" + SerialNumber + "/configure",
                                            {},
                                            Body,
-                                           10000);
+                                           60000);
 
             auto ResponseStatus = R.Do(Response, client ? client->UserInfo_.webtoken.access_token_ : "");
             if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
@@ -201,9 +201,7 @@ namespace OpenWifi::SDK::GW {
                 Poco::JSON::Stringifier::stringify(Response,os);
                 return true;
             }
-
             return false;
         }
-
     }
 }
