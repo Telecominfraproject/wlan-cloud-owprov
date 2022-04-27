@@ -41,6 +41,7 @@ namespace OpenWifi {
         ServiceClassDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
         virtual ~ServiceClassDB() {};
         bool Upgrade(uint32_t from, uint32_t &to) override;
+        std::string DefaultForOperator(const std::string & OperatorId);
     private:
     };
 }

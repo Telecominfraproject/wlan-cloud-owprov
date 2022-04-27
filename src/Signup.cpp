@@ -95,8 +95,11 @@ namespace OpenWifi {
                             SD.deviceType = IT.deviceType;
                             SD.state = OS.str();
                             SD.subscriberId = SE.userId;
+                            SD.serviceClass = StorageService()->ServiceClassDB().DefaultForOperator(SE.operatorId);
+
                             StorageService()->SubscriberDeviceDB().DeleteRecord("serialNumber", SD.serialNumber);
                             StorageService()->SubscriberDeviceDB().CreateRecord(SD);
+                            StorageService()->InventoryDB().DeleteRecord("serialNumber", SD.serialNumber);
 
                             SE.status = "signup completed";
                             SE.serialNumber = SerialNumber;

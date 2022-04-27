@@ -56,6 +56,19 @@ namespace OpenWifi {
         RunScript(Script);
         return true;
     }
+
+    std::string ServiceClassDB::DefaultForOperator(const std::string & OperatorId) {
+        try {
+            std::vector<ProvObjects::ServiceClass>  SC;
+            StorageService()->ServiceClassDB().GetRecords(0,1,SC,fmt::format(" operatorId='{}' and defaultService=true ", OperatorId));
+            if(SC.size()==1)
+                return SC[0].info.id;
+        } catch (...) {
+
+        }
+        return "";
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::ServiceClassDBRecordType, OpenWifi::ProvObjects::ServiceClass>::Convert(const OpenWifi::ServiceClassDBRecordType &In, OpenWifi::ProvObjects::ServiceClass &Out) {
