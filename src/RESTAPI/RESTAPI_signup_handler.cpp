@@ -11,11 +11,19 @@ namespace OpenWifi {
     void RESTAPI_signup_handler::DoPost() {
         auto UserName = GetParameter("email");
         Poco::toLowerInPlace(UserName);
+        Poco::trimInPlace(UserName);
+
         auto macAddress = GetParameter("macAddress");
         Poco::toLowerInPlace(macAddress);
+        Poco::trimInPlace(macAddress);
+
         auto deviceID = GetParameter("deviceID");
+        Poco::toLowerInPlace(deviceID);
+        Poco::trimInPlace(deviceID);
+
         auto registrationId = GetParameter("registrationId");
         Poco::toLowerInPlace(registrationId);
+        Poco::trimInPlace(registrationId);
 
         if(UserName.empty() || macAddress.empty() || registrationId.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
@@ -57,10 +65,6 @@ namespace OpenWifi {
                     return ReturnObject(Answer);
                 }
             }
-        }
-
-        if(!StorageService()->OperatorDB().Exists("registrationId",registrationId)) {
-            return BadRequest(RESTAPI::Errors::InvalidRegistrationOperatorName);
         }
 
         //  So we do not have an outstanding signup...
