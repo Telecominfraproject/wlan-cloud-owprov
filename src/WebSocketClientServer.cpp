@@ -63,7 +63,7 @@ namespace OpenWifi {
         uint64_t Sent=0;
 
         for(const auto &client:Clients_) {
-            std::cout << "WebSocket notification: " << Payload << std::cout ;
+            std::cout << "WebSocket notification: " << Payload << std::endl ;
             if(client.second.second == UserName) {
                  if(client.second.first->Send(Payload))
                      Sent++;
