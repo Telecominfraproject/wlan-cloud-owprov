@@ -114,7 +114,7 @@ namespace OpenWifi {
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
             ProvObjects::WebSocketNotification N;
-            N.content.type = "configuration_update";
+            N.content.type = "venue_configuration_update";
 
             Logger().information(fmt::format("Job {} Starting.", JobId_));
 
@@ -126,6 +126,8 @@ namespace OpenWifi {
                     Poco::Thread                thr_;
                     VenueDeviceConfigUpdater    *task= nullptr;
                 };
+
+                N.content.title = fmt::format("Updating {} configurations", Venue.info.name);
 
                 std::array<tState,MaxThreads> Tasks;
 
