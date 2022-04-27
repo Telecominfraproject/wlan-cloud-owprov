@@ -39,7 +39,7 @@ namespace OpenWifi {
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
                 SerialNumber = Device.serialNumber;
-                std::cout << "Starting push for " << Device.serialNumber << std::endl;
+                // std::cout << "Starting push for " << Device.serialNumber << std::endl;
                 Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                 auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                 auto Configuration = Poco::makeShared<Poco::JSON::Object>();
@@ -51,21 +51,21 @@ namespace OpenWifi {
                     if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
                         Logger().debug(fmt::format("{}: Configuration pushed.",Device.serialNumber));
                         Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
-                        std::cout << Device.serialNumber << ": Updated" << std::endl;
+                        // std::cout << Device.serialNumber << ": Updated" << std::endl;
                         updated_++;
                     } else {
                         Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
-                        std::cout << Device.serialNumber << ": Failed" << std::endl;
+                        // std::cout << Device.serialNumber << ": Failed" << std::endl;
                         failed_++;
                     }
                 } else {
                     Logger().debug(fmt::format("{}: Configuration is bad.",Device.serialNumber));
                     bad_config_++;
-                    std::cout << Device.serialNumber << ": Bad config" << std::endl;
+                    // std::cout << Device.serialNumber << ": Bad config" << std::endl;
                 }
             }
             done_ = true;
-            std::cout << "Done push for " << Device.serialNumber << std::endl;
+            // std::cout << "Done push for " << Device.serialNumber << std::endl;
         }
 
         uint64_t        updated_=0, failed_=0, bad_config_=0;
@@ -131,7 +131,7 @@ namespace OpenWifi {
 
                 for(const auto &uuid:Venue.devices) {
                     auto NewTask = new VenueDeviceConfigUpdater(uuid, Venue.info.name, Logger());
-                    std::cout << "Scheduling config push for " << uuid << std::endl;
+                    // std::cout << "Scheduling config push for " << uuid << std::endl;
                     bool found_slot = false;
                     while (!found_slot) {
                         for (auto &cur_task: Tasks) {
