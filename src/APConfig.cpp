@@ -181,7 +181,6 @@ namespace OpenWifi {
                         element.isBoolean() ||
                         element.isInteger() ||
                         element.isSigned() ) {
-                std::cout << "Element type STRING: " << element.type().name() << std::endl;
                 ResultArray->add(element);
             } else {
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
