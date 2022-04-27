@@ -147,6 +147,7 @@ namespace OpenWifi {
                                 cur_task.task = NewTask;
                                 cur_task.thr_.start(*NewTask);
                                 found_slot = true;
+                                break;
                             }
                         }
 
