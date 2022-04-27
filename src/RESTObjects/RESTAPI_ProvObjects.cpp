@@ -1157,8 +1157,8 @@ namespace OpenWifi::ProvObjects {
         field_to_json(Obj,"title",title);
         field_to_json(Obj,"type",type);
         field_to_json(Obj,"success",success);
-        field_to_json(Obj,"errors",errors);
-        field_to_json(Obj,"warnings",warnings);
+        field_to_json(Obj,"error",error);
+        field_to_json(Obj,"warning",warning);
         field_to_json(Obj,"timeStamp",timeStamp);
         field_to_json(Obj,"details",details);
     }
@@ -1168,8 +1168,8 @@ namespace OpenWifi::ProvObjects {
             field_from_json(Obj,"title",title);
             field_from_json(Obj,"type",type);
             field_from_json(Obj,"success",success);
-            field_from_json(Obj,"errors",errors);
-            field_from_json(Obj,"warnings",warnings);
+            field_from_json(Obj,"error",error);
+            field_from_json(Obj,"warning",warning);
             field_from_json(Obj,"timeStamp",timeStamp);
             field_from_json(Obj,"details",details);
             return true;
