@@ -44,6 +44,9 @@ namespace OpenWifi {
         Msg.set("notification",Payload);
         std::ostringstream OO;
         Msg.stringify(OO);
+
+        std::cout << std::endl << OO.str() << std::endl;
+
         return SendToUser(userName,OO.str());
     }
 
