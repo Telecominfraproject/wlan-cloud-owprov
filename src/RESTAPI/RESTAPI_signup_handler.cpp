@@ -95,7 +95,9 @@ namespace OpenWifi {
         Poco::JSON::Object  Body;
         OpenAPIRequestPost  CreateUser( uSERVICE_SECURITY, "/api/v1/signup", {
                 { "email", UserName },
-                { "signupUUID" , SignupUUID }
+                { "signupUUID" , SignupUUID },
+                { "owner" , SignupOperator.info.id },
+
         }, Body, 30000);
 
         Poco::JSON::Object::Ptr Answer;

@@ -1037,7 +1037,6 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj,"realMacAddress", realMacAddress);
         field_to_json( Obj,"firmwareRCOnly", firmwareRCOnly);
         field_to_json( Obj,"firmwareUpgrade", firmwareUpgrade);
-
     }
 
     bool SubscriberDevice::from_json(const Poco::JSON::Object::Ptr &Obj) {
