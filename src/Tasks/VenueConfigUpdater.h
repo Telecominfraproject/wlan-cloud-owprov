@@ -184,7 +184,7 @@ namespace OpenWifi {
                     }
                 }
 
-                N.content.details = fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations. ",
+                N.content.details = fmt::format("Job {} Completed: {} updated, {} failed to update, {} bad configurations. ",
                                                 JobId_, Updated ,Failed, BadConfigs);
 
             } else {
