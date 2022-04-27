@@ -41,6 +41,7 @@ namespace OpenWifi {
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
                 N.content.title = "Venue Configuration Updater: " + venue_;
+                std::cout << "Starting push for " << uuid_ << std::endl;
                 Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                 auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                 auto Configuration = Poco::makeShared<Poco::JSON::Object>();
@@ -73,6 +74,7 @@ namespace OpenWifi {
                 }
             }
             done_ = true;
+            std::cout << "Done push for " << uuid_ << std::endl;
         }
 
         uint64_t        updated_=0, failed_=0, bad_config_=0;
@@ -137,6 +139,7 @@ namespace OpenWifi {
 
                 for(const auto &uuid:Venue.devices) {
                     auto NewTask = new VenueDeviceConfigUpdater(uuid, Venue.info.name, Logger());
+                    std::cout << "Scheduling config push for " << uuid << std::endl;
                     bool found_slot = false;
                     while (!found_slot) {
                         for (auto &cur_task: Tasks) {
@@ -199,7 +202,7 @@ namespace OpenWifi {
             }
 
             auto Sent = WebSocketClientServer()->SendUserNotification(UI_.email,N);
-            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update{} , {} bad configurations. Notification was send={}",
+            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations. Notification was send={}",
                                              JobId_, Updated ,Failed, BadConfigs, Sent));
             delete this;
         }
