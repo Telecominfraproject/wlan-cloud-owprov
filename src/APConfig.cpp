@@ -126,27 +126,19 @@ namespace OpenWifi {
 
     bool APConfig::ReplaceVariablesInObject( const Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
         // get all the names and expand
-        std::cout << __LINE__ << std::endl;
         auto Names = Original->getNames();
         for(const auto &i:Names) {
-            std::cout << __LINE__ << "  Variable: " << i << std::endl;
             if(i=="__variableBlock") {
-                std::cout << __LINE__ << std::endl;
                 if(Original->isArray(i)) {
-                    std::cout << __LINE__ << std::endl;
                     auto UUIDs = Original->getArray(i);
                     for(const auto &uuid:*UUIDs) {
-                        std::cout << __LINE__ << std::endl;
                         ProvObjects::VariableBlock  VB;
                         if(StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-                            std::cout << __LINE__ << std::endl;
                             for(const auto &var:VB.variables) {
-                                std::cout << __LINE__ << std::endl;
                                 Poco::JSON::Parser P;
                                 auto VariableBlockInfo = P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for(const auto &j:VarNames) {
-                                    std::cout << __LINE__ << std::endl;
                                     Result->set(j,VariableBlockInfo->get(j));
                                 }
                             }
@@ -173,50 +165,31 @@ namespace OpenWifi {
     bool APConfig::ReplaceVariablesInArray( const Poco::JSON::Array::Ptr & Original, Poco::JSON::Array::Ptr & ResultArray) {
 
         for(const auto &element:*Original) {
-            std::cout << __LINE__ << "ELEMENT: " << element.toString() << std::endl;
-            if(element.isString()) std::cout << "ELEMENT TYPE STRING" << std::endl;
-            if(element.isArray()) std::cout << "ELEMENT TYPE ARRAY" << std::endl;
-            if(element.isBoolean()) std::cout << "ELEMENT TYPE BOOLEAN" << std::endl;
-            if(element.isInteger()) std::cout << "ELEMENT TYPE INTEGER" << std::endl;
-            if(element.isList()) std::cout << "ELEMENT TYPE LIST" << std::endl;
-            if(element.isOrdered()) std::cout << "ELEMENT TYPE ORDERED" << std::endl;
-            if(element.isStruct()) std::cout << "ELEMENT TYPE STRUCT" << std::endl;
-            if(element.isDeque()) std::cout  << "ELEMENT TYPE DEQUE" << std::endl;
-            if(element.isEmpty()) std::cout  << "ELEMENT TYPE EMPTY" << std::endl;
-            if(element.isVector()) std::cout  << "ELEMENT TYPE VECTOR" << std::endl;
 
             if(element.isArray()) {
-                std::cout << "Element type ARRAY: " << element.type().name() << std::endl;
-                std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Array>();
-                auto Object = element.extract<Poco::JSON::Array::Ptr>();
+                const auto & Object = element.extract<Poco::JSON::Array::Ptr>();
                 ReplaceVariablesInArray(Object,Expanded);
                 ResultArray->add(Expanded);
             } else if(element.isStruct()) {
-                std::cout << "Element type STRUCT: " << element.type().name() << std::endl;
-                std::cout << __LINE__ << std::endl;
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
-                auto Obj = element.extract<Poco::JSON::Object::Ptr>();
-                ReplaceVariablesInObject(Obj,Expanded);
+                const auto & Object = element.extract<Poco::JSON::Object::Ptr>();
+                ReplaceVariablesInObject(Object,Expanded);
                 ResultArray->add(Expanded);
-            } else if(element.isString()) {
+            } else if(  element.isString() ||
+                        element.isNumeric() ||
+                        element.isBoolean() ||
+                        element.isInteger() ||
+                        element.isSigned() ) {
                 std::cout << "Element type STRING: " << element.type().name() << std::endl;
                 ResultArray->add(element);
             } else {
-/*                std::cout << "Element type UNKNOWN: " << element.type().name() << std::endl;
-                std::cout << __LINE__ << std::endl;
-                ResultArray->add(element);
-*/
                 auto Expanded = Poco::makeShared<Poco::JSON::Object>();
-                auto Obj = element.extract<Poco::JSON::Object::Ptr>();
-                std::cout << __LINE__ << std::endl;
-                ReplaceVariablesInObject(Obj,Expanded);
-                std::cout << __LINE__ << std::endl;
+                const auto & Object = element.extract<Poco::JSON::Object::Ptr>();
+                ReplaceVariablesInObject(Object,Expanded);
                 ResultArray->add(Expanded);
-                std::cout << __LINE__ << std::endl;
             }
         }
-        std::cout << __LINE__ << std::endl;
         return true;
     }
 
@@ -247,12 +220,9 @@ namespace OpenWifi {
             auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
             auto Names = O->getNames();
             for(const auto &SectionName:Names) {
-                std::cout << __LINE__ << "Section: " << SectionName << std::endl;
                 auto InsertInfo = Sections.insert(SectionName);
                 if (InsertInfo.second) {
-                    std::cout << __LINE__ << std::endl;
                     if (O->isArray(SectionName)) {
-                        std::cout << __LINE__ << std::endl;
                         auto OriginalArray = O->getArray(SectionName);
                         if (Explain_) {
                             Poco::JSON::Object ExObj;
@@ -262,15 +232,10 @@ namespace OpenWifi {
                             ExObj.set("element", OriginalArray);
                             Explanation_.add(ExObj);
                         }
-                        std::cout << __LINE__ << std::endl;
                         auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
-                        std::cout << __LINE__ << std::endl;
                         ReplaceVariablesInArray(OriginalArray, ExpandedArray);
-                        std::cout << __LINE__ << std::endl;
                         Configuration->set(SectionName, ExpandedArray);
-                        std::cout << __LINE__ << std::endl;
                     } else if (O->isObject(SectionName)) {
-                        std::cout << __LINE__ << std::endl;
                         auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
                         if (Explain_) {
                             Poco::JSON::Object ExObj;
@@ -284,7 +249,7 @@ namespace OpenWifi {
                         ReplaceVariablesInObject(OriginalSection, ExpandedSection);
                         Configuration->set(SectionName, ExpandedSection);
                     } else {
-                        std::cout << __LINE__ << std::endl;
+                        std::cout << " --- unknown element type --- " << O->get(SectionName).toString() << std::endl;
                     }
                 } else {
                     if (Explain_) {
