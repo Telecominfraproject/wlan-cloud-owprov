@@ -18,6 +18,7 @@
 #include "framework/MicroService.h"
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "ProvWebSocketClient.h"
 
 namespace OpenWifi {
 
@@ -45,10 +46,11 @@ namespace OpenWifi {
             void PostInitialization(Poco::Util::Application &self);
 
 	  	private:
-			static Daemon 				        *instance_;
-			OpenWifi::ProvisioningDashboard		DB_{};
-			ProvObjects::FIRMWARE_UPGRADE_RULES FWRules_{ProvObjects::dont_upgrade};
-            std::string         AssetDir_;
+			static Daemon 				            *instance_;
+			OpenWifi::ProvisioningDashboard		    DB_{};
+			ProvObjects::FIRMWARE_UPGRADE_RULES     FWRules_{ProvObjects::dont_upgrade};
+            std::string                             AssetDir_;
+            std::unique_ptr<ProvWebSocketClient>    WebSocketProcessor_;
     };
 
 	inline Daemon * Daemon() { return Daemon::instance(); }

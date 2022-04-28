@@ -16,7 +16,6 @@
 #include "framework/ConfigurationValidator.h"
 #include "SerialNumberCache.h"
 #include "JobController.h"
-#include "WebSocketClientServer.h"
 #include "FindCountry.h"
 #include "Signup.h"
 #include "DeviceTypeCache.h"
@@ -58,6 +57,8 @@ namespace OpenWifi {
 	    } else {
 	        FWRules_ = ProvObjects::dont_upgrade;
 	    }
+
+        WebSocketProcessor_ = std::make_unique<ProvWebSocketClient>(logger());
 
         AssetDir_ = MicroService::instance().DataDir() + "/wwwassets";
         Poco::File	DataDir(AssetDir_);

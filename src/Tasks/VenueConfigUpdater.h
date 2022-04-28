@@ -8,7 +8,6 @@
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
-#include "WebSocketClientServer.h"
 
 namespace OpenWifi {
 
@@ -113,7 +112,7 @@ namespace OpenWifi {
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
-            ProvObjects::WebSocketNotification N;
+            WebSocketNotification N;
             N.content.type = "venue_configuration_update";
 
             Logger().information(fmt::format("Job {} Starting.", JobId_));

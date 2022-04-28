@@ -15,7 +15,6 @@
 #include "RESTAPI/RESTAPI_entity_list_handler.h"
 #include "RESTAPI/RESTAPI_configurations_handler.h"
 #include "RESTAPI/RESTAPI_configurations_list_handler.h"
-#include "RESTAPI/RESTAPI_webSocketServer.h"
 #include "RESTAPI/RESTAPI_contact_list_handler.h"
 #include "RESTAPI/RESTAPI_location_list_handler.h"
 #include "RESTAPI/RESTAPI_venue_list_handler.h"

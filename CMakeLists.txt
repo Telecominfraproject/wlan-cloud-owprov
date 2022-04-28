@@ -102,7 +102,6 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_inventory_list_handler.cpp src/RESTAPI/RESTAPI_inventory_list_handler.h
         src/RESTAPI/RESTAPI_entity_list_handler.cpp src/RESTAPI/RESTAPI_entity_list_handler.h
         src/RESTAPI/RESTAPI_configurations_handler.cpp src/RESTAPI/RESTAPI_configurations_handler.h
-        src/RESTAPI/RESTAPI_webSocketServer.h src/RESTAPI/RESTAPI_webSocketServer.cpp
         src/RESTAPI/RESTAPI_contact_list_handler.cpp src/RESTAPI/RESTAPI_contact_list_handler.h
         src/RESTAPI/RESTAPI_location_list_handler.cpp src/RESTAPI/RESTAPI_location_list_handler.h
         src/RESTAPI/RESTAPI_venue_list_handler.cpp src/RESTAPI/RESTAPI_venue_list_handler.h
@@ -126,7 +125,6 @@ add_executable(owprov
         src/JobController.cpp src/JobController.h
         src/JobRegistrations.cpp
         src/storage/storage_jobs.cpp src/storage/storage_jobs.h
-        src/WebSocketClientServer.cpp src/WebSocketClientServer.h
         src/storage/storage_maps.cpp src/storage/storage_maps.h
         src/RESTAPI/RESTAPI_map_handler.cpp src/RESTAPI/RESTAPI_map_handler.h
         src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h
@@ -136,7 +134,7 @@ add_executable(owprov
         src/storage/storage_variables.cpp src/storage/storage_variables.h
         src/RESTAPI/RESTAPI_variables_handler.cpp src/RESTAPI/RESTAPI_variables_handler.h
         src/RESTAPI/RESTAPI_variables_list_handler.cpp src/RESTAPI/RESTAPI_variables_list_handler.h
-        src/FileDownloader.cpp src/FileDownloader.h src/Tasks/VenueConfigUpdater.cpp src/Tasks/VenueConfigUpdater.h src/Kafka_ProvUpdater.cpp src/Kafka_ProvUpdater.h src/storage/storage_operataor.cpp src/storage/storage_operataor.h src/storage/storage_sub_devices.cpp src/storage/storage_sub_devices.h src/storage/storage_service_class.cpp src/storage/storage_service_class.h src/RESTAPI/RESTAPI_sub_devices_list_handler.cpp src/RESTAPI/RESTAPI_sub_devices_list_handler.h src/RESTAPI/RESTAPI_sub_devices_handler.cpp src/RESTAPI/RESTAPI_sub_devices_handler.h src/RESTAPI/RESTAPI_service_class_list_handler.cpp src/RESTAPI/RESTAPI_service_class_list_handler.h src/RESTAPI/RESTAPI_service_class_handler.cpp src/RESTAPI/RESTAPI_service_class_handler.h src/RESTAPI/RESTAPI_operators_list_handler.cpp src/RESTAPI/RESTAPI_operators_list_handler.h src/RESTAPI/RESTAPI_operators_handler.cpp src/RESTAPI/RESTAPI_operators_handler.h src/storage/storage_op_contacts.cpp src/storage/storage_op_contacts.h src/storage/storage_op_locations.cpp src/storage/storage_op_locations.h src/RESTAPI/RESTAPI_op_contact_list_handler.cpp src/RESTAPI/RESTAPI_op_contact_list_handler.h src/RESTAPI/RESTAPI_op_contact_handler.cpp src/RESTAPI/RESTAPI_op_contact_handler.h src/RESTAPI/RESTAPI_op_location_list_handler.cpp src/RESTAPI/RESTAPI_op_location_list_handler.h src/RESTAPI/RESTAPI_op_location_handler.cpp src/RESTAPI/RESTAPI_op_location_handler.h)
+        src/FileDownloader.cpp src/FileDownloader.h src/Tasks/VenueConfigUpdater.cpp src/Tasks/VenueConfigUpdater.h src/Kafka_ProvUpdater.cpp src/Kafka_ProvUpdater.h src/storage/storage_operataor.cpp src/storage/storage_operataor.h src/storage/storage_sub_devices.cpp src/storage/storage_sub_devices.h src/storage/storage_service_class.cpp src/storage/storage_service_class.h src/RESTAPI/RESTAPI_sub_devices_list_handler.cpp src/RESTAPI/RESTAPI_sub_devices_list_handler.h src/RESTAPI/RESTAPI_sub_devices_handler.cpp src/RESTAPI/RESTAPI_sub_devices_handler.h src/RESTAPI/RESTAPI_service_class_list_handler.cpp src/RESTAPI/RESTAPI_service_class_list_handler.h src/RESTAPI/RESTAPI_service_class_handler.cpp src/RESTAPI/RESTAPI_service_class_handler.h src/RESTAPI/RESTAPI_operators_list_handler.cpp src/RESTAPI/RESTAPI_operators_list_handler.h src/RESTAPI/RESTAPI_operators_handler.cpp src/RESTAPI/RESTAPI_operators_handler.h src/storage/storage_op_contacts.cpp src/storage/storage_op_contacts.h src/storage/storage_op_locations.cpp src/storage/storage_op_locations.h src/RESTAPI/RESTAPI_op_contact_list_handler.cpp src/RESTAPI/RESTAPI_op_contact_list_handler.h src/RESTAPI/RESTAPI_op_contact_handler.cpp src/RESTAPI/RESTAPI_op_contact_handler.h src/RESTAPI/RESTAPI_op_location_list_handler.cpp src/RESTAPI/RESTAPI_op_location_list_handler.h src/RESTAPI/RESTAPI_op_location_handler.cpp src/RESTAPI/RESTAPI_op_location_handler.h src/ProvWebSocketClient.cpp src/ProvWebSocketClient.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}
