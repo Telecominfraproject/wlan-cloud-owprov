@@ -27,13 +27,13 @@ namespace OpenWifi {
         if (!Prefix.empty() && Prefix.length() < 13) {
             std::vector<uint64_t> Numbers;
             SerialNumberCache()->FindNumbers(Prefix, 50, Numbers);
-            Poco::JSON::Array A;
+            Poco::JSON::Array Arr;
             for (const auto &i : Numbers)
-                A.add(Utils::int_to_hex(i));
-            Poco::JSON::Object A0;
-            A0.set("serialNumbers", A0);
+                Arr.add(Utils::int_to_hex(i));
+            Poco::JSON::Object RetObj;
+            RetObj.set("serialNumbers", Arr);
             std::ostringstream SS;
-            Poco::JSON::Stringifier::stringify(A, SS);
+            Poco::JSON::Stringifier::stringify(RetObj, SS);
             Answer = SS.str();
         }
     }
