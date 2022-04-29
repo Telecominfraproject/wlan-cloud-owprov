@@ -11,6 +11,45 @@
 
 namespace OpenWifi {
 
+    struct WebSocketNotificationJobContent {
+        std::string                 title,
+                                    details,
+                                    jobId;
+        std::vector<std::string>    success,
+                                    error,
+                                    warning;
+        uint64_t                    timeStamp=OpenWifi::Now();
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    inline void WebSocketNotificationJobContent::to_json(Poco::JSON::Object &Obj) const {
+        RESTAPI_utils::field_to_json(Obj,"title",title);
+        RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
+        RESTAPI_utils::field_to_json(Obj,"success",success);
+        RESTAPI_utils::field_to_json(Obj,"error",error);
+        RESTAPI_utils::field_to_json(Obj,"warning",warning);
+        RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
+        RESTAPI_utils::field_to_json(Obj,"details",details);
+    }
+
+    inline bool WebSocketNotificationJobContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            RESTAPI_utils::field_from_json(Obj,"title",title);
+            RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
+            RESTAPI_utils::field_from_json(Obj,"success",success);
+            RESTAPI_utils::field_from_json(Obj,"error",error);
+            RESTAPI_utils::field_from_json(Obj,"warning",warning);
+            RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
+            RESTAPI_utils::field_from_json(Obj,"details",details);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
     [[maybe_unused]] static void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
         try {
             if(Response->has("results")) {
@@ -112,8 +151,8 @@ namespace OpenWifi {
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
-            WebSocketNotification N;
-            N.content.type = "venue_configuration_update";
+            WebSocketNotification<WebSocketNotificationJobContent> N;
+            N.type = "venue_configuration_update";
 
             Logger().information(fmt::format("Job {} Starting.", JobId_));
 
@@ -127,6 +166,7 @@ namespace OpenWifi {
                 };
 
                 N.content.title = fmt::format("Updating {} configurations", Venue.info.name);
+                N.content.jobId = JobId_;
 
                 std::array<tState,MaxThreads> Tasks;
 
