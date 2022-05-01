@@ -59,7 +59,7 @@ namespace OpenWifi {
                 if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupSuccess ) {
-                    Logger().information(Poco::format("SIGNUP: Returning existing signup record for '%s'",i.email));
+                    Logger().information(fmt::format("SIGNUP: Returning existing signup record for '{}'",i.email));
                     Poco::JSON::Object Answer;
                     i.to_json(Answer);
                     return ReturnObject(Answer);
@@ -94,7 +94,7 @@ namespace OpenWifi {
         //  Let's create one
         //  If sec.signup("email",uuid);
         auto SignupUUID = MicroService::instance().CreateUUID();
-        Logger().information(Poco::format("SIGNUP: Creating signup entry for '%s', uuid=%s",UserName, SignupUUID));
+        Logger().information(fmt::format("SIGNUP: Creating signup entry for '{}', uuid='{}'",UserName, SignupUUID));
 
         Poco::JSON::Object  Body;
         OpenAPIRequestPost  CreateUser( uSERVICE_SECURITY, "/api/v1/signup", {
@@ -111,7 +111,7 @@ namespace OpenWifi {
             UI.from_json(Answer);
             std::ostringstream os;
             Answer->stringify(os);
-            Logger().information(Poco::format("SIGNUP: email: '%s' signupID: '%s' userId: '%s'", UserName, SignupUUID, UI.id));
+            Logger().information(fmt::format("SIGNUP: email: '{}' signupID: '{}' userId: '{}'", UserName, SignupUUID, UI.id));
 
             //  so create the Signup entry and modify the inventory
             ProvObjects::SignupEntry    SE;
