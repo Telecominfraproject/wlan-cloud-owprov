@@ -1,8 +1,6 @@
 //
-// Created by stephane bourque on 2022-04-01.
+// Created by stephane bourque on 2022-05-04.
 //
-
-#pragma once
 
 #include "framework/MicroService.h"
 #include "StorageService.h"
@@ -11,12 +9,11 @@
 
 namespace OpenWifi {
 
-    struct WebSocketNotificationJobContent {
+    struct WebSocketNotificationRebootList {
         std::string                 title,
                                     details,
                                     jobId;
         std::vector<std::string>    success,
-                                    error,
                                     warning;
         uint64_t                    timeStamp=OpenWifi::Now();
 
@@ -24,22 +21,20 @@ namespace OpenWifi {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    inline void WebSocketNotificationJobContent::to_json(Poco::JSON::Object &Obj) const {
+    inline void WebSocketNotificationRebootList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json(Obj,"title",title);
         RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
         RESTAPI_utils::field_to_json(Obj,"success",success);
-        RESTAPI_utils::field_to_json(Obj,"error",error);
         RESTAPI_utils::field_to_json(Obj,"warning",warning);
         RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
         RESTAPI_utils::field_to_json(Obj,"details",details);
     }
 
-    inline bool WebSocketNotificationJobContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    inline bool WebSocketNotificationRebootList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             RESTAPI_utils::field_from_json(Obj,"title",title);
             RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
             RESTAPI_utils::field_from_json(Obj,"success",success);
-            RESTAPI_utils::field_from_json(Obj,"error",error);
             RESTAPI_utils::field_from_json(Obj,"warning",warning);
             RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
             RESTAPI_utils::field_from_json(Obj,"details",details);
@@ -50,26 +45,12 @@ namespace OpenWifi {
         return false;
     }
 
-    [[maybe_unused]] static void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec & Warnings) {
-        try {
-            if(Response->has("results")) {
-                auto Results = Response->get("results").extract<Poco::JSON::Object::Ptr>();
-                auto Status = Results->get("status").extract<Poco::JSON::Object::Ptr>();
-                auto Rejected = Status->getArray("rejected");
-                std::transform(Rejected->begin(),Rejected->end(),std::back_inserter(Warnings), [](auto i) -> auto { return i.toString(); });
-//                for(const auto &i:*Rejected)
-                //                  Warnings.push_back(i.toString());
-            }
-        } catch (...) {
-        }
-    }
-
-    class VenueDeviceConfigUpdater : public Poco::Runnable {
+    class VenueDeviceRebooter : public Poco::Runnable {
     public:
-        VenueDeviceConfigUpdater(const std::string &UUID, const std::string &venue, Poco::Logger &L) :
-            uuid_(UUID),
-            venue_(venue),
-            Logger_(L) {
+        VenueDeviceRebooter(const std::string &UUID, const std::string &venue, Poco::Logger &L) :
+                uuid_(UUID),
+                venue_(venue),
+                Logger_(L) {
         }
 
         void run() final {
@@ -77,36 +58,19 @@ namespace OpenWifi {
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
                 SerialNumber = Device.serialNumber;
-                // std::cout << "Starting push for " << Device.serialNumber << std::endl;
-                Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
-                auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
-                auto Configuration = Poco::makeShared<Poco::JSON::Object>();
-                if (DeviceConfig->Get(Configuration)) {
-                    std::ostringstream OS;
-                    Configuration->stringify(OS);
-                    auto Response=Poco::makeShared<Poco::JSON::Object>();
-                    Logger().debug(fmt::format("{}: Pushing configuration.",Device.serialNumber));
-                    if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
-                        Logger().debug(fmt::format("{}: Configuration pushed.",Device.serialNumber));
-                        Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
-                        // std::cout << Device.serialNumber << ": Updated" << std::endl;
-                        updated_++;
-                    } else {
-                        Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
-                        // std::cout << Device.serialNumber << ": Failed" << std::endl;
-                        failed_++;
-                    }
+                if (SDK::GW::Device::Reboot(Device.serialNumber, 0)) {
+                    Logger().debug(fmt::format("{}: Rebooted.",Device.serialNumber));
+                    rebooted_++;
                 } else {
-                    Logger().debug(fmt::format("{}: Configuration is bad.",Device.serialNumber));
-                    bad_config_++;
-                    // std::cout << Device.serialNumber << ": Bad config" << std::endl;
+                    Logger().information(fmt::format("{}: Not rebooted.", Device.serialNumber));
+                    failed_++;
                 }
             }
             done_ = true;
             // std::cout << "Done push for " << Device.serialNumber << std::endl;
         }
 
-        uint64_t        updated_=0, failed_=0, bad_config_=0;
+        uint64_t        rebooted_=0, failed_=0;
         bool            started_ = false,
                         done_ = false;
         std::string     SerialNumber;
@@ -118,13 +82,13 @@ namespace OpenWifi {
         inline Poco::Logger & Logger() { return Logger_; }
     };
 
-    class VenueConfigUpdater: public Poco::Runnable {
+    class VenueRebooter: public Poco::Runnable {
     public:
-        explicit VenueConfigUpdater(const std::string & VenueUUID, const SecurityObjects::UserInfo &UI, uint64_t When, Poco::Logger &L) :
-            VenueUUID_(VenueUUID),
-            UI_(UI),
-            When_(When),
-            Logger_(L)
+        explicit VenueRebooter(const std::string & VenueUUID, const SecurityObjects::UserInfo &UI, uint64_t When, Poco::Logger &L) :
+                VenueUUID_(VenueUUID),
+                UI_(UI),
+                When_(When),
+                Logger_(L)
         {
 
         }
@@ -151,27 +115,27 @@ namespace OpenWifi {
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
-            WebSocketNotification<WebSocketNotificationJobContent> N;
-            N.type = "venue_configuration_update";
+            WebSocketNotification<WebSocketNotificationRebootList> N;
+            N.type = "venue_rebooter";
 
             Logger().information(fmt::format("Job {} Starting.", JobId_));
 
             ProvObjects::Venue  Venue;
-            uint64_t Updated = 0, Failed = 0 , BadConfigs = 0 ;
+            uint64_t rebooted_ = 0, failed_ = 0;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
                 const std::size_t MaxThreads=16;
                 struct tState {
                     Poco::Thread                thr_;
-                    VenueDeviceConfigUpdater    *task= nullptr;
+                    VenueDeviceRebooter    *task= nullptr;
                 };
 
-                N.content.title = fmt::format("Updating {} configurations", Venue.info.name);
+                N.content.title = fmt::format("Rebooting {} devices.", Venue.info.name);
                 N.content.jobId = JobId_;
 
                 std::array<tState,MaxThreads> Tasks;
 
                 for(const auto &uuid:Venue.devices) {
-                    auto NewTask = new VenueDeviceConfigUpdater(uuid, Venue.info.name, Logger());
+                    auto NewTask = new VenueDeviceRebooter(uuid, Venue.info.name, Logger());
                     // std::cout << "Scheduling config push for " << uuid << std::endl;
                     bool found_slot = false;
                     while (!found_slot) {
@@ -192,9 +156,8 @@ namespace OpenWifi {
                                         continue;
                                     if (!cur_task.thr_.isRunning() && cur_task.task->done_) {
                                         cur_task.thr_.join();
-                                        Updated += cur_task.task->updated_;
-                                        Failed += cur_task.task->failed_;
-                                        BadConfigs += cur_task.task->bad_config_;
+                                        rebooted_ += cur_task.task->rebooted_;
+                                        failed_ += cur_task.task->failed_;
                                         cur_task.task->started_ = cur_task.task->done_ = false;
                                         delete cur_task.task;
                                         cur_task.task = nullptr;
@@ -216,15 +179,12 @@ namespace OpenWifi {
                             }
                             if(!cur_task.thr_.isRunning() && cur_task.task->done_) {
                                 cur_task.thr_.join();
-                                if(cur_task.task->updated_) {
-                                    Updated++;
+                                if(cur_task.task->rebooted_) {
+                                    rebooted_++;
                                     N.content.success.push_back(cur_task.task->SerialNumber);
                                 } else if(cur_task.task->failed_) {
-                                    Failed++;
+                                    failed_++;
                                     N.content.warning.push_back(cur_task.task->SerialNumber);
-                                } else {
-                                    BadConfigs++;
-                                    N.content.error.push_back(cur_task.task->SerialNumber);
                                 }
                                 cur_task.task->started_ = cur_task.task->done_ = false;
                                 delete cur_task.task;
@@ -234,8 +194,8 @@ namespace OpenWifi {
                     }
                 }
 
-                N.content.details = fmt::format("Job {} Completed: {} updated, {} failed to update, {} bad configurations. ",
-                                                JobId_, Updated ,Failed, BadConfigs);
+                N.content.details = fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
+                                                JobId_, rebooted_ ,failed_);
 
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
@@ -243,8 +203,8 @@ namespace OpenWifi {
             }
 
             auto Sent = WebSocketClientServer()->SendUserNotification(UI_.email,N);
-            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations. Notification was sent={}",
-                                             JobId_, Updated ,Failed, BadConfigs, Sent));
+            Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot. Notification was sent={}",
+                                             JobId_, rebooted_ ,failed_, Sent));
             delete this;
         }
     };

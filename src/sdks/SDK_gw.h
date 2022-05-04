@@ -9,6 +9,7 @@
 namespace OpenWifi::SDK::GW {
     namespace Device {
         void Reboot(RESTAPIHandler *client, const std::string & Mac, uint64_t When);
+        bool Reboot(const std::string & Mac, [[maybe_unused]] uint64_t When);
         void LEDs(RESTAPIHandler *client, const std::string & Mac, uint64_t When, uint64_t Duration, const std::string & Pattern);
         void Factory(RESTAPIHandler *client, const std::string & Mac, uint64_t When, bool KeepRedirector);
         void Upgrade(RESTAPIHandler *client, const std::string & Mac, uint64_t When, const std::string & ImageName, bool KeepRedirector);

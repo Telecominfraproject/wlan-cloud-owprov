@@ -17,6 +17,19 @@ namespace OpenWifi::SDK::GW {
             PerformCommand(client,"reboot",EndPoint, ObjRequest);
         }
 
+        bool Reboot(const std::string & Mac, [[maybe_unused]] uint64_t When) {
+            std::string         EndPoint = "/api/v1/device/" + Mac + "/reboot";
+            Poco::JSON::Object  ObjRequest;
+
+            ObjRequest.set("serialNumber", Mac);
+            ObjRequest.set("when", When );
+
+            OpenAPIRequestPost      RebootCommand( uSERVICE_GATEWAY, EndPoint, {}, ObjRequest, 30000);
+
+            Poco::JSON::Object::Ptr Response;
+            return RebootCommand.Do(Response) == Poco::Net::HTTPResponse::HTTP_OK;
+        }
+
         void LEDs(RESTAPIHandler *client, const std::string & Mac, uint64_t When, uint64_t Duration, const std::string & Pattern) {
             std::string         EndPoint = "/api/v1/device/" + Mac + "/leds";
             Poco::JSON::Object  ObjRequest;

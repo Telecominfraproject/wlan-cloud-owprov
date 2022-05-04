@@ -13,6 +13,7 @@
 #include "StorageService.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "Tasks/VenueConfigUpdater.h"
+#include "Tasks/VenueRebooter.h"
 
 #include "Kafka_ProvUpdater.h"
 
@@ -224,6 +225,21 @@ namespace OpenWifi{
             SNL.serialNumbers = Existing.devices;
 
             auto Task = new VenueConfigUpdater(UUID,UserInfo_.userinfo,0,Logger());
+            auto JobId = Task->Start();
+
+            SNL.to_json(Answer);
+            Answer.set("jobId",JobId);
+            return ReturnObject(Answer);
+        }
+
+        auto rebootAllDevices = GetBoolParameter("rebootAllDevices");
+        if(rebootAllDevices) {
+            ProvObjects::SerialNumberList   SNL;
+
+            Poco::JSON::Object  Answer;
+            SNL.serialNumbers = Existing.devices;
+
+            auto Task = new VenueRebooter(UUID,UserInfo_.userinfo,0,Logger());
             auto JobId = Task->Start();
 
             SNL.to_json(Answer);

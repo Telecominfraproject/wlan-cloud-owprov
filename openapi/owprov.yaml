@@ -2444,6 +2444,12 @@ paths:
             default: false
           required: false
         - in: query
+          name: rebootAllDevices
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
           name: testUpdateOnly
           schema:
             type: boolean
