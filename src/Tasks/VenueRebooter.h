@@ -3,47 +3,13 @@
 //
 
 #include "framework/MicroService.h"
+#include "framework/WebSocketClientNotifications.h"
+
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
 
 namespace OpenWifi {
-
-    struct WebSocketNotificationRebootList {
-        std::string                 title,
-                                    details,
-                                    jobId;
-        std::vector<std::string>    success,
-                                    warning;
-        uint64_t                    timeStamp=OpenWifi::Now();
-
-        void to_json(Poco::JSON::Object &Obj) const;
-        bool from_json(const Poco::JSON::Object::Ptr &Obj);
-    };
-
-    inline void WebSocketNotificationRebootList::to_json(Poco::JSON::Object &Obj) const {
-        RESTAPI_utils::field_to_json(Obj,"title",title);
-        RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
-        RESTAPI_utils::field_to_json(Obj,"success",success);
-        RESTAPI_utils::field_to_json(Obj,"warning",warning);
-        RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
-        RESTAPI_utils::field_to_json(Obj,"details",details);
-    }
-
-    inline bool WebSocketNotificationRebootList::from_json(const Poco::JSON::Object::Ptr &Obj) {
-        try {
-            RESTAPI_utils::field_from_json(Obj,"title",title);
-            RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
-            RESTAPI_utils::field_from_json(Obj,"success",success);
-            RESTAPI_utils::field_from_json(Obj,"warning",warning);
-            RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
-            RESTAPI_utils::field_from_json(Obj,"details",details);
-            return true;
-        } catch(...) {
-
-        }
-        return false;
-    }
 
     class VenueDeviceRebooter : public Poco::Runnable {
     public:
@@ -115,8 +81,7 @@ namespace OpenWifi {
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
-            WebSocketNotification<WebSocketNotificationRebootList> N;
-            N.type = "venue_rebooter";
+            WebSocketClientNotificationVenueRebootList_t        N;
 
             Logger().information(fmt::format("Job {} Starting.", JobId_));
 
@@ -202,9 +167,9 @@ namespace OpenWifi {
                 Logger().warning(N.content.details);
             }
 
-            auto Sent = WebSocketClientServer()->SendUserNotification(UI_.email,N);
-            Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot. Notification was sent={}",
-                                             JobId_, rebooted_ ,failed_, Sent));
+            WebSocketClientNotificationVenueRebootCompletionToUser(UI_.email,N);
+            Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
+                                             JobId_, rebooted_ ,failed_));
             delete this;
         }
     };
