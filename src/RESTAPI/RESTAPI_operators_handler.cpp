@@ -51,7 +51,7 @@ namespace OpenWifi {
 
     void RESTAPI_operators_handler::DoPost() {
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Operator   NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -103,7 +103,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        return InternalError("Failed creating operator.");
+        return InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
     void RESTAPI_operators_handler::DoPut() {
@@ -117,7 +117,7 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Operator   UpdatedObj;
         if(!UpdatedObj.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);

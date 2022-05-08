@@ -112,22 +112,20 @@ namespace OpenWifi {
         Logger().notice("Stopping.");
     }
 
-    bool Storage::Validate(const Poco::URI::QueryParameters &P, std::string &Error) {
+    bool Storage::Validate(const Poco::URI::QueryParameters &P, RESTAPI::Errors::msg &Error) {
 	    for(const auto &i:P) {
 	        auto uuid_parts = Utils::Split(i.second,':');
 	        if(uuid_parts.size()==2) {
 	            auto F = ExistFunc_.find(uuid_parts[0]);
 	            if(F!=ExistFunc_.end()) {
 	                if(!F->second("id", uuid_parts[1])) {
-	                    Error = "Unknown " + F->first + " UUID:" + uuid_parts[1] ;
-	                    break;
+                        Error = RESTAPI::Errors::UnknownId;
+                        return false;
 	                }
 	            }
 	        }
 	    }
-	    if(Error.empty())
-	        return true;
-	    return false;
+        return true;
 	}
 
 	bool Storage::ValidateSingle(const std::string &P, std::string & Error) {

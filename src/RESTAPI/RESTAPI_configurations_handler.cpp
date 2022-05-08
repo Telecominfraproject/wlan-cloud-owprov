@@ -81,13 +81,13 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
+        const auto & RawObject = ParsedBody_;
         std::string Arg;
         if(HasParameter("validateOnly",Arg) && Arg=="true") {
-            auto Body = ParseStream();
-            if(!Body->has("configuration")) {
-                return BadRequest("Must have 'configuration' element.");
+            if(!RawObject->has("configuration")) {
+                return BadRequest(RESTAPI::Errors::MustHaveConfigElement);
             }
-            auto Config=Body->get("configuration").toString();
+            auto Config=RawObject->get("configuration").toString();
             Poco::JSON::Object  Answer;
             std::string Error;
             auto Res = ValidateUCentralConfiguration(Config,Error);
@@ -97,7 +97,6 @@ namespace OpenWifi{
         }
 
         ProvObjects::DeviceConfiguration NewObject;
-        auto RawObject = ParseStream();
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
@@ -123,9 +122,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
-        std::string Error;
+        RESTAPI::Errors::msg Error;
         if(!ValidateConfigBlock(NewObject,Error)) {
-            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
+            return BadRequest(Error);
         }
 
         if(DB_.CreateRecord(NewObject)) {
@@ -150,7 +149,7 @@ namespace OpenWifi{
         }
 
         ProvObjects::DeviceConfiguration    NewConfig;
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         if (!NewConfig.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
@@ -166,9 +165,9 @@ namespace OpenWifi{
         if(!NewConfig.deviceTypes.empty())
             Existing.deviceTypes = NewConfig.deviceTypes;
 
-        std::string Error;
+        RESTAPI::Errors::msg Error;
         if(!ValidateConfigBlock( NewConfig,Error)) {
-            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid + ", error: " + Error);
+            return BadRequest(Error);
         }
 
         if(RawObject->has("configuration")) {

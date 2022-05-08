@@ -62,7 +62,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        auto Obj = ParseStream();
+        const auto & Obj = ParsedBody_;
         ProvObjects::Entity NewEntity;
         if (!NewEntity.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -124,7 +124,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Entity NewEntity;
         if(!NewEntity.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -145,7 +145,7 @@ namespace OpenWifi{
             Existing.sourceIP = NewEntity.sourceIP;
         }
 
-        std::string Error;
+        RESTAPI::Errors::msg    Error;
         if(!StorageService()->Validate(Parameters_,Error)) {
             return BadRequest(Error);
         }

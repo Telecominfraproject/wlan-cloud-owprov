@@ -152,10 +152,10 @@ namespace OpenWifi{
         }
 
         if(DB_.Exists(RESTAPI::Protocol::SERIALNUMBER,SerialNumber)) {
-            return BadRequest(RESTAPI::Errors::SerialNumberExists + " (" + SerialNumber + ")");
+            return BadRequest(RESTAPI::Errors::SerialNumberExists);
         }
 
-        auto Obj = ParseStream();
+        const auto & Obj = ParsedBody_;
         ProvObjects::InventoryTag NewObject;
         if (!NewObject.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -205,10 +205,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
-        std::string ErrorText;
-        auto ObjectsCreated = CreateObjects(NewObject,*this,ErrorText);
-        if(!ErrorText.empty()) {
-            return BadRequest(ErrorText);
+        RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
+        if(Error.err_num != 0) {
+            return BadRequest(Error);
         }
 
         if(DB_.CreateRecord(NewObject)) {
@@ -279,7 +279,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::InventoryTag   NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -355,10 +355,10 @@ namespace OpenWifi{
             Existing.state = NewObject.state;
         }
 
-        std::string ErrorText;
-        auto ObjectsCreated = CreateObjects(Existing,*this,ErrorText);
-        if(!ErrorText.empty()) {
-            return BadRequest(ErrorText);
+        RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
+        if(Error.err_num != 0) {
+            return BadRequest(Error);
         }
 
         if(!ObjectsCreated.empty()) {

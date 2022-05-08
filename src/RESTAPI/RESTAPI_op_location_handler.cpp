@@ -43,7 +43,7 @@ namespace OpenWifi {
 
     void RESTAPI_op_location_handler::DoPost() {
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         OpLocationDB::RecordName   NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -67,7 +67,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto RawObject = ParseStream();
+        const auto RawObject = ParsedBody_;
         OpLocationDB::RecordName   UpdateObj;
         if(!UpdateObj.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);

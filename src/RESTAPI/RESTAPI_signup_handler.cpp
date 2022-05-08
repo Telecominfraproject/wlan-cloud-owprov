@@ -53,7 +53,7 @@ namespace OpenWifi {
             for(const auto &i:SEs) {
 
                 if(!i.deviceID.empty() && i.deviceID!=deviceID) {
-                    return BadRequest("Invalid deviceID");
+                    return BadRequest(RESTAPI::Errors::InvalidDeviceID);
                 }
 
                 if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
@@ -181,7 +181,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        return BadRequest("Not implemented");
+        return BadRequest(RESTAPI::Errors::NotImplemented);
     }
 
     void RESTAPI_signup_handler::DoGet() {

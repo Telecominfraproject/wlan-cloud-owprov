@@ -116,7 +116,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto Obj = ParseStream();
+        const auto & Obj = ParsedBody_;
         ProvObjects::Venue NewObject;
         if (!NewObject.from_json(Obj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -176,11 +176,10 @@ namespace OpenWifi{
 
         NewObject.children.clear();
 
-        std::string ErrorText;
-        auto ObjectsToCreate = CreateObjects(NewObject, *this, ErrorText);
-
-        if(!ErrorText.empty()) {
-            return BadRequest(ErrorText);
+        RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
+        if(Error.err_num != 0) {
+            return BadRequest(Error);
         }
 
         if(DB_.CreateRecord(NewObject)) {
@@ -247,7 +246,7 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Venue NewObject;
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -329,9 +328,11 @@ namespace OpenWifi{
         std::string ErrorText;
         NewObject.parent = Existing.parent;
         NewObject.entity = Existing.entity;
-        auto ObjectsCreated = CreateObjects(NewObject, *this, ErrorText);
-        if(!ErrorText.empty()) {
-            return BadRequest(ErrorText);
+
+        RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
+        if(Error.err_num != 0) {
+            return BadRequest(Error);
         }
 
         if(!ObjectsCreated.empty()) {

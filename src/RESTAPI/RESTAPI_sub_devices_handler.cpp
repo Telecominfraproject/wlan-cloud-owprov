@@ -48,7 +48,7 @@ namespace OpenWifi {
 
     void RESTAPI_sub_devices_handler::DoPost() {
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         SubscriberDeviceDB::RecordName NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -71,7 +71,7 @@ namespace OpenWifi {
     void RESTAPI_sub_devices_handler::DoPut() {
         auto uuid = GetBinding("uuid");
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         SubscriberDeviceDB::RecordName UpdateObj;
         if(!UpdateObj.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);

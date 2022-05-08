@@ -33,7 +33,7 @@ namespace OpenWifi{
 
     void RESTAPI_entity_list_handler::DoPost() {
         if (GetBoolParameter("setTree",false)) {
-            auto FullTree = ParseStream();
+            const auto & FullTree = ParsedBody_;
             DB_.ImportTree(FullTree);
             return OK();
         }

@@ -170,7 +170,7 @@ namespace OpenWifi {
                     AddExtendedInfo(E,Obj);
                 ObjArr.add(Obj);
             } else {
-                return R.BadRequest(RESTAPI::Errors::UnknownId + i);
+                return R.BadRequest(RESTAPI::Errors::UnknownId);
             }
         }
         Poco::JSON::Object  Answer;
@@ -189,7 +189,7 @@ namespace OpenWifi {
                     AddExtendedInfo(E,Obj);
                 ObjArr.add(Obj);
             } else {
-                return R.BadRequest(RESTAPI::Errors::UnknownId + i);
+                return R.BadRequest(RESTAPI::Errors::UnknownId);
             }
         }
         Poco::JSON::Object  Answer;
@@ -359,17 +359,13 @@ namespace OpenWifi {
     }
 
     template <typename db_type, typename Member> void RemoveMembership( db_type & DB, Member T, const std::string & Obj, const std::string &Id) {
-        std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
             DB.ManipulateVectorMember(T, "id", Obj, Id, false);
-        std::cout << __LINE__ << std::endl;
     }
 
     template <typename db_type, typename Member> void AddMembership( db_type & DB, Member T, const std::string & Obj, const std::string &Id) {
-        std::cout << __LINE__ << std::endl;
         if(!Obj.empty())
             DB.ManipulateVectorMember(T, "id", Obj, Id, true);
-        std::cout << __LINE__ << std::endl;
     }
 
     template <typename db_type, typename Member> void ManageMembership( db_type & DB, Member T, const std::string & From, const std::string & To, const std::string &Id) {
@@ -378,22 +374,14 @@ namespace OpenWifi {
     }
 
     template <typename db_type, typename Member> void ManageMembership( db_type & DB, Member T, const Types::UUIDvec_t & From, const Types::UUIDvec_t & To, const std::string &Id) {
-        std::cout << __LINE__ << std::endl;
         if(From!=To) {
-            std::cout << __LINE__ << std::endl;
             for (const auto &i: From) {
-                std::cout << __LINE__ << std::endl;
                 RemoveMembership(DB, T, i, Id);
-                std::cout << __LINE__ << std::endl;
             }
             for (const auto &i: To) {
-                std::cout << __LINE__ << std::endl;
                 AddMembership(DB, T, i, Id);
-                std::cout << __LINE__ << std::endl;
             }
-            std::cout << __LINE__ << std::endl;
         }
-        std::cout << __LINE__ << std::endl;
     }
 
     template <typename Member, typename Rec, typename db_type > bool CreateMove(const Poco::JSON::Object::Ptr & RawObj, const char *fieldname, Member T, Rec & Existing, std::string &From, std::string &To, db_type & TheDB) {
@@ -416,7 +404,7 @@ namespace OpenWifi {
         return EntityDB::RootUUID();
     }
 
-    inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::string & Error) {
+    inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, RESTAPI::Errors::msg & Error) {
         static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
 
         for(const auto &i:Config.configuration) {
@@ -432,20 +420,21 @@ namespace OpenWifi {
                 auto N = Blocks->getNames();
                 for (const auto &j: N) {
                     if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
-                        Error = "Unknown section: " + j;
+                        Error = RESTAPI::Errors::UnknownConfigurationSection;
                         return false;
                     }
                 }
             } catch (const Poco::JSON::JSONException &E ) {
-                Error = "Block: " + i.name + " failed parsing: " + E.message();
+                Error = RESTAPI::Errors::InvalidJSONDocument;
                 return false;
             }
 
             try {
-                if (ValidateUCentralConfiguration(i.configuration, Error)) {
+                std::string ErrorText;
+                if (ValidateUCentralConfiguration(i.configuration, ErrorText)) {
                     // std::cout << "Block: " << i.name << " is valid" << std::endl;
                 } else {
-                    Error =  "Block: " + i.name + "  Rejected config:" + i.configuration ;
+                    Error =  RESTAPI::Errors::ConfigBlockInvalid ;
                     return false;
                 }
             } catch(...) {
@@ -457,7 +446,7 @@ namespace OpenWifi {
         return true;
     }
 
-    template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, std::string &ErrorText) {
+    template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, RESTAPI::Errors::msg & Error) {
         std::map<std::string,std::string>   Result;
 
         auto createObjects = R.GetParameter("createObjects","");
@@ -498,7 +487,7 @@ namespace OpenWifi {
                                 }
                             }
                         } else {
-                            ErrorText = RESTAPI::Errors::InvalidJSONDocument;
+                            Error = RESTAPI::Errors::InvalidJSONDocument;
                             break;
                         }
                     } else if (Object->has("contact")) {
@@ -514,7 +503,7 @@ namespace OpenWifi {
                         ProvObjects::DeviceConfiguration    DC;
                         if(DC.from_json(ConfigurationDetails)) {
                             if constexpr(std::is_same_v<Type, ProvObjects::InventoryTag>) {
-                                if(!ValidateConfigBlock(DC,ErrorText)) {
+                                if(!ValidateConfigBlock(DC,Error)) {
                                     break;
                                 }
                                 std::cout << "Configuration decoded: " << DC.info.name << std::endl;
@@ -525,7 +514,7 @@ namespace OpenWifi {
                                 }
                             }
                         } else {
-                            ErrorText = RESTAPI::Errors::InvalidJSONDocument;
+                            Error = RESTAPI::Errors::InvalidJSONDocument;
                             break;
                         }
                     }
@@ -589,7 +578,7 @@ namespace OpenWifi {
         return false;
     }
 
-    template <typename DBType> bool ValidDbId(const Types::UUID_t &uuid, DBType & DB, bool AllowEmpty , const std::string &Error , RESTAPIHandler & H) {
+    template <typename DBType> bool ValidDbId(const Types::UUID_t &uuid, DBType & DB, bool AllowEmpty , const RESTAPI::Errors::msg &Error , RESTAPIHandler & H) {
         if(!AllowEmpty && uuid.empty()) {
             H.BadRequest(Error);
             return false;
@@ -655,7 +644,7 @@ namespace OpenWifi {
             Updated.to_json(Answer);
             return H.ReturnObject(Answer);
         } else {
-            H.InternalError("Record could not be updated.");
+            H.InternalError(RESTAPI::Errors::RecordNotUpdated);
         }
     }
 
@@ -667,7 +656,7 @@ namespace OpenWifi {
             Updated.to_json(Answer);
             return H.ReturnObject(Answer);
         } else {
-            H.InternalError("Record could not be created.");
+            H.InternalError(RESTAPI::Errors::RecordNotCreated);
         }
     }
 

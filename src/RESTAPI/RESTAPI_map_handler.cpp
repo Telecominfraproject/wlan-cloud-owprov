@@ -35,7 +35,7 @@ namespace OpenWifi{
         }
 
         if(UserInfo_.userinfo.id!=Existing.creator) {
-            return UnAuthorized("You must be the creator of the map to delete it");
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         DB_.DeleteRecord("id", Existing.info.id);
@@ -55,7 +55,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Map NewObject;
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -66,7 +66,7 @@ namespace OpenWifi{
         }
 
         if(!ValidateVisibility(NewObject.visibility)) {
-            return BadRequest("Invalid visibility attribute");
+            return BadRequest(RESTAPI::Errors::InvalidVisibilityAttribute);
         }
 
         if(RawObject->has("entity")) {
@@ -101,7 +101,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Map NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -113,7 +113,7 @@ namespace OpenWifi{
 
         if(Existing.creator != UserInfo_.userinfo.id) {
             if(Existing.visibility == "private") {
-                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
             }
             if(Existing.visibility == "select") {
                 for(const auto &i:Existing.access.list) {

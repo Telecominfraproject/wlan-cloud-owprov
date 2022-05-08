@@ -75,7 +75,7 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        auto RawObj = ParseStream();
+        const auto & RawObj = ParsedBody_;
         ProvObjects::ManagementRole NewObject;
         if (!NewObject.from_json(RawObj)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
@@ -114,7 +114,7 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         ProvObjects::ManagementRole NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);

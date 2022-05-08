@@ -63,7 +63,7 @@ namespace OpenWifi {
             OpenWifi::OpLocationDB & OpLocationDB() { return *OpLocationDB_; };
             OpenWifi::OpContactDB & OpContactDB() { return *OpContactDB_; };
 
-            bool Validate(const Poco::URI::QueryParameters &P, std::string &Error);
+            bool Validate(const Poco::URI::QueryParameters &P, RESTAPI::Errors::msg &Error);
             bool Validate(const Types::StringVec &P, std::string &Error);
             inline bool ValidatePrefix(const std::string &P) const { return ExistFunc_.find(P)!=ExistFunc_.end(); }
             bool ExpandInUse(const Types::StringVec &UUIDs, ExpandedListMap & Map, std::vector<std::string> & Errors);

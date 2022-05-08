@@ -76,7 +76,7 @@ namespace OpenWifi{
         }
 
         ProvObjects::ManagementPolicy   NewObject;
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
@@ -114,7 +114,7 @@ namespace OpenWifi{
         }
 
         ProvObjects::ManagementPolicy   NewPolicy;
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         if(!NewPolicy.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
