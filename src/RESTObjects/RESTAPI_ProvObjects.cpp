@@ -1103,7 +1103,7 @@ namespace OpenWifi::ProvObjects {
     }
 
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I) {
-        uint64_t Now = std::time(nullptr);
+        uint64_t Now = OpenWifi::Now();
         if(O->has("name"))
             I.name = O->get("name").toString();
 

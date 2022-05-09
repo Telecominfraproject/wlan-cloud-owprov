@@ -147,7 +147,7 @@ namespace OpenWifi{
             Existing.phones = NewObject.phones;
         if(RawObject->has("mobiles"))
             Existing.mobiles = NewObject.mobiles;
-        Existing.info.modified = std::time(nullptr);
+        Existing.info.modified = OpenWifi::Now();
         if(RawObject->has("type"))
             Existing.type = NewObject.type;
 

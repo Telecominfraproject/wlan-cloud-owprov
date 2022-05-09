@@ -146,7 +146,7 @@ namespace OpenWifi {
             V.info.name = Child->get("name").toString();
             V.info.id = MicroService::CreateUUID();
             V.parent = Parent;
-            V.info.created = V.info.modified = std::time(nullptr);
+            V.info.created = V.info.modified = OpenWifi::Now();
             // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
@@ -163,7 +163,7 @@ namespace OpenWifi {
             ProvObjects::Entity E;
             E.info.name = Name;
             E.info.id = EntityDB::RootUUID();
-            E.info.created = E.info.modified = std::time(nullptr);
+            E.info.created = E.info.modified = OpenWifi::Now();
             // StorageService()->EntityDB().CreateShortCut(E);
         }
 
@@ -175,7 +175,7 @@ namespace OpenWifi {
             E.info.name = Child->get("name").toString();
             E.info.id = MicroService::CreateUUID();
             E.parent = Parent;
-            E.info.created = E.info.modified = std::time(nullptr);
+            E.info.created = E.info.modified = OpenWifi::Now();
             // StorageService()->EntityDB().CreateShortCut(E);
             ImportTree( Child, E.info.id );
         }
@@ -187,7 +187,7 @@ namespace OpenWifi {
             V.info.name = Child->get("name").toString();
             V.info.id = MicroService::CreateUUID();
             V.entity = Parent;
-            V.info.created = V.info.modified = std::time(nullptr);
+            V.info.created = V.info.modified = OpenWifi::Now();
             // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
