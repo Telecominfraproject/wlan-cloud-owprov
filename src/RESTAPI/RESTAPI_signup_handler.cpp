@@ -170,6 +170,7 @@ namespace OpenWifi {
         }
 
         if(Operation == "emailVerified" && SE.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForEmail) {
+            Logger().information(fmt::format("{}: email {} verified.",SE.info.id, SE.email));
             std::cout << "Verified email for : " << SE.email << std::endl;
             SE.info.modified = OpenWifi::Now();
             SE.status = "emailVerified";
@@ -181,7 +182,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        return BadRequest(RESTAPI::Errors::NotImplemented);
+        return BadRequest(RESTAPI::Errors::UnknownId);
     }
 
     void RESTAPI_signup_handler::DoGet() {
@@ -190,9 +191,11 @@ namespace OpenWifi {
         auto macAddress = GetParameter("macAddress");
         auto List = GetBoolParameter("listOnly",false);
 
+        Logger().information(fmt::format("Looking for signup for {}",EMail));
         Poco::JSON::Object          Answer;
         ProvObjects::SignupEntry    SE;
         if(!SignupUUID.empty()) {
+            Logger().information(fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
             if(StorageService()->SignupDB().GetRecord("id", SignupUUID, SE)) {
                 SE.to_json(Answer);
                 return ReturnObject(Answer);
@@ -200,21 +203,25 @@ namespace OpenWifi {
             return NotFound();
         } else if(!EMail.empty()) {
             SignupDB::RecordVec SEs;
+            Logger().information(fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
             if(StorageService()->SignupDB().GetRecords(0,100,SEs, " email='"+EMail+"' ")) {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
         } else if(!macAddress.empty()) {
             SignupDB::RecordVec SEs;
+            Logger().information(fmt::format("Looking for signup for {}: Mac {}",EMail, macAddress));
             if(StorageService()->SignupDB().GetRecords(0,100,SEs, " serialNumber='"+macAddress+"' ")) {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
         } else if(List) {
+            Logger().information(fmt::format("Returning list of signups...",EMail, macAddress));
             SignupDB::RecordVec SEs;
             StorageService()->SignupDB().GetRecords(0,100,SEs);
             return ReturnObject("signups",SEs);
         }
+        Logger().information(fmt::format("Bad signup get",EMail, macAddress));
         return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
 

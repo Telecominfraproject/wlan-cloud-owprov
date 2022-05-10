@@ -95,10 +95,14 @@ namespace OpenWifi {
                             SD.deviceType = IT.deviceType;
                             SD.state = OS.str();
                             SD.subscriberId = SE.userId;
-                            SD.serviceClass = StorageService()->ServiceClassDB().DefaultForOperator(SE.operatorId);
 
+                            Logger().information(fmt::format("Setting service class for {}",SD.serialNumber));
+                            SD.serviceClass = StorageService()->ServiceClassDB().DefaultForOperator(SE.operatorId);
+                            Logger().information(fmt::format("Removing old device information for {}",SD.serialNumber));
                             StorageService()->SubscriberDeviceDB().DeleteRecord("serialNumber", SD.serialNumber);
+                            Logger().information(fmt::format("Creating subscriber device for {}",SD.serialNumber));
                             StorageService()->SubscriberDeviceDB().CreateRecord(SD);
+                            Logger().information(fmt::format("Removing old inventory for {}",SD.serialNumber));
                             StorageService()->InventoryDB().DeleteRecord("serialNumber", SD.serialNumber);
 
                             SE.status = "signup completed";
@@ -107,8 +111,11 @@ namespace OpenWifi {
                             SE.completed = OpenWifi::Now();
                             SE.info.modified = OpenWifi::Now();
                             SE.error = 0;
+                            Logger().information(fmt::format("Completed signup for {}",SD.serialNumber));
                             StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);
+                            Logger().information(fmt::format("Setting GW subscriber for {}",SD.serialNumber));
                             SDK::GW::Device::SetSubscriber(SerialNumber, IT.subscriber);
+                            Logger().information(fmt::format("Success for {}",SD.serialNumber));
                             break;
                         }
                     }
