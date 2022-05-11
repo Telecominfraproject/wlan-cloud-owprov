@@ -160,15 +160,18 @@ namespace OpenWifi {
         auto SignupUUID = GetParameter("signupUUID");
         auto Operation = GetParameter("operation");
 
+        Logger().information(fmt::format("signup-progress: {} - {} ", SignupUUID, Operation));
         if(SignupUUID.empty() || Operation.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         ProvObjects::SignupEntry    SE;
+        Logger().information(fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
         if(!StorageService()->SignupDB().GetRecord("id",SignupUUID,SE)) {
             return NotFound();
         }
 
+        Logger().information(fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
         if(Operation == "emailVerified" && SE.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForEmail) {
             Logger().information(fmt::format("{}: email {} verified.",SE.info.id, SE.email));
             std::cout << "Verified email for : " << SE.email << std::endl;
@@ -181,6 +184,7 @@ namespace OpenWifi {
             SE.to_json(Answer);
             return ReturnObject(Answer);
         }
+        Logger().information(fmt::format("signup-progress: {} - {} something is bad", SignupUUID, Operation));
 
         return BadRequest(RESTAPI::Errors::UnknownId);
     }
