@@ -4356,6 +4356,8 @@ namespace OpenWifi {
                                                Path,
                                                Poco::Net::HTTPMessage::HTTP_1_1);
 
+                Poco::Logger::get("REST-CALLER").information(fmt::format("GET: {}", URI.toString()));
+
                 if(BearerToken.empty()) {
                     Request.add("X-API-KEY", Svc.AccessKey);
                     Request.add("X-INTERNAL-NAME", MicroService::instance().PublicEndPoint());
@@ -4406,11 +4408,14 @@ namespace OpenWifi {
             for(auto const &Svc:Services) {
                 Poco::URI	URI(Svc.PrivateEndPoint);
 
+
                 auto Secure = (URI.getScheme() == "https");
 
                 URI.setPath(EndPoint_);
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
+
+                Poco::Logger::get("REST-CALLER").information(fmt::format("PUT: {}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
@@ -4482,11 +4487,14 @@ namespace OpenWifi {
             for(auto const &Svc:Services) {
                 Poco::URI	URI(Svc.PrivateEndPoint);
 
+
                 auto Secure = (URI.getScheme() == "https");
 
                 URI.setPath(EndPoint_);
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
+
+                Poco::Logger::get("REST-CALLER").information(fmt::format("POST: {}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
@@ -4561,6 +4569,8 @@ namespace OpenWifi {
                 URI.setPath(EndPoint_);
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
+
+                Poco::Logger::get("REST-CALLER").information(fmt::format("DELETE: {}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
