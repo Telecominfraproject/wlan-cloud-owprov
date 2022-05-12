@@ -1813,21 +1813,31 @@ namespace OpenWifi {
 	            Request = &RequestIn;
 	            Response = &ResponseIn;
 
+                Logger_.information(fmt::format("Line: {}",__LINE__));
+
 				Poco::Thread::current()->setName("WebServerThread_" + std::to_string(TransactionId_));
+                Logger_.information(fmt::format("Line: {}",__LINE__));
 
                 if(Request->getContentLength()>0) {
+                    Logger_.information(fmt::format("Line: {}",__LINE__));
                     if(Request->getContentType().find("application/json")!=std::string::npos) {
+                        Logger_.information(fmt::format("Line: {}",__LINE__));
                         ParsedBody_ = IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+                        Logger_.information(fmt::format("Line: {}",__LINE__));
                     }
+                    Logger_.information(fmt::format("Line: {}",__LINE__));
                 }
 
+                Logger_.information(fmt::format("Line: {}",__LINE__));
 	            if(RateLimited_ && RESTAPI_RateLimiter()->IsRateLimited(RequestIn,MyRates_.Interval, MyRates_.MaxCalls)) {
 	                return UnAuthorized(RESTAPI::Errors::RATE_LIMIT_EXCEEDED);
 	            }
 
+                Logger_.information(fmt::format("Line: {}",__LINE__));
 	            if (!ContinueProcessing())
 	                return;
 
+                Logger_.information(fmt::format("Line: {}",__LINE__));
 	            bool Expired=false, Contacted=false;
 	            if (AlwaysAuthorize_ && !IsAuthorized(Expired, Contacted, SubOnlyService_)) {
 	                if(Expired)
