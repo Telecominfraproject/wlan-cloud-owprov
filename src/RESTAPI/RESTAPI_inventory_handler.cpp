@@ -299,7 +299,8 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        AssignIfPresent(RawObject, "rrm",Existing.rrm);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = NewObject.deviceRules;
 
         std::string FromPolicy, ToPolicy;
         if(!CreateMove(RawObject,"managementPolicy",&InventoryDB::RecordName::managementPolicy, Existing, FromPolicy,

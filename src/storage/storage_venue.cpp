@@ -33,7 +33,7 @@ namespace OpenWifi {
         ORM::Field{"design",ORM::FieldType::FT_TEXT},
         ORM::Field{"contacts",ORM::FieldType::FT_TEXT},
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
-        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceRules",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
         ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
@@ -65,6 +65,7 @@ namespace OpenWifi {
                 "alter table " + TableName_ + " add column managementPolicies text",
                 "alter table " + TableName_ + " add column boards text",
                 "alter table " + TableName_ + " rename column contact to contacts",
+                "alter table " + TableName_ + " add column deviceRules text"
         };
 
         for(const auto &i:Script) {
@@ -116,7 +117,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.design = In.get<12>();
     Out.contacts = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
     Out.location = In.get<14>();
-    Out.rrm = In.get<15>();
+    Out.deviceRules = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::DeviceRules>(In.get<15>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<16>());
     Out.deviceConfiguration = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<18>());
@@ -144,7 +145,7 @@ template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::
     Out.set<12>(In.design);
     Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.contacts));
     Out.set<14>(In.location);
-    Out.set<15>(In.rrm);
+    Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.deviceRules));
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.deviceConfiguration));
     Out.set<18>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));

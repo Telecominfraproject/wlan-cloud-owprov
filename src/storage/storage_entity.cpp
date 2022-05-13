@@ -30,7 +30,7 @@ namespace OpenWifi {
         ORM::Field{"venues",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
         ORM::Field{"devices",ORM::FieldType::FT_TEXT},
-        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceRules",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"sourceIP",ORM::FieldType::FT_TEXT},
         ORM::Field{"variables",ORM::FieldType::FT_TEXT},
@@ -58,7 +58,8 @@ namespace OpenWifi {
                 "alter table " + TableName_ + " add column managementPolicies text",
                 "alter table " + TableName_ + " add column maps text",
                 "alter table " + TableName_ + " add column configurations text",
-                "alter table " + TableName_ + " add column managementRoles text"
+                "alter table " + TableName_ + " add column managementRoles text",
+                "alter table " + TableName_ + " add column deviceRules text"
         };
 
         for(const auto &i:Script) {
@@ -210,7 +211,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.venues = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
     Out.deviceConfiguration = OpenWifi::RESTAPI_utils::to_object_array(In.get<12>());
     Out.devices = OpenWifi::RESTAPI_utils::to_object_array(In.get<13>());
-    Out.rrm = In.get<14>();
+    Out.deviceRules = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::DeviceRules>(In.get<14>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<15>());
     Out.sourceIP = OpenWifi::RESTAPI_utils::to_object_array(In.get<16>());
     Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<17>());
@@ -235,7 +236,7 @@ template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects:
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.venues));
     Out.set<12>(OpenWifi::RESTAPI_utils::to_string(In.deviceConfiguration));
     Out.set<13>(OpenWifi::RESTAPI_utils::to_string(In.devices));
-    Out.set<14>(In.rrm);
+    Out.set<14>(OpenWifi::RESTAPI_utils::to_string(In.deviceRules));
     Out.set<15>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.sourceIP));
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.variables));

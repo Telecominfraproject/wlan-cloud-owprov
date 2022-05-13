@@ -14,6 +14,7 @@
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "Tasks/VenueConfigUpdater.h"
 #include "Tasks/VenueRebooter.h"
+#include "Tasks/VenueUpgrade.h"
 
 #include "Kafka_ProvUpdater.h"
 
@@ -216,8 +217,7 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
-        auto updateAllDevices = GetBoolParameter("updateAllDevices");
-        if(updateAllDevices) {
+        if(GetBoolParameter("updateAllDevices")) {
             ProvObjects::SerialNumberList   SNL;
 
             Poco::JSON::Object  Answer;
@@ -231,8 +231,21 @@ namespace OpenWifi{
             return ReturnObject(Answer);
         }
 
-        auto rebootAllDevices = GetBoolParameter("rebootAllDevices");
-        if(rebootAllDevices) {
+        if(GetBoolParameter("upgradeAllDevices")) {
+            ProvObjects::SerialNumberList   SNL;
+
+            Poco::JSON::Object  Answer;
+            SNL.serialNumbers = Existing.devices;
+
+            auto Task = new VenueUpgrade(UUID,UserInfo_.userinfo,0,Logger());
+            auto JobId = Task->Start();
+
+            SNL.to_json(Answer);
+            Answer.set("jobId",JobId);
+            return ReturnObject(Answer);
+        }
+
+        if(GetBoolParameter("rebootAllDevices")) {
             ProvObjects::SerialNumberList   SNL;
 
             Poco::JSON::Object  Answer;
@@ -256,7 +269,8 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        AssignIfPresent(RawObject, "rrm",Existing.rrm);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = NewObject.deviceRules;
 
         if(RawObject->has("sourceIP")) {
             if(!NewObject.sourceIP.empty() && !CIDR::ValidateIpRanges(NewObject.sourceIP)) {

@@ -202,9 +202,8 @@ namespace OpenWifi{
             Existing.variables = ToVariables;
         }
 
-        AssignIfPresent(RawObject,  "rrm", Existing.rrm);
-        AssignIfPresent(RawObject,  "firmwareUpgrade",Existing.firmwareUpgrade);
-        AssignIfPresent(RawObject,  "firmwareRCOnly", Existing.firmwareRCOnly);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = NewConfig.deviceRules;
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
             ManageMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations, FromVariables, ToVariables, Existing.info.id);

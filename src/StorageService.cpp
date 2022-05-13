@@ -247,7 +247,7 @@ namespace OpenWifi {
             Root.info.id = EntityDB::RootUUID();
             Root.info.name = "Top Entity";
             Root.info.created = Root.info.modified = OpenWifi::Now();
-            Root.rrm = "off";
+            Root.deviceRules.rrm = "off";
             EntityDB().CreateRecord(Root);
         }
 
@@ -258,7 +258,7 @@ namespace OpenWifi {
             DefOp.info.name = "Default Operator";
             DefOp.defaultOperator = true;
             DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
-            DefOp.rrm = "inherit";
+            DefOp.deviceRules.rrm = "inherit";
             OperatorDB_->CreateRecord(DefOp);
 
             ProvObjects::ServiceClass DefSer;

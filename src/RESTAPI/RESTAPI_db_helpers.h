@@ -525,12 +525,14 @@ namespace OpenWifi {
         return Result;
     }
 
-    inline bool ValidRRM(const std::string &V) {
-        return (V=="on" || V=="off" || V=="inherit");
+    inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR) {
+        return  (DR.rrm=="on" || DR.rrm=="off" || DR.rrm=="inherit") &&
+                (DR.firmwareUpgrade=="on" || DR.firmwareUpgrade=="off" || DR.firmwareUpgrade=="inherit") &&
+                (DR.rcOnly=="on" || DR.rcOnly=="off" || DR.rcOnly=="inherit");
     }
 
-    inline bool ValidRRM(const std::string &V, RESTAPIHandler &H) {
-        if(V=="on" || V=="off" || V=="inherit")
+    inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR, RESTAPIHandler &H) {
+        if(ValidDeviceRules(DR))
             return true;
         H.BadRequest(RESTAPI::Errors::InvalidRRM);
         return false;

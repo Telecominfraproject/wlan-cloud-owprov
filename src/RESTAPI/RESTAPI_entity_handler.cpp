@@ -150,7 +150,8 @@ namespace OpenWifi{
             return BadRequest(Error);
         }
 
-        AssignIfPresent(RawObject, "rrm", Existing.rrm);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = NewEntity.deviceRules;
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
             MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);

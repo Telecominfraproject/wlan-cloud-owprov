@@ -37,7 +37,7 @@ namespace OpenWifi {
         ORM::Field{"location",ORM::FieldType::FT_TEXT},
         ORM::Field{"contact",ORM::FieldType::FT_TEXT},
         ORM::Field{"deviceConfiguration",ORM::FieldType::FT_TEXT},
-        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceRules",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
         ORM::Field{"managementPolicy",ORM::FieldType::FT_TEXT},
         ORM::Field{"state",ORM::FieldType::FT_TEXT},
@@ -63,7 +63,8 @@ namespace OpenWifi {
             "alter table " + TableName_ + " add column state text" ,
             "alter table " + TableName_ + " add column locale varchar(16)" ,
             "alter table " + TableName_ + " add column realMacAddress text" ,
-            "alter table " + TableName_ + " add column devClass text"
+            "alter table " + TableName_ + " add column devClass text",
+            "alter table " + TableName_ + " add column deviceRules text"
         };
 
         for(const auto &i:Script) {
@@ -194,12 +195,12 @@ namespace OpenWifi {
                     ProvObjects::DeviceConfiguration    C;
                     for(const auto &i:E.deviceConfiguration) {
                         if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
-                            if(C.firmwareUpgrade=="no") {
+                            if(C.deviceRules.firmwareUpgrade=="no") {
                                 Rules = ProvObjects::dont_upgrade;
                                 return false;
                             }
-                            if(C.firmwareUpgrade=="yes") {
-                                if(C.firmwareRCOnly)
+                            if(C.deviceRules.firmwareUpgrade=="yes") {
+                                if(C.deviceRules.rcOnly=="yes")
                                     Rules = ProvObjects::upgrade_release_only;
                                 else
                                     Rules = ProvObjects::upgrade_latest;
@@ -226,12 +227,12 @@ namespace OpenWifi {
                     ProvObjects::DeviceConfiguration    C;
                     for(const auto &i:V.deviceConfiguration) {
                         if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
-                            if(C.firmwareUpgrade=="no") {
+                            if(C.deviceRules.firmwareUpgrade=="no") {
                                 Rules = ProvObjects::dont_upgrade;
                                 return false;
                             }
-                            if(C.firmwareUpgrade=="yes") {
-                                if(C.firmwareRCOnly)
+                            if(C.deviceRules.firmwareUpgrade=="yes") {
+                                if(C.deviceRules.rcOnly=="yes")
                                     Rules = ProvObjects::upgrade_release_only;
                                 else
                                     Rules = ProvObjects::upgrade_latest;
@@ -261,12 +262,12 @@ namespace OpenWifi {
             if(!T.deviceConfiguration.empty()) {
                 ProvObjects::DeviceConfiguration    C;
                 if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
-                    if(C.firmwareUpgrade=="no") {
+                    if(C.deviceRules.firmwareUpgrade=="no") {
                         Rules = ProvObjects::dont_upgrade;
                         return false;
                     }
-                    if(C.firmwareUpgrade=="yes") {
-                        if(C.firmwareRCOnly)
+                    if(C.deviceRules.firmwareUpgrade=="yes") {
+                        if(C.deviceRules.rcOnly=="yes")
                             Rules = ProvObjects::upgrade_release_only;
                         else
                             Rules = ProvObjects::upgrade_latest;
@@ -299,12 +300,12 @@ namespace OpenWifi {
         try {
             ProvObjects::Entity  E;
             if(StorageService()->EntityDB().GetRecord("id", Entity, E)) {
-                if(E.rrm == "inherit") {
+                if(E.deviceRules.rrm == "inherit") {
                     if(!E.parent.empty())
                         return LookForRRMInEntity(E.parent);
                     return false;
                 }
-                if(E.rrm=="no")
+                if(E.deviceRules.rrm=="no")
                     return false;
                 return true;
             }
@@ -319,14 +320,14 @@ namespace OpenWifi {
         try {
             ProvObjects::Venue  V;
             if(StorageService()->VenueDB().GetRecord("id", Venue, V)) {
-                if(V.rrm == "inherit") {
+                if(V.deviceRules.rrm == "inherit") {
                     if(!V.parent.empty())
                         return LookForRRMInVenue(V.parent);
                     if(!V.entity.empty())
                         return LookForRRMInEntity(V.entity);
                     return false;
                 }
-                if(V.rrm=="no")
+                if(V.deviceRules.rrm=="no")
                     return false;
                 return true;
             }
@@ -353,9 +354,9 @@ namespace OpenWifi {
             std::string     SerialNumber = Utils::IntToSerialNumber(i);
             ProvObjects::InventoryTag   Tag;
             if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,Tag)) {
-                if(Tag.rrm=="no")
+                if(Tag.deviceRules.rrm=="no")
                     continue;
-                if(Tag.rrm=="inherit") {
+                if(Tag.deviceRules.rrm=="inherit") {
                     if(!LookForRRM(Tag))
                         continue;
                 }
@@ -383,7 +384,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.location = In.get<13>();
     Out.contact = In.get<14>();
     Out.deviceConfiguration = In.get<15>();
-    Out.rrm = In.get<16>();
+    Out.deviceRules = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::DeviceRules>(In.get<16>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<17>());
     Out.managementPolicy = In.get<18>();
     Out.state = In.get<19>();
@@ -409,7 +410,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<13>(In.location);
     Out.set<14>(In.contact);
     Out.set<15>(In.deviceConfiguration);
-    Out.set<16>(In.rrm);
+    Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.deviceRules));
     Out.set<17>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
     Out.set<18>(In.managementPolicy);
     Out.set<19>(In.state);

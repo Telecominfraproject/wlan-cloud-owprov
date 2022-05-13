@@ -58,7 +58,7 @@ namespace OpenWifi {
             !ValidDbId(NewObject.operatorId, StorageService()->OperatorDB(), true, RESTAPI::Errors::InvalidOperatorId, *this)                ||
             !ValidDbId(NewObject.serviceClass, StorageService()->ServiceClassDB(), true, RESTAPI::Errors::InvalidServiceClassId, *this)      ||
             !ValidSubscriberId(NewObject.subscriberId, true, *this) ||
-            !ValidRRM(NewObject.rrm,*this) ||
+            (RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))  ||
             !ValidSerialNumber(NewObject.serialNumber,false,*this)
                 ) {
             return;
@@ -86,7 +86,7 @@ namespace OpenWifi {
             !ValidDbId(UpdateObj.operatorId, StorageService()->OperatorDB(), true, RESTAPI::Errors::InvalidOperatorId, *this)                ||
             !ValidDbId(UpdateObj.serviceClass, StorageService()->ServiceClassDB(), true, RESTAPI::Errors::InvalidServiceClassId, *this)      ||
             !ValidSubscriberId(UpdateObj.subscriberId, true, *this) ||
-            !ValidRRM(UpdateObj.rrm,*this) ||
+            (RawObject->has("deviceRules") && !ValidDeviceRules(UpdateObj.deviceRules,*this))  ||
             !ValidSerialNumber(UpdateObj.serialNumber,false,*this)
                 ) {
             return;
@@ -99,7 +99,8 @@ namespace OpenWifi {
         AssignIfPresent(RawObject, "serviceClass", Existing.serviceClass);
         AssignIfPresent(RawObject, "qrCode", Existing.qrCode);
         AssignIfPresent(RawObject, "geoCode", Existing.geoCode);
-        AssignIfPresent(RawObject, "rrm", Existing.rrm);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = UpdateObj.deviceRules;
         AssignIfPresent(RawObject, "state", Existing.state);
         AssignIfPresent(RawObject, "locale", Existing.locale);
         AssignIfPresent(RawObject, "billingCode", Existing.billingCode);

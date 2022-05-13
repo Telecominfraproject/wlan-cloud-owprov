@@ -28,10 +28,8 @@ namespace OpenWifi {
         ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
         ORM::Field{"inUse",ORM::FieldType::FT_TEXT},
         ORM::Field{"variables",ORM::FieldType::FT_TEXT},
-        ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+        ORM::Field{"deviceRules",ORM::FieldType::FT_TEXT},
         ORM::Field{"tags",ORM::FieldType::FT_TEXT},
-        ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT},
-        ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_INT},
         ORM::Field{"subscriberOnly",ORM::FieldType::FT_BOOLEAN},
         ORM::Field{"entity",ORM::FieldType::FT_TEXT},
         ORM::Field{"venue",ORM::FieldType::FT_TEXT},
@@ -50,7 +48,8 @@ namespace OpenWifi {
             "alter table " + TableName_ + " add column subscriberOnly BOOLEAN;",
             "alter table " + TableName_ + " add column entity TEXT;",
             "alter table " + TableName_ + " add column subscriber TEXT;",
-            "alter table " + TableName_ + " add column venue TEXT;"
+            "alter table " + TableName_ + " add column venue TEXT;",
+            "alter table " + TableName_ + " add column deviceRules TEXT;"
         };
         RunScript(Statements);
         to = 2;
@@ -149,14 +148,12 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<8>());
     Out.inUse = OpenWifi::RESTAPI_utils::to_object_array(In.get<9>());
     Out.variables = OpenWifi::RESTAPI_utils::to_object_array(In.get<10>());
-    Out.rrm = In.get<11>();
+    Out.deviceRules = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::DeviceRules>(In.get<11>());
     Out.info.tags = OpenWifi::RESTAPI_utils::to_taglist(In.get<12>());
-    Out.firmwareUpgrade = In.get<13>();
-    Out.firmwareRCOnly = In.get<14>();
-    Out.subscriberOnly = In.get<15>();
-    Out.entity = In.get<16>();
-    Out.venue = In.get<17>();
-    Out.subscriber = In.get<18>();
+    Out.subscriberOnly = In.get<13>();
+    Out.entity = In.get<14>();
+    Out.venue = In.get<15>();
+    Out.subscriber = In.get<16>();
 }
 
 template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvObjects::DeviceConfiguration>::Convert(const OpenWifi::ProvObjects::DeviceConfiguration &In, OpenWifi::ConfigurationDBRecordType &Out) {
@@ -171,12 +168,10 @@ template<> void ORM::DB<    OpenWifi::ConfigurationDBRecordType, OpenWifi::ProvO
     Out.set<8>(OpenWifi::RESTAPI_utils::to_string(In.configuration));
     Out.set<9>(OpenWifi::RESTAPI_utils::to_string(In.inUse));
     Out.set<10>(OpenWifi::RESTAPI_utils::to_string(In.variables));
-    Out.set<11>(In.rrm);
+    Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.deviceRules));
     Out.set<12>(OpenWifi::RESTAPI_utils::to_string(In.info.tags));
-    Out.set<13>(In.firmwareUpgrade);
-    Out.set<14>(In.firmwareRCOnly);
-    Out.set<15>(In.subscriberOnly);
-    Out.set<16>(In.entity);
-    Out.set<17>(In.venue);
-    Out.set<18>(In.subscriber);
+    Out.set<13>(In.subscriberOnly);
+    Out.set<14>(In.entity);
+    Out.set<15>(In.venue);
+    Out.set<16>(In.subscriber);
 }

@@ -181,6 +181,28 @@ components:
           items:
             $ref: '#/components/schemas/ManagementPolicy'
 
+    DeviceRules:
+      type: object
+      properties:
+        rcOnly:
+          type: string
+          enum:
+            - yes
+            - no
+            - inherit
+        rrm:
+          type: string
+          enum:
+            - yes
+            - no
+            - inherit
+        firmwareUpgrade:
+          type: string
+          enum:
+            - yes
+            - no
+            - inherit
+
     # uuids: ent:<uuid>
     Entity:
       type: object
@@ -255,12 +277,8 @@ components:
           items:
             type: string
             format: uuid
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         sourceIP:
           $ref: '#/components/schemas/StringList'
         defaultEntity:
@@ -336,12 +354,8 @@ components:
         location:
           type: string
           format: uuid
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         sourceIP:
           $ref: '#/components/schemas/StringList'
         managementPolicies:
@@ -790,17 +804,8 @@ components:
         subscriberOnly:
           type: boolean
           default: false
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
-        firmwareUpgrade:
-          type: string
-          example: auto or a time string of the format DOW-HH:MM
-        firmwareRCOnly:
-          type: boolean
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         venue:
           type: string
           format: uuid
@@ -850,12 +855,8 @@ components:
         deviceConfiguration:
           type: string
           format: uuid
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         managementPolicy:
           type: string
           format: uuid
@@ -1198,17 +1199,8 @@ components:
         defaultOperator:
           type: boolean
           default: false
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
-        firmwareUpgrade:
-          type: string
-          example: auto or a time string of the format DOW-HH:MM
-        firmwareRCOnly:
-          type: boolean
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         managementPolicy:
           type: string
           format: uuid
@@ -1254,12 +1246,8 @@ components:
           $ref: '#/components/schemas/SubLocation'
         contact:
           $ref: '#/components/schemas/SubContact'
-        rrm:
-          type: string
-          enum:
-            - off
-            - on
-            - inherit
+        deviceRules:
+          $ref: '#/components/schemas/DeviceRules'
         state:
           type: string
         locale:

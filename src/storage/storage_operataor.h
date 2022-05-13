@@ -22,8 +22,6 @@ namespace OpenWifi {
             std::string,
             bool,
             std::string,
-            bool,
-            std::string,
             std::string
     > OperatorDBRecordType;
 

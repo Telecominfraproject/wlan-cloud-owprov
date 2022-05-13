@@ -28,28 +28,26 @@ namespace OpenWifi {
             ORM::Field{"serviceClass",ORM::FieldType::FT_TEXT},
             ORM::Field{"qrCode",ORM::FieldType::FT_TEXT},
             ORM::Field{"geoCode",ORM::FieldType::FT_TEXT},
-            ORM::Field{"rrm",ORM::FieldType::FT_TEXT},
+            ORM::Field{"deviceRules",ORM::FieldType::FT_TEXT},
             ORM::Field{"state",ORM::FieldType::FT_TEXT},
             ORM::Field{"locale",ORM::FieldType::FT_TEXT},
             ORM::Field{"billingCode",ORM::FieldType::FT_TEXT},
             ORM::Field{"configuration",ORM::FieldType::FT_TEXT},
             ORM::Field{"suspended",ORM::FieldType::FT_BOOLEAN},
-            ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT},
-            ORM::Field{"firmwareRCOnly",ORM::FieldType::FT_TEXT},
-            ORM::Field{"firmwareUpgrade",ORM::FieldType::FT_TEXT}
+            ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT}
     };
 
     static  ORM::IndexVec    SubscriberDeviceDB_Indexes{
-            { std::string("subscriber_device_name_index3"),
+            { std::string("subscriber_device_name_index4"),
               ORM::IndexEntryVec{ {std::string("name"), ORM::Indextype::ASC} } },
-            { std::string("subscriber_device_serialNumber_index3"),
+            { std::string("subscriber_device_serialNumber_index4"),
               ORM::IndexEntryVec{ {std::string("serialNumber"), ORM::Indextype::ASC} } } ,
-            { std::string("subscriber_device_realMacAddress_index3"),
+            { std::string("subscriber_device_realMacAddress_index4"),
               ORM::IndexEntryVec{ {std::string("realMacAddress"), ORM::Indextype::ASC} } }
     };
 
     SubscriberDeviceDB::SubscriberDeviceDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
-            DB(T, "sub_devices3", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
+            DB(T, "sub_devices4", SubscriberDeviceDB_Fields, SubscriberDeviceDB_Indexes, P, L, "sdv") {
     }
 
     bool SubscriberDeviceDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
@@ -78,15 +76,13 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.serviceClass = In.get<13>();
     Out.qrCode = In.get<14>();
     Out.geoCode = In.get<15>();
-    Out.rrm = In.get<16>();
+    Out.deviceRules = OpenWifi::RESTAPI_utils::to_object<OpenWifi::ProvObjects::DeviceRules>(In.get<16>());
     Out.state = In.get<17>();
     Out.locale = In.get<18>();
     Out.billingCode = In.get<19>();
     Out.configuration = OpenWifi::RESTAPI_utils::to_object_array<OpenWifi::ProvObjects::DeviceConfigurationElement>(In.get<20>());
     Out.suspended = In.get<21>();
     Out.realMacAddress = In.get<22>();
-    Out.firmwareRCOnly = In.get<23>();
-    Out.firmwareUpgrade = In.get<24>();
 }
 
 template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjects::SubscriberDevice>::Convert(const OpenWifi::ProvObjects::SubscriberDevice &In, OpenWifi::SubDeviceDBRecordType &Out) {
@@ -106,13 +102,11 @@ template<> void ORM::DB<    OpenWifi::SubDeviceDBRecordType, OpenWifi::ProvObjec
     Out.set<13>(In.serviceClass);
     Out.set<14>(In.qrCode);
     Out.set<15>(In.geoCode);
-    Out.set<16>(In.rrm);
+    Out.set<16>(OpenWifi::RESTAPI_utils::to_string(In.deviceRules));
     Out.set<17>(In.state);
     Out.set<18>(In.locale);
     Out.set<19>(In.billingCode);
     Out.set<20>(OpenWifi::RESTAPI_utils::to_string(In.configuration));
     Out.set<21>(In.suspended);
     Out.set<22>(In.realMacAddress);
-    Out.set<23>(In.firmwareRCOnly);
-    Out.set<24>(In.firmwareUpgrade);
 }

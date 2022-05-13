@@ -65,13 +65,6 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
 
-        if(NewObject.rrm.empty())
-            NewObject.rrm = "inherit";
-
-        if(!ValidRRM(NewObject.rrm)) {
-            return BadRequest(RESTAPI::Errors::InvalidRRM);
-        }
-
         if(!ValidSourceIP(NewObject.sourceIP)) {
             return BadRequest(RESTAPI::Errors::InvalidIPAddresses);
         }
@@ -143,15 +136,8 @@ namespace OpenWifi {
             Existing.sourceIP = UpdatedObj.sourceIP;
         }
 
-        if(RawObject->has("rrm")) {
-            if(!UpdatedObj.rrm.empty() && !ValidRRM(UpdatedObj.rrm)) {
-                return BadRequest(RESTAPI::Errors::InvalidRRM);
-            }
-            Existing.rrm = UpdatedObj.rrm.empty() ? "inherit" : UpdatedObj.rrm;
-        }
-
-        AssignIfPresent(RawObject, "firmwareUpgrade", Existing.firmwareUpgrade);
-        AssignIfPresent(RawObject, "firmwareRCOnly", Existing.firmwareRCOnly);
+        if(RawObject->has("deviceRules"))
+            Existing.deviceRules = UpdatedObj.deviceRules;
 
         return ReturnUpdatedObject(DB_, Existing, *this);
     }
