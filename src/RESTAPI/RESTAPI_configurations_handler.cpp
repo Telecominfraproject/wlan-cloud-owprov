@@ -101,6 +101,10 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
+        }
+
         if(!ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
@@ -148,30 +152,34 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        ProvObjects::DeviceConfiguration    NewConfig;
+        ProvObjects::DeviceConfiguration    NewObject;
         const auto & RawObject = ParsedBody_;
-        if (!NewConfig.from_json(RawObject)) {
+        if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
         }
 
         if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(!NewConfig.deviceTypes.empty() && !DeviceTypeCache()->AreAcceptableDeviceTypes(NewConfig.deviceTypes, true)) {
+        if(!NewObject.deviceTypes.empty() && !DeviceTypeCache()->AreAcceptableDeviceTypes(NewObject.deviceTypes, true)) {
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
-        if(!NewConfig.deviceTypes.empty())
-            Existing.deviceTypes = NewConfig.deviceTypes;
+        if(!NewObject.deviceTypes.empty())
+            Existing.deviceTypes = NewObject.deviceTypes;
 
         RESTAPI::Errors::msg Error;
-        if(!ValidateConfigBlock( NewConfig,Error)) {
+        if(!ValidateConfigBlock( NewObject,Error)) {
             return BadRequest(Error);
         }
 
         if(RawObject->has("configuration")) {
-            Existing.configuration = NewConfig.configuration;
+            Existing.configuration = NewObject.configuration;
         }
 
         std::string FromPolicy, ToPolicy;
@@ -188,22 +196,22 @@ namespace OpenWifi{
 
         Types::UUIDvec_t FromVariables, ToVariables;
         if(RawObject->has("variables")) {
-            for(const auto &i:NewConfig.variables) {
+            for(const auto &i:NewObject.variables) {
                 if(!i.empty() && !StorageService()->VariablesDB().Exists("id",i)) {
                     return BadRequest(RESTAPI::Errors::VariableMustExist);
                 }
             }
             for(const auto &i:Existing.variables)
                 FromVariables.emplace_back(i);
-            for(const auto &i:NewConfig.variables)
+            for(const auto &i:NewObject.variables)
                 ToVariables.emplace_back(i);
             FromVariables = Existing.variables;
-            ToVariables = NewConfig.variables;
+            ToVariables = NewObject.variables;
             Existing.variables = ToVariables;
         }
 
         if(RawObject->has("deviceRules"))
-            Existing.deviceRules = NewConfig.deviceRules;
+            Existing.deviceRules = NewObject.deviceRules;
 
         if(DB_.UpdateRecord("id",UUID,Existing)) {
             ManageMembership(StorageService()->VariablesDB(),&ProvObjects::VariableBlock::configurations, FromVariables, ToVariables, Existing.info.id);

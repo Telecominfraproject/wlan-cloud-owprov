@@ -155,10 +155,14 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::SerialNumberExists);
         }
 
-        const auto & Obj = ParsedBody_;
+        const auto & RawObject = ParsedBody_;
         ProvObjects::InventoryTag NewObject;
-        if (!NewObject.from_json(Obj)) {
+        if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
         }
 
         if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {
@@ -169,7 +173,7 @@ namespace OpenWifi{
             NewObject.devClass = Provisioning::DeviceClass::ANY;
         }
 
-        if(!ProvObjects::CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+        if(!ProvObjects::CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
@@ -283,6 +287,10 @@ namespace OpenWifi{
         ProvObjects::InventoryTag   NewObject;
         if(!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
         }
 
         if(!Provisioning::DeviceClass::Validate(NewObject.devClass.c_str())) {

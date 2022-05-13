@@ -62,13 +62,17 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        const auto & Obj = ParsedBody_;
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Entity NewEntity;
-        if (!NewEntity.from_json(Obj)) {
+        if (!NewEntity.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(!ProvObjects::CreateObjectInfo(Obj,UserInfo_.userinfo,NewEntity.info)) {
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewEntity.deviceRules,*this))) {
+            return;
+        }
+
+        if(!ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewEntity.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
@@ -128,6 +132,10 @@ namespace OpenWifi{
         ProvObjects::Entity NewEntity;
         if(!NewEntity.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewEntity.deviceRules,*this))) {
+            return;
         }
 
         if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {

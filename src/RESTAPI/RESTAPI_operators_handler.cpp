@@ -61,6 +61,10 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::CannotCreateDefaultOperator);
         }
 
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
+        }
+
         if(RawObject->has("managementPolicy") && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
             return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
         }
@@ -114,6 +118,10 @@ namespace OpenWifi {
         ProvObjects::Operator   UpdatedObj;
         if(!UpdatedObj.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(UpdatedObj.deviceRules,*this))) {
+            return;
         }
 
         if(RawObject->has("managementPolicy")) {

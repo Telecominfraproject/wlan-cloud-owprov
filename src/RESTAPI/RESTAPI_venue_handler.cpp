@@ -117,13 +117,17 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::MissingUUID);
         }
 
-        const auto & Obj = ParsedBody_;
+        const auto & RawObject = ParsedBody_;
         ProvObjects::Venue NewObject;
-        if (!NewObject.from_json(Obj)) {
+        if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if (!CreateObjectInfo(Obj, UserInfo_.userinfo, NewObject.info)) {
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
+        }
+
+        if (!CreateObjectInfo(RawObject, UserInfo_.userinfo, NewObject.info)) {
             return BadRequest(RESTAPI::Errors::NameMustBeSet);
         }
 
@@ -202,6 +206,7 @@ namespace OpenWifi{
 
     void RESTAPI_venue_handler::DoPut() {
         std::string UUID = GetBinding("uuid", "");
+
         ProvObjects::Venue Existing;
         if(UUID.empty() || !DB_.GetRecord("id",UUID,Existing)) {
             return NotFound();
@@ -263,6 +268,10 @@ namespace OpenWifi{
         ProvObjects::Venue NewObject;
         if (!NewObject.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
+            return;
         }
 
         if(!UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
