@@ -46,6 +46,7 @@ namespace OpenWifi {
         virtual ~VenueDB() {};
         bool GetByIP(const std::string &IP, std::string & uuid);
         bool Upgrade(uint32_t from, uint32_t &to) override;
+        bool EvaluateDeviceRules( const std::string & id, ProvObjects::DeviceRules & Rules);
     private:
     };
 }

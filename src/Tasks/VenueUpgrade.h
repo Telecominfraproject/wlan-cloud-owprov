@@ -15,9 +15,10 @@
 namespace OpenWifi {
     class VenueDeviceUpgrade : public Poco::Runnable {
     public:
-        VenueDeviceUpgrade(const std::string &UUID, const std::string &venue, [[maybe_unused]] const std::string &fw_rules, Poco::Logger &L) :
+        VenueDeviceUpgrade(const std::string &UUID, const std::string &venue, const ProvObjects::DeviceRules &Rules, Poco::Logger &L) :
                 uuid_(UUID),
                 venue_(venue),
+                rules_(Rules),
                 Logger_(L) {
         }
 
@@ -26,12 +27,28 @@ namespace OpenWifi {
             started_=true;
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
                 SerialNumber = Device.serialNumber;
-                // get the latest firmware for device type
-                if (SDK::GW::Device::Reboot(Device.serialNumber, 0)) {
-                    Logger().debug(fmt::format("{}: Upgraded.",Device.serialNumber));
-                    upgraded_++;
+
+                Storage::ApplyRules(rules_,Device.deviceRules);
+                if(Device.deviceRules.firmwareUpgrade=="no") {
+                    std::cout << "Skipped Upgrade:" << Device.serialNumber << std::endl;
+                    skipped_++;
+                    done_=true;
+                    return;
+                }
+
+                FMSObjects::Firmware    F;
+                if(SDK::FMS::Firmware::GetLatest(Device.deviceType,Device.deviceRules.rcOnly=="yes",F)) {
+                    if (SDK::GW::Device::Upgrade(nullptr, Device.serialNumber, 0, F.uri)) {
+                        std::cout << "Upgraded:" << Device.serialNumber << " to " << F.uri << std::endl;
+                        Logger().debug(fmt::format("{}: Upgraded.",Device.serialNumber));
+                        upgraded_++;
+                    } else {
+                        std::cout << "Did not Upgrade:" << Device.serialNumber << " to " << F.uri << std::endl;
+                        Logger().information(fmt::format("{}: Not Upgraded.", Device.serialNumber));
+                        failed_++;
+                    }
                 } else {
-                    Logger().information(fmt::format("{}: Not Upgraded.", Device.serialNumber));
+                    std::cout << "Did not Upgrade:" << Device.serialNumber << " to <unknown>" << std::endl;
                     failed_++;
                 }
             }
@@ -39,7 +56,7 @@ namespace OpenWifi {
             // std::cout << "Done push for " << Device.serialNumber << std::endl;
         }
 
-        uint64_t        upgraded_=0, failed_=0;
+        uint64_t        upgraded_=0, failed_=0, skipped_=0;
         bool            started_ = false,
                         done_ = false;
         std::string     SerialNumber;
@@ -47,6 +64,7 @@ namespace OpenWifi {
     private:
         std::string     uuid_;
         std::string     venue_;
+        ProvObjects::DeviceRules    rules_;
         Poco::Logger    &Logger_;
         inline Poco::Logger & Logger() { return Logger_; }
     };
@@ -101,10 +119,12 @@ namespace OpenWifi {
                 N.content.jobId = JobId_;
 
                 std::array<tState,MaxThreads> Tasks;
+                ProvObjects::DeviceRules    Rules;
+
+                StorageService()->VenueDB().EvaluateDeviceRules(Venue.info.id, Rules);
 
                 for(const auto &uuid:Venue.devices) {
-                    std::string fw_rules;
-                    auto NewTask = new VenueDeviceUpgrade(uuid, Venue.info.name, fw_rules,Logger());
+                    auto NewTask = new VenueDeviceUpgrade(uuid, Venue.info.name, Rules,Logger());
                     // std::cout << "Scheduling config push for " << uuid << std::endl;
                     bool found_slot = false;
                     while (!found_slot) {

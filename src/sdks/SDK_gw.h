@@ -16,6 +16,7 @@ namespace OpenWifi::SDK::GW {
         void Refresh(RESTAPIHandler *client, const std::string & Mac, uint64_t When);
         void PerformCommand(RESTAPIHandler *client, const std::string &Command, const std::string & EndPoint, Poco::JSON::Object & CommandRequest);
         bool Configure(RESTAPIHandler *client, const std::string &Mac, Poco::JSON::Object::Ptr & Configuration, Poco::JSON::Object::Ptr & Response);
+        bool Upgrade(RESTAPIHandler *client, const std::string & Mac, uint64_t When, const std::string & ImageName);
 
         bool SetVenue(RESTAPIHandler *client, const std::string & SerialNumber, const std::string &uuid);
         bool SetSubscriber(RESTAPIHandler *client, const std::string & SerialNumber, const std::string &uuid);

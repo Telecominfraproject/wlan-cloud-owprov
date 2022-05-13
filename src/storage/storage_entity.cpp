@@ -194,6 +194,20 @@ namespace OpenWifi {
         }
     }
 
+    bool EntityDB::EvaluateDeviceRules(const std::string &id, ProvObjects::DeviceRules &Rules) {
+        ProvObjects::Entity  E;
+        if(GetRecord("id",id,E)) {
+            if(!Storage::ApplyRules( E.deviceRules, Rules))
+                return true;
+
+            if(!E.parent.empty()) {
+                return EvaluateDeviceRules(E.parent,Rules);
+            }
+        }
+        Storage::ApplyConfigRules(Rules);
+        return true;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::EntityDBRecordType, OpenWifi::ProvObjects::Entity>::Convert(const OpenWifi::EntityDBRecordType &In, OpenWifi::ProvObjects::Entity &Out) {

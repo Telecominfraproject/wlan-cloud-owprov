@@ -74,7 +74,27 @@ namespace OpenWifi {
 
             inline const std::string & DefaultOperator() { return DefaultOperator_; }
 
-          private:
+            static inline bool ApplyRules(const ProvObjects::DeviceRules &R, ProvObjects::DeviceRules & R_res) {
+                if(R_res.rcOnly=="inherit")
+                    R_res.rcOnly=R.rcOnly;
+                if(R_res.firmwareUpgrade=="inherit")
+                    R_res.firmwareUpgrade=R.firmwareUpgrade;
+                if(R_res.rrm=="inherit")
+                    R_res.rrm=R.rrm;
+
+                return (R_res.rrm=="inherit" || R_res.rcOnly=="inherit" || R_res.firmwareUpgrade=="inherit");
+            }
+
+            static inline void ApplyConfigRules(ProvObjects::DeviceRules & R_res) {
+                if(R_res.firmwareUpgrade=="inherit")
+                    R_res.firmwareUpgrade=MicroService::instance().ConfigGetString("firmware.updater.upgrade","yes");
+                if(R_res.rcOnly=="inherit")
+                    R_res.rcOnly=MicroService::instance().ConfigGetString("firmware.updater.releaseonly","yes");
+                if(R_res.rrm=="inherit")
+                    R_res.rrm=MicroService::instance().ConfigGetString("rrm.default","no");
+            }
+
+    private:
             std::unique_ptr<OpenWifi::EntityDB>                 EntityDB_;
             std::unique_ptr<OpenWifi::PolicyDB>                 PolicyDB_;
             std::unique_ptr<OpenWifi::VenueDB>                  VenueDB_;

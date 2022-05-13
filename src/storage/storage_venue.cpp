@@ -99,6 +99,24 @@ namespace OpenWifi {
         return false;
     }
 
+    bool VenueDB::EvaluateDeviceRules(const std::string &id, ProvObjects::DeviceRules &Rules) {
+        ProvObjects::Venue  V;
+        if(GetRecord("id",id,V)) {
+            if(!Storage::ApplyRules( V.deviceRules, Rules))
+                return true;
+
+            if(!V.parent.empty()) {
+                return EvaluateDeviceRules(V.parent,Rules);
+            }
+
+            if(!V.entity.empty()) {
+                return StorageService()->EntityDB().EvaluateDeviceRules(V.entity,Rules);
+            }
+        }
+        Storage::ApplyConfigRules(Rules);
+        return true;
+    }
+
 }
 
 template<> void ORM::DB<    OpenWifi::VenueDBRecordType, OpenWifi::ProvObjects::Venue>::Convert(const OpenWifi::VenueDBRecordType &In, OpenWifi::ProvObjects::Venue &Out) {

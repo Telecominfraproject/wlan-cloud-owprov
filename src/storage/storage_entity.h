@@ -51,6 +51,7 @@ namespace OpenWifi {
         bool CreateShortCut( ProvObjects::Entity & E);
         bool GetByIP(const std::string &IP, std::string & uuid);
         bool Upgrade(uint32_t from, uint32_t &to) override;
+        bool EvaluateDeviceRules(const std::string &id, ProvObjects::DeviceRules &Rules);
     private:
         inline static const std::string RootUUID_{"0000-0000-0000"};
     };
