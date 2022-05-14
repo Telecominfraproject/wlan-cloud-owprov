@@ -84,7 +84,8 @@ findbrowser() {
 setprov() {
 if [ -z ${OWPROV_OVERRIDE+x} ]; then
 	curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemEndpoints" \
-        -H "accept: application/json" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${token}"  > ${result_file}
 	rawurl="$(cat ${result_file} | jq -r '.endpoints[] | select( .type == "owprov" ) | .uri')"
 	if [[ ! -z "${rawurl}" ]]; then
@@ -108,38 +109,37 @@ fi
 }
 
 logout() {
-  curl  ${FLAGS} -X DELETE -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${token}" \
-        "https://${OWSEC}/api/v1/oauth2/${token}"
+  curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/oauth2/${token}" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}"
   rm -rf token.json
 }
 
 getroot() {
-    curl    ${FLAGS} \
+    curl    ${FLAGS} "https://${OWPROV}/api/v1/entity/0000-0000-0000" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${token}" \
-            -H "accept: application/json" \
-            "https://${OWPROV}/api/v1/entity/0000-0000-0000"  > ${result_file}
+            -H "accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
 setroot() {
     payload="{ \"name\" : \"Arilia Root\", \"description\" : \"This is the top level entry in the hierarchy.\" }";
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/0000-0000-0000" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
-    -d "$payload" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
 addentity() {
     payload="{ \"name\" : \"$1\", \"description\" : \"sub entity.\", \"parent\" : \"0000-0000-0000\", \"notes\" : [ {\"note\" : \"CLI added\"} ] }";
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity/1" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
-    -d "$payload" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
@@ -147,7 +147,7 @@ getentity() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/entity/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -155,7 +155,7 @@ getentities() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/entity" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -163,7 +163,7 @@ tree() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/entity?getTree=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -171,7 +171,7 @@ importtree() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/entity?setTree=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json " \
+    -H "Accept: application/json " \
     --data "@$1" > ${result_file}
     jq < ${result_file}
 }
@@ -180,7 +180,7 @@ gettag() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory?entity=$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -189,7 +189,7 @@ addtag() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/inventory/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -199,7 +199,7 @@ addunassignedtag() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/inventory/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -209,7 +209,7 @@ assigntagentity() {
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -219,7 +219,7 @@ assigntagvenue() {
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -229,7 +229,7 @@ unassigntag() {
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1?unassign=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -238,7 +238,7 @@ gettags() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/inventory" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -246,7 +246,7 @@ getunassignedtags(){
     curl ${FLAGS} "https://${OWPROV}/api/v1/inventory?unassigned=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -254,7 +254,7 @@ tagcount() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/inventory?countOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -262,7 +262,7 @@ entitycount() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/entity?countOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -270,7 +270,7 @@ venuecount() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/venue?countOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -278,7 +278,7 @@ contactcount() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/contact?countOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -286,7 +286,7 @@ locationcount() {
     curl ${FLAGS} "https://${OWPROV}/api/v1/location?countOnly=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -295,7 +295,7 @@ addconfig() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     echo ${payload}
     jq < ${result_file}
@@ -306,7 +306,7 @@ addconfigtx() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     echo ${payload}
     jq < ${result_file}
@@ -317,7 +317,7 @@ addconfigmetrics() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     echo ${payload}
     jq < ${result_file}
@@ -327,7 +327,7 @@ addconfigfile() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d @"$1" > ${result_file}
     jq < ${result_file}
 }
@@ -336,7 +336,7 @@ getconfig() {
     curl    ${FLAGS}  "https://${OWPROV}/api/v1/configuration/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -344,7 +344,7 @@ deleteconfig() {
     curl    ${FLAGS} -X DELETE  "https://${OWPROV}/api/v1/configuration/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -353,7 +353,7 @@ setentityconfig() {
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/entity/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -362,7 +362,7 @@ listconfigs() {
     curl    ${FLAGS}  "https://${OWPROV}/api/v1/configuration" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -370,7 +370,7 @@ deviceconfig() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory/$1?config=true&explain=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -378,7 +378,7 @@ devicefwoptions() {
     curl    ${FLAGS} "https://${OWPROV}/api/v1/inventory/$1?firmwareOptions=true" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+    -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
@@ -387,71 +387,78 @@ adddeviceconfig() {
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/inventory/$1" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
+    -H "Accept: application/json" \
     -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
 validateconfig() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/configuration/1?validateOnly=true" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" \
-    -d @"$1" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d @"$1" > ${result_file}
     jq < ${result_file}
 }
 
 setloglevel() {
     payload="{ \"command\" : \"setloglevel\" , \"subsystems\" : [ { \"tag\" : \"$1\" , \"value\" : \"$2\" } ] }"
-            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"
 }
 
 getloglevels() {
     payload="{ \"command\" : \"getloglevels\" }"
-            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"
 }
 
 getloglevelnames() {
     payload="{ \"command\" : \"getloglevelnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"
 }
 
 getsubsystemnames() {
     payload="{ \"command\" : \"getsubsystemnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"
 }
 
 systeminfo() {
     curl  ${FLAGS} -X GET "https://${OWPROV}/api/v1/system?command=info" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 reloadsubsystem() {
     payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"$1\" ] }"
-            curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWPROV}/api/v1/system" \
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"
 }
 
 getsubdevs() {
     curl ${FLAGS} -X GET "https://${OWPROV}/api/v1/inventory?subscriber=$1" \
-            -H "accept: application/json" \
-            -H "Authorization: Bearer ${token}" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
@@ -462,25 +469,25 @@ addresscheck() {
 
 affecteddevices() {
     curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/configuration/${1}?computedAffected=true" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
 signup() {
     curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/signup?email=stephane.bourque@gmail.com&macAddress=04f8f8fc3771" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
 getsignup() {
     curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/signup?signupUUID=$1" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -H "accept: application/json" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
 
