@@ -526,9 +526,9 @@ namespace OpenWifi {
     }
 
     inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR) {
-        return  (DR.rrm=="on" || DR.rrm=="off" || DR.rrm=="inherit") &&
-                (DR.firmwareUpgrade=="on" || DR.firmwareUpgrade=="off" || DR.firmwareUpgrade=="inherit") &&
-                (DR.rcOnly=="on" || DR.rcOnly=="off" || DR.rcOnly=="inherit");
+        return  (DR.rrm=="yes" || DR.rrm=="no" || DR.rrm=="inherit") &&
+                (DR.firmwareUpgrade=="yes" || DR.firmwareUpgrade=="no" || DR.firmwareUpgrade=="inherit") &&
+                (DR.rcOnly=="yes" || DR.rcOnly=="no" || DR.rcOnly=="inherit");
     }
 
     inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR, RESTAPIHandler &H) {

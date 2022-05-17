@@ -491,6 +491,14 @@ getsignup() {
     jq < ${result_file}
 }
 
+listvenues() {
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/venue" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; echo "You are logged in..."  ; logout ;;
@@ -537,6 +545,7 @@ case "$1" in
     "signup") login; signup ; logout;;
     "getsignup") login; getsignup $2; logout;;
     "getsubdevs") login; getsubdevs $2; logout;;
+    "listvenues") login; listvenues $2; logout;;
     *) help ;;
 esac
 
