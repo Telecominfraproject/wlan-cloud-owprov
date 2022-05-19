@@ -20,6 +20,8 @@ namespace OpenWifi {
                                  TransactionId,
                                  Internal){}
         static auto PathName() { return std::list<std::string>{"/api/v1/subscriberDevice/{uuid}"}; };
+        bool ApplyConfiguration(const std::string &SerialNumber);
+
     private:
         SubscriberDeviceDB    &DB_=StorageService()->SubscriberDeviceDB();
         void DoGet() final ;

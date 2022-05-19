@@ -5,6 +5,8 @@
 #include "RESTAPI_sub_devices_handler.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "sdks/SDK_sec.h"
+#include "sdks/SDK_gw.h"
+#include "APConfig.h"
 
 namespace OpenWifi {
 
@@ -111,7 +113,32 @@ namespace OpenWifi {
         if(RawObject->has("configuration")) {
             Existing.configuration = UpdateObj.configuration;
         }
+        StorageService()->SubscriberDeviceDB().UpdateRecord("id",uuid,Existing);
+        ApplyConfiguration(Existing.serialNumber);
         return ReturnUpdatedObject(DB_,Existing,*this);
+    }
+
+    bool RESTAPI_sub_devices_handler::ApplyConfiguration(const std::string &SerialNumber) {
+        auto Device = std::make_shared<APConfig>(SerialNumber, Logger());
+        auto Configuration = Poco::makeShared<Poco::JSON::Object>();
+        Poco::JSON::Object ErrorsObj, WarningsObj;
+        Logger().debug(Poco::format("%s: Computing configuration.",SerialNumber));
+        if (Device->Get(Configuration)) {
+            std::ostringstream OS;
+            Configuration->stringify(OS);
+            auto Response=Poco::makeShared<Poco::JSON::Object>();
+            Logger().debug(Poco::format("%s: Sending configuration push.",SerialNumber));
+            if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
+                Logger().debug(Poco::format("%s: Sending configuration pushed.",SerialNumber));
+                return true;
+            } else {
+                Logger().debug(Poco::format("%s: Sending configuration failed.",SerialNumber));
+                return false;
+            }
+        } else {
+            Logger().debug(Poco::format("%s: Configuration is bad.",SerialNumber));
+            return false;
+        }
     }
 
 }

@@ -19,12 +19,14 @@ namespace OpenWifi {
     class APConfig {
         public:
             explicit APConfig(const std::string & SerialNumber, const std::string & DeviceType, Poco::Logger & L, bool Explain=false);
+            explicit APConfig(const std::string & SerialNumber, Poco::Logger & L);
 
 
             [[nodiscard]] bool Get(Poco::JSON::Object::Ptr &Configuration);
 
             void AddConfiguration(const std::string &UUID);
             void AddConfiguration(const Types::UUIDvec_t &UUID);
+            void AddConfiguration(const ProvObjects::DeviceConfigurationElementVec &Elements);
             void AddVenueConfig(const std::string &UUID);
             void AddEntityConfig(const std::string &UUID);
             const Poco::JSON::Array & Explanation() { return Explanation_; };
@@ -37,7 +39,8 @@ namespace OpenWifi {
             Types::StringPairVec        Errors;
             bool                        Explain_=false;
             Poco::JSON::Array           Explanation_;
-            Poco::Logger & Logger() { return Logger_;}
+            bool                        Sub_=false;
+            Poco::Logger & Logger()     { return Logger_;}
 
             bool ReplaceVariablesInArray( const Poco::JSON::Array::Ptr & O, Poco::JSON::Array::Ptr & Result);
             bool ReplaceVariablesInObject( const Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result);

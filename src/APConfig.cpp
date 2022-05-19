@@ -15,6 +15,14 @@ namespace OpenWifi {
     {
     }
 
+    APConfig::APConfig(const std::string & SerialNumber, Poco::Logger & L)
+        :   SerialNumber_(SerialNumber),
+            Logger_(L)
+    {
+        Explain_ = false;
+        Sub_ = true;
+    }
+
     bool APConfig::FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr, Poco::JSON::Object::Ptr & Radio) {
         for(const auto &i:*Arr) {
             auto R = i.extract<Poco::JSON::Object::Ptr>();
@@ -44,84 +52,6 @@ namespace OpenWifi {
         std::cout << S << ":" << std::endl;
         std::cout << ">>>" << std::endl << O.str() << std::endl << "<<<" << std::endl;
          */
-    }
-
-    bool APConfig::mergeArray(const std::string &K, const Poco::JSON::Array::Ptr &A , const Poco::JSON::Array::Ptr &B, Poco::JSON::Array &Arr) {
-        if(K=="radios") {
-            auto BB=Poco::makeShared<Poco::JSON::Array>();
-            BB = B;
-            for(const auto &i:*A) {
-                auto A_Radio = i.extract<Poco::JSON::Object::Ptr>();
-                // std::cout << "Radio A:" << std::endl;
-                // ShowJSON(A_Radio);
-                if(A_Radio->has("band")) {
-                    std::string Band = A_Radio->get("band").toString();
-                    // std::cout << "Looking for band: " << Band << std::endl;
-                    auto B_Radio=Poco::makeShared<Poco::JSON::Object>();
-                    if(FindRadio(Band,B,B_Radio)) {
-                        ShowJSON("Data to be merged", B_Radio);
-                        auto RR = Poco::makeShared<Poco::JSON::Object>();
-                        merge(A_Radio, B_Radio,RR);
-                        ShowJSON("Merged data", RR);
-                        auto CC = Poco::makeShared<Poco::JSON::Array>();
-                        RemoveBand(Band, BB, CC );
-                        BB = CC;
-                        Arr.add(RR);
-                    } else {
-                        Arr.add(A_Radio);
-                    }
-                }
-            }
-            for(const auto &i:*BB)
-                Arr.add(i);
-        } else {
-            Arr = *A;
-        }
-        return true;
-    }
-
-    bool APConfig::merge(const Poco::JSON::Object::Ptr & A, const Poco::JSON::Object::Ptr & B, Poco::JSON::Object::Ptr &C) {
-        for(const auto &i:*A) {
-            const std::string & K = i.first;
-            //  std::cout << "KEY: " << K << std::endl;
-            if(B->has(K)) {
-                if(A->isArray(K)) {
-                    //  std::cout << "ISARRAY" << std::endl;
-                    if(B->isArray(K)) {
-                        Poco::JSON::Array   Arr;
-                        auto AR1=A->getArray(K);
-                        auto AR2=B->getArray(K);
-                        mergeArray(K,AR1,AR2,Arr);
-                        C->set(K,Arr);
-                    } else {
-                        C->set(K,A->getArray(K));
-                    }
-                }
-                else if(A->isObject(K) && B->isObject(K)) {
-                    //  std::cout << "ISOBJECT" << std::endl;
-                    auto R=Poco::makeShared<Poco::JSON::Object>();
-                    merge(A->getObject(K),B->getObject(K),R);
-                    C->set(K,R);
-                }
-                else {
-                    C->set(K,i.second);
-                }
-            } else {
-                C->set(K,i.second);
-            }
-        }
-
-        for(const auto &i:*B) {
-            const std::string & K = i.first;
-            if(!A->has(K)) {
-                // std::cout << "Before leave" << std::endl;
-                // ShowJSON(C);
-                C->set(K, i.second);
-                // std::cout << "After leave" << std::endl;
-                // ShowJSON(C);
-            }
-        }
-        return true;
     }
 
     bool APConfig::ReplaceVariablesInObject( const Poco::JSON::Object::Ptr & Original, Poco::JSON::Object::Ptr & Result) {
@@ -196,15 +126,24 @@ namespace OpenWifi {
         if(Config_.empty()) {
             Explanation_.clear();
             try {
-                ProvObjects::InventoryTag   D;
-                if(StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
-                    if(!D.deviceConfiguration.empty()) {
-                        AddConfiguration(D.deviceConfiguration);
+                if(!Sub_) {
+                    ProvObjects::InventoryTag D;
+                    if (StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
+                        if (!D.deviceConfiguration.empty()) {
+                            AddConfiguration(D.deviceConfiguration);
+                        }
+                        if (!D.entity.empty()) {
+                            AddEntityConfig(D.entity);
+                        } else if (!D.venue.empty()) {
+                            AddVenueConfig(D.venue);
+                        }
                     }
-                    if(!D.entity.empty()) {
-                        AddEntityConfig(D.entity);
-                    } else if(!D.venue.empty()) {
-                        AddVenueConfig(D.venue);
+                } else {
+                    ProvObjects::SubscriberDevice D;
+                    if (StorageService()->SubscriberDeviceDB().GetRecord("serialNumber", SerialNumber_, D)) {
+                        if (!D.configuration.empty()) {
+                            AddConfiguration(D.configuration);
+                        }
                     }
                 }
                 //  Now we have all the config we need.
@@ -275,6 +214,22 @@ namespace OpenWifi {
                 return true;
         }
         return false;
+    }
+
+    void APConfig::AddConfiguration(const ProvObjects::DeviceConfigurationElementVec &Elements) {
+        for(const auto &i:Elements) {
+            if(i.weight==0) {
+                VerboseElement  VE{ .element = i};
+                Config_.push_back(VE);
+            } else {
+                // we need to insert after everything bigger or equal
+                auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
+                                             [](const VerboseElement &Elem, uint64_t Value) {
+                                                 return Elem.element.weight>=Value; });
+                VerboseElement  VE{ .element = i};
+                Config_.insert(Hint,VE);
+            }
+        }
     }
 
     void APConfig::AddConfiguration(const Types::UUIDvec_t &UUIDs) {
