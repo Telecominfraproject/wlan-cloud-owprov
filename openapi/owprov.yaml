@@ -2072,6 +2072,13 @@ paths:
             example: serialNumber:a,created:d
           required: false
         - in: query
+          description: return extended information
+          name: orderSpec
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
           description: return the list of devices under RRM
           name: rrmOnly
           schema:
@@ -2095,6 +2102,7 @@ paths:
                   - $ref: '#/components/schemas/SerialNumberList'
                   - $ref: '#/components/schemas/InventoryTagList'
                   - $ref: '#/components/schemas/CountAnswer'
+                  - $ref: '#/components/schemas/StringList'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

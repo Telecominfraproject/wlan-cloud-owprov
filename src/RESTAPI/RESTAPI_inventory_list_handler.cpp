@@ -34,10 +34,15 @@ namespace OpenWifi{
     }
 
     void RESTAPI_inventory_list_handler::DoGet() {
-        std::string UUID;
-        std::string Arg,Arg2;
+
+        if(GetBoolParameter("orderSpec")) {
+            return ReturnFieldList(DB_,*this);
+        }
 
         bool SerialOnly=GetBoolParameter("serialOnly");
+
+        std::string UUID;
+        std::string Arg,Arg2;
 
         std::string OrderBy{" ORDER BY serialNumber ASC "};
         if(HasParameter("orderBy",Arg)) {
