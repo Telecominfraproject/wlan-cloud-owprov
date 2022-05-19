@@ -45,7 +45,8 @@ namespace OpenWifi {
         return false;
     }
 
-    static void ShowJSON([[maybe_unused]] const char *S, [[maybe_unused]] const Poco::JSON::Object::Ptr &Obj) {
+
+    [[maybe_unused ]] static void ShowJSON([[maybe_unused]] const char *S, [[maybe_unused]] const Poco::JSON::Object::Ptr &Obj) {
         /*
         std::stringstream O;
         Poco::JSON::Stringifier::stringify(Obj,O);
