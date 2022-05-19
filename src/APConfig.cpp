@@ -219,14 +219,14 @@ namespace OpenWifi {
     void APConfig::AddConfiguration(const ProvObjects::DeviceConfigurationElementVec &Elements) {
         for(const auto &i:Elements) {
             if(i.weight==0) {
-                VerboseElement  VE{ .element = i};
+                VerboseElement  VE{ .element = i, .info = ProvObjects::ObjectInfo{} };
                 Config_.push_back(VE);
             } else {
                 // we need to insert after everything bigger or equal
                 auto Hint = std::lower_bound(Config_.cbegin(),Config_.cend(),i.weight,
                                              [](const VerboseElement &Elem, uint64_t Value) {
                                                  return Elem.element.weight>=Value; });
-                VerboseElement  VE{ .element = i};
+                VerboseElement  VE{ .element = i, .info = ProvObjects::ObjectInfo{}};
                 Config_.insert(Hint,VE);
             }
         }
