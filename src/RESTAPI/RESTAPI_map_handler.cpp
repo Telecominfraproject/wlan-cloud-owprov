@@ -34,7 +34,9 @@ namespace OpenWifi{
             return NotFound();
         }
 
-        if(UserInfo_.userinfo.id!=Existing.creator) {
+        if( UserInfo_.userinfo.userRole!=SecurityObjects::ROOT &&
+            UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN &&
+            UserInfo_.userinfo.id!=Existing.creator) {
             return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
@@ -111,16 +113,30 @@ namespace OpenWifi{
             return BadRequest( RESTAPI::Errors::NameMustBeSet);
         }
 
-        if(Existing.creator != UserInfo_.userinfo.id) {
+        if( UserInfo_.userinfo.userRole!=SecurityObjects::ROOT &&
+            UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN &&
+            UserInfo_.userinfo.id!=Existing.creator) {
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
+        }
+
+        if( UserInfo_.userinfo.userRole==SecurityObjects::ROOT ||
+            UserInfo_.userinfo.userRole==SecurityObjects::ADMIN) {
+
+        } else if(Existing.creator != UserInfo_.userinfo.id) {
             if(Existing.visibility == "private") {
                 return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
             }
             if(Existing.visibility == "select") {
+                bool allowed=false;
                 for(const auto &i:Existing.access.list) {
                     for(const auto &j:i.users.list) {
                         if(j==UserInfo_.userinfo.id) {
+                            allowed=true;
                         }
                     }
+                }
+                if(!allowed) {
+                    return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
                 }
             }
         }
