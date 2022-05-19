@@ -181,6 +181,7 @@ configProperties:
   openwifi.system.uri.public: https://localhost:16005
   openwifi.system.uri.ui: https://localhost
   openwifi.system.commandchannel: /tmp/app_owprov
+  iptocountry.provider: ipinfo
   # Logging
   logging.type: console
   logging.path: $OWPROV_ROOT/logs
