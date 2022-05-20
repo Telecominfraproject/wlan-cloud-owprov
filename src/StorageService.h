@@ -85,13 +85,14 @@ namespace OpenWifi {
                 return (R_res.rrm=="inherit" || R_res.rcOnly=="inherit" || R_res.firmwareUpgrade=="inherit");
             }
 
-            static inline void ApplyConfigRules(ProvObjects::DeviceRules & R_res) {
+            static inline bool ApplyConfigRules(ProvObjects::DeviceRules & R_res) {
                 if(R_res.firmwareUpgrade=="inherit")
                     R_res.firmwareUpgrade=MicroService::instance().ConfigGetString("firmware.updater.upgrade","yes");
                 if(R_res.rcOnly=="inherit")
                     R_res.rcOnly=MicroService::instance().ConfigGetString("firmware.updater.releaseonly","yes");
                 if(R_res.rrm=="inherit")
                     R_res.rrm=MicroService::instance().ConfigGetString("rrm.default","no");
+                return true;
             }
 
     private:

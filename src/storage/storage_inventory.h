@@ -44,19 +44,20 @@ namespace OpenWifi {
             virtual ~InventoryDB() {};
             bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo,
                                       const std::string & DeviceType, const std::string &Locale );
-            bool FindFirmwareOptions(std::string  & SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
-            static bool FindFirmwareOptionsForEntity(const std::string & EntityUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
-            static bool FindFirmwareOptionsForVenue(const std::string & VenueUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules);
+
             void InitializeSerialCache();
             bool GetRRMDeviceList(Types::UUIDvec_t & DeviceList);
-            bool LookForRRM( const ProvObjects::InventoryTag &T);
-            bool LookForRRMInVenue(const std::string &Venue);
-            bool LookForRRMInEntity(const std::string &Entity);
+
+            bool EvaluateDeviceIDRules(const std::string &id, ProvObjects::DeviceRules &Rules);
+            bool EvaluateDeviceSerialNumberRules(const std::string &serialNumber, ProvObjects::DeviceRules &Rules);
+
             inline uint32_t Version() override {
                 return 1;
             }
+
             bool Upgrade(uint32_t from, uint32_t &to) override;
 
         private:
+            bool EvaluateDeviceRules(const ProvObjects::InventoryTag &T, ProvObjects::DeviceRules &Rules);
     };
 }

@@ -59,17 +59,10 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
-            ProvObjects::FIRMWARE_UPGRADE_RULES Rules;
-
-            StorageService()->InventoryDB().FindFirmwareOptions(SerialNumber,Rules);
-
-            if(Rules == ProvObjects::dont_upgrade) {
-                Answer.set("firmwareUpgrade","no");
-            } else {
-                Answer.set("firmwareUpgrade","yes");
-                if(Rules == ProvObjects::upgrade_release_only)
-                    Answer.set("firmwareRCOnly", Rules == ProvObjects::upgrade_release_only );
-            }
+            ProvObjects::DeviceRules Rules;
+            StorageService()->InventoryDB().EvaluateDeviceSerialNumberRules(SerialNumber,Rules);
+            Answer.set("firmwareUpgrade",Rules.firmwareUpgrade);
+            Answer.set("firmwareRCOnly", Rules.rcOnly == "yes" );
             return ReturnObject(Answer);
         } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
             Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));

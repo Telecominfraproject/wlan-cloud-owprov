@@ -186,109 +186,27 @@ namespace OpenWifi {
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForEntity(const std::string &EntityUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
-        std::string UUID = EntityUUID;
-        while(!UUID.empty() && UUID!=EntityDB::RootUUID()) {
-            ProvObjects::Entity                 E;
-            if(StorageService()->EntityDB().GetRecord("id",UUID,E)) {
-                if(!E.deviceConfiguration.empty()) {
-                    ProvObjects::DeviceConfiguration    C;
-                    for(const auto &i:E.deviceConfiguration) {
-                        if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
-                            if(C.deviceRules.firmwareUpgrade=="no") {
-                                Rules = ProvObjects::dont_upgrade;
-                                return false;
-                            }
-                            if(C.deviceRules.firmwareUpgrade=="yes") {
-                                if(C.deviceRules.rcOnly=="yes")
-                                    Rules = ProvObjects::upgrade_release_only;
-                                else
-                                    Rules = ProvObjects::upgrade_latest;
-                                return true;
-                            }
-                        }
-                    }
-                }
-                UUID = E.parent;
-            } else {
-                break;
-            }
-        }
-        Rules = Daemon()->FirmwareRules();
+    bool InventoryDB::EvaluateDeviceIDRules(const std::string &id, ProvObjects::DeviceRules &Rules) {
+        ProvObjects::InventoryTag T;
+        if(GetRecord("id", id, T))
+            return EvaluateDeviceRules(T,Rules);
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptionsForVenue(const std::string &VenueUUID, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
-        std::string UUID = VenueUUID;
-        while(!UUID.empty()) {
-            ProvObjects::Venue                 V;
-            if(StorageService()->VenueDB().GetRecord("id",UUID,V)) {
-                if(!V.deviceConfiguration.empty()) {
-                    ProvObjects::DeviceConfiguration    C;
-                    for(const auto &i:V.deviceConfiguration) {
-                        if(StorageService()->ConfigurationDB().GetRecord("id",i,C)) {
-                            if(C.deviceRules.firmwareUpgrade=="no") {
-                                Rules = ProvObjects::dont_upgrade;
-                                return false;
-                            }
-                            if(C.deviceRules.firmwareUpgrade=="yes") {
-                                if(C.deviceRules.rcOnly=="yes")
-                                    Rules = ProvObjects::upgrade_release_only;
-                                else
-                                    Rules = ProvObjects::upgrade_latest;
-                                return true;
-                            }
-                        }
-                    }
-                }
-                if(!V.entity.empty()) {
-                    return FindFirmwareOptionsForEntity(V.entity,Rules);
-                } else {
-                    UUID = V.parent;
-                }
-            } else {
-                break;
-            }
-        }
-        Rules = Daemon()->FirmwareRules();
+    bool InventoryDB::EvaluateDeviceSerialNumberRules(const std::string &serialNumber, ProvObjects::DeviceRules &Rules) {
+        ProvObjects::InventoryTag T;
+        if(GetRecord("serialNumber", serialNumber, T))
+            return EvaluateDeviceRules(T,Rules);
         return false;
     }
 
-    bool InventoryDB::FindFirmwareOptions(std::string &SerialNumber, ProvObjects::FIRMWARE_UPGRADE_RULES & Rules) {
-        ProvObjects::InventoryTag   T;
-        if(GetRecord("serialNumber",SerialNumber,T)) {
-            std::cout << "SerialNumber: " << SerialNumber << " found device." << std::endl;
-            //  if there is a local configuration, use this
-            if(!T.deviceConfiguration.empty()) {
-                ProvObjects::DeviceConfiguration    C;
-                if(StorageService()->ConfigurationDB().GetRecord("id",T.deviceConfiguration,C)) {
-                    if(C.deviceRules.firmwareUpgrade=="no") {
-                        Rules = ProvObjects::dont_upgrade;
-                        return false;
-                    }
-                    if(C.deviceRules.firmwareUpgrade=="yes") {
-                        if(C.deviceRules.rcOnly=="yes")
-                            Rules = ProvObjects::upgrade_release_only;
-                        else
-                            Rules = ProvObjects::upgrade_latest;
-                        return true;
-                    }
-                }
-            }
-
-            //  look at entity...
-            if(!T.entity.empty()) {
-                return FindFirmwareOptionsForEntity(T.entity,Rules);
-            }
-
-            if(!T.venue.empty()) {
-                return FindFirmwareOptionsForVenue(T.venue,Rules);
-            }
-            Rules = Daemon()->FirmwareRules();
-            return false;
-        }
-        Rules = ProvObjects::dont_upgrade;
-        return false;
+    bool InventoryDB::EvaluateDeviceRules(const ProvObjects::InventoryTag &T, ProvObjects::DeviceRules &Rules) {
+        Rules = T.deviceRules;
+        if(!T.venue.empty())
+            return StorageService()->VenueDB().EvaluateDeviceRules(T.venue,Rules);
+        if(!T.entity.empty())
+            return StorageService()->EntityDB().EvaluateDeviceRules(T.venue,Rules);
+        return Storage::ApplyConfigRules(Rules);
     }
 
     void InventoryDB::InitializeSerialCache() {
@@ -296,71 +214,17 @@ namespace OpenWifi {
         Iterate(F);
     }
 
-    bool InventoryDB::LookForRRMInEntity(const std::string &Entity) {
-        try {
-            ProvObjects::Entity  E;
-            if(StorageService()->EntityDB().GetRecord("id", Entity, E)) {
-                if(E.deviceRules.rrm == "inherit") {
-                    if(!E.parent.empty())
-                        return LookForRRMInEntity(E.parent);
-                    return false;
-                }
-                if(E.deviceRules.rrm=="no")
-                    return false;
-                return true;
-            }
-            return false;
-        } catch(...) {
-
-        }
-        return false;
-    }
-
-    bool InventoryDB::LookForRRMInVenue(const std::string &Venue) {
-        try {
-            ProvObjects::Venue  V;
-            if(StorageService()->VenueDB().GetRecord("id", Venue, V)) {
-                if(V.deviceRules.rrm == "inherit") {
-                    if(!V.parent.empty())
-                        return LookForRRMInVenue(V.parent);
-                    if(!V.entity.empty())
-                        return LookForRRMInEntity(V.entity);
-                    return false;
-                }
-                if(V.deviceRules.rrm=="no")
-                    return false;
-                return true;
-            }
-            return false;
-        } catch(...) {
-
-        }
-        return false;
-    }
-
-    bool InventoryDB::LookForRRM(const ProvObjects::InventoryTag &T) {
-        if(!T.venue.empty())
-            return LookForRRMInVenue(T.venue);
-        if(!T.entity.empty())
-            return LookForRRMInEntity(T.entity);
-        return false;
-    }
-
     bool InventoryDB::GetRRMDeviceList(Types::UUIDvec_t &DeviceList) {
         // get a local copy of the cache - this could be expensive.
         auto C = SerialNumberCache()->GetCacheCopy();
 
         for(const auto &i:C) {
-            std::string     SerialNumber = Utils::IntToSerialNumber(i);
             ProvObjects::InventoryTag   Tag;
-            if(StorageService()->InventoryDB().GetRecord("serialNumber",SerialNumber,Tag)) {
-                if(Tag.deviceRules.rrm=="no")
-                    continue;
-                if(Tag.deviceRules.rrm=="inherit") {
-                    if(!LookForRRM(Tag))
-                        continue;
-                }
-                DeviceList.push_back(SerialNumber);
+            ProvObjects::DeviceRules    Rules;
+            std::string     SerialNumber = Utils::IntToSerialNumber(i);
+            if(EvaluateDeviceSerialNumberRules(SerialNumber,Rules)) {
+                if(Rules.rrm=="yes")
+                    DeviceList.push_back(SerialNumber);
             }
         }
         return true;
