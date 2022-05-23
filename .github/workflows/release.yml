@@ -22,7 +22,7 @@ jobs:
           path: wlan-cloud-owprov
 
       - name: Build package
-        working-directory: wlan-cloud-owprov/chart
+        working-directory: wlan-cloud-owprov/helm
         run: |
           helm plugin install https://github.com/aslafy-z/helm-git --version 0.10.0
           helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -32,7 +32,7 @@ jobs:
           helm package . -d dist
 
       - name: Generate GitHub release body
-        working-directory: wlan-cloud-owprov/chart
+        working-directory: wlan-cloud-owprov/helm
         run: |
           pip3 install yq -q
           echo "Docker image - tip-tip-wlan-cloud-ucentral.jfrog.io/owprov:$GITHUB_REF_NAME" > release.txt
@@ -42,5 +42,5 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: wlan-cloud-owprov/chart/release.txt
-          files: wlan-cloud-owprov/chart/dist/*
+          body_path: wlan-cloud-owprov/helm/release.txt
+          files: wlan-cloud-owprov/helm/dist/*
