@@ -2768,7 +2768,7 @@ static json DefaultUCentralSchema = R"(
                 throw std::invalid_argument(value + " is not a valid port range: should an integer between 1-65535 or a port range like post-port.");
             } catch (...) {
             }
-            throw std::invalid_argument(value + " is not a valid URI: should be something like https://hello.world.com.");
+            throw std::invalid_argument(value + " is not a valid port range: should an integer between 1-65535 or a port range like post-port.");
         } else if(format == "ip") {
             if (IsIP(value))
                 return;
