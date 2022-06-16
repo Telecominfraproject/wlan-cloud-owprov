@@ -13,10 +13,15 @@
 
 namespace OpenWifi {
 
+<<<<<<< HEAD
     static const std::string GitUCentralJSONSchemaFile{
             "https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
+=======
+static const std::string GitUCentralJSONSchemaFile{
+	"https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
+>>>>>>> origin
 
-    static json DefaultUCentralSchema = R"(
+static json DefaultUCentralSchema = R"(
 
 {
 	"$id": "https://openwrt.org/ucentral.schema.json",
@@ -2623,7 +2628,9 @@ namespace OpenWifi {
     void ConfigurationValidator::Init() {
         if(Initialized_)
             return;
+
         std::string GitSchema;
+<<<<<<< HEAD
 
         if(MicroService::instance().ConfigGetBool("ucentral.datamodel.internal",true)) {
             RootSchema_ = DefaultUCentralSchema;
@@ -2633,6 +2640,17 @@ namespace OpenWifi {
 
         try {
             auto GitURI = MicroService::instance().ConfigGetString("ucentral.datamodel.uri",GitUCentralJSONSchemaFile);
+=======
+		if(MicroService::instance().ConfigGetBool("ucentral.datamodel.internal",true)) {
+			RootSchema_ = DefaultUCentralSchema;
+			Logger().information("Using uCentral validation from built-in default.");
+			Initialized_ = Working_ = true;
+			return;
+		}
+
+        try {
+			auto GitURI = MicroService::instance().ConfigGetString("ucentral.datamodel.uri",GitUCentralJSONSchemaFile);
+>>>>>>> origin
             if(Utils::wgets(GitURI, GitSchema)) {
                 RootSchema_ = json::parse(GitSchema);
                 Logger().information("Using uCentral validation schema from GIT.");
@@ -2699,6 +2717,17 @@ namespace OpenWifi {
         return IsCIDRv4(value) || IsCIDRv6(value);
     }
 
+    static inline bool IsPortRangeIsValid(const std::string &r) {
+        const auto ports = Poco::StringTokenizer("-",r,Poco::StringTokenizer::TOK_TRIM);
+
+        for(const auto &port:ports) {
+            uint32_t port_num = std::stoul(port);
+            if(port_num==0 || port_num>65535)
+                return false;
+        }
+        return true;
+    }
+
     void ConfigurationValidator::my_format_checker(const std::string &format, const std::string &value)
     {
         static const std::regex host_regex{"^(?=.{1,254}$)((?=[a-z0-9-]{1,63}\\.)(xn--+)?[a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,63}$"};
@@ -2749,6 +2778,14 @@ namespace OpenWifi {
             } catch (...) {
             }
             throw std::invalid_argument(value + " is not a valid URI: should be something like https://hello.world.com.");
+        } else if(format == "uc-portrange") {
+            try {
+                if(IsPortRangeIsValid(value))
+                    return;
+                throw std::invalid_argument(value + " is not a valid port range: should an integer between 1-65535 or a port range like post-port.");
+            } catch (...) {
+            }
+            throw std::invalid_argument(value + " is not a valid port range: should an integer between 1-65535 or a port range like post-port.");
         } else if(format == "ip") {
             if (IsIP(value))
                 return;
