@@ -13,13 +13,8 @@
 
 namespace OpenWifi {
 
-<<<<<<< HEAD
-    static const std::string GitUCentralJSONSchemaFile{
-            "https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
-=======
 static const std::string GitUCentralJSONSchemaFile{
-	"https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
->>>>>>> origin
+		"https://raw.githubusercontent.com/blogic/ucentral-schema/main/ucentral.schema.json"};
 
 static json DefaultUCentralSchema = R"(
 
@@ -2630,17 +2625,6 @@ static json DefaultUCentralSchema = R"(
             return;
 
         std::string GitSchema;
-<<<<<<< HEAD
-
-        if(MicroService::instance().ConfigGetBool("ucentral.datamodel.internal",true)) {
-            RootSchema_ = DefaultUCentralSchema;
-            Logger().information("Using uCentral validation from built-in default.");
-            return;
-        }
-
-        try {
-            auto GitURI = MicroService::instance().ConfigGetString("ucentral.datamodel.uri",GitUCentralJSONSchemaFile);
-=======
 		if(MicroService::instance().ConfigGetBool("ucentral.datamodel.internal",true)) {
 			RootSchema_ = DefaultUCentralSchema;
 			Logger().information("Using uCentral validation from built-in default.");
@@ -2650,7 +2634,6 @@ static json DefaultUCentralSchema = R"(
 
         try {
 			auto GitURI = MicroService::instance().ConfigGetString("ucentral.datamodel.uri",GitUCentralJSONSchemaFile);
->>>>>>> origin
             if(Utils::wgets(GitURI, GitSchema)) {
                 RootSchema_ = json::parse(GitSchema);
                 Logger().information("Using uCentral validation schema from GIT.");
