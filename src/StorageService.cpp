@@ -213,21 +213,45 @@ namespace OpenWifi {
             return true;
         };
 
-        auto FixEntityDevices = [&](const ProvObjects::Entity &E) -> bool {
+        auto FixEntity = [&](const ProvObjects::Entity &E) -> bool {
             Types::UUIDvec_t NewDevices;
+            bool Modified=false;
             for(const auto &device:E.devices) {
                 ProvObjects::InventoryTag T;
                 if(InventoryDB().GetRecord("id", device, T)) {
                     NewDevices.emplace_back(device);
                 } else {
-
+                    Modified=true;
                 }
             }
 
-            if(NewDevices!=E.devices) {
+            Types::UUIDvec_t NewContacts;
+            for(const auto &contact:E.contacts) {
+                ProvObjects::Contact C;
+                if(ContactDB().GetRecord("id", contact, C)) {
+                    NewContacts.emplace_back(contact);
+                } else {
+                    Modified=true;
+                }
+            }
+
+            Types::UUIDvec_t NewLocations;
+            for(const auto &location:E.locations) {
+                ProvObjects::Location L;
+                if(LocationDB().GetRecord("id", location, L)) {
+                    NewLocations.emplace_back(location);
+                } else {
+                    Modified=true;
+                }
+            }
+
+            if(Modified)
+            {
                 Logger().warning(fmt::format("  fixing entity: {}",E.info.name));
                 ProvObjects::Entity NewEntity = E;
                 NewEntity.devices = NewDevices;
+                NewEntity.contacts = NewContacts;
+                NewEntity.locations = NewLocations;
                 EntityDB().UpdateRecord("id", E.info.id, NewEntity);
             }
             return true;
@@ -236,7 +260,7 @@ namespace OpenWifi {
         Logger().information("Checking DB consistency: venues");
         VenueDB().Iterate(FixVenueDevices);
         Logger().information("Checking DB consistency: entities");
-        EntityDB().Iterate(FixEntityDevices);
+        EntityDB().Iterate(FixEntity);
 
     }
 
