@@ -245,6 +245,26 @@ namespace OpenWifi {
                 }
             }
 
+            Types::UUIDvec_t NewVenues;
+            for(const auto &venue:E.venues) {
+                ProvObjects::Venue V;
+                if(VenueDB().GetRecord("id", venue, V)) {
+                    NewVenues.emplace_back(venue);
+                } else {
+                    Modified=true;
+                }
+            }
+
+            Types::UUIDvec_t NewVariables;
+            for(const auto &variable:E.variables) {
+                ProvObjects::VariableBlock V;
+                if(VariablesDB().GetRecord("id", variable, V)) {
+                    NewVariables.emplace_back(variable);
+                } else {
+                    Modified=true;
+                }
+            }
+
             if(Modified)
             {
                 Logger().warning(fmt::format("  fixing entity: {}",E.info.name));
@@ -252,6 +272,8 @@ namespace OpenWifi {
                 NewEntity.devices = NewDevices;
                 NewEntity.contacts = NewContacts;
                 NewEntity.locations = NewLocations;
+                NewEntity.venues = NewVenues;
+                NewEntity.variables = NewVariables;
                 EntityDB().UpdateRecord("id", E.info.id, NewEntity);
             }
             return true;
