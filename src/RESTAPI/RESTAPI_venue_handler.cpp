@@ -27,6 +27,7 @@ namespace OpenWifi{
             for (const auto &i: V.children) {
                 ProvObjects::Venue V2;
                 if (StorageService()->VenueDB().GetRecord("id", i, V2)) {
+                    std::copy(V2.devices.begin(),V2.devices.end(),std::back_inserter(R));
                     auto LowerDevs = GetDevices(V2, GetChildren);
                     std::copy(LowerDevs.begin(), LowerDevs.end(), std::back_inserter(R));
                 }
