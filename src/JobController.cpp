@@ -27,7 +27,7 @@ namespace OpenWifi {
 
     void JobController::run() {
         Running_ = true ;
-
+        Utils::SetThreadName("job-controller");
         while(Running_) {
             Poco::Thread::trySleep(2000);
         }

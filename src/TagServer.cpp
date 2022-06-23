@@ -21,7 +21,7 @@ namespace OpenWifi {
     }
 
     void TagServer::run() {
-
+        Utils::SetThreadName("tag-server");
     }
 
 }
