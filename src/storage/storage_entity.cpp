@@ -96,40 +96,42 @@ namespace OpenWifi {
     void EntityDB::AddVenues(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Venue E;
         // std::cout << "Adding venue:" << Node << std::endl;
-        StorageService()->VenueDB().GetRecord("id",Node,E);
-        Poco::JSON::Array   Venues;
-        for(const auto &i:E.children) {
-            Poco::JSON::Object Venue;
-            AddVenues(Venue, i);
-            Venues.add(Venue);
+        if(StorageService()->VenueDB().GetRecord("id",Node,E)) {
+            Poco::JSON::Array Venues;
+            for (const auto &i: E.children) {
+                Poco::JSON::Object Venue;
+                AddVenues(Venue, i);
+                Venues.add(Venue);
+            }
+            Tree.set("type", "venue");
+            Tree.set("name", E.info.name);
+            Tree.set("uuid", E.info.id);
+            Tree.set("children", Venues);
         }
-        Tree.set("type","venue");
-        Tree.set("name",E.info.name);
-        Tree.set("uuid",E.info.id);
-        Tree.set("children",Venues);
     }
 
     void EntityDB::BuildTree(Poco::JSON::Object &Tree, const std::string & Node) {
         ProvObjects::Entity E;
         // std::cout << "Adding node:" << Node << std::endl;
-        StorageService()->EntityDB().GetRecord("id",Node,E);
-        Poco::JSON::Array   Children;
-        for(const auto &i:E.children) {
-            Poco::JSON::Object  Child;
-            BuildTree(Child,i);
-            Children.add(Child);
+        if(StorageService()->EntityDB().GetRecord("id",Node,E)) {
+            Poco::JSON::Array Children;
+            for (const auto &i: E.children) {
+                Poco::JSON::Object Child;
+                BuildTree(Child, i);
+                Children.add(Child);
+            }
+            Poco::JSON::Array Venues;
+            for (const auto &i: E.venues) {
+                Poco::JSON::Object Venue;
+                AddVenues(Venue, i);
+                Venues.add(Venue);
+            }
+            Tree.set("type", "entity");
+            Tree.set("name", E.info.name);
+            Tree.set("uuid", E.info.id);
+            Tree.set("children", Children);
+            Tree.set("venues", Venues);
         }
-        Poco::JSON::Array   Venues;
-        for(const auto &i:E.venues) {
-            Poco::JSON::Object Venue;
-            AddVenues(Venue, i);
-            Venues.add(Venue);
-        }
-        Tree.set("type","entity");
-        Tree.set("name",E.info.name);
-        Tree.set("uuid",E.info.id);
-        Tree.set("children",Children);
-        Tree.set("venues", Venues);
     }
 
     void EntityDB::ImportVenues(const Poco::JSON::Object::Ptr &O, const std::string &Parent) {
