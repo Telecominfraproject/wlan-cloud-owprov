@@ -5,7 +5,7 @@ if [ "$SELFSIGNED_CERTS" = 'true' ]; then
     update-ca-certificates
 fi
 
-if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWPROV_CONFIG"/owprov.properties ]]; then
+if [[ "$TEMPLATE_CONFIG" = 'true' ]]; then
   RESTAPI_HOST_ROOTCA=${RESTAPI_HOST_ROOTCA:-"\$OWPROV_ROOT/certs/restapi-ca.pem"} \
   RESTAPI_HOST_PORT=${RESTAPI_HOST_PORT:-"16005"} \
   RESTAPI_HOST_CERT=${RESTAPI_HOST_CERT:-"\$OWPROV_ROOT/certs/restapi-cert.pem"} \
