@@ -42,6 +42,7 @@ namespace OpenWifi {
 
     void Signup::run() {
         Running_ = true;
+        Utils::SetThreadName("signup-mgr");
         while(Running_) {
             Poco::Thread::trySleep(5000);
 

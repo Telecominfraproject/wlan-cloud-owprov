@@ -105,6 +105,7 @@ namespace OpenWifi {
     }
 
     void Storage::onTimer([[maybe_unused]] Poco::Timer &timer) {
+        Utils::SetThreadName("strg-janitor");
     }
 
     void Storage::Stop() {

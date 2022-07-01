@@ -78,6 +78,8 @@ namespace OpenWifi {
 
         inline void run() final {
 
+            Utils::SetThreadName("venue-reboot");
+
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
@@ -170,6 +172,9 @@ namespace OpenWifi {
             WebSocketClientNotificationVenueRebootCompletionToUser(UI_.email,N);
             Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
                                              JobId_, rebooted_ ,failed_));
+
+            Utils::SetThreadName("free");
+
             delete this;
         }
     };

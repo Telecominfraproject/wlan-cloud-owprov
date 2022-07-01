@@ -26,6 +26,7 @@ namespace OpenWifi {
 
     void AutoDiscovery::run() {
         Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
+        Utils::SetThreadName("auto-discovery");
         while(Note && Running_) {
             auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
             if(Msg!= nullptr) {
