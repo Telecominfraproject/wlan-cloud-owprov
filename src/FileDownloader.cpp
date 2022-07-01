@@ -26,6 +26,8 @@ namespace OpenWifi {
                 {"https://ucentral.io/ucentral.schema.pretty.json", "ucentral.schema.pretty.json" }
             };
 
+        Utils::SetThreadName("file-dmnldr");
+
         for(const auto &[url,filename]:Files) {
             try {
                 std::string FileContent;

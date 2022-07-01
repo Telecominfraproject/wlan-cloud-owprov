@@ -99,6 +99,8 @@ namespace OpenWifi {
 
         inline void run() final {
 
+            Utils::SetThreadName("venue-upgr");
+
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
 
@@ -194,6 +196,8 @@ namespace OpenWifi {
             WebSocketClientNotificationVenueRebootCompletionToUser(UI_.email,N);
             Logger().information(fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
                                              JobId_, upgraded_ ,failed_));
+            Utils::SetThreadName("free");
+
             delete this;
         }
     };

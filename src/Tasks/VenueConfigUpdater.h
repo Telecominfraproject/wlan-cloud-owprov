@@ -37,6 +37,7 @@ namespace OpenWifi {
         void run() final {
             ProvObjects::InventoryTag   Device;
             started_=true;
+            Utils::SetThreadName("venue-cfg");
             if(StorageService()->InventoryDB().GetRecord("id",uuid_,Device)) {
                 SerialNumber = Device.serialNumber;
                 // std::cout << "Starting push for " << Device.serialNumber << std::endl;
@@ -66,6 +67,7 @@ namespace OpenWifi {
             }
             done_ = true;
             // std::cout << "Done push for " << Device.serialNumber << std::endl;
+            Utils::SetThreadName("free");
         }
 
         uint64_t        updated_=0, failed_=0, bad_config_=0;
@@ -109,6 +111,8 @@ namespace OpenWifi {
         inline Poco::Logger & Logger() { return Logger_; }
 
         inline void run() final {
+
+            Utils::SetThreadName("venue-update");
 
             if(When_ && When_>OpenWifi::Now())
                 Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
@@ -206,6 +210,8 @@ namespace OpenWifi {
             WebSocketClientNotificationVenueUpdateJobCompletionToUser(UI_.email, N);
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
                                              JobId_, Updated ,Failed, BadConfigs));
+            Utils::SetThreadName("free");
+
             delete this;
         }
     };
