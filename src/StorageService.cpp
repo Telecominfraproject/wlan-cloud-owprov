@@ -280,11 +280,43 @@ namespace OpenWifi {
             return true;
         };
 
+        auto FixInventory = [&](const ProvObjects::InventoryTag &T) -> bool {
+            // check the venue/entity for this device.
+            ProvObjects::InventoryTag   NewTag{T};
+            bool modified=false;
+            if(!T.venue.empty() && !VenueDB().Exists("id",T.venue)) {
+                NewTag.venue.clear();
+                modified=true;
+            }
+
+            if(!T.entity.empty() && !EntityDB().Exists("id",T.entity)) {
+                NewTag.entity.clear();
+                modified=true;
+            }
+
+            if(!T.location.empty() && !LocationDB().Exists("id",T.location)) {
+                NewTag.location.clear();
+                modified=true;
+            }
+
+            if(!T.contact.empty() && !ContactDB().Exists("id",T.contact)) {
+                NewTag.contact.clear();
+                modified=true;
+            }
+
+            if(modified) {
+                Logger().warning(fmt::format("  fixing entity: {}",T.info.name));
+                InventoryDB().UpdateRecord("id", T.info.id, NewTag);
+            }
+            return true;
+        };
+
         Logger().information("Checking DB consistency: venues");
         VenueDB().Iterate(FixVenueDevices);
         Logger().information("Checking DB consistency: entities");
         EntityDB().Iterate(FixEntity);
-
+        Logger().information("Checking DB consistency: inventory");
+        InventoryDB().Iterate(FixInventory);
     }
 
     void Storage::InitializeSystemDBs() {
