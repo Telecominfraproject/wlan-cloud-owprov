@@ -37,6 +37,7 @@ namespace OpenWifi {
                 if(job!=nullptr) {
                     if(job->Started()==0 && Pool_.used()<Pool_.available()) {
                         std::cout << "Starting: " << job->Name() << "    ID:" << job->JobId() << std::endl;
+                        job->Logger().information(fmt::format("Starting {}: {}",job->JobId(),job->Name());
                         job->Start();
                         Pool_.start(*job);
                     }
@@ -47,6 +48,7 @@ namespace OpenWifi {
                 if(*it!=nullptr && (*it)->Completed()!=0) {
                     auto tmp = it;
                     it = jobs_.erase(it);
+                    std::cout << "Completed: " << (*it)->Name() << "    ID:" << (*it)->JobId() << std::endl;
                     delete *tmp;
                 } else {
                     ++it;
