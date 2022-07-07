@@ -265,7 +265,7 @@ namespace OpenWifi{
             SNL.serialNumbers = Existing.devices;
             auto JobId = MicroService::instance().CreateUUID();
             Types::StringVec Parameters{UUID};;
-            auto NewJob = new VenueRebooter(JobId,"VenueFirmwareUpgrade", Parameters, 0, UserInfo_.userinfo, Logger());
+            auto NewJob = new VenueRebooter(JobId,"VenueRebooter", Parameters, 0, UserInfo_.userinfo, Logger());
             std::cout << "Adding new job" << std::endl;
             JobController()->AddJob(dynamic_cast<Job*>(NewJob));
             std::cout << "Job added" << std::endl;
