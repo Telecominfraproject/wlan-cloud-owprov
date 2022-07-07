@@ -246,9 +246,12 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-
-            auto Task = new VenueUpgrade(UUID,UserInfo_.userinfo,0,Logger());
-            auto JobId = Task->Start();
+            auto JobId = MicroService::instance().CreateUUID();
+            Types::StringVec Parameters{UUID};;
+            auto NewJob = new VenueUpgrade(JobId,"VenueFirmwareUpgrade", Parameters, 0, UserInfo_.userinfo, Logger());
+            std::cout << "Adding new job" << std::endl;
+            JobController()->AddJob(dynamic_cast<Job*>(NewJob));
+            std::cout << "Job added" << std::endl;
 
             SNL.to_json(Answer);
             Answer.set("jobId",JobId);
@@ -260,9 +263,12 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-
-            auto Task = new VenueRebooter(UUID,UserInfo_.userinfo,0,Logger());
-            auto JobId = Task->Start();
+            auto JobId = MicroService::instance().CreateUUID();
+            Types::StringVec Parameters{UUID};;
+            auto NewJob = new VenueRebooter(JobId,"VenueFirmwareUpgrade", Parameters, 0, UserInfo_.userinfo, Logger());
+            std::cout << "Adding new job" << std::endl;
+            JobController()->AddJob(dynamic_cast<Job*>(NewJob));
+            std::cout << "Job added" << std::endl;
 
             SNL.to_json(Answer);
             Answer.set("jobId",JobId);

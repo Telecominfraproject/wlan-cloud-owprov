@@ -33,12 +33,9 @@ namespace OpenWifi {
 
             std::lock_guard G(Mutex_);
 
-            std::cout << jobs_.size() << " jobs in queue." << std::endl;
-
             for(auto &job:jobs_) {
                 if(job!=nullptr) {
                     if(job->Started()==0 && Pool_.used()<Pool_.available()) {
-                        std::cout << "Starting: " << job->Name() << "    ID:" << job->JobId() << std::endl;
                         job->Logger().information(fmt::format("Starting {}: {}",job->JobId(),job->Name()));
                         job->Start();
                         Pool_.start(*job);
@@ -46,11 +43,10 @@ namespace OpenWifi {
                 }
             }
 
-            std::cout << Pool_.used() << " jobs running. Max jobs: " << Pool_.available() << std::endl;
             for(auto it = jobs_.begin(); it!=jobs_.end();) {
                 if(*it!=nullptr && (*it)->Completed()!=0) {
                     auto tmp = it;
-                    std::cout << "Completed: " << (*it)->Name() << "    ID:" << (*it)->JobId() << std::endl;
+                    (*it)->Logger().information(fmt::format("Completed {}: {}",(*it)->JobId(),(*it)->Name()));
                     it = jobs_.erase(it);
                     delete *tmp;
                 } else {
