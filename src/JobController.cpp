@@ -46,6 +46,7 @@ namespace OpenWifi {
                 }
             }
 
+            std::cout << Pool_.used() << " jobs running. Max jobs: " << Pool_.available() << std::endl;
             for(auto it = jobs_.begin(); it!=jobs_.end();) {
                 if(*it!=nullptr && (*it)->Completed()!=0) {
                     auto tmp = it;
