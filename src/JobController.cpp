@@ -33,6 +33,8 @@ namespace OpenWifi {
 
             std::lock_guard G(Mutex_);
 
+            std::cout << jobs_.size() << " jobs in queue." << std::endl;
+
             for(auto &job:jobs_) {
                 if(job!=nullptr) {
                     if(job->Started()==0 && Pool_.used()<Pool_.available()) {
