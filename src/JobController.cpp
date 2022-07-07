@@ -47,8 +47,8 @@ namespace OpenWifi {
             for(auto it = jobs_.begin(); it!=jobs_.end();) {
                 if(*it!=nullptr && (*it)->Completed()!=0) {
                     auto tmp = it;
-                    it = jobs_.erase(it);
                     std::cout << "Completed: " << (*it)->Name() << "    ID:" << (*it)->JobId() << std::endl;
+                    it = jobs_.erase(it);
                     delete *tmp;
                 } else {
                     ++it;
