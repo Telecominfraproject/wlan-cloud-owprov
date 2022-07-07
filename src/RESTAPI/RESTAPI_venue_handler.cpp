@@ -228,10 +228,10 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-
-            auto Task = new VenueConfigUpdater(UUID,UserInfo_.userinfo,0,Logger());
-            auto JobId = Task->Start();
-
+            auto JobId = MicroService::instance().CreateUUID();
+            Types::StringVec Parameters{UUID};;
+            auto NewJob = new VenueConfigUpdater(JobId,"VenueConfigurationUpdater", Parameters, 0, UserInfo_.userinfo, Logger());
+            JobController()->AddJob(dynamic_cast<Job*>(NewJob));
             SNL.to_json(Answer);
             Answer.set("jobId",JobId);
             return ReturnObject(Answer);

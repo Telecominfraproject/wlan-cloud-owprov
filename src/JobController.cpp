@@ -30,6 +30,28 @@ namespace OpenWifi {
         Utils::SetThreadName("job-controller");
         while(Running_) {
             Poco::Thread::trySleep(2000);
+
+            std::lock_guard G(Mutex_);
+
+            for(auto &job:jobs_) {
+                if(job!=nullptr) {
+                    if(job->Started()==0 && Pool_.used()<Pool_.available()) {
+                        std::cout << "Starting: " << job->Name() << "    ID:" << job->JobId() << std::endl;
+                        job->Start();
+                        Pool_.start(*job);
+                    }
+                }
+            }
+
+            for(auto it = jobs_.begin(); it!=jobs_.end();) {
+                if(*it!=nullptr && (*it)->Completed()!=0) {
+                    auto tmp = it;
+                    it = jobs_.erase(it);
+                    delete *tmp;
+                } else {
+                    ++it;
+                }
+            }
         }
 
     }
