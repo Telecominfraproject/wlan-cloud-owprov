@@ -11,6 +11,7 @@
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
 #include "sdks/SDK_fms.h"
+#include "JobController.h"
 
 namespace OpenWifi {
     class VenueDeviceUpgrade : public Poco::Runnable {
@@ -69,44 +70,19 @@ namespace OpenWifi {
         inline Poco::Logger & Logger() { return Logger_; }
     };
 
-    class VenueUpgrade: public Poco::Runnable {
+    class VenueUpgrade: public Job {
     public:
-        explicit VenueUpgrade(const std::string & VenueUUID, const SecurityObjects::UserInfo &UI, uint64_t When, Poco::Logger &L) :
-                VenueUUID_(VenueUUID),
-                UI_(UI),
-                When_(When),
-                Logger_(L)
-        {
+        VenueUpgrade(const std::string &JobID, const std::string &name, const std::vector<std::string> & parameters, uint64_t when, const SecurityObjects::UserInfo &UI, Poco::Logger &L) :
+                Job(JobID, name, parameters, when, UI, L) {
 
         }
 
-        inline std::string Start() {
-            JobId_ = MicroService::CreateUUID();
-            Worker_.start(*this);
-            return JobId_;
-        }
-
-    private:
-        std::string                 VenueUUID_;
-        SecurityObjects::UserInfo   UI_;
-        uint64_t                    When_;
-        Poco::Logger                &Logger_;
-        Poco::Thread                Worker_;
-        std::string                 JobId_;
-        Poco::ThreadPool            Pool_{2,16,300};
-
-        inline Poco::Logger & Logger() { return Logger_; }
-
-        inline void run() final {
+        inline virtual void run() final {
 
             Utils::SetThreadName("venue-upgr");
-
-            if(When_ && When_>OpenWifi::Now())
-                Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
+            auto VenueUUID_ = Parameter(0);
 
             WebSocketClientNotificationVenueRebootList_t        N;
-
-            Logger().information(fmt::format("Job {} Starting.", JobId_));
 
             ProvObjects::Venue  Venue;
             uint64_t upgraded_ = 0, failed_ = 0;
@@ -118,7 +94,7 @@ namespace OpenWifi {
                 };
 
                 N.content.title = fmt::format("Upgrading {} devices.", Venue.info.name);
-                N.content.jobId = JobId_;
+                N.content.jobId = JobId();
 
                 std::array<tState,MaxThreads> Tasks;
                 ProvObjects::DeviceRules    Rules;
@@ -186,19 +162,19 @@ namespace OpenWifi {
                 }
 
                 N.content.details = fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
-                                                JobId_, upgraded_ ,failed_);
+                                                JobId(), upgraded_ ,failed_);
 
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
                 Logger().warning(N.content.details);
             }
 
-            WebSocketClientNotificationVenueRebootCompletionToUser(UI_.email,N);
+            WebSocketClientNotificationVenueRebootCompletionToUser(UserInfo().email,N);
             Logger().information(fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
-                                             JobId_, upgraded_ ,failed_));
+                                             JobId(), upgraded_ ,failed_));
             Utils::SetThreadName("free");
 
-            delete this;
+            Complete();
         }
     };
 }
