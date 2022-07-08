@@ -60,9 +60,7 @@ namespace OpenWifi {
 
             void AddJob( Job* newJob ) {
                 std::lock_guard G(Mutex_);
-
                 jobs_.push_back(newJob);
-
             }
 
         private:
