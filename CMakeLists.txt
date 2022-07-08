@@ -125,7 +125,6 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_db_helpers.h
         src/JobController.cpp src/JobController.h
         src/JobRegistrations.cpp
-        src/storage/storage_jobs.cpp src/storage/storage_jobs.h
         src/storage/storage_maps.cpp src/storage/storage_maps.h
         src/RESTAPI/RESTAPI_map_handler.cpp src/RESTAPI/RESTAPI_map_handler.h
         src/RESTAPI/RESTAPI_map_list_handler.cpp src/RESTAPI/RESTAPI_map_list_handler.h

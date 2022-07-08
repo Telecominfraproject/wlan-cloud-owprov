@@ -9,6 +9,7 @@
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
 #include "framework/WebSocketClientNotifications.h"
+#include "JobController.h"
 
 namespace OpenWifi {
 
@@ -82,44 +83,20 @@ namespace OpenWifi {
         inline Poco::Logger & Logger() { return Logger_; }
     };
 
-    class VenueConfigUpdater: public Poco::Runnable {
+    class VenueConfigUpdater: public Job {
     public:
-        explicit VenueConfigUpdater(const std::string & VenueUUID, const SecurityObjects::UserInfo &UI, uint64_t When, Poco::Logger &L) :
-            VenueUUID_(VenueUUID),
-            UI_(UI),
-            When_(When),
-            Logger_(L)
-        {
+        VenueConfigUpdater(const std::string &JobID, const std::string &name, const std::vector<std::string> & parameters, uint64_t when, const SecurityObjects::UserInfo &UI, Poco::Logger &L) :
+                Job(JobID, name, parameters, when, UI, L) {
 
         }
 
-        inline std::string Start() {
-            JobId_ = MicroService::CreateUUID();
-            Worker_.start(*this);
-            return JobId_;
-        }
-
-    private:
-        std::string                 VenueUUID_;
-        SecurityObjects::UserInfo   UI_;
-        uint64_t                    When_;
-        Poco::Logger                &Logger_;
-        Poco::Thread                Worker_;
-        std::string                 JobId_;
-        Poco::ThreadPool            Pool_{2,16,300};
-
-        inline Poco::Logger & Logger() { return Logger_; }
-
-        inline void run() final {
+        inline virtual void run() {
+            std::string                 VenueUUID_;
 
             Utils::SetThreadName("venue-update");
-
-            if(When_ && When_>OpenWifi::Now())
-                Poco::Thread::trySleep( (long) (When_ - OpenWifi::Now()) * 1000 );
+            VenueUUID_ = Parameter(0);
 
             WebSocketNotification<WebSocketNotificationJobContent> N;
-
-            Logger().information(fmt::format("Job {} Starting.", JobId_));
 
             ProvObjects::Venue  Venue;
             uint64_t Updated = 0, Failed = 0 , BadConfigs = 0 ;
@@ -131,7 +108,7 @@ namespace OpenWifi {
                 };
 
                 N.content.title = fmt::format("Updating {} configurations", Venue.info.name);
-                N.content.jobId = JobId_;
+                N.content.jobId = JobId();
 
                 std::array<tState,MaxThreads> Tasks;
 
@@ -200,19 +177,18 @@ namespace OpenWifi {
                 }
 
                 N.content.details = fmt::format("Job {} Completed: {} updated, {} failed to update, {} bad configurations. ",
-                                                JobId_, Updated ,Failed, BadConfigs);
+                                                JobId(), Updated ,Failed, BadConfigs);
 
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
                 Logger().warning(N.content.details);
             }
 
-            WebSocketClientNotificationVenueUpdateJobCompletionToUser(UI_.email, N);
+            WebSocketClientNotificationVenueUpdateJobCompletionToUser(UserInfo().email, N);
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
-                                             JobId_, Updated ,Failed, BadConfigs));
+                                             JobId(), Updated ,Failed, BadConfigs));
             Utils::SetThreadName("free");
-
-            delete this;
+            Complete();
         }
     };
 
