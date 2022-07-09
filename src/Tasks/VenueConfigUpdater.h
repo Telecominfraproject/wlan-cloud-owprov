@@ -45,25 +45,30 @@ namespace OpenWifi {
                 Logger().debug(fmt::format("{}: Computing configuration.",Device.serialNumber));
                 auto DeviceConfig = std::make_shared<APConfig>(Device.serialNumber, Device.deviceType, Logger(), false);
                 auto Configuration = Poco::makeShared<Poco::JSON::Object>();
-                if (DeviceConfig->Get(Configuration)) {
-                    std::ostringstream OS;
-                    Configuration->stringify(OS);
-                    auto Response=Poco::makeShared<Poco::JSON::Object>();
-                    Logger().debug(fmt::format("{}: Pushing configuration.",Device.serialNumber));
-                    if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
-                        Logger().debug(fmt::format("{}: Configuration pushed.",Device.serialNumber));
-                        Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
-                        // std::cout << Device.serialNumber << ": Updated" << std::endl;
-                        updated_++;
+                try {
+                    if (DeviceConfig->Get(Configuration)) {
+                        std::ostringstream OS;
+                        Configuration->stringify(OS);
+                        auto Response = Poco::makeShared<Poco::JSON::Object>();
+                        Logger().debug(fmt::format("{}: Pushing configuration.", Device.serialNumber));
+                        if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
+                            Logger().debug(fmt::format("{}: Configuration pushed.", Device.serialNumber));
+                            Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
+                            // std::cout << Device.serialNumber << ": Updated" << std::endl;
+                            updated_++;
+                        } else {
+                            Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
+                            // std::cout << Device.serialNumber << ": Failed" << std::endl;
+                            failed_++;
+                        }
                     } else {
-                        Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
-                        // std::cout << Device.serialNumber << ": Failed" << std::endl;
-                        failed_++;
+                        Logger().debug(fmt::format("{}: Configuration is bad.", Device.serialNumber));
+                        bad_config_++;
+                        // std::cout << Device.serialNumber << ": Bad config" << std::endl;
                     }
-                } else {
-                    Logger().debug(fmt::format("{}: Configuration is bad.",Device.serialNumber));
+                } catch (...) {
+                    Logger().debug(fmt::format("{}: Configuration is bad (caused an exception).", Device.serialNumber));
                     bad_config_++;
-                    // std::cout << Device.serialNumber << ": Bad config" << std::endl;
                 }
             }
             done_ = true;

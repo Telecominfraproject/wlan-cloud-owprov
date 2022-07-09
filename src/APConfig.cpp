@@ -153,60 +153,62 @@ namespace OpenWifi {
             }
         }
 
-        std::set<std::string>   Sections;
-        for(const auto &i:Config_) {
-            Poco::JSON::Parser  P;
-            auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
-            auto Names = O->getNames();
-            for(const auto &SectionName:Names) {
-                auto InsertInfo = Sections.insert(SectionName);
-                if (InsertInfo.second) {
-                    if (O->isArray(SectionName)) {
-                        auto OriginalArray = O->getArray(SectionName);
-                        if (Explain_) {
-                            Poco::JSON::Object ExObj;
-                            ExObj.set("from-uuid", i.info.id);
-                            ExObj.set("from-name", i.info.name);
-                            ExObj.set("action", "added");
-                            ExObj.set("element", OriginalArray);
-                            Explanation_.add(ExObj);
+        try {
+            std::set<std::string> Sections;
+            for (const auto &i: Config_) {
+                Poco::JSON::Parser P;
+                auto O = P.parse(i.element.configuration).extract<Poco::JSON::Object::Ptr>();
+                auto Names = O->getNames();
+                for (const auto &SectionName: Names) {
+                    auto InsertInfo = Sections.insert(SectionName);
+                    if (InsertInfo.second) {
+                        if (O->isArray(SectionName)) {
+                            auto OriginalArray = O->getArray(SectionName);
+                            if (Explain_) {
+                                Poco::JSON::Object ExObj;
+                                ExObj.set("from-uuid", i.info.id);
+                                ExObj.set("from-name", i.info.name);
+                                ExObj.set("action", "added");
+                                ExObj.set("element", OriginalArray);
+                                Explanation_.add(ExObj);
+                            }
+                            auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
+                            ReplaceVariablesInArray(OriginalArray, ExpandedArray);
+                            Configuration->set(SectionName, ExpandedArray);
+                        } else if (O->isObject(SectionName)) {
+                            auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
+                            if (Explain_) {
+                                Poco::JSON::Object ExObj;
+                                ExObj.set("from-uuid", i.info.id);
+                                ExObj.set("from-name", i.info.name);
+                                ExObj.set("action", "added");
+                                ExObj.set("element", OriginalSection);
+                                Explanation_.add(ExObj);
+                            }
+                            auto ExpandedSection = Poco::makeShared<Poco::JSON::Object>();
+                            ReplaceVariablesInObject(OriginalSection, ExpandedSection);
+                            Configuration->set(SectionName, ExpandedSection);
+                        } else {
+                            std::cout << " --- unknown element type --- " << O->get(SectionName).toString()
+                                      << std::endl;
                         }
-                        auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
-                        ReplaceVariablesInArray(OriginalArray, ExpandedArray);
-                        Configuration->set(SectionName, ExpandedArray);
-                    } else if (O->isObject(SectionName)) {
-                        auto OriginalSection = O->get(SectionName).extract<Poco::JSON::Object::Ptr>();
-                        if (Explain_) {
-                            Poco::JSON::Object ExObj;
-                            ExObj.set("from-uuid", i.info.id);
-                            ExObj.set("from-name", i.info.name);
-                            ExObj.set("action", "added");
-                            ExObj.set("element", OriginalSection);
-                            Explanation_.add(ExObj);
-                        }
-                        auto ExpandedSection = Poco::makeShared<Poco::JSON::Object>();
-                        ReplaceVariablesInObject(OriginalSection, ExpandedSection);
-                        Configuration->set(SectionName, ExpandedSection);
                     } else {
-                        std::cout << " --- unknown element type --- " << O->get(SectionName).toString() << std::endl;
-                    }
-                } else {
-                    if (Explain_) {
-                        Poco::JSON::Object ExObj;
-                        ExObj.set("from-uuid", i.info.id);
-                        ExObj.set("from-name", i.info.name);
-                        ExObj.set("action", "ignored");
-                        ExObj.set("reason", "weight insufficient");
-                        ExObj.set("element", O->get(SectionName));
-                        Explanation_.add(ExObj);
+                        if (Explain_) {
+                            Poco::JSON::Object ExObj;
+                            ExObj.set("from-uuid", i.info.id);
+                            ExObj.set("from-name", i.info.name);
+                            ExObj.set("action", "ignored");
+                            ExObj.set("reason", "weight insufficient");
+                            ExObj.set("element", O->get(SectionName));
+                            Explanation_.add(ExObj);
+                        }
                     }
                 }
             }
-        }
-        if(Config_.empty())
-            return false;
+        } catch (...) {
 
-        return true;
+        }
+        return !Config_.empty();
     }
 
     static bool DeviceTypeMatch(const std::string &DeviceType, const Types::StringVec & Types) {
