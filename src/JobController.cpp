@@ -33,22 +33,22 @@ namespace OpenWifi {
 
             std::lock_guard G(Mutex_);
 
-            for(auto &job:jobs_) {
-                if(job!=nullptr) {
-                    if(job->Started()==0 && Pool_.used()<Pool_.available()) {
-                        job->Logger().information(fmt::format("Starting {}: {}",job->JobId(),job->Name()));
-                        job->Start();
-                        Pool_.start(*job);
+            for(auto &current_job:jobs_) {
+                if(current_job!=nullptr) {
+                    if(current_job->Started()==0 && Pool_.used()<Pool_.available()) {
+                        current_job->Logger().information(fmt::format("Starting {}: {}",current_job->JobId(),current_job->Name()));
+                        current_job->Start();
+                        Pool_.start(*current_job);
                     }
                 }
             }
 
-            for(auto it = jobs_.begin(); it!=jobs_.end();) {
-                if(*it!=nullptr && (*it)->Completed()!=0) {
-                    auto tmp = it;
-                    (*it)->Logger().information(fmt::format("Completed {}: {}",(*it)->JobId(),(*it)->Name()));
+            for(auto it = jobs_.begin(); it!=jobs_.end();) {\
+                auto current_job = *it;
+                if(current_job!=nullptr && current_job->Completed()!=0) {
+                    current_job->Logger().information(fmt::format("Completed {}: {}",current_job->JobId(),current_job->Name()));
                     it = jobs_.erase(it);
-                    delete *tmp;
+                    delete current_job;
                 } else {
                     ++it;
                 }
