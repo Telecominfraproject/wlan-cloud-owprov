@@ -20,8 +20,6 @@ namespace OpenWifi {
                 auto Status = Results->get("status").extract<Poco::JSON::Object::Ptr>();
                 auto Rejected = Status->getArray("rejected");
                 std::transform(Rejected->begin(),Rejected->end(),std::back_inserter(Warnings), [](auto i) -> auto { return i.toString(); });
-//                for(const auto &i:*Rejected)
-                //                  Warnings.push_back(i.toString());
             }
         } catch (...) {
         }
@@ -106,78 +104,66 @@ namespace OpenWifi {
             ProvObjects::Venue  Venue;
             uint64_t Updated = 0, Failed = 0 , BadConfigs = 0 ;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
-                const std::size_t MaxThreads=16;
-                struct tState {
-                    Poco::Thread                thr_;
-                    VenueDeviceConfigUpdater    *task= nullptr;
-                };
 
                 N.content.title = fmt::format("Updating {} configurations", Venue.info.name);
                 N.content.jobId = JobId();
 
-                std::array<tState,MaxThreads> Tasks;
+                Poco::ThreadPool    Pool_;
+                std::list<VenueDeviceConfigUpdater*> JobList;
+
 
                 for(const auto &uuid:Venue.devices) {
                     auto NewTask = new VenueDeviceConfigUpdater(uuid, Venue.info.name, Logger());
-                    // std::cout << "Scheduling config push for " << uuid << std::endl;
-                    bool found_slot = false;
-                    while (!found_slot) {
-                        for (auto &cur_task: Tasks) {
-                            if (cur_task.task == nullptr) {
-                                cur_task.task = NewTask;
-                                cur_task.thr_.start(*NewTask);
-                                found_slot = true;
-                                break;
-                            }
+                    bool TaskAdded=false;
+                    while(!TaskAdded) {
+                        if (Pool_.available()) {
+                            JobList.push_back(NewTask);
+                            Pool_.start(*NewTask);
+                            TaskAdded = true;
+                            continue;
                         }
+                    }
 
-                        //  Let's look for a slot...
-                        if (!found_slot) {
-                            for (auto &cur_task: Tasks) {
-                                if (cur_task.task != nullptr && cur_task.task->started_) {
-                                    if (cur_task.thr_.isRunning())
-                                        continue;
-                                    if (!cur_task.thr_.isRunning() && cur_task.task->done_) {
-                                        cur_task.thr_.join();
-                                        Updated += cur_task.task->updated_;
-                                        Failed += cur_task.task->failed_;
-                                        BadConfigs += cur_task.task->bad_config_;
-                                        cur_task.task->started_ = cur_task.task->done_ = false;
-                                        delete cur_task.task;
-                                        cur_task.task = nullptr;
-                                    }
-                                }
+                    for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
+                        VenueDeviceConfigUpdater * current_job = *job_it;
+                        if(current_job!= nullptr && current_job->done_) {
+                            Updated += current_job->updated_;
+                            Failed += current_job->failed_;
+                            BadConfigs += current_job->bad_config_;
+                            if(current_job->updated_) {
+                                N.content.success.push_back(current_job->SerialNumber);
+                            } else if(current_job->failed_) {
+                                N.content.warning.push_back(current_job->SerialNumber);
+                            } else {
+                                N.content.error.push_back(current_job->SerialNumber);
                             }
+                            job_it = JobList.erase(job_it);
+                            delete current_job;
+                        } else {
+                            ++job_it;
                         }
                     }
                 }
+
                 Logger().debug("Waiting for outstanding update threads to finish.");
-                bool stillTasksRunning=true;
-                while(stillTasksRunning) {
-                    stillTasksRunning = false;
-                    for(auto &cur_task:Tasks) {
-                        if(cur_task.task!= nullptr && cur_task.task->started_) {
-                            if(cur_task.thr_.isRunning()) {
-                                stillTasksRunning = true;
-                                continue;
-                            }
-                            if(!cur_task.thr_.isRunning() && cur_task.task->done_) {
-                                cur_task.thr_.join();
-                                if(cur_task.task->updated_) {
-                                    Updated++;
-                                    N.content.success.push_back(cur_task.task->SerialNumber);
-                                } else if(cur_task.task->failed_) {
-                                    Failed++;
-                                    N.content.warning.push_back(cur_task.task->SerialNumber);
-                                } else {
-                                    BadConfigs++;
-                                    N.content.error.push_back(cur_task.task->SerialNumber);
-                                }
-                                cur_task.task->started_ = cur_task.task->done_ = false;
-                                delete cur_task.task;
-                                cur_task.task = nullptr;
-                            }
+                Pool_.joinAll();
+                for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
+                    VenueDeviceConfigUpdater * current_job = *job_it;
+                    if(current_job!= nullptr && current_job->done_) {
+                        Updated += current_job->updated_;
+                        Failed += current_job->failed_;
+                        BadConfigs += current_job->bad_config_;
+                        if(current_job->updated_) {
+                            N.content.success.push_back(current_job->SerialNumber);
+                        } else if(current_job->failed_) {
+                            N.content.warning.push_back(current_job->SerialNumber);
+                        } else {
+                            N.content.error.push_back(current_job->SerialNumber);
                         }
+                        job_it = JobList.erase(job_it);
+                        delete current_job;
+                    } else {
+                        ++job_it;
                     }
                 }
 
@@ -189,6 +175,7 @@ namespace OpenWifi {
                 Logger().warning(N.content.details);
             }
 
+            // std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueUpdateJobCompletionToUser(UserInfo().email, N);
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
                                              JobId(), Updated ,Failed, BadConfigs));
