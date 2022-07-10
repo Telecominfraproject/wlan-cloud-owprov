@@ -66,77 +66,60 @@ namespace OpenWifi {
             ProvObjects::Venue  Venue;
             uint64_t rebooted_ = 0, failed_ = 0;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
-                const std::size_t MaxThreads=16;
-                struct tState {
-                    Poco::Thread                thr_;
-                    VenueDeviceRebooter    *task= nullptr;
-                };
+
+                Poco::ThreadPool    Pool_;
 
                 N.content.title = fmt::format("Rebooting {} devices.", Venue.info.name);
                 N.content.jobId = JobId();
 
-                std::array<tState,MaxThreads> Tasks;
+                std::list<VenueDeviceRebooter*> JobList;
 
                 for(const auto &uuid:Venue.devices) {
                     auto NewTask = new VenueDeviceRebooter(uuid, Venue.info.name, Logger());
-                    // std::cout << "Scheduling config push for " << uuid << std::endl;
-                    bool found_slot = false;
-                    while (!found_slot) {
-                        for (auto &cur_task: Tasks) {
-                            if (cur_task.task == nullptr) {
-                                cur_task.task = NewTask;
-                                cur_task.thr_.start(*NewTask);
-                                found_slot = true;
-                                break;
-                            }
+                    bool TaskAdded=false;
+                    while(!TaskAdded) {
+                        if (Pool_.available()) {
+                            JobList.push_back(NewTask);
+                            Pool_.start(*NewTask);
+                            TaskAdded = true;
+                            continue;
                         }
+                    }
 
-                        //  Let's look for a slot...
-                        if (!found_slot) {
-                            for (auto &cur_task: Tasks) {
-                                if (cur_task.task != nullptr && cur_task.task->started_) {
-                                    if (cur_task.thr_.isRunning())
-                                        continue;
-                                    if (!cur_task.thr_.isRunning() && cur_task.task->done_) {
-                                        cur_task.thr_.join();
-                                        rebooted_ += cur_task.task->rebooted_;
-                                        failed_ += cur_task.task->failed_;
-                                        cur_task.task->started_ = cur_task.task->done_ = false;
-                                        delete cur_task.task;
-                                        cur_task.task = nullptr;
-                                    }
-                                }
-                            }
+                    for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
+                        VenueDeviceRebooter * current_job = *job_it;
+                        if(current_job!= nullptr && current_job->done_) {
+                            if(current_job->rebooted_)
+                                N.content.success.push_back(current_job->SerialNumber);
+                            else
+                                N.content.warning.push_back(current_job->SerialNumber);
+                            rebooted_ += current_job->rebooted_;
+                            failed_ += current_job->failed_;
+                            job_it = JobList.erase(job_it);
+                            delete current_job;
+                        } else {
+                            ++job_it;
                         }
                     }
                 }
+
                 Logger().debug("Waiting for outstanding update threads to finish.");
-                bool stillTasksRunning=true;
-                while(stillTasksRunning) {
-                    stillTasksRunning = false;
-                    for(auto &cur_task:Tasks) {
-                        if(cur_task.task!= nullptr && cur_task.task->started_) {
-                            if(cur_task.thr_.isRunning()) {
-                                stillTasksRunning = true;
-                                continue;
-                            }
-                            if(!cur_task.thr_.isRunning() && cur_task.task->done_) {
-                                cur_task.thr_.join();
-                                if(cur_task.task->rebooted_) {
-                                    rebooted_++;
-                                    N.content.success.push_back(cur_task.task->SerialNumber);
-                                } else if(cur_task.task->failed_) {
-                                    failed_++;
-                                    N.content.warning.push_back(cur_task.task->SerialNumber);
-                                }
-                                cur_task.task->started_ = cur_task.task->done_ = false;
-                                delete cur_task.task;
-                                cur_task.task = nullptr;
-                            }
-                        }
+                Pool_.joinAll();
+                for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
+                    VenueDeviceRebooter * current_job = *job_it;
+                    if(current_job!= nullptr && current_job->done_) {
+                        if(current_job->rebooted_)
+                            N.content.success.push_back(current_job->SerialNumber);
+                        else
+                            N.content.warning.push_back(current_job->SerialNumber);
+                        rebooted_ += current_job->rebooted_;
+                        failed_ += current_job->failed_;
+                        job_it = JobList.erase(job_it);
+                        delete current_job;
+                    } else {
+                        ++job_it;
                     }
                 }
-
                 N.content.details = fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
                                                 JobId(), rebooted_ ,failed_);
 
