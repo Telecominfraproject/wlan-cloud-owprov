@@ -67,11 +67,10 @@ namespace OpenWifi {
             uint64_t rebooted_ = 0, failed_ = 0;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
 
-                Poco::ThreadPool    Pool_;
-
                 N.content.title = fmt::format("Rebooting {} devices.", Venue.info.name);
                 N.content.jobId = JobId();
 
+                Poco::ThreadPool    Pool_;
                 std::list<VenueDeviceRebooter*> JobList;
 
                 for(const auto &uuid:Venue.devices) {
