@@ -146,12 +146,12 @@ namespace OpenWifi {
 
                 N.content.details = fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
                                                 JobId(), upgraded_ ,failed_);
-
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
                 Logger().warning(N.content.details);
             }
 
+            std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueRebootCompletionToUser(UserInfo().email,N);
             Logger().information(fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
                                              JobId(), upgraded_ ,failed_));
