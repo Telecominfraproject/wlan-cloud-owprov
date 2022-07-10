@@ -31,7 +31,7 @@ namespace OpenWifi {
 
                 Storage::ApplyRules(rules_,Device.deviceRules);
                 if(Device.deviceRules.firmwareUpgrade=="no") {
-                    std::cout << "Skipped Upgrade:" << Device.serialNumber << std::endl;
+                    poco_debug(Logger(),fmt::format("Skipped Upgrade: {}", Device.serialNumber));
                     skipped_++;
                     done_=true;
                     return;
@@ -40,16 +40,14 @@ namespace OpenWifi {
                 FMSObjects::Firmware    F;
                 if(SDK::FMS::Firmware::GetLatest(Device.deviceType,Device.deviceRules.rcOnly=="yes",F)) {
                     if (SDK::GW::Device::Upgrade(nullptr, Device.serialNumber, 0, F.uri)) {
-                        std::cout << "Upgraded:" << Device.serialNumber << " to " << F.uri << std::endl;
                         Logger().debug(fmt::format("{}: Upgraded.",Device.serialNumber));
                         upgraded_++;
                     } else {
-                        std::cout << "Did not Upgrade:" << Device.serialNumber << " to " << F.uri << std::endl;
                         Logger().information(fmt::format("{}: Not Upgraded.", Device.serialNumber));
                         failed_++;
                     }
                 } else {
-                    std::cout << "Did not Upgrade:" << Device.serialNumber << " to <unknown>" << std::endl;
+                    Logger().information(fmt::format("{}: Not Upgraded. No firmware available.", Device.serialNumber));
                     failed_++;
                 }
             }
@@ -151,7 +149,7 @@ namespace OpenWifi {
                 Logger().warning(N.content.details);
             }
 
-            std::cout << N.content.details << std::endl;
+            // std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueRebootCompletionToUser(UserInfo().email,N);
             Logger().information(fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
                                              JobId(), upgraded_ ,failed_));

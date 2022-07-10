@@ -175,7 +175,7 @@ namespace OpenWifi {
                 Logger().warning(N.content.details);
             }
 
-            std::cout << N.content.details << std::endl;
+            // std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueUpdateJobCompletionToUser(UserInfo().email, N);
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
                                              JobId(), Updated ,Failed, BadConfigs));

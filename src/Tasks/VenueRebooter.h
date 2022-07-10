@@ -127,7 +127,7 @@ namespace OpenWifi {
                 Logger().warning(N.content.details);
             }
 
-            std::cout << N.content.details << std::endl;
+            // std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueRebootCompletionToUser(UserInfo().email,N);
             Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
                                              JobId(), rebooted_ ,failed_));
