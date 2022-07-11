@@ -189,7 +189,7 @@ namespace OpenWifi {
     }
 
     inline void WebSocketClientNotificationVenueRebootCompletionToUser( const std::string & User, WebSocketClientNotificationVenueRebootList_t &N) {
-        N.type = "venue_firmware_upgrade";
+        N.type = "venue_rebooter";
         WebSocketClientServer()->SendUserNotification(User,N);
     }
 
@@ -236,7 +236,7 @@ namespace OpenWifi {
     }
 
     inline void WebSocketClientNotificationVenueUpgradeCompletionToUser( const std::string & User, WebSocketClientNotificationVenueUpgradeList_t &N) {
-        N.type = "venue_rebooter";
+        N.type = "venue_upgrader";
         WebSocketClientServer()->SendUserNotification(User,N);
     }
 
