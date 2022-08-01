@@ -101,7 +101,7 @@ namespace OpenWifi {
                 { "email", UserName },
                 { "signupUUID" , SignupUUID },
                 { "owner" , SignupOperator.info.id },
-
+                { "operatorName", SignupOperator.registrationId }
         }, Body, 30000);
 
         Poco::JSON::Object::Ptr Answer;

@@ -27,6 +27,11 @@ namespace OpenWifi {
     inline uint64_t Now() { return std::time(nullptr); };
 }
 
+namespace OpenWifi::Utils {
+    std::vector<unsigned char> base64decode(const std::string& input);
+    std::string base64encode(const unsigned char *input, uint32_t size);
+}
+
 using namespace std::chrono_literals;
 
 #include "Poco/Util/Application.h"
@@ -238,6 +243,11 @@ namespace OpenWifi::RESTAPI_utils {
         Obj.set(Field,Value);
     }
 
+    inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const Poco::Data::BLOB &Value) {
+        auto Result = Utils::base64encode((const unsigned char *)Value.rawContent(),Value.size());
+        Obj.set(Field,Result);
+    }
+
     inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const Types::StringPairVec & S) {
         Poco::JSON::Array   Array;
         for(const auto &i:S) {
@@ -334,12 +344,12 @@ namespace OpenWifi::RESTAPI_utils {
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, double & Value) {
         if(Obj->has(Field) && !Obj->isNull(Field))
-            Value = (double) Obj->get(Field);
+            Value = (double)Obj->get(Field);
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, float & Value) {
         if(Obj->has(Field) && !Obj->isNull(Field))
-            Value = (float) Obj->get(Field);
+            Value = (float)Obj->get(Field);
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, bool &Value) {
@@ -374,7 +384,14 @@ namespace OpenWifi::RESTAPI_utils {
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, uint64_t &Value) {
         if(Obj->has(Field) && !Obj->isNull(Field))
-            Value = (uint64_t ) Obj->get(Field);
+            Value = (uint64_t)Obj->get(Field);
+    }
+
+    inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, Poco::Data::BLOB &Value) {
+        if(Obj->has(Field) && !Obj->isNull(Field)) {
+            auto Result = Utils::base64decode(Obj->get(Field).toString());
+            Value.assignRaw((const unsigned char *)&Result[0],Result.size());
+        }
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, Types::StringPairVec &Vec) {
@@ -685,6 +702,19 @@ namespace OpenWifi::Utils {
         uint dashes=0;
         return (std::all_of(UUID.begin(),UUID.end(),[&](auto i){ if(i=='-') dashes++; return i=='-' || std::isxdigit(i);})) && (dashes>0);
     }
+
+	template <typename ...Args> std::string ComputeHash(Args&&... args) {
+		Poco::SHA2Engine    E;
+		auto as_string = [](auto p) {
+			if constexpr(std::is_arithmetic_v<decltype(p)>) {
+				return std::to_string(p);
+			} else {
+				return p;
+			}
+		};
+		(E.update(as_string(args)),...);
+		return Poco::SHA2Engine::digestToHex(E.digest());
+	}
 
     [[nodiscard]] inline std::vector<std::string> Split(const std::string &List, char Delimiter=',' ) {
         std::vector<std::string> ReturnList;
@@ -1382,13 +1412,14 @@ namespace OpenWifi {
 
 	    [[nodiscard]] inline const std::string &Address() const { return address_; };
 	    [[nodiscard]] inline uint32_t Port() const { return port_; };
-	    [[nodiscard]] inline const std::string &KeyFile() const { return key_file_; };
-	    [[nodiscard]] inline const std::string &CertFile() const { return cert_file_; };
-	    [[nodiscard]] inline const std::string &RootCA() const { return root_ca_; };
-	    [[nodiscard]] inline const std::string &KeyFilePassword() const { return key_file_password_; };
-	    [[nodiscard]] inline const std::string &IssuerCertFile() const { return issuer_cert_file_; };
-	    [[nodiscard]] inline const std::string &Name() const { return name_; };
+	    [[nodiscard]] inline auto KeyFile() const { return key_file_; };
+	    [[nodiscard]] inline auto CertFile() const { return cert_file_; };
+	    [[nodiscard]] inline auto RootCA() const { return root_ca_; };
+	    [[nodiscard]] inline auto KeyFilePassword() const { return key_file_password_; };
+	    [[nodiscard]] inline auto IssuerCertFile() const { return issuer_cert_file_; };
+	    [[nodiscard]] inline auto Name() const { return name_; };
 	    [[nodiscard]] inline int Backlog() const { return backlog_; }
+		[[nodiscard]] inline auto Cas() const { return cas_; }
 
 	    [[nodiscard]] inline Poco::Net::SecureServerSocket CreateSecureSocket(Poco::Logger &L) const {
 	        Poco::Net::Context::Params P;
@@ -1868,8 +1899,8 @@ namespace OpenWifi {
 	            Request = &RequestIn;
 	            Response = &ResponseIn;
 
-				std::string th_name = "restsvr_" + std::to_string(TransactionId_);
-				Utils::SetThreadName(th_name.c_str());
+//				std::string th_name = "restsvr_" + std::to_string(TransactionId_);
+//				Utils::SetThreadName(th_name.c_str());
 
                 if(Request->getContentLength()>0) {
                     if(Request->getContentType().find("application/json")!=std::string::npos) {
@@ -2063,6 +2094,17 @@ namespace OpenWifi {
             }
             return false;
         }
+
+        static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, Poco::Data::BLOB &Value) {
+            if(O->has(Field)) {
+                std::string Content = O->get(Field).toString();
+                auto DecodedBlob = Utils::base64decode(Content);
+                Value.assignRaw((const unsigned char *)&DecodedBlob[0],DecodedBlob.size());
+                return true;
+            }
+            return false;
+        }
+
 
         template <typename T> bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, const T &value, T & assignee) {
             if(O->has(Field)) {
@@ -2684,7 +2726,7 @@ namespace OpenWifi {
 
 		inline void run() override {
 			Poco::AutoPtr<Poco::Notification>	Note(Queue_.waitDequeueNotification());
-			Utils::SetThreadName("kafka-dispatch");
+			Utils::SetThreadName("kafka:dispatch");
 			while(Note && Running_) {
 				auto Msg = dynamic_cast<KafkaMessage*>(Note.get());
 				if(Msg!= nullptr) {
@@ -2707,12 +2749,12 @@ namespace OpenWifi {
 		}
 
 	  private:
-		std::recursive_mutex  	Mutex_;
-		Types::NotifyTable      Notifiers_;
-		Poco::Thread        	Worker_;
-		mutable std::atomic_bool    	Running_=false;
-		uint64_t          		FunctionId_=1;
-		Poco::NotificationQueue	Queue_;
+		std::recursive_mutex  		Mutex_;
+		Types::NotifyTable      	Notifiers_;
+		Poco::Thread        		Worker_;
+		mutable std::atomic_bool    Running_=false;
+		uint64_t          			FunctionId_=1;
+		Poco::NotificationQueue		Queue_;
 	};
 
 	class KafkaManager : public SubSystemServer {
@@ -2994,7 +3036,7 @@ namespace OpenWifi {
 	    }
 	    int Start() override;
 	    inline void Stop() override {
-	        Logger().information("Stopping ");
+	        Logger().information("Stopping...");
 	        for( const auto & svr : RESTServers_ )
 	            svr->stop();
 			Pool_.stopAll();
@@ -3006,18 +3048,17 @@ namespace OpenWifi {
 
 	    inline Poco::Net::HTTPRequestHandler *CallServer(const std::string &Path, uint64_t Id) {
 	        RESTAPIHandler::BindingMap Bindings;
-			Utils::SetThreadName(fmt::format("rest_ext_{}",Id).c_str());
+			Utils::SetThreadName(fmt::format("x-rest:{}",Id).c_str());
 	        return RESTAPI_ExtRouter(Path, Bindings, Logger(), Server_, Id);
 	    }
 
 	private:
 	    std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
-	    Poco::ThreadPool	    Pool_;
+	    Poco::ThreadPool	    Pool_{"x-rest",2,32};
 	    RESTAPI_GenericServer   Server_;
 
         RESTAPI_ExtServer() noexcept:
-	    SubSystemServer("RESTAPI_ExtServer", "RESTAPIServer", "openwifi.restapi"),
-        Pool_("RESTAPI_ExtServer",4,50,120)
+	    SubSystemServer("RESTAPI_ExtServer", "REST-XSRV", "openwifi.restapi")
             {
             }
 	};
@@ -3030,7 +3071,7 @@ namespace OpenWifi {
 	    inline Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &Request) override {
 			try {
 				Poco::URI uri(Request.getURI());
-				Utils::SetThreadName(fmt::format("rest_ext_{}",TransactionId_).c_str());
+				Utils::SetThreadName(fmt::format("x-rest:{}",TransactionId_).c_str());
 				return RESTAPI_ExtServer()->CallServer(uri.getPath(), TransactionId_++);
 			} catch (...) {
 
@@ -3128,7 +3169,7 @@ namespace OpenWifi {
 
 	    inline int Start() override;
 	    inline void Stop() override {
-	        Logger().information("Stopping ");
+	        Logger().information("Stopping...");
 	        for( const auto & svr : RESTServers_ )
 	            svr->stop();
 			Pool_.stopAll();
@@ -3139,17 +3180,16 @@ namespace OpenWifi {
 
 	    inline Poco::Net::HTTPRequestHandler *CallServer(const std::string &Path, uint64_t Id) {
 	        RESTAPIHandler::BindingMap Bindings;
-			Utils::SetThreadName(fmt::format("rest_int_{}",Id).c_str());
+			Utils::SetThreadName(fmt::format("i-rest:{}",Id).c_str());
 	        return RESTAPI_IntRouter(Path, Bindings, Logger(), Server_, Id);
 	    }
 	private:
 	    std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
-	    Poco::ThreadPool	    Pool_;
+	    Poco::ThreadPool	    Pool_{"i-rest",2,16};
 	    RESTAPI_GenericServer   Server_;
 
         RESTAPI_IntServer() noexcept:
-		   SubSystemServer("RESTAPI_IntServer", "REST-ISRV", "openwifi.internal.restapi"),
-            Pool_("RESTAPI_IntServer",4,50,120)
+		   SubSystemServer("RESTAPI_IntServer", "REST-ISRV", "openwifi.internal.restapi")
         {
         }
 	};
@@ -3160,6 +3200,7 @@ namespace OpenWifi {
 	public:
         inline IntRequestHandlerFactory() = default;
 	    inline Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &Request) override {
+			Utils::SetThreadName(fmt::format("i-rest:{}",TransactionId_).c_str());
 	        Poco::URI uri(Request.getURI());
 	        return RESTAPI_IntServer()->CallServer(uri.getPath(), TransactionId_);
 	    }
@@ -3203,7 +3244,6 @@ namespace OpenWifi {
 		}
 
 		[[nodiscard]] std::string Version() { return Version_; }
-		// [[nodiscard]] const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
 		[[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
 		[[nodiscard]] inline const std::string & WWWAssetsDir() { return WWWAssetsDir_; }
 		[[nodiscard]] bool Debug() const { return DebugMode_; }
@@ -3236,7 +3276,12 @@ namespace OpenWifi {
             return Poco::Logger::get(Name);
         }
 
-		static inline void Exit(int Reason);
+        virtual void GetExtraConfiguration(Poco::JSON::Object & Cfg) {
+            Cfg.set("additionalConfiguration",false);
+        }
+
+
+        static inline void Exit(int Reason);
 		inline void BusMessageReceived(const std::string &Key, const std::string & Payload);
 		inline MicroServiceMetaVec GetServices(const std::string & Type);
 		inline MicroServiceMetaVec GetServices();
@@ -3272,7 +3317,6 @@ namespace OpenWifi {
 		inline std::string ConfigPath(const std::string &Key);
 		inline std::string Encrypt(const std::string &S);
 		inline std::string Decrypt(const std::string &S);
-		inline std::string CreateHash(const std::string &S);
 		inline std::string MakeSystemEventMessage( const std::string & Type ) const;
 		[[nodiscard]] inline bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
 		inline static void SavePID();
@@ -3302,6 +3346,9 @@ namespace OpenWifi {
                 return Signer_.sign(T,Algo);
             }
         }
+
+		inline Poco::ThreadPool & TimerPool() { return TimerPool_; }
+
 	  private:
 	    static MicroService         * instance_;
 		bool                        HelpRequested_ = false;
@@ -3315,7 +3362,6 @@ namespace OpenWifi {
 		std::string                 WWWAssetsDir_;
 		Poco::Crypto::CipherFactory & CipherFactory_ = Poco::Crypto::CipherFactory::defaultFactory();
 		Poco::Crypto::Cipher        * Cipher_ = nullptr;
-		Poco::SHA2Engine			SHA2_;
 		MicroServiceMetaMap			Services_;
 		std::string 				MyHash_;
 		std::string 				MyPrivateEndPoint_;
@@ -3336,6 +3382,7 @@ namespace OpenWifi {
         bool                        NoBuiltInCrypto_=false;
         Poco::JWT::Signer	        Signer_;
 		Poco::Logger				&Logger_;
+		Poco::ThreadPool			TimerPool_{"timer:pool",2,16};
     };
 
 	inline void MicroService::Exit(int Reason) {
@@ -3485,7 +3532,7 @@ namespace OpenWifi {
 	    MyPrivateEndPoint_ = ConfigGetString("openwifi.system.uri.private");
 	    MyPublicEndPoint_ = ConfigGetString("openwifi.system.uri.public");
 	    UIURI_ = ConfigGetString("openwifi.system.uri.ui");
-	    MyHash_ = CreateHash(MyPublicEndPoint_);
+	    MyHash_ = Utils::ComputeHash(MyPublicEndPoint_);
 	}
 
 	void MicroServicePostInitialization();
@@ -3548,8 +3595,6 @@ namespace OpenWifi {
     void DaemonPostInitialization(Poco::Util::Application &self);
 
 	inline void MicroService::initialize(Poco::Util::Application &self) {
-		// Utils::SetThreadName("microservice");
-
 		// add the default services
         LoadConfigurationFile();
         InitializeLoggingSystem();
@@ -3824,11 +3869,6 @@ namespace OpenWifi {
 	    return Cipher_->decryptString(S, Poco::Crypto::Cipher::Cipher::ENC_BASE64);;
 	}
 
-	inline std::string MicroService::CreateHash(const std::string &S) {
-	    SHA2_.update(S);
-	    return Utils::ToHex(SHA2_.digest());
-	}
-
 	inline std::string MicroService::MakeSystemEventMessage( const std::string & Type ) const {
 	    Poco::JSON::Object	Obj;
 	    Obj.set(KafkaTopics::ServiceEvents::Fields::EVENT,Type);
@@ -3891,6 +3931,7 @@ namespace OpenWifi {
             Params->setMaxThreads(50);
             Params->setMaxQueued(200);
             Params->setKeepAlive(true);
+			Params->setName("ws:xrest");
 
             std::unique_ptr<Poco::Net::HTTPServer>  NewServer;
             if(MicroService::instance().NoAPISecurity()) {
@@ -3927,6 +3968,7 @@ namespace OpenWifi {
             Params->setMaxThreads(50);
             Params->setMaxQueued(200);
             Params->setKeepAlive(true);
+			Params->setName("ws:irest");
 
             std::unique_ptr<Poco::Net::HTTPServer>  NewServer;
             if(MicroService::instance().NoAPISecurity()) {
@@ -3944,8 +3986,6 @@ namespace OpenWifi {
     }
 
     inline int MicroService::main([[maybe_unused]] const ArgVec &args) {
-
-		// Utils::SetThreadName("main");
 	    MyErrorHandler	ErrorHandler(*this);
 	    Poco::ErrorHandler::set(&ErrorHandler);
 
@@ -4052,6 +4092,7 @@ namespace OpenWifi {
 	        Port_ = (int)MicroService::instance().ConfigGetInt("alb.port",15015);
 	        Socket_ = std::make_unique<Poco::Net::ServerSocket>(Port_);
 	        auto Params = new Poco::Net::HTTPServerParams;
+			Params->setName("ws:alb");
 	        Server_ = std::make_unique<Poco::Net::HTTPServer>(new ALBRequestHandlerFactory(Logger()), *Socket_, Params);
 	        Server_->start();
 	    }
@@ -4061,7 +4102,7 @@ namespace OpenWifi {
 
     inline void BusEventManager::run() {
         Running_ = true;
-		Utils::SetThreadName("BusEventManager");
+		Utils::SetThreadName("fmwk:EventMgr");
         auto Msg = MicroService::instance().MakeSystemEventMessage(KafkaTopics::ServiceEvents::EVENT_JOIN);
         KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,MicroService::instance().PrivateEndPoint(),Msg, false);
         while(Running_) {
@@ -4148,7 +4189,7 @@ namespace OpenWifi {
 
 	inline void KafkaProducer::run() {
 
-		Utils::SetThreadName("KafkaProducer");
+		Utils::SetThreadName("Kafka:Prod");
 	    cppkafka::Configuration Config({
             { "client.id", MicroService::instance().ConfigGetString("openwifi.kafka.client.id") },
             { "metadata.broker.list", MicroService::instance().ConfigGetString("openwifi.kafka.brokerlist") }
@@ -4187,7 +4228,7 @@ namespace OpenWifi {
 	}
 
 	inline void KafkaConsumer::run() {
-		Utils::SetThreadName("KafkaConsumer");
+		Utils::SetThreadName("Kafka:Cons");
 
 	    cppkafka::Configuration Config({
 	        { "client.id", MicroService::instance().ConfigGetString("openwifi.kafka.client.id") },
@@ -4327,6 +4368,11 @@ namespace OpenWifi {
 	            Answer.set("certificates", Certificates);
 	            return ReturnObject(Answer);
 	        }
+            if(GetBoolParameter("extraConfiguration")) {
+                Poco::JSON::Object  Answer;
+                MicroService::instance().GetExtraConfiguration(Answer);
+                return ReturnObject(Answer);
+            }
 	        BadRequest(RESTAPI::Errors::InvalidCommand);
 	    }
 
@@ -4848,7 +4894,7 @@ namespace OpenWifi {
 		void SendToAll(const std::string &Payload);
     private:
         mutable std::atomic_bool Running_ = false;
-        Poco::Thread Thr_;
+        Poco::Thread 								Thr_;
         // std::unique_ptr<MyParallelSocketReactor> ReactorPool_;
 		Poco::Net::SocketReactor					Reactor_;
 		Poco::Thread								ReactorThread_;
@@ -4938,13 +4984,13 @@ namespace OpenWifi {
 
     [[nodiscard]] inline bool SendToUser(const std::string &userName, const std::string &Payload);
     inline WebSocketClientServer::WebSocketClientServer() noexcept:
-            SubSystemServer("WebSocketClientServer", "WSCLNT-SVR", "websocketclients")
+            SubSystemServer("WebSocketClientServer", "UI-WSCLNT-SVR", "websocketclients")
     {
     }
 
     inline void WebSocketClientServer::run() {
         Running_ = true ;
-		Utils::SetThreadName("ws:clnt-svr");
+		Utils::SetThreadName("ws:uiclnt-svr");
         while(Running_) {
             Poco::Thread::trySleep(2000);
 
@@ -5037,7 +5083,7 @@ namespace OpenWifi {
 			case Poco::Net::WebSocket::FRAME_OP_PONG: {
 			} break;
 			case Poco::Net::WebSocket::FRAME_OP_CLOSE: {
-				Logger().warning(Poco::format("CLOSE(%s): Client is closing its connection.", Id_));
+				Logger().warning(Poco::format("CLOSE(%s): UI Client is closing its connection.", Id_));
 				Done = true;
 			} break;
 			case Poco::Net::WebSocket::FRAME_OP_TEXT: {
@@ -5176,7 +5222,7 @@ namespace OpenWifi {
                 try
                 {
                     Poco::Net::WebSocket WS(*Request, *Response);
-                    Logger().information("WebSocket connection established.");
+                    Logger().information("UI-WebSocket connection established.");
                     auto Id = MicroService::CreateUUID();
                     WebSocketClientServer()->NewClient(WS,Id);
                 }

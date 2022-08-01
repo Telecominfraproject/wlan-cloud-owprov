@@ -1,0 +1,174 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi RRM Provider Model
+  description: Definitions and APIs to manages an OpenWiFi RRM Providers.
+  version: 1.0.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16022/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/NotFound'
+    Unauthorized:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Unauthorized'
+    Success:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Success'
+    BadRequest:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/BadRequest'
+
+  schemas:
+
+    Provider:
+      type: object
+      properties:
+        vendor:
+          description: The name of the vendor for display.
+          type: string
+          minLength: 1
+          maxLength: 128
+        vendorShortname:
+          description: A shortname for the vendor. Only letters and numbers are allowed. This is the name used internally.
+          type: string
+          minLength: 4
+          maxLength: 16
+        version:
+          description: An identifier that will help users identify the version of the RRM module they are using.
+          type: string
+        about:
+          description: A link to the Vendor page for this RRM Module
+          type: string
+
+
+    Algorithm:
+      type: object
+      properties:
+        name:
+          description: A display for this algorithm.
+          type: string
+          minLength: 1
+          maxLength: 128
+        description:
+          description: A description of the algorithm.
+          type: string
+        shortName:
+          description: This is the name used internally.
+          type: string
+          minLength: 4
+          maxLength: 16
+        parameterFormat:
+          description: this is a Regex used to validate the input. If this is empty, no validation will be performed.
+          type: string
+        parameterSamples:
+          description: These samples will be displayed in the UI to the user trying to configure the options
+          type: array
+          items:
+            type: string
+        helper:
+          description: A link to a web page or PDF document explaining the algorithm and its parameters
+          type: string
+
+    Algorithms:
+      description: The list of all algorithms supported by the vendor
+      type: array
+      items:
+        $ref: '#/components/schemas/Algorithm'
+
+paths:
+  /provider:
+    get:
+      tags:
+        - RRM
+      operationId: getProvider
+      summary: Retrieve information about the provider for this RRM Module
+      responses:
+        200:
+          $ref: '#/components/schemas/Provider'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /algorithms:
+    get:
+      tags:
+        - RRM
+      operationId: getAlgorithms
+      summary: Retrieve a lists of algorithms supported in the module.
+      responses:
+        200:
+          $ref: '#/components/schemas/Algorithms'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /runRRM:
+    put:
+      tags:
+        - RRM
+      operationId: runRRMNow
+      summary: Run a specific or default RRM algorithm. The UI user or CLI user will have the ability to run an algorithm on demand.
+      parameters:
+        - in: query
+          description:
+          name: venue
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          description: Perform RRM without updating anything. This may be used by an admin to see what RRM would do.
+          name: mock
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
+          description: Specify the RRM algorithm to use. If omitted, select the default algorithm.
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Specify the parameters to use with the RRM algorithm to use. If omitted, select the default parameters.
+          schema:
+            type: string
+          required: false
+      responses:
+        200:
+          description: Return the list of actions that were or would be performed.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
