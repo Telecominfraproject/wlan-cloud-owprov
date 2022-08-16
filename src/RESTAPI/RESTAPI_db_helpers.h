@@ -405,7 +405,9 @@ namespace OpenWifi {
     }
 
     inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, RESTAPI::Errors::msg & Error) {
-        static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services", "unit" };
+        static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services",
+                                                            "unit", "definitions", "ethernet", "switch", "config-raw",
+                                                            "third-party" };
 
         for(const auto &i:Config.configuration) {
             Poco::JSON::Parser  P;
