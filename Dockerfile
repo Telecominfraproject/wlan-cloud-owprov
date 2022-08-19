@@ -113,7 +113,7 @@ COPY owprov.properties.tmpl /
 COPY docker-entrypoint.sh /
 COPY wait-for-postgres.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
-    -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
+    -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.crt
 
 COPY --from=owprov-build /owprov/cmake-build/owprov /openwifi/owprov
 COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/* /usr/local/lib
