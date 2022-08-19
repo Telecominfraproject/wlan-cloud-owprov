@@ -119,6 +119,8 @@ COPY --from=owprov-build /owprov/cmake-build/owprov /openwifi/owprov
 COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/* /usr/local/lib
 COPY --from=poco-build /poco/cmake-build/lib/* /usr/local/lib
 
+RUN ldconfig
+
 EXPOSE 16005 17005 16105
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
