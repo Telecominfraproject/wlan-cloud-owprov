@@ -9,6 +9,9 @@
 #include "framework/MicroService.h"
 #include "framework/ConfigurationValidator.h"
 #include "sdks/SDK_sec.h"
+#include "Poco/StringTokenizer.h"
+
+#include "libs/croncpp.h"
 
 namespace OpenWifi {
 
@@ -523,12 +526,30 @@ namespace OpenWifi {
                 }
             }
         }
-
         return Result;
     }
 
+    inline bool ValidSchedule(const std::string &v) {
+        try
+        {
+            auto cron = cron::make_cron(v);
+            return true;
+        }
+        catch (cron::bad_cronexpr const & ex)
+        {
+        }
+        return false;
+    }
+
+    inline bool ValidRRM(const std::string &v) {
+        if((v=="no") || (v=="inherit")) return true;
+        auto parts = Poco::StringTokenizer(v,":");
+        if(parts.count()!=4) return false;
+        return ValidSchedule(parts[2]);
+    }
+
     inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR) {
-        return  (DR.rrm=="yes" || DR.rrm=="no" || DR.rrm=="inherit") &&
+        return  (ValidRRM(DR.rrm)) &&
                 (DR.firmwareUpgrade=="yes" || DR.firmwareUpgrade=="no" || DR.firmwareUpgrade=="inherit") &&
                 (DR.rcOnly=="yes" || DR.rcOnly=="no" || DR.rcOnly=="inherit");
     }

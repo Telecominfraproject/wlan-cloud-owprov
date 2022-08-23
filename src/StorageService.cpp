@@ -195,18 +195,24 @@ namespace OpenWifi {
         // check that all inventory in venues and entities actually exists, if not, fix it.
         auto FixVenueDevices = [&](const ProvObjects::Venue &V) -> bool {
             Types::UUIDvec_t NewDevices;
+            bool modified=false;
             for(const auto &device:V.devices) {
                 ProvObjects::InventoryTag T;
                 if(InventoryDB().GetRecord("id", device, T)) {
                     NewDevices.emplace_back(device);
                 } else {
-
+                    modified=true;
                 }
             }
 
-            if(NewDevices!=V.devices) {
+            ProvObjects::Venue NewVenue = V;
+            if(V.deviceRules.rrm=="yes") {
+                NewVenue.deviceRules.rrm="inherit";
+                modified=true;
+            }
+
+            if(modified) {
                 Logger().warning(fmt::format("  fixing venue: {}", V.info.name));
-                ProvObjects::Venue NewVenue = V;
                 NewVenue.devices = NewDevices;
                 VenueDB().UpdateRecord("id", V.info.id, NewVenue);
             }
@@ -266,10 +272,16 @@ namespace OpenWifi {
                 }
             }
 
+            ProvObjects::Entity NewEntity = E;
+
+            if(E.deviceRules.rrm=="yes") {
+                NewEntity.deviceRules.rrm="inherit";
+                Modified=true;
+            }
+
             if(Modified)
             {
                 Logger().warning(fmt::format("  fixing entity: {}",E.info.name));
-                ProvObjects::Entity NewEntity = E;
                 NewEntity.devices = NewDevices;
                 NewEntity.contacts = NewContacts;
                 NewEntity.locations = NewLocations;
@@ -304,9 +316,63 @@ namespace OpenWifi {
                 modified=true;
             }
 
+            if(T.deviceRules.rrm=="yes") {
+                NewTag.deviceRules.rrm = "inherit";
+                modified=true;
+            }
+
             if(modified) {
                 Logger().warning(fmt::format("  fixing entity: {}",T.info.name));
                 InventoryDB().UpdateRecord("id", T.info.id, NewTag);
+            }
+            return true;
+        };
+
+        auto FixConfiguration = [&](const ProvObjects::DeviceConfiguration &C) -> bool {
+            ProvObjects::DeviceConfiguration NewConfig{C};
+
+            bool modified = false;
+
+            if (C.deviceRules.rrm == "yes") {
+                NewConfig.deviceRules.rrm = "inherit";
+                modified = true;
+            }
+
+            if (modified) {
+                Logger().warning(fmt::format("  fixing configuration: {}", C.info.name));
+                ConfigurationDB().UpdateRecord("id", C.info.id, NewConfig);
+            }
+            return true;
+        };
+
+        auto FixOperator = [&](const ProvObjects::Operator &O) -> bool {
+            ProvObjects::Operator NewOp{O};
+            bool modified = false;
+
+            if (O.deviceRules.rrm == "yes") {
+                NewOp.deviceRules.rrm = "inherit";
+                modified = true;
+            }
+
+            if (modified) {
+                Logger().warning(fmt::format("  fixing operator: {}", O.info.name));
+                OperatorDB().UpdateRecord("id", O.info.id, NewOp);
+            }
+            return true;
+        };
+
+        auto FixSubscriber = [&](const ProvObjects::SubscriberDevice &O) -> bool {
+            ProvObjects::SubscriberDevice NewSub{O};
+            bool modified = false;
+
+            if (O.deviceRules.rrm == "yes") {
+                NewSub.deviceRules.rrm = "inherit";
+                modified = true;
+            }
+
+            if (modified) {
+                Logger().warning(fmt::format("  fixing subscriber: {}", O.info.name));
+                SubscriberDeviceDB().UpdateRecord("id", O.info.id, NewSub);
             }
             return true;
         };
@@ -317,6 +383,12 @@ namespace OpenWifi {
         EntityDB().Iterate(FixEntity);
         Logger().information("Checking DB consistency: inventory");
         InventoryDB().Iterate(FixInventory);
+        Logger().information("Checking DB consistency: configurations");
+        ConfigurationDB().Iterate(FixConfiguration);
+        Logger().information("Checking DB consistency: operators");
+        OperatorDB().Iterate(FixOperator);
+        Logger().information("Checking DB consistency: subscribers");
+        SubscriberDeviceDB().Iterate(FixSubscriber);
     }
 
     void Storage::InitializeSystemDBs() {
