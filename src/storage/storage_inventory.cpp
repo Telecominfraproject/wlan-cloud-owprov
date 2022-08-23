@@ -223,7 +223,7 @@ namespace OpenWifi {
             ProvObjects::DeviceRules    Rules;
             std::string     SerialNumber = Utils::IntToSerialNumber(i);
             if(EvaluateDeviceSerialNumberRules(SerialNumber,Rules)) {
-                if(Rules.rrm=="yes")
+                if(Rules.rrm!="no" && Rules.rrm!="inherit")
                     DeviceList.push_back(SerialNumber);
             }
         }
