@@ -2041,6 +2041,13 @@ paths:
             type: boolean
             default: false
           required: false
+        - in: query
+          description: return the resolved configuration for a specific device
+          name:   resolveConfig
+          schema:
+            type: boolean
+            default: false
+          required: false
 
       responses:
         200:

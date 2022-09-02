@@ -108,6 +108,19 @@ namespace OpenWifi{
             }
             Results.to_json(Answer);
             return ReturnObject(Answer);
+        } else if(GetBoolParameter("resolveConfig", false)) {
+            Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
+            auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
+            auto Configuration = Poco::makeShared<Poco::JSON::Object>();
+            Poco::JSON::Object ErrorsObj, WarningsObj;
+            ProvObjects::InventoryConfigApplyResult Results;
+            Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
+            if (Device->Get(Configuration)) {
+                Answer.set("configuration", Configuration);
+            } else {
+                Answer.set("error", 1);
+            }
+            return ReturnObject(Answer);
         }   else if(QB_.AdditionalInfo) {
             AddExtendedInfo(Existing,Answer);
         }
