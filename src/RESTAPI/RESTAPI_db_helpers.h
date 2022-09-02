@@ -543,9 +543,18 @@ namespace OpenWifi {
 
     inline bool ValidRRM(const std::string &v) {
         if((v=="no") || (v=="inherit")) return true;
-        auto parts = Poco::StringTokenizer(v,":");
-        if(parts.count()!=4) return false;
-        return ValidSchedule(parts[2]);
+        try {
+            Poco::JSON::Parser  P;
+            auto O = P.parse(v).extract<Poco::JSON::Object::Ptr>();
+
+            ProvObjects::RRMDetails D;
+            if(D.from_json(O)) {
+                return ValidSchedule(D.schedule);
+            }
+        } catch (...) {
+
+        }
+        return false;
     }
 
     inline bool ValidDeviceRules(const ProvObjects::DeviceRules & DR) {
