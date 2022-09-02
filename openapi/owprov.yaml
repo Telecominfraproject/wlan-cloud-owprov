@@ -2034,6 +2034,14 @@ paths:
             type: string
             format: uuid
           required: false
+        - in: query
+          description: return RRM settings for a specific device
+          name: rrmSettings
+          schema:
+            type: boolean
+            default: false
+          required: false
+
       responses:
         200:
           description: Return a list of elements
