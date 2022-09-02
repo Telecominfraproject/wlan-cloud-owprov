@@ -83,12 +83,13 @@ namespace OpenWifi {
     InventoryDB::InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L) :
         DB(T, "inventory", InventoryDB_Fields, InventoryDB_Indexes, P, L, "inv") {}
 
-    bool InventoryDB::CreateFromConnection( const std::string &SerialNumber,
+    bool InventoryDB::CreateFromConnection( const std::string &SerialNumberRaw,
                                             const std::string &ConnectionInfo,
                                             const std::string &DeviceType,
                                             const std::string &Locale) {
 
         ProvObjects::InventoryTag   ExistingDevice;
+        auto SerialNumber = Poco::toLower(SerialNumberRaw);
         if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
             ProvObjects::InventoryTag   NewDevice;
             uint64_t Now = OpenWifi::Now();
