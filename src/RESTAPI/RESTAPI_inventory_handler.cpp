@@ -136,6 +136,7 @@ namespace OpenWifi{
 
     void RESTAPI_inventory_handler::DoPost() {
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
+        Poco::toLowerInPlace(SerialNumber);
         if(SerialNumber.empty()) {
             return BadRequest(RESTAPI::Errors::MissingSerialNumber);
         }

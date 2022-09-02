@@ -23,6 +23,7 @@ namespace OpenWifi {
                                                               bool &Done, std::string &Answer) {
         Done = false;
         auto Prefix = O->get("serial_prefix").toString();
+        Poco::toLowerInPlace(Prefix);
         Logger().information(Poco::format("serial_number_search: %s", Prefix));
         if (!Prefix.empty() && Prefix.length() < 13) {
             std::vector<uint64_t> Numbers;
@@ -83,6 +84,7 @@ namespace OpenWifi {
         Done = false;
         auto operatorId = O->get("operatorId").toString();
         auto Prefix = O->get("serial_prefix").toString();
+        Poco::toLowerInPlace(Prefix);
         std::string Query;
 
         if(Prefix[0]=='*') {
