@@ -35,36 +35,53 @@ namespace OpenWifi{
 
     void RESTAPI_inventory_handler::DoGet() {
 
-        ProvObjects::InventoryTag   Existing;
-        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER,"");
-        Logger().debug(Poco::format("%s: Retrieving inventory information.",SerialNumber));
-        if(SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER,SerialNumber,Existing)) {
+        ProvObjects::InventoryTag Existing;
+        std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER, "");
+        Logger().debug(Poco::format("%s: Retrieving inventory information.", SerialNumber));
+        if (SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER, SerialNumber, Existing)) {
             return NotFound();
         }
-        Logger().debug(Poco::format("%s,%s: Retrieving inventory information.", Existing.serialNumber, Existing.info.id ));
+        Logger().debug(
+                Poco::format("%s,%s: Retrieving inventory information.", Existing.serialNumber, Existing.info.id));
 
-        Poco::JSON::Object  Answer;
+        Poco::JSON::Object Answer;
         std::string Arg;
-        if(HasParameter("config",Arg) && Arg=="true") {
-            bool Explain = (HasParameter("explain",Arg) && Arg == "true");
-            APConfig    Device(SerialNumber,Existing.deviceType,Logger(), Explain);
+        if (HasParameter("config", Arg) && Arg == "true") {
+            bool Explain = (HasParameter("explain", Arg) && Arg == "true");
+            APConfig Device(SerialNumber, Existing.deviceType, Logger(), Explain);
 
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
-            if(Device.Get(Configuration)) {
+            if (Device.Get(Configuration)) {
                 Answer.set("config", Configuration);
-                if(Explain)
+                if (Explain)
                     Answer.set("explanation", Device.Explanation());
             } else {
-                Answer.set("config","none");
+                Answer.set("config", "none");
             }
             return ReturnObject(Answer);
-        } else if(HasParameter("firmwareOptions", Arg) && Arg=="true") {
+        } else if (GetBoolParameter("firmwareOptions", false)) {
             ProvObjects::DeviceRules Rules;
-            StorageService()->InventoryDB().EvaluateDeviceSerialNumberRules(SerialNumber,Rules);
-            Answer.set("firmwareUpgrade",Rules.firmwareUpgrade);
-            Answer.set("firmwareRCOnly", Rules.rcOnly == "yes" );
+            StorageService()->InventoryDB().EvaluateDeviceSerialNumberRules(SerialNumber, Rules);
+            Answer.set("firmwareUpgrade", Rules.firmwareUpgrade);
+            Answer.set("firmwareRCOnly", Rules.rcOnly == "yes");
             return ReturnObject(Answer);
-        } else if(HasParameter("applyConfiguration",Arg) && Arg=="true") {
+        } else if(GetBoolParameter("rrmSettings",false)) {
+            ProvObjects::DeviceRules Rules;
+            StorageService()->InventoryDB().EvaluateDeviceSerialNumberRules(SerialNumber, Rules);
+            if(Rules.rrm=="no" || Rules.rrm=="inherit") {
+                Answer.set("rrm", Rules.rrm);
+            } else {
+                ProvObjects::RRMDetails D;
+                Poco::JSON::Parser  P;
+                try {
+                    auto Obj = P.parse(Rules.rrm).extract<Poco::JSON::Object::Ptr>();
+                    Answer.set("rrm", Obj);
+                } catch (...) {
+                    Answer.set("rrm", "invalid");
+                }
+            }
+            return ReturnObject(Answer);
+        } else if(GetBoolParameter("applyConfiguration", false)) {
             Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
             auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
@@ -90,6 +107,19 @@ namespace OpenWifi{
                 Results.errorCode = 1;
             }
             Results.to_json(Answer);
+            return ReturnObject(Answer);
+        } else if(GetBoolParameter("resolveConfig", false)) {
+            Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
+            auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
+            auto Configuration = Poco::makeShared<Poco::JSON::Object>();
+            Poco::JSON::Object ErrorsObj, WarningsObj;
+            ProvObjects::InventoryConfigApplyResult Results;
+            Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
+            if (Device->Get(Configuration)) {
+                Answer.set("configuration", Configuration);
+            } else {
+                Answer.set("error", 1);
+            }
             return ReturnObject(Answer);
         }   else if(QB_.AdditionalInfo) {
             AddExtendedInfo(Existing,Answer);
