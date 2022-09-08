@@ -202,7 +202,9 @@ namespace OpenWifi {
                 details,
                 jobId;
         std::vector<std::string>    success,
-                warning;
+                                    skipped,
+                                    no_firmware,
+                                    not_connected;
         uint64_t                    timeStamp=OpenWifi::Now();
 
         void to_json(Poco::JSON::Object &Obj) const;
@@ -215,7 +217,9 @@ namespace OpenWifi {
         RESTAPI_utils::field_to_json(Obj,"title",title);
         RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
         RESTAPI_utils::field_to_json(Obj,"success",success);
-        RESTAPI_utils::field_to_json(Obj,"warning",warning);
+        RESTAPI_utils::field_to_json(Obj,"notConnected",not_connected);
+        RESTAPI_utils::field_to_json(Obj,"noFirmware",no_firmware);
+        RESTAPI_utils::field_to_json(Obj,"skipped",skipped);
         RESTAPI_utils::field_to_json(Obj,"timeStamp",timeStamp);
         RESTAPI_utils::field_to_json(Obj,"details",details);
     }
@@ -225,7 +229,9 @@ namespace OpenWifi {
             RESTAPI_utils::field_from_json(Obj,"title",title);
             RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
             RESTAPI_utils::field_from_json(Obj,"success",success);
-            RESTAPI_utils::field_from_json(Obj,"warning",warning);
+            RESTAPI_utils::field_from_json(Obj,"notConnected",not_connected);
+            RESTAPI_utils::field_from_json(Obj,"noFirmware",no_firmware);
+            RESTAPI_utils::field_from_json(Obj,"skipped",skipped);
             RESTAPI_utils::field_from_json(Obj,"timeStamp",timeStamp);
             RESTAPI_utils::field_from_json(Obj,"details",details);
             return true;
