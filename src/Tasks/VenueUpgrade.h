@@ -44,18 +44,21 @@ namespace OpenWifi {
                         upgraded_++;
                     } else {
                         Logger().information(fmt::format("{}: Not Upgraded.", Device.serialNumber));
-                        failed_++;
+                        not_connected_++;
                     }
                 } else {
                     Logger().information(fmt::format("{}: Not Upgraded. No firmware available.", Device.serialNumber));
-                    failed_++;
+                    no_firmware_++;
                 }
             }
             done_ = true;
             // std::cout << "Done push for " << Device.serialNumber << std::endl;
         }
 
-        uint64_t        upgraded_=0, failed_=0, skipped_=0;
+        std::uint64_t   upgraded_ = 0,
+                        not_connected_ = 0,
+                        skipped_ = 0,
+                        no_firmware_ = 0;
         bool            started_ = false,
                         done_ = false;
         std::string     SerialNumber;
@@ -83,7 +86,10 @@ namespace OpenWifi {
             WebSocketClientNotificationVenueUpgradeList_t        N;
 
             ProvObjects::Venue  Venue;
-            uint64_t upgraded_ = 0, failed_ = 0;
+            uint64_t    upgraded_ = 0,
+                        not_connected_ = 0,
+                        skipped_ = 0,
+                        no_firmware_ = 0;
             if(StorageService()->VenueDB().GetRecord("id",VenueUUID_,Venue)) {
 
                 N.content.title = fmt::format("Upgrading {} devices.", Venue.info.name);
@@ -112,10 +118,16 @@ namespace OpenWifi {
                         if (current_job != nullptr && current_job->done_) {
                             if (current_job->upgraded_)
                                 N.content.success.push_back(current_job->SerialNumber);
-                            else
-                                N.content.warning.push_back(current_job->SerialNumber);
+                            else  if (current_job->skipped_)
+                                N.content.skipped.push_back(current_job->SerialNumber);
+                            else  if (current_job->not_connected_)
+                                N.content.not_connected.push_back(current_job->SerialNumber);
+                            else  if (current_job->no_firmware_)
+                                N.content.no_firmware.push_back(current_job->SerialNumber);
                             upgraded_ += current_job->upgraded_;
-                            failed_ += current_job->failed_;
+                            skipped_ += current_job->skipped_;
+                            no_firmware_ += current_job->no_firmware_;
+                            not_connected_ += current_job->not_connected_;
                             job_it = JobList.erase(job_it);
                             delete current_job;
                         } else {
@@ -129,12 +141,18 @@ namespace OpenWifi {
                 for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
                     VenueDeviceUpgrade * current_job = *job_it;
                     if(current_job!= nullptr && current_job->done_) {
-                        if(current_job->upgraded_)
+                        if (current_job->upgraded_)
                             N.content.success.push_back(current_job->SerialNumber);
-                        else
-                            N.content.warning.push_back(current_job->SerialNumber);
+                        else  if (current_job->skipped_)
+                            N.content.skipped.push_back(current_job->SerialNumber);
+                        else  if (current_job->not_connected_)
+                            N.content.not_connected.push_back(current_job->SerialNumber);
+                        else  if (current_job->no_firmware_)
+                            N.content.no_firmware.push_back(current_job->SerialNumber);
                         upgraded_ += current_job->upgraded_;
-                        failed_ += current_job->failed_;
+                        skipped_ += current_job->skipped_;
+                        no_firmware_ += current_job->no_firmware_;
+                        not_connected_ += current_job->not_connected_;
                         job_it = JobList.erase(job_it);
                         delete current_job;
                     } else {
@@ -142,8 +160,12 @@ namespace OpenWifi {
                     }
                 }
 
-                N.content.details = fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
-                                                JobId(), upgraded_ ,failed_);
+                N.content.details = fmt::format("Job {} Completed: {} upgraded, {} not connected, {} skipped, {} no firmware.",
+                                                JobId(),
+                                                upgraded_ ,
+                                                not_connected_,
+                                                skipped_,
+                                                no_firmware_);
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
                 Logger().warning(N.content.details);
@@ -151,10 +173,8 @@ namespace OpenWifi {
 
             // std::cout << N.content.details << std::endl;
             WebSocketClientNotificationVenueUpgradeCompletionToUser(UserInfo().email,N);
-            Logger().information(fmt::format("Job {} Completed: {} upgraded, {} failed to upgrade.",
-                                             JobId(), upgraded_ ,failed_));
+            Logger().information(N.content.details);
             Utils::SetThreadName("free");
-
             Complete();
         }
     };
