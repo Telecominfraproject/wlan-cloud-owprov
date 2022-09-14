@@ -1959,11 +1959,6 @@ paths:
             type: boolean
           required: false
         - in: query
-          name: deviceType
-          schema:
-            type: string
-          required: false
-        - in: query
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
           name: offset
           schema:
@@ -2269,12 +2264,6 @@ paths:
           schema:
             type: string
             example: serial1,serial2,serial3
-          required: false
-        - in: query
-          description: only serial numbers of full device details
-          name: serialOnly
-          schema:
-            type: boolean
           required: false
         - in: query
           description: return the number of devices
