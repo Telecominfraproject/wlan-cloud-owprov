@@ -185,6 +185,11 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
+        NormalizeMac(NewObject.serialNumber);
+        if(SerialNumber!=NewObject.serialNumber) {
+            return BadRequest(RESTAPI::Errors::SerialNumberMismatch);
+        }
+
         if((RawObject->has("deviceRules") && !ValidDeviceRules(NewObject.deviceRules,*this))) {
             return;
         }
