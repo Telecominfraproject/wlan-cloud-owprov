@@ -80,6 +80,7 @@ add_executable(owprov
         src/framework/ow_constants.h
         src/framework/MicroServiceErrorHandler.h
         src/framework/WebSocketClientNotifications.h
+        src/framework/MicroServiceErrorHandler.h
         src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
         src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
         src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
