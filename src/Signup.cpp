@@ -5,12 +5,13 @@
 #include "Signup.h"
 #include "StorageService.h"
 #include "sdks/SDK_gw.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
     int Signup::Start() {
-        GracePeriod_ = MicroService::instance().ConfigGetInt("signup.graceperiod", 60*60);
-        LingerPeriod_ = MicroService::instance().ConfigGetInt("signup.lingerperiod", 24*60*60);
+        GracePeriod_ = MicroServiceConfigGetInt("signup.graceperiod", 60*60);
+        LingerPeriod_ = MicroServiceConfigGetInt("signup.lingerperiod", 24*60*60);
 
         SignupDB::RecordVec Signups_;
         StorageService()->SignupDB().GetIncompleteSignups(Signups_);
@@ -86,7 +87,7 @@ namespace OpenWifi {
 
                             // we need to move this device to the SubscriberDevice DB
                             ProvObjects::SubscriberDevice   SD;
-                            SD.info.id = MicroService::CreateUUID();
+                            SD.info.id = MicroServiceCreateUUID();
                             SD.info.modified = SD.info.created = OpenWifi::Now();
                             SD.info.name = IT.realMacAddress;
                             SD.operatorId = SE.operatorId;

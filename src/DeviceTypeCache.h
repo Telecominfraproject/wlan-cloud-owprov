@@ -6,7 +6,11 @@
 
 #include <set>
 
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
+#include "framework/AppServiceRegistry.h"
+#include "framework/OpenAPIRequests.h"
+#include "framework/MicroServiceNames.h"
+
 #include "Poco/Timer.h"
 
 namespace OpenWifi {

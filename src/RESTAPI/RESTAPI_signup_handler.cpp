@@ -5,6 +5,9 @@
 #include "RESTAPI_signup_handler.h"
 #include "StorageService.h"
 #include "Signup.h"
+#include "framework/OpenAPIRequests.h"
+#include "framework/MicroServiceNames.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -93,7 +96,7 @@ namespace OpenWifi {
         //  OK, we can claim this device, can we create a userid?
         //  Let's create one
         //  If sec.signup("email",uuid);
-        auto SignupUUID = MicroService::instance().CreateUUID();
+        auto SignupUUID = MicroServiceCreateUUID();
         Logger().information(fmt::format("SIGNUP: Creating signup entry for '{}', uuid='{}'",UserName, SignupUUID));
 
         Poco::JSON::Object  Body;

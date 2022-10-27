@@ -4,6 +4,7 @@
 
 #include "TagServer.h"
 #include "StorageService.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
     int TagServer::Start() {

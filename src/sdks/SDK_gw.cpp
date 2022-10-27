@@ -2,8 +2,10 @@
 // Created by stephane bourque on 2022-01-11.
 //
 
-#include "framework/MicroService.h"
 #include "SDK_gw.h"
+
+#include "framework/MicroServiceNames.h"
+#include "framework/OpenAPIRequests.h"
 
 
 namespace OpenWifi::SDK::GW {

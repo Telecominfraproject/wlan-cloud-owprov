@@ -14,6 +14,8 @@
 #include "StorageService.h"
 #include "RESTAPI_db_helpers.h"
 
+#include "framework/CIDR.h"
+
 namespace OpenWifi{
 
     void RESTAPI_entity_handler::DoGet() {
@@ -78,7 +80,7 @@ namespace OpenWifi{
 
         //  When creating an entity, it cannot have any relations other that parent, notes, name, description. Everything else
         //  must be conveyed through PUT.
-        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroService::CreateUUID();
+        NewEntity.info.id = (UUID==EntityDB::RootUUID()) ? UUID : MicroServiceCreateUUID();
 
         if(UUID==EntityDB::RootUUID()) {
             NewEntity.parent="";

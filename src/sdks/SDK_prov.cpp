@@ -3,6 +3,8 @@
 //
 
 #include "SDK_prov.h"
+#include "framework/MicroServiceNames.h"
+#include "framework/OpenAPIRequests.h"
 
 
 namespace OpenWifi::SDK::Prov {

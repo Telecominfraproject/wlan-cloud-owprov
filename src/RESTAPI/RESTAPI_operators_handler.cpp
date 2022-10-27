@@ -83,7 +83,7 @@ namespace OpenWifi {
 
             // Create the default service...
             ProvObjects::ServiceClass DefSer;
-            DefSer.info.id = MicroService::CreateUUID();
+            DefSer.info.id = MicroServiceCreateUUID();
             DefSer.info.name = "Default Service Class";
             DefSer.defaultService = true;
             DefSer.info.created = DefSer.info.modified = OpenWifi::Now();

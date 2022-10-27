@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "Poco/Timer.h"
 

@@ -7,16 +7,17 @@
 #include "StorageService.h"
 #include "SerialNumberCache.h"
 #include "sdks/SDK_sec.h"
+#include "framework/UI_WebSocketClientServer.h"
 
 namespace OpenWifi {
 
     ProvWebSocketClient::ProvWebSocketClient(Poco::Logger &Logger) :
             Logger_(Logger){
-        WebSocketClientServer()->SetProcessor(this);
+        UI_WebSocketClientServer()->SetProcessor(this);
     }
 
     ProvWebSocketClient::~ProvWebSocketClient() {
-        WebSocketClientServer()->SetProcessor(nullptr);
+        UI_WebSocketClientServer()->SetProcessor(nullptr);
     }
 
     void ProvWebSocketClient::ws_command_serial_number_search(const Poco::JSON::Object::Ptr &O,
@@ -117,11 +118,11 @@ namespace OpenWifi {
                 auto Command = O->get("command").toString();
                 if (Command == "serial_number_search" && O->has("serial_prefix")) {
                     ws_command_serial_number_search(O,Done,Answer);
-                } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "address_completion" && O->has("address")) {
+                } else if (UI_WebSocketClientServer()->GeoCodeEnabled() && Command == "address_completion" && O->has("address")) {
                     ws_command_address_completion(O,Done,Answer);
-                } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "subuser_search" && O->has("operatorId")) {
+                } else if (UI_WebSocketClientServer()->GeoCodeEnabled() && Command == "subuser_search" && O->has("operatorId")) {
                     ws_command_subuser_search(O,Done,Answer);
-                } else if (WebSocketClientServer()->GeoCodeEnabled() && Command == "subdevice_search" && O->has("operatorId") && O->has("serial_prefix")) {
+                } else if (UI_WebSocketClientServer()->GeoCodeEnabled() && Command == "subdevice_search" && O->has("operatorId") && O->has("serial_prefix")) {
                     ws_command_subdevice_search(O,Done,Answer);
                 } else if (Command=="exit") {
                     ws_command_exit(O,Done,Answer);
@@ -142,7 +143,7 @@ namespace OpenWifi {
             Poco::URI   uri(URI);
 
             uri.addQueryParameter("address",A);
-            uri.addQueryParameter("key", WebSocketClientServer()->GoogleApiKey());
+            uri.addQueryParameter("key", UI_WebSocketClientServer()->GoogleApiKey());
 
             Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
             Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_GET, uri.getPathAndQuery(), Poco::Net::HTTPMessage::HTTP_1_1);

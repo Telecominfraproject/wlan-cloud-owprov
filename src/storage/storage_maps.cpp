@@ -3,6 +3,7 @@
 //
 
 #include "storage_maps.h"
+#include "framework/RESTAPI_utils.h"
 
 namespace OpenWifi {
 

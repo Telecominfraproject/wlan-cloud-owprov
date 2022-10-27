@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_Handler.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi::SDK::Sec {

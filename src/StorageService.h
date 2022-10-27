@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "framework/StorageClass.h"
-
+#include "framework/MicroServiceFuncs.h"
 #include "storage/storage_entity.h"
 #include "storage/storage_policies.h"
 #include "storage/storage_venue.h"
@@ -28,6 +27,9 @@
 #include "storage/storage_operataor.h"
 #include "storage/storage_service_class.h"
 #include "storage/storage_sub_devices.h"
+
+#include "Poco/URI.h"
+#include "framework/ow_constants.h"
 
 namespace OpenWifi {
 
@@ -87,11 +89,11 @@ namespace OpenWifi {
 
             static inline bool ApplyConfigRules(ProvObjects::DeviceRules & R_res) {
                 if(R_res.firmwareUpgrade=="inherit")
-                    R_res.firmwareUpgrade=MicroService::instance().ConfigGetString("firmware.updater.upgrade","yes");
+                    R_res.firmwareUpgrade=MicroServiceConfigGetString("firmware.updater.upgrade","yes");
                 if(R_res.rcOnly=="inherit")
-                    R_res.rcOnly=MicroService::instance().ConfigGetString("firmware.updater.releaseonly","yes");
+                    R_res.rcOnly=MicroServiceConfigGetString("firmware.updater.releaseonly","yes");
                 if(R_res.rrm=="inherit")
-                    R_res.rrm=MicroService::instance().ConfigGetString("rrm.default","no");
+                    R_res.rrm=MicroServiceConfigGetString("rrm.default","no");
                 return true;
             }
 

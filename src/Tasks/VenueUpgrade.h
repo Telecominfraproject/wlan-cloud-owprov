@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "framework/WebSocketClientNotifications.h"
 
 #include "StorageService.h"
@@ -12,6 +11,7 @@
 #include "sdks/SDK_gw.h"
 #include "sdks/SDK_fms.h"
 #include "JobController.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
     class VenueDeviceUpgrade : public Poco::Runnable {

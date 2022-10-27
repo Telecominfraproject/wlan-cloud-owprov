@@ -15,6 +15,8 @@
 #include "Tasks/VenueConfigUpdater.h"
 #include "Tasks/VenueRebooter.h"
 #include "Tasks/VenueUpgrade.h"
+#include "framework/CIDR.h"
+#include "framework/MicroServiceFuncs.h"
 
 #include "Kafka_ProvUpdater.h"
 
@@ -228,7 +230,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-            auto JobId = MicroService::instance().CreateUUID();
+            auto JobId = MicroServiceCreateUUID();
             Types::StringVec Parameters{UUID};;
             auto NewJob = new VenueConfigUpdater(JobId,"VenueConfigurationUpdater", Parameters, 0, UserInfo_.userinfo, Logger());
             JobController()->AddJob(dynamic_cast<Job*>(NewJob));
@@ -242,7 +244,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-            auto JobId = MicroService::instance().CreateUUID();
+            auto JobId = MicroServiceCreateUUID();
             Types::StringVec Parameters{UUID};;
             auto NewJob = new VenueUpgrade(JobId,"VenueFirmwareUpgrade", Parameters, 0, UserInfo_.userinfo, Logger());
             JobController()->AddJob(dynamic_cast<Job*>(NewJob));
@@ -256,7 +258,7 @@ namespace OpenWifi{
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
-            auto JobId = MicroService::instance().CreateUUID();
+            auto JobId = MicroServiceCreateUUID();
             Types::StringVec Parameters{UUID};;
             auto NewJob = new VenueRebooter(JobId,"VenueRebooter", Parameters, 0, UserInfo_.userinfo, Logger());
             JobController()->AddJob(dynamic_cast<Job*>(NewJob));

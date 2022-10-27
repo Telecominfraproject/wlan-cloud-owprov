@@ -5,7 +5,9 @@
 #include "AutoDiscovery.h"
 #include "framework/ow_constants.h"
 #include "framework/KafkaTopics.h"
+#include "framework/KafkaManager.h"
 #include "StorageService.h"
+#include "Poco/JSON/Parser.h"
 
 namespace OpenWifi {
 

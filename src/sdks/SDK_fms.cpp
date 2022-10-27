@@ -3,8 +3,11 @@
 //
 
 #include "SDK_fms.h"
-#include "framework/MicroService.h"
+
 #include "RESTObjects/RESTAPI_FMSObjects.h"
+
+#include "framework/MicroServiceNames.h"
+#include "framework/OpenAPIRequests.h"
 
 namespace OpenWifi::SDK::FMS {
 

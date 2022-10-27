@@ -10,7 +10,9 @@
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_utils.h"
+#include "framework/CIDR.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -147,7 +149,7 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = MicroService::CreateUUID();
+            V.info.id = MicroServiceCreateUUID();
             V.parent = Parent;
             V.info.created = V.info.modified = OpenWifi::Now();
             // StorageService()->VenueDB().CreateShortCut(V);
@@ -176,7 +178,7 @@ namespace OpenWifi {
             ProvObjects::Entity E;
 
             E.info.name = Child->get("name").toString();
-            E.info.id = MicroService::CreateUUID();
+            E.info.id = MicroServiceCreateUUID();
             E.parent = Parent;
             E.info.created = E.info.modified = OpenWifi::Now();
             // StorageService()->EntityDB().CreateShortCut(E);
@@ -188,7 +190,7 @@ namespace OpenWifi {
             const auto & Child = i.extract<Poco::JSON::Object::Ptr>();
             ProvObjects::Venue  V;
             V.info.name = Child->get("name").toString();
-            V.info.id = MicroService::CreateUUID();
+            V.info.id = MicroServiceCreateUUID();
             V.entity = Parent;
             V.info.created = V.info.modified = OpenWifi::Now();
             // StorageService()->VenueDB().CreateShortCut(V);

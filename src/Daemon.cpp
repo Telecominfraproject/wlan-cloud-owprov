@@ -9,6 +9,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Environment.h"
+#include "Poco/Net/SSLManager.h"
 
 #include "Daemon.h"
 #include "StorageService.h"
@@ -20,6 +21,7 @@
 #include "Signup.h"
 #include "DeviceTypeCache.h"
 #include "FileDownloader.h"
+#include "framework/UI_WebSocketClientServer.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -38,7 +40,7 @@ namespace OpenWifi {
 									   SerialNumberCache(),
 									   AutoDiscovery(),
 									   JobController(),
-									   WebSocketClientServer(),
+									   UI_WebSocketClientServer(),
                                        FindCountryFromIP(),
                                        Signup(),
                                        FileDownloader()
@@ -70,6 +72,11 @@ namespace OpenWifi {
             }
         }
     }
+
+    void DaemonPostInitialization(Poco::Util::Application &self) {
+        Daemon()->PostInitialization(self);
+    }
+
 }
 
 int main(int argc, char **argv) {

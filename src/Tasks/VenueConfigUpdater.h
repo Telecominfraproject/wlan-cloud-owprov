@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
 #include "framework/WebSocketClientNotifications.h"
 #include "JobController.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 

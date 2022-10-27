@@ -8,6 +8,8 @@
 
 #include "StorageService.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/utils.h"
+#include "fmt/format.h"
 
 namespace OpenWifi {
 
@@ -405,7 +407,7 @@ namespace OpenWifi {
         auto OperatorCount = OperatorDB().Count();
         if(OperatorCount==0) {
             ProvObjects::Operator DefOp;
-            DefOp.info.id = MicroService::CreateUUID();
+            DefOp.info.id = MicroServiceCreateUUID();
             DefOp.info.name = "Default Operator";
             DefOp.defaultOperator = true;
             DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
@@ -413,7 +415,7 @@ namespace OpenWifi {
             OperatorDB_->CreateRecord(DefOp);
 
             ProvObjects::ServiceClass DefSer;
-            DefSer.info.id = MicroService::CreateUUID();
+            DefSer.info.id = MicroServiceCreateUUID();
             DefSer.info.name = "Default Service Class";
             DefSer.defaultService = true;
             DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
