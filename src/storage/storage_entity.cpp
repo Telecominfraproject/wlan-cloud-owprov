@@ -13,6 +13,8 @@
 #include "framework/RESTAPI_utils.h"
 #include "framework/CIDR.h"
 #include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
+
 
 namespace OpenWifi {
 
@@ -151,7 +153,7 @@ namespace OpenWifi {
             V.info.name = Child->get("name").toString();
             V.info.id = MicroServiceCreateUUID();
             V.parent = Parent;
-            V.info.created = V.info.modified = OpenWifi::Now();
+            V.info.created = V.info.modified = Utils::Now();
             // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }
@@ -168,7 +170,7 @@ namespace OpenWifi {
             ProvObjects::Entity E;
             E.info.name = Name;
             E.info.id = EntityDB::RootUUID();
-            E.info.created = E.info.modified = OpenWifi::Now();
+            E.info.created = E.info.modified = Utils::Now();
             // StorageService()->EntityDB().CreateShortCut(E);
         }
 
@@ -180,7 +182,7 @@ namespace OpenWifi {
             E.info.name = Child->get("name").toString();
             E.info.id = MicroServiceCreateUUID();
             E.parent = Parent;
-            E.info.created = E.info.modified = OpenWifi::Now();
+            E.info.created = E.info.modified = Utils::Now();
             // StorageService()->EntityDB().CreateShortCut(E);
             ImportTree( Child, E.info.id );
         }
@@ -192,7 +194,7 @@ namespace OpenWifi {
             V.info.name = Child->get("name").toString();
             V.info.id = MicroServiceCreateUUID();
             V.entity = Parent;
-            V.info.created = V.info.modified = OpenWifi::Now();
+            V.info.created = V.info.modified = Utils::Now();
             // StorageService()->VenueDB().CreateShortCut(V);
             ImportVenues( Child, V.info.id );
         }

@@ -399,7 +399,7 @@ namespace OpenWifi {
 
             Root.info.id = EntityDB::RootUUID();
             Root.info.name = "Top Entity";
-            Root.info.created = Root.info.modified = OpenWifi::Now();
+            Root.info.created = Root.info.modified = Utils::Now();
             Root.deviceRules.rrm = "off";
             EntityDB().CreateRecord(Root);
         }
@@ -410,7 +410,7 @@ namespace OpenWifi {
             DefOp.info.id = MicroServiceCreateUUID();
             DefOp.info.name = "Default Operator";
             DefOp.defaultOperator = true;
-            DefOp.info.created = DefOp.info.modified = OpenWifi::Now();
+            DefOp.info.created = DefOp.info.modified = Utils::Now();
             DefOp.deviceRules.rrm = "inherit";
             OperatorDB_->CreateRecord(DefOp);
 
@@ -418,7 +418,7 @@ namespace OpenWifi {
             DefSer.info.id = MicroServiceCreateUUID();
             DefSer.info.name = "Default Service Class";
             DefSer.defaultService = true;
-            DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
+            DefSer.info.created = DefSer.info.modified = Utils::Now();
             DefSer.operatorId = DefOp.info.id;
             DefSer.period = "monthly";
             DefSer.billingCode = "basic";

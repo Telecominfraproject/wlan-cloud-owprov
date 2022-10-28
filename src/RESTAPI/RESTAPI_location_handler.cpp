@@ -12,6 +12,7 @@
 #include "StorageService.h"
 #include "Daemon.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
+#include "framework/utils.h"
 
 namespace OpenWifi{
 
@@ -147,7 +148,7 @@ namespace OpenWifi{
             Existing.phones = NewObject.phones;
         if(RawObject->has("mobiles"))
             Existing.mobiles = NewObject.mobiles;
-        Existing.info.modified = OpenWifi::Now();
+        Existing.info.modified = Utils::Now();
         if(RawObject->has("type"))
             Existing.type = NewObject.type;
 

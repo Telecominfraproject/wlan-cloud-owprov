@@ -16,6 +16,7 @@
 #include "sdks/SDK_gw.h"
 #include "SerialNumberCache.h"
 #include "nlohmann/json.hpp"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -92,7 +93,7 @@ namespace OpenWifi {
         auto SerialNumber = Poco::toLower(SerialNumberRaw);
         if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
             ProvObjects::InventoryTag   NewDevice;
-            uint64_t Now = OpenWifi::Now();
+            uint64_t Now = Utils::Now();
 
             auto Tokens = Poco::StringTokenizer(ConnectionInfo,"@:");
             std::string IP;
@@ -108,7 +109,7 @@ namespace OpenWifi {
             NewDevice.locale = Locale;
             nlohmann::json StateDoc;
             StateDoc["method"] = "auto-discovery";
-            StateDoc["date"] = OpenWifi::Now();
+            StateDoc["date"] = Utils::Now();
             NewDevice.state = to_string(StateDoc);
             NewDevice.devClass = "any";
             if(!IP.empty()) {
@@ -157,11 +158,11 @@ namespace OpenWifi {
                 auto State = nlohmann::json::parse(ExistingDevice.state);
                 if(State["method"] == "claiming") {
                     uint64_t Date = State["date"];
-                    uint64_t Now = OpenWifi::Now();
+                    uint64_t Now = Utils::Now();
 
                     if((Now - Date)<(24*60*60)) {
                         State["method"] = "claimed";
-                        State["date"] = OpenWifi::Now();
+                        State["date"] = Utils::Now();
                         ExistingDevice.state = to_string(State);
                         modified = true;
                     } else {
@@ -180,7 +181,7 @@ namespace OpenWifi {
             }
 
             if(modified) {
-                ExistingDevice.info.modified = OpenWifi::Now();
+                ExistingDevice.info.modified = Utils::Now();
                 StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber, ExistingDevice);
             }
         }

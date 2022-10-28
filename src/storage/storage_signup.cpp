@@ -8,6 +8,8 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
 #include "framework/RESTAPI_utils.h"
+#include "framework/utils.h"
+
 #include "Signup.h"
 #include "sdks/SDK_sec.h"
 #include "nlohmann/json.hpp"
@@ -59,7 +61,7 @@ namespace OpenWifi {
     void SignupDB::RemoveIncompleteSignups() {
         try {
             Types::StringVec ToDelete, TimedOut;
-            uint64_t         now = OpenWifi::Now();
+            uint64_t         now = Utils::Now();
             auto F = [&](const SignupDB::RecordName &R) -> bool {
 
                 if(R.completed!=0)
@@ -85,8 +87,8 @@ namespace OpenWifi {
                                         DeviceStatus["claimerId"] = "";
                                         DeviceStatus["signupUUID"] = "";
                                         IT.subscriber = "";
-                                        IT.info.modified = Now();
-                                        IT.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now(),.createdBy="signup-bot",.note="Device release from signup process."});
+                                        IT.info.modified = Utils::Now();
+                                        IT.info.notes.push_back(SecurityObjects::NoteInfo{.created=Utils::Now(),.createdBy="signup-bot",.note="Device release from signup process."});
                                         StorageService()->InventoryDB().UpdateRecord("serialNumber",R.serialNumber,IT);
                                     }
                                 } catch (...) {
@@ -110,7 +112,7 @@ namespace OpenWifi {
                 if(GetRecord("id",i,R)) {
                     R.statusCode=ProvObjects::SignupStatusCodes::SignupTimedOut;
                     R.status = "timedOut";
-                    R.info.modified=Now();
+                    R.info.modified=Utils::Now();
                     UpdateRecord("id",i,R);
                 }
             }
