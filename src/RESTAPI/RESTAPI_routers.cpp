@@ -34,6 +34,7 @@
 #include "RESTAPI/RESTAPI_op_contact_list_handler.h"
 #include "RESTAPI/RESTAPI_op_location_handler.h"
 #include "RESTAPI/RESTAPI_op_location_list_handler.h"
+
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
 

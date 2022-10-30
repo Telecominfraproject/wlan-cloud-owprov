@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include "framework/WebSocketClientNotifications.h"
-
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
 #include "sdks/SDK_fms.h"
 #include "JobController.h"
 #include "framework/MicroServiceFuncs.h"
+#include "UI_Prov_WebSocketNotifications.h"
 
 namespace OpenWifi {
     class VenueDeviceUpgrade : public Poco::Runnable {
