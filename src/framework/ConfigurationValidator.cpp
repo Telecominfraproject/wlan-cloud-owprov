@@ -2659,6 +2659,7 @@ static json DefaultUCentralSchema = R"(
     }
 
     int ConfigurationValidator::Start() {
+        std::cout << __LINE__ << std::endl;
         Init();
         return 0;
     }

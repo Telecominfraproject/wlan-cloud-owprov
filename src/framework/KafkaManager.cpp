@@ -301,8 +301,10 @@ namespace OpenWifi {
 
 
 	int KafkaManager::Start() {
+        std::cout << __LINE__ << std::endl;
 		if(!KafkaEnabled_)
 			return 0;
+        std::cout << __LINE__ << std::endl;
         poco_information(Logger(),"Starting...");
         std::cout << __LINE__ << std::endl;
         ConsumerThr_ = std::make_unique<KafkaConsumer>(Logger().create("KAFKA-CONSUMER",Logger().getChannel()));

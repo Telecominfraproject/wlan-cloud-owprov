@@ -14,6 +14,7 @@
 namespace OpenWifi {
 
     int Storage::Start() {
+        std::cout << __LINE__ << std::endl;
         poco_information(Logger(),"Starting...");
 		std::lock_guard		Guard(Mutex_);
 
