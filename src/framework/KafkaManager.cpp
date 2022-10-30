@@ -304,12 +304,19 @@ namespace OpenWifi {
 		if(!KafkaEnabled_)
 			return 0;
         poco_information(Logger(),"Starting...");
+        std::cout << __LINE__ << std::endl;
         ConsumerThr_ = std::make_unique<KafkaConsumer>(Logger().create("KAFKA-CONSUMER",Logger().getChannel()));
+        std::cout << __LINE__ << std::endl;
         ConsumerThr_->Start();
+        std::cout << __LINE__ << std::endl;
         ProducerThr_ = std::make_unique<KafkaProducer>(Logger().create("KAFKA-PRODUCER",Logger().getChannel()));
+        std::cout << __LINE__ << std::endl;
 		ProducerThr_->Start();
+        std::cout << __LINE__ << std::endl;
         Dispatcher_ = std::make_unique<KafkaDispatcher>(Logger().create("KAFKA-DISPATCHER",Logger().getChannel()));
+        std::cout << __LINE__ << std::endl;
 		Dispatcher_->Start();
+        std::cout << __LINE__ << std::endl;
 		return 0;
 	}
 
