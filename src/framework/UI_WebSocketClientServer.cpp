@@ -18,10 +18,11 @@
 namespace OpenWifi {
 
 	void UI_WebSocketClientServer::NewClient(Poco::Net::WebSocket & WS, const std::string &Id, const std::string &UserName ) {
-		std::lock_guard G(Mutex_);
-        auto Client = std::make_unique<UI_WebSocketClientInfo>(WS,Id, UserName);
 
-        Clients_[Id] = std::move(Client);
+        std::lock_guard G(Mutex_);
+        auto Client = std::make_unique<UI_WebSocketClientInfo>(WS,Id, UserName);
+        auto ClientSocket = Client->WS_->impl()->sockfd();
+        Clients_[ClientSocket] = std::move(Client);
 
         Client->WS_->setNoDelay(true);
         Client->WS_->setKeepAlive(true);
@@ -45,10 +46,11 @@ namespace OpenWifi {
 		Processor_ = F;
 	}
 
-	void UI_WebSocketClientServer::UnRegister(const std::string &Id) {
+/*	void UI_WebSocketClientServer::UnRegister(const std::string &Id) {
 		std::lock_guard G(Mutex_);
-		Clients_.erase(Id);
+		//
 	}
+*/
 
 	[[nodiscard]] inline bool SendToUser(const std::string &userName, const std::string &Payload);
 	UI_WebSocketClientServer::UI_WebSocketClientServer() noexcept:
@@ -104,6 +106,7 @@ namespace OpenWifi {
 		}
 	};
 
+    /*
 	bool UI_WebSocketClientServer::Send(const std::string &Id, const std::string &Payload) {
 		std::lock_guard G(Mutex_);
 
@@ -112,6 +115,7 @@ namespace OpenWifi {
 			return It->second->WS_->sendFrame(Payload.c_str(),Payload.size());
 		return false;
 	}
+     */
 
 	bool UI_WebSocketClientServer::SendToUser(const std::string &UserName, const std::string &Payload) {
 		std::lock_guard G(Mutex_);
@@ -142,18 +146,13 @@ namespace OpenWifi {
 		}
 	}
 
-    UI_WebSocketClientServer::ClientList::iterator UI_WebSocketClientServer::FindWSClient( [[maybe_unused]]  std::lock_guard<std::recursive_mutex> &G, const Poco::Net::Socket &Socket) {
-        for(auto i = Clients_.begin();i!=Clients_.end();++i) {
-            if(*i->second->WS_ == Socket) {
-                return i;
-            }
-        }
-        return end(Clients_);
+    UI_WebSocketClientServer::ClientList::iterator UI_WebSocketClientServer::FindWSClient( [[maybe_unused]]  std::lock_guard<std::recursive_mutex> &G, int ClientSocket) {
+        return Clients_.find(ClientSocket);
     }
 
     void UI_WebSocketClientServer::OnSocketError([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf) {
         std::lock_guard     G(LocalMutex_);
-        auto Client = FindWSClient(G,pNf->socket());
+        auto Client = FindWSClient(G,pNf->socket().impl()->sockfd());
         if(Client==end(Clients_))
             return;
         EndConnection(G,Client);
@@ -168,9 +167,11 @@ namespace OpenWifi {
         UI_WebSocketClientServer::ClientList::iterator Client;
         std::lock_guard     G(LocalMutex_);
 
+        pNf->socket().impl()->sockfd();
+
 		try {
 
-            Client = FindWSClient(G,pNf->socket());
+            Client = FindWSClient(G,pNf->socket().impl()->sockfd());
             if( Client == end(Clients_))
                 return;
 
@@ -250,7 +251,7 @@ namespace OpenWifi {
         ClientList::iterator Client;
         std::lock_guard     G(LocalMutex_);
         try {
-            Client = FindWSClient(G, pNf->socket());
+            Client = FindWSClient(G, pNf->socket().impl()->sockfd());
             if (Client == end(Clients_))
                 return;
             EndConnection(G, Client);

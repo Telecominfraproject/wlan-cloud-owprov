@@ -56,10 +56,10 @@ namespace OpenWifi {
 		Poco::Net::SocketReactor & Reactor() { return Reactor_; }
 		void NewClient(Poco::Net::WebSocket &WS, const std::string &Id, const std::string &UserName);
 		void SetProcessor(UI_WebSocketClientProcessor *F);
-		void UnRegister(const std::string &Id);
+		// void UnRegister(const std::string &Id);
 		[[nodiscard]] inline bool GeoCodeEnabled() const { return GeoCodeEnabled_; }
 		[[nodiscard]] inline std::string GoogleApiKey() const { return GoogleApiKey_; }
-		[[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
+		// [[nodiscard]] bool Send(const std::string &Id, const std::string &Payload);
 
 		template <typename T> bool
 		SendUserNotification(const std::string &userName, const WebSocketNotification<T> &Notification) {
@@ -87,7 +87,7 @@ namespace OpenWifi {
 		[[nodiscard]] bool SendToUser(const std::string &userName, const std::string &Payload);
 		void SendToAll(const std::string &Payload);
 
-        using ClientList = std::map<std::string,std::unique_ptr<UI_WebSocketClientInfo>>;
+        using ClientList = std::map<int,std::unique_ptr<UI_WebSocketClientInfo>>;
     private:
 		mutable std::atomic_bool Running_ = false;
 		Poco::Thread 								Thr_;
@@ -105,7 +105,7 @@ namespace OpenWifi {
         void OnSocketShutdown(const Poco::AutoPtr<Poco::Net::ShutdownNotification> &pNf);
         void OnSocketError(const Poco::AutoPtr<Poco::Net::ErrorNotification> &pNf);
 
-        ClientList::iterator FindWSClient( std::lock_guard<std::recursive_mutex> &G, const Poco::Net::Socket & S);
+        ClientList::iterator FindWSClient( std::lock_guard<std::recursive_mutex> &G, int ClientSocket);
 
 
 	};
