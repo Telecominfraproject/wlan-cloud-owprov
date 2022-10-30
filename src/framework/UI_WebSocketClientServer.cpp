@@ -38,7 +38,6 @@ namespace OpenWifi {
                                  Poco::NObserver<UI_WebSocketClientServer, Poco::Net::ErrorNotification>(
                                          *this, &UI_WebSocketClientServer::OnSocketError));
         Client->SocketRegistered_ = true;
-        std::cout << "B: WS: User -> " << UserName << std::endl;
         Clients_[ClientSocket] = std::move(Client);
     }
 
@@ -46,13 +45,6 @@ namespace OpenWifi {
 		Processor_ = F;
 	}
 
-/*	void UI_WebSocketClientServer::UnRegister(const std::string &Id) {
-		std::lock_guard G(Mutex_);
-		//
-	}
-*/
-
-	[[nodiscard]] inline bool SendToUser(const std::string &userName, const std::string &Payload);
 	UI_WebSocketClientServer::UI_WebSocketClientServer() noexcept:
 		 SubSystemServer("WebSocketClientServer", "UI-WSCLNT-SVR", "websocketclients")
 	{
@@ -72,8 +64,8 @@ namespace OpenWifi {
                                         Poco::NObserver<UI_WebSocketClientServer,
                                                 Poco::Net::ErrorNotification>(*this,&UI_WebSocketClientServer::OnSocketError));
         }
-        std::cout << "B: WS: User -> " << Client->second->UserName_ << std::endl; ;
         Clients_.erase(Client);
+        std::cout << "How many clients: " << Clients_.size() << std::endl;
     }
 
 	void UI_WebSocketClientServer::run() {
@@ -90,7 +82,6 @@ namespace OpenWifi {
 	int UI_WebSocketClientServer::Start() {
 		GoogleApiKey_ = MicroServiceConfigGetString("google.apikey","");
 		GeoCodeEnabled_ = !GoogleApiKey_.empty();
-		// ReactorPool_ = std::make_unique<MyParallelSocketReactor>();
 		ReactorThread_.start(Reactor_);
 		Thr_.start(*this);
 		return 0;
@@ -159,15 +150,10 @@ namespace OpenWifi {
 	}
 
 	void UI_WebSocketClientServer::OnSocketReadable([[maybe_unused]] const Poco::AutoPtr<Poco::Net::ReadableNotification> &pNf) {
-		int flags;
-		int n;
-		bool Done=false;
-
 
         UI_WebSocketClientServer::ClientList::iterator Client;
-        std::lock_guard     G(LocalMutex_);
 
-        pNf->socket().impl()->sockfd();
+        std::lock_guard     G(LocalMutex_);
 
 		try {
 
@@ -176,6 +162,8 @@ namespace OpenWifi {
                 return;
 
 			Poco::Buffer<char> IncomingFrame(0);
+            int flags;
+            int n;
 			n = Client->second->WS_->receiveFrame(IncomingFrame, flags);
 			auto Op = flags & Poco::Net::WebSocket::FRAME_OP_BITMASK;
 
@@ -194,7 +182,7 @@ namespace OpenWifi {
 			} break;
 			case Poco::Net::WebSocket::FRAME_OP_CLOSE: {
 				poco_debug(Logger(),fmt::format("CLOSE({}): {} UI Client is closing WS connection.", Client->second->Id_, Client->second->UserName_));
-				Done = true;
+                return EndConnection(G, Client);
 			} break;
 			case Poco::Net::WebSocket::FRAME_OP_TEXT: {
 				IncomingFrame.append(0);
@@ -213,37 +201,34 @@ namespace OpenWifi {
 					} else {
 						std::string S{"Invalid token. Closing connection."};
                         Client->second->WS_->sendFrame(S.c_str(), S.size());
-						Done = true;
+                        return EndConnection(G, Client);
 					}
 
 				} else {
-					try {
-						Poco::JSON::Parser P;
-						auto Obj =
-							P.parse(IncomingFrame.begin()).extract<Poco::JSON::Object::Ptr>();
-						std::string Answer;
-						if (Processor_ != nullptr)
-							Processor_->Processor(Obj, Answer, Done);
-						if (!Answer.empty())
-                            Client->second->WS_->sendFrame(Answer.c_str(), (int)Answer.size());
-						else {
-                            Client->second->WS_->sendFrame("{}", 2);
-						}
-					} catch (const Poco::JSON::JSONException &E) {
-						Logger().log(E);
-						Done=true;
-					}
+                    Poco::JSON::Parser P;
+                    auto Obj =
+                        P.parse(IncomingFrame.begin()).extract<Poco::JSON::Object::Ptr>();
+                    std::string Answer;
+                    bool CloseConnection=false;
+                    if (Processor_ != nullptr) {
+                        Processor_->Processor(Obj, Answer, CloseConnection);
+                    }
+                    if (!Answer.empty())
+                        Client->second->WS_->sendFrame(Answer.c_str(), (int)Answer.size());
+                    else {
+                        Client->second->WS_->sendFrame("{}", 2);
+                    }
+
+                    if(CloseConnection) {
+                        return EndConnection(G, Client);
+                    }
 				}
 			} break;
 			default: {
 			}
 			}
 		} catch (...) {
-			Done=true;
-		}
-
-		if(Done) {
-			return EndConnection(G, Client);;
+            return EndConnection(G, Client);
 		}
 	}
 
