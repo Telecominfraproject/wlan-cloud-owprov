@@ -68,8 +68,9 @@ namespace OpenWifi {
 	}
 
 	inline void KafkaProducer::run() {
-
         Poco::Logger &Logger_ = Poco::Logger::create("KAFKA-PRODUCER", KafkaManager()->Logger().getChannel());
+        poco_information(Logger_,"Starting...");
+
 		Utils::SetThreadName("Kafka:Prod");
 		cppkafka::Configuration Config({
 			{ "client.id", MicroServiceConfigGetString("openwifi.kafka.client.id", "") },
@@ -106,6 +107,7 @@ namespace OpenWifi {
 			}
 			Note = Queue_.waitDequeueNotification();
 		}
+        poco_information(Logger_,"Stopped...");
 	}
 
 	inline void KafkaConsumer::run() {
@@ -301,7 +303,6 @@ namespace OpenWifi {
 
 
 	int KafkaManager::Start() {
-        std::cout << __LINE__ << std::endl;
 		if(!KafkaEnabled_)
 			return 0;
         ConsumerThr_.Start();
