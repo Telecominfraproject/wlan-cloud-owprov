@@ -22,16 +22,12 @@ namespace OpenWifi {
 	void UI_WebSocketClientServer::NewClient(Poco::Net::WebSocket & WS, const std::string &Id, const std::string &UserName ) {
 
         std::lock_guard G(Mutex_);
-        DBG;
         auto Client = std::make_unique<UI_WebSocketClientInfo>(WS,Id, UserName);
-        DBG;
         auto ClientSocket = Client->WS_->impl()->sockfd();
-        DBG;
 
         Client->WS_->setNoDelay(true);
         Client->WS_->setKeepAlive(true);
         Client->WS_->setBlocking(false);
-        DBG;
         Reactor_.addEventHandler(*Client->WS_,
                                  Poco::NObserver<UI_WebSocketClientServer, Poco::Net::ReadableNotification>(
                                          *this, &UI_WebSocketClientServer::OnSocketReadable));
@@ -41,15 +37,9 @@ namespace OpenWifi {
         Reactor_.addEventHandler(*Client->WS_,
                                  Poco::NObserver<UI_WebSocketClientServer, Poco::Net::ErrorNotification>(
                                          *this, &UI_WebSocketClientServer::OnSocketError));
-        DBG;
         Client->SocketRegistered_ = true;
-        DBG;
-
         std::cout << "B: WS: User -> " << UserName << std::endl;
-        DBG;
         Clients_[ClientSocket] = std::move(Client);
-        DBG;
-
     }
 
 	void UI_WebSocketClientServer::SetProcessor( UI_WebSocketClientProcessor * F) {
@@ -116,16 +106,15 @@ namespace OpenWifi {
 		}
 	};
 
-    /*
-	bool UI_WebSocketClientServer::Send(const std::string &Id, const std::string &Payload) {
+	bool UI_WebSocketClientServer::SendToId(const std::string &Id, const std::string &Payload) {
 		std::lock_guard G(Mutex_);
 
-		auto It = Clients_.find(Id);
-		if(It!=Clients_.end())
-			return It->second->WS_->sendFrame(Payload.c_str(),Payload.size());
+        for(const auto &Client:Clients_) {
+            if(Client.second->Id_==Id)
+                return Client.second->WS_->sendFrame(Payload.c_str(),(int)Payload.size());
+        }
 		return false;
 	}
-     */
 
 	bool UI_WebSocketClientServer::SendToUser(const std::string &UserName, const std::string &Payload) {
 		std::lock_guard G(Mutex_);
@@ -134,7 +123,7 @@ namespace OpenWifi {
 		for(const auto &client:Clients_) {
 			if(client.second->UserName_ == UserName) {
 				try {
-					if (client.second->WS_->sendFrame(Payload.c_str(),Payload.size()))
+					if (client.second->WS_->sendFrame(Payload.c_str(),(int)Payload.size()))
 						Sent++;
 				} catch (...) {
 					return false;
@@ -149,7 +138,7 @@ namespace OpenWifi {
 
 		for(const auto &client:Clients_) {
 			try {
-				client.second->WS_->sendFrame(Payload.c_str(),Payload.size());
+				client.second->WS_->sendFrame(Payload.c_str(),(int)Payload.size());
 			} catch (...) {
 
 			}
