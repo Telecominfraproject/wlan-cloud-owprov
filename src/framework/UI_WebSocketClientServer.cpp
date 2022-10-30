@@ -15,18 +15,25 @@
 
 #include "fmt/format.h"
 
+#define DBG { std::cout << __LINE__ << std::endl; }
+
 namespace OpenWifi {
 
 	void UI_WebSocketClientServer::NewClient(Poco::Net::WebSocket & WS, const std::string &Id, const std::string &UserName ) {
 
         std::lock_guard G(Mutex_);
+        DBG;
         auto Client = std::make_unique<UI_WebSocketClientInfo>(WS,Id, UserName);
+        DBG;
         auto ClientSocket = Client->WS_->impl()->sockfd();
+        DBG;
         Clients_[ClientSocket] = std::move(Client);
+        DBG;
 
         Client->WS_->setNoDelay(true);
         Client->WS_->setKeepAlive(true);
         Client->WS_->setBlocking(false);
+        DBG;
         Reactor_.addEventHandler(*Client->WS_,
                                  Poco::NObserver<UI_WebSocketClientServer, Poco::Net::ReadableNotification>(
                                          *this, &UI_WebSocketClientServer::OnSocketReadable));
@@ -36,9 +43,12 @@ namespace OpenWifi {
         Reactor_.addEventHandler(*Client->WS_,
                                  Poco::NObserver<UI_WebSocketClientServer, Poco::Net::ErrorNotification>(
                                          *this, &UI_WebSocketClientServer::OnSocketError));
+        DBG;
         Client->SocketRegistered_ = true;
+        DBG;
 
         std::cout << "B: WS: User -> " << UserName << std::endl;
+        DBG;
 
     }
 
