@@ -7,6 +7,7 @@
 
 namespace OpenWifi {
     int FileDownloader::Start() {
+        poco_information(Logger(),"Starting...");
         TimerCallback_ = std::make_unique<Poco::TimerCallback<FileDownloader>>(*this,&FileDownloader::onTimer);
         Timer_.setStartInterval( 20 * 1000);  // first run in 20 seconds
         Timer_.setPeriodicInterval(2 * 60 * 60 * 1000); // 1 hours
@@ -15,8 +16,9 @@ namespace OpenWifi {
     }
 
     void FileDownloader::Stop() {
+        poco_information(Logger(),"Stopping...");
         Timer_.stop();
-        Logger().notice("Stopping.");
+        poco_information(Logger(),"Stopped...");
     }
 
     void FileDownloader::onTimer([[maybe_unused]] Poco::Timer &timer) {

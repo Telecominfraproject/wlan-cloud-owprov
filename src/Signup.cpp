@@ -11,6 +11,7 @@
 namespace OpenWifi {
 
     int Signup::Start() {
+        poco_information(Logger(),"Starting...");
         GracePeriod_ = MicroServiceConfigGetInt("signup.graceperiod", 60*60);
         LingerPeriod_ = MicroServiceConfigGetInt("signup.lingerperiod", 24*60*60);
 
@@ -31,10 +32,12 @@ namespace OpenWifi {
     }
 
     void Signup::Stop() {
+        poco_information(Logger(),"Stopping...");
         Running_ = false;
         Timer_.stop();
         Worker_.wakeUp();
         Worker_.join();
+        poco_information(Logger(),"Stopped...");
     }
 
     void Signup::onTimer([[maybe_unused]] Poco::Timer &timer) {

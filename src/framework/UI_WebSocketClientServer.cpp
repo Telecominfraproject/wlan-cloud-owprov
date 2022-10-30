@@ -80,6 +80,7 @@ namespace OpenWifi {
 	};
 
 	int UI_WebSocketClientServer::Start() {
+        poco_information(Logger(),"Starting...");
 		GoogleApiKey_ = MicroServiceConfigGetString("google.apikey","");
 		GeoCodeEnabled_ = !GoogleApiKey_.empty();
 		ReactorThread_.start(Reactor_);
@@ -89,12 +90,14 @@ namespace OpenWifi {
 
 	void UI_WebSocketClientServer::Stop() {
 		if(Running_) {
+            poco_information(Logger(),"Stopping...");
             Clients_.clear();
 			Reactor_.stop();
 			ReactorThread_.join();
 			Running_ = false;
 			Thr_.wakeUp();
 			Thr_.join();
+            poco_information(Logger(),"Stopped...");
 		}
 	};
 

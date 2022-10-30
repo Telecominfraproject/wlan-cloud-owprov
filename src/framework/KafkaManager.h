@@ -34,13 +34,16 @@ namespace OpenWifi {
 
 	class KafkaProducer : public Poco::Runnable {
 	  public:
-
+        KafkaProducer(Poco::Logger &L) :
+            Logger_(L) {
+        }
 		void run () override;
 		void Start();
 		void Stop();
 		void Produce(const std::string &Topic, const std::string &Key, const std::string &Payload);
 
 	  private:
+        Poco::Logger                &Logger_;
 		std::recursive_mutex  		Mutex_;
 		Poco::Thread        		Worker_;
 		mutable std::atomic_bool    Running_=false;
@@ -49,18 +52,25 @@ namespace OpenWifi {
 
 	class KafkaConsumer : public Poco::Runnable {
 	  public:
+        KafkaConsumer(Poco::Logger &L) :
+            Logger_(L) {
+        }
 		void run() override;
 		void Start();
 		void Stop();
 
 	  private:
-		std::recursive_mutex  	Mutex_;
-		Poco::Thread        	Worker_;
-		mutable std::atomic_bool    	Running_=false;
+        Poco::Logger                &Logger_;
+		std::recursive_mutex  	    Mutex_;
+		Poco::Thread        	    Worker_;
+		mutable std::atomic_bool    Running_=false;
 	};
 
 	class KafkaDispatcher : public Poco::Runnable {
 	  public:
+        KafkaDispatcher(Poco::Logger &L) :
+            Logger_(L) {
+        }
 
 		void Start();
 		void Stop();
@@ -71,6 +81,7 @@ namespace OpenWifi {
 		void Topics(std::vector<std::string> &T);
 
 	  private:
+        Poco::Logger                &Logger_;
 		std::recursive_mutex  		Mutex_;
 		Types::NotifyTable      	Notifiers_;
 		Poco::Thread        		Worker_;
@@ -104,11 +115,11 @@ namespace OpenWifi {
 		void Topics(std::vector<std::string> &T);
 
 	  private:
-		bool 							KafkaEnabled_ = false;
-		std::string 					SystemInfoWrapper_;
-		KafkaProducer                   ProducerThr_;
-		KafkaConsumer                   ConsumerThr_;
-		KafkaDispatcher					Dispatcher_;
+		bool 							    KafkaEnabled_ = false;
+		std::string 					    SystemInfoWrapper_;
+		std::unique_ptr<KafkaProducer>      ProducerThr_;
+		std::unique_ptr<KafkaConsumer>      ConsumerThr_;
+		std::unique_ptr<KafkaDispatcher>    Dispatcher_;
 
 		void PartitionAssignment(const cppkafka::TopicPartitionList& partitions);
 		void PartitionRevocation(const cppkafka::TopicPartitionList& partitions);

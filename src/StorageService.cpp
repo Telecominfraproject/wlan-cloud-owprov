@@ -14,6 +14,7 @@
 namespace OpenWifi {
 
     int Storage::Start() {
+        poco_information(Logger(),"Starting...");
 		std::lock_guard		Guard(Mutex_);
 
 		StorageClass::Start();
@@ -111,8 +112,9 @@ namespace OpenWifi {
     }
 
     void Storage::Stop() {
+        poco_information(Logger(),"Stopping...");
         Timer_.stop();
-        Logger().notice("Stopping.");
+        poco_information(Logger(),"Stopped...");
     }
 
     bool Storage::Validate(const Poco::URI::QueryParameters &P, RESTAPI::Errors::msg &Error) {

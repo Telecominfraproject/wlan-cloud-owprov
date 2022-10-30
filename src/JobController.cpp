@@ -11,9 +11,8 @@ namespace OpenWifi {
     void RegisterJobTypes();
 
     int JobController::Start() {
-
+        poco_information(Logger(),"Starting...");
         RegisterJobTypes();
-
         if(!Running_)
             Thr_.start(*this);
 
@@ -22,8 +21,10 @@ namespace OpenWifi {
 
     void JobController::Stop() {
         if(Running_) {
+            poco_information(Logger(),"Stopping...");
             Running_ = false;
             Thr_.join();
+            poco_information(Logger(),"Stopped...");
         }
     }
 

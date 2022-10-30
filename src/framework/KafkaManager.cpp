@@ -67,8 +67,6 @@ namespace OpenWifi {
 		KafkaEnabled_ = MicroServiceConfigGetBool("openwifi.kafka.enable",false);
 	}
 
-
-
 	inline void KafkaProducer::run() {
 
 		Utils::SetThreadName("Kafka:Prod");
@@ -185,6 +183,7 @@ namespace OpenWifi {
 	}
 
 	void KafkaProducer::Start() {
+        poco_information(Logger_,"Starting...");
 		if(!Running_) {
 			Running_=true;
 			Worker_.start(*this);
@@ -193,9 +192,11 @@ namespace OpenWifi {
 
 	void KafkaProducer::Stop() {
 		if(Running_) {
+            poco_information(Logger_,"Stopping...");
 			Running_=false;
 			Queue_.wakeUpAll();
 			Worker_.join();
+            poco_information(Logger_,"Stopped...");
 		}
 	}
 
@@ -206,6 +207,7 @@ namespace OpenWifi {
 
 	void KafkaConsumer::Start() {
 		if(!Running_) {
+            poco_information(Logger_,"Starting...");
 			Running_=true;
 			Worker_.start(*this);
 		}
@@ -213,14 +215,17 @@ namespace OpenWifi {
 
 	void KafkaConsumer::Stop() {
 		if(Running_) {
+            poco_information(Logger_,"Stopping...");
 			Running_=false;
 			Worker_.wakeUp();
 			Worker_.join();
+            poco_information(Logger_,"Stopped...");
 		}
 	}
 
 	void KafkaDispatcher::Start() {
 		if(!Running_) {
+            poco_information(Logger_,"Starting...");
 			Running_=true;
 			Worker_.start(*this);
 		}
@@ -228,9 +233,11 @@ namespace OpenWifi {
 
 	void KafkaDispatcher::Stop() {
 		if(Running_) {
+            poco_information(Logger_,"Stopping...");
 			Running_=false;
 			Queue_.wakeUpAll();
 			Worker_.join();
+            poco_information(Logger_,"Stopped...");
 		}
 	}
 
@@ -296,18 +303,22 @@ namespace OpenWifi {
 	int KafkaManager::Start() {
 		if(!KafkaEnabled_)
 			return 0;
-		ConsumerThr_.Start();
-		ProducerThr_.Start();
-		Dispatcher_.Start();
+        poco_information(Logger(),"Starting...");
+        ConsumerThr_ = std::make_unique<KafkaConsumer>(Logger().create("KAFKA-CONSUMER",Logger().getChannel()));
+        ConsumerThr_->Start();
+        ProducerThr_ = std::make_unique<KafkaProducer>(Logger().create("KAFKA-PRODUCER",Logger().getChannel()));
+		ProducerThr_->Start();
+        Dispatcher_ = std::make_unique<KafkaDispatcher>(Logger().create("KAFKA-DISPATCHER",Logger().getChannel()));
+		Dispatcher_->Start();
 		return 0;
 	}
 
 	void KafkaManager::Stop()  {
 		if(KafkaEnabled_) {
 			poco_information(Logger(),"Stopping...");
-			Dispatcher_.Stop();
-			ProducerThr_.Stop();
-			ConsumerThr_.Stop();
+			Dispatcher_->Stop();
+			ProducerThr_->Stop();
+			ConsumerThr_->Stop();
 			poco_information(Logger(),"Stopped...");
 			return;
 		}
@@ -315,12 +326,12 @@ namespace OpenWifi {
 
 	void KafkaManager::PostMessage(const std::string &topic, const std::string & key, const std::string &PayLoad, bool WrapMessage ) {
 		if(KafkaEnabled_) {
-			ProducerThr_.Produce(topic,key,WrapMessage ? WrapSystemId(PayLoad) : PayLoad);
+			ProducerThr_->Produce(topic,key,WrapMessage ? WrapSystemId(PayLoad) : PayLoad);
 		}
 	}
 
 	void KafkaManager::Dispatch(const std::string &Topic, const std::string & Key, const std::string &Payload) {
-		Dispatcher_.Dispatch(Topic, Key, Payload);
+		Dispatcher_->Dispatch(Topic, Key, Payload);
 	}
 
 	[[nodiscard]] std::string KafkaManager::WrapSystemId(const std::string & PayLoad) {
@@ -329,7 +340,7 @@ namespace OpenWifi {
 
 	uint64_t KafkaManager::RegisterTopicWatcher(const std::string &Topic, Types::TopicNotifyFunction &F) {
 		if(KafkaEnabled_) {
-			return Dispatcher_.RegisterTopicWatcher(Topic,F);
+			return Dispatcher_->RegisterTopicWatcher(Topic,F);
 		} else {
 			return 0;
 		}
@@ -337,12 +348,12 @@ namespace OpenWifi {
 
 	void KafkaManager::UnregisterTopicWatcher(const std::string &Topic, uint64_t Id) {
 		if(KafkaEnabled_) {
-			Dispatcher_.UnregisterTopicWatcher(Topic, Id);
+			Dispatcher_->UnregisterTopicWatcher(Topic, Id);
 		}
 	}
 
 	void KafkaManager::Topics(std::vector<std::string> &T) {
-		Dispatcher_.Topics(T);
+		Dispatcher_->Topics(T);
 	}
 
 	void KafkaManager::PartitionAssignment(const cppkafka::TopicPartitionList& partitions) {
