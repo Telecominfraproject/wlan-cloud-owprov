@@ -98,6 +98,7 @@ namespace OpenWifi {
 
 	void UI_WebSocketClientServer::Stop() {
 		if(Running_) {
+            Clients_.clear();
 			Reactor_.stop();
 			ReactorThread_.join();
 			Running_ = false;
