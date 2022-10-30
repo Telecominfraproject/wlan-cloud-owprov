@@ -27,8 +27,6 @@ namespace OpenWifi {
         DBG;
         auto ClientSocket = Client->WS_->impl()->sockfd();
         DBG;
-        Clients_[ClientSocket] = std::move(Client);
-        DBG;
 
         Client->WS_->setNoDelay(true);
         Client->WS_->setKeepAlive(true);
@@ -48,6 +46,8 @@ namespace OpenWifi {
         DBG;
 
         std::cout << "B: WS: User -> " << UserName << std::endl;
+        DBG;
+        Clients_[ClientSocket] = std::move(Client);
         DBG;
 
     }
