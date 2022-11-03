@@ -76,7 +76,7 @@ namespace OpenWifi {
 
     void DaemonPostInitialization(Poco::Util::Application &self) {
         Daemon()->PostInitialization(self);
-        ProvWebSocketNotifications::RegisterProvNotifications();
+        ProvWebSocketNotifications::Register();
     }
 
 }

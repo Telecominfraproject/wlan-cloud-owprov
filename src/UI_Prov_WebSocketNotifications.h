@@ -54,7 +54,7 @@ namespace OpenWifi::ProvWebSocketNotifications {
 
     typedef WebSocketNotification<FWUpgradeList> VenueFWUpgradeList_t;
 
-    void RegisterProvNotifications();
+    void Register();
 
     void VenueFWUpgradeCompletion( const std::string & User, VenueFWUpgradeList_t &N);
     void VenueFWUpgradeCompletion( VenueFWUpgradeList_t &N);

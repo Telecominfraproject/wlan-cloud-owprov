@@ -85,7 +85,7 @@ namespace OpenWifi::ProvWebSocketNotifications {
         return false;
     }
 
-    void RegisterProvNotifications() {
+    void Register() {
         static const UI_WebSocketClientServer::NotificationTypeIdVec Notifications = {
                 { 1000, "venue_fw_upgrade" },
                 { 2000, "venue_config_update" },
