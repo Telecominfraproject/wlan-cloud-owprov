@@ -22,6 +22,7 @@
 #include "DeviceTypeCache.h"
 #include "FileDownloader.h"
 #include "framework/UI_WebSocketClientServer.h"
+#include "UI_Prov_WebSocketNotifications.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -75,6 +76,7 @@ namespace OpenWifi {
 
     void DaemonPostInitialization(Poco::Util::Application &self) {
         Daemon()->PostInitialization(self);
+        ProvWebSocketNotifications::RegisterProvNotifications();
     }
 
 }

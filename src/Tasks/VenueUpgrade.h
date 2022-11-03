@@ -82,7 +82,7 @@ namespace OpenWifi {
             Utils::SetThreadName("venue-upgr");
             auto VenueUUID_ = Parameter(0);
 
-            WebSocketClientNotificationVenueUpgradeList_t        N;
+            ProvWebSocketNotifications::VenueFWUpgradeList_t        N;
 
             ProvObjects::Venue  Venue;
             uint64_t    upgraded_ = 0,
@@ -171,7 +171,7 @@ namespace OpenWifi {
             }
 
             // std::cout << N.content.details << std::endl;
-            WebSocketClientNotificationVenueUpgradeCompletionToUser(UserInfo().email,N);
+            ProvWebSocketNotifications::VenueFWUpgradeCompletion(UserInfo().email,N);
             Logger().information(N.content.details);
             Utils::SetThreadName("free");
             Complete();

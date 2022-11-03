@@ -5,9 +5,9 @@
 #include "UI_Prov_WebSocketNotifications.h"
 
 
-namespace OpenWifi {
+namespace OpenWifi::ProvWebSocketNotifications {
 
-    void WebSocketNotificationJobContent::to_json(Poco::JSON::Object &Obj) const {
+    void ConfigUpdateList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json(Obj,"title",title);
         RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
         RESTAPI_utils::field_to_json(Obj,"success",success);
@@ -17,7 +17,7 @@ namespace OpenWifi {
         RESTAPI_utils::field_to_json(Obj,"details",details);
     }
 
-    bool WebSocketNotificationJobContent::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    bool ConfigUpdateList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             RESTAPI_utils::field_from_json(Obj,"title",title);
             RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
@@ -33,7 +33,7 @@ namespace OpenWifi {
         return false;
     }
 
-    void WebSocketNotificationRebootList::to_json(Poco::JSON::Object &Obj) const {
+    void RebootList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json(Obj,"title",title);
         RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
         RESTAPI_utils::field_to_json(Obj,"success",success);
@@ -42,7 +42,7 @@ namespace OpenWifi {
         RESTAPI_utils::field_to_json(Obj,"details",details);
     }
 
-    bool WebSocketNotificationRebootList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    bool RebootList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             RESTAPI_utils::field_from_json(Obj,"title",title);
             RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
@@ -57,7 +57,7 @@ namespace OpenWifi {
         return false;
     }
 
-    void WebSocketNotificationUpgradeList::to_json(Poco::JSON::Object &Obj) const {
+    void FWUpgradeList::to_json(Poco::JSON::Object &Obj) const {
         RESTAPI_utils::field_to_json(Obj,"title",title);
         RESTAPI_utils::field_to_json(Obj,"jobId",jobId);
         RESTAPI_utils::field_to_json(Obj,"success",success);
@@ -68,7 +68,7 @@ namespace OpenWifi {
         RESTAPI_utils::field_to_json(Obj,"details",details);
     }
 
-    bool WebSocketNotificationUpgradeList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+    bool FWUpgradeList::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             RESTAPI_utils::field_from_json(Obj,"title",title);
             RESTAPI_utils::field_from_json(Obj,"jobId",jobId);
@@ -85,33 +85,42 @@ namespace OpenWifi {
         return false;
     }
 
-    void WebSocketClientNotificationVenueUpdateJobCompletionToUser( WebSocketClientNotificationVenueUpdateJob_t &N) {
-        N.type = "venue_configuration_update";
+    void RegisterProvNotifications() {
+        static const UI_WebSocketClientServer::NotificationTypeIdVec Notifications = {
+                { 1000, "venue_fw_upgrade" },
+                { 2000, "venue_config_update" },
+                { 3000, "venue_rebooter" }
+        };
+        UI_WebSocketClientServer()->RegisterNotifications(Notifications);
+    }
+
+    void VenueFWUpgradeCompletion( VenueFWUpgradeList_t &N) {
+        N.type_id = 1000 ;
         UI_WebSocketClientServer()->SendNotification(N);
     }
 
-    void WebSocketClientNotificationVenueRebootCompletionToUser( WebSocketClientNotificationVenueRebootList_t &N) {
-        N.type = "venue_rebooter";
-        UI_WebSocketClientServer()->SendNotification(N);
-    }
-
-    void WebSocketClientNotificationVenueUpgradeCompletionToUser( WebSocketClientNotificationVenueUpgradeList_t &N) {
-        N.type = "venue_upgrader";
-        UI_WebSocketClientServer()->SendNotification(N);
-    }
-
-    void WebSocketClientNotificationVenueUpdateJobCompletionToUser( const std::string & User, WebSocketClientNotificationVenueUpdateJob_t &N) {
-        N.type = "venue_configuration_update";
+    void VenueFWUpgradeCompletion( const std::string & User, VenueFWUpgradeList_t &N) {
+        N.type_id = 1000 ;
         UI_WebSocketClientServer()->SendUserNotification(User,N);
     }
 
-    void WebSocketClientNotificationVenueRebootCompletionToUser( const std::string & User, WebSocketClientNotificationVenueRebootList_t &N) {
-        N.type = "venue_rebooter";
+    void VenueConfigUpdateCompletion( ConfigUpdateList_t &N) {
+        N.type_id = 2000 ;
+        UI_WebSocketClientServer()->SendNotification(N);
+    }
+
+    void VenueConfigUpdateCompletion( const std::string & User, ConfigUpdateList_t &N) {
+        N.type_id = 2000 ;
         UI_WebSocketClientServer()->SendUserNotification(User,N);
     }
 
-    void WebSocketClientNotificationVenueUpgradeCompletionToUser( const std::string & User, WebSocketClientNotificationVenueUpgradeList_t &N) {
-        N.type = "venue_upgrader";
+    void VenueRebootCompletion( VenueRebootList_t &N) {
+        N.type_id = 3000 ;
+        UI_WebSocketClientServer()->SendNotification(N);
+    }
+
+    void VenueRebootCompletion( const std::string & User, VenueRebootList_t &N) {
+        N.type_id = 3000 ;
         UI_WebSocketClientServer()->SendUserNotification(User,N);
     }
 

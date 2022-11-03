@@ -59,7 +59,7 @@ namespace OpenWifi {
 
             Utils::SetThreadName("venue-reboot");
 
-            WebSocketClientNotificationVenueRebootList_t        N;
+            ProvWebSocketNotifications::VenueRebootList_t        N;
             auto VenueUUID_ = Parameter(0);
 
             ProvObjects::Venue  Venue;
@@ -127,7 +127,7 @@ namespace OpenWifi {
             }
 
             // std::cout << N.content.details << std::endl;
-            WebSocketClientNotificationVenueRebootCompletionToUser(UserInfo().email,N);
+            ProvWebSocketNotifications::VenueRebootCompletion(UserInfo().email,N);
             Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
                                              JobId(), rebooted_ ,failed_));
             Utils::SetThreadName("free");

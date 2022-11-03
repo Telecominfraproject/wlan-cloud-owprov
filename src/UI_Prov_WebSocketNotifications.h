@@ -7,8 +7,8 @@
 #include "framework/UI_WebSocketClientNotifications.h"
 #include "framework/UI_WebSocketClientServer.h"
 
-namespace OpenWifi {
-    struct WebSocketNotificationJobContent {
+namespace OpenWifi::ProvWebSocketNotifications {
+    struct ConfigUpdateList {
         std::string                 title,
                 details,
                 jobId;
@@ -21,9 +21,9 @@ namespace OpenWifi {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    typedef WebSocketNotification<WebSocketNotificationJobContent>  WebSocketClientNotificationVenueUpdateJob_t;
+    typedef WebSocketNotification<ConfigUpdateList>  ConfigUpdateList_t;
 
-    struct WebSocketNotificationRebootList {
+    struct RebootList {
         std::string                 title,
                 details,
                 jobId;
@@ -35,9 +35,9 @@ namespace OpenWifi {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    typedef WebSocketNotification<WebSocketNotificationRebootList> WebSocketClientNotificationVenueRebootList_t;
+    typedef WebSocketNotification<RebootList> VenueRebootList_t;
 
-    struct WebSocketNotificationUpgradeList {
+    struct FWUpgradeList {
         std::string title,
                 details,
                 jobId;
@@ -52,13 +52,17 @@ namespace OpenWifi {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
-    typedef WebSocketNotification<WebSocketNotificationUpgradeList> WebSocketClientNotificationVenueUpgradeList_t;
+    typedef WebSocketNotification<FWUpgradeList> VenueFWUpgradeList_t;
 
-    void WebSocketClientNotificationVenueUpdateJobCompletionToUser( const std::string & User, WebSocketClientNotificationVenueUpdateJob_t &N);
-    void WebSocketClientNotificationVenueRebootCompletionToUser( const std::string & User, WebSocketClientNotificationVenueRebootList_t &N);
-    void WebSocketClientNotificationVenueUpgradeCompletionToUser( const std::string & User, WebSocketClientNotificationVenueUpgradeList_t &N);
-    void WebSocketClientNotificationVenueUpdateJobCompletionToUser( WebSocketClientNotificationVenueUpdateJob_t &N);
-    void WebSocketClientNotificationVenueRebootCompletionToUser( WebSocketClientNotificationVenueRebootList_t &N);
-    void WebSocketClientNotificationVenueUpgradeCompletionToUser( WebSocketClientNotificationVenueUpgradeList_t &N);
+    void RegisterProvNotifications();
+
+    void VenueFWUpgradeCompletion( const std::string & User, VenueFWUpgradeList_t &N);
+    void VenueFWUpgradeCompletion( VenueFWUpgradeList_t &N);
+
+    void VenueConfigUpdateCompletion( const std::string & User, ConfigUpdateList_t &N);
+    void VenueConfigUpdateCompletion( ConfigUpdateList_t &N);
+
+    void VenueRebootCompletion( const std::string & User, VenueRebootList_t &N);
+    void VenueRebootCompletion( VenueRebootList_t &N);
 }
 // namespace OpenWifi
