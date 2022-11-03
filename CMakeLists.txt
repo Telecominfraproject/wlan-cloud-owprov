@@ -109,6 +109,7 @@ add_executable(owprov
         src/framework/RESTAPI_IntServer.h
         src/framework/RESTAPI_SystemCommand.h
         src/framework/RESTAPI_WebSocketServer.h
+        src/framework/RESTAPI_SystemConfiguration.h
         src/framework/EventBusManager.cpp
         src/framework/EventBusManager.h
         src/framework/RESTAPI_PartHandler.h
