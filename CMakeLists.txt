@@ -203,7 +203,7 @@ add_executable(owprov
         src/ProvWebSocketClient.cpp src/ProvWebSocketClient.h
         src/Tasks/VenueRebooter.h src/Tasks/VenueUpgrade.h
         src/sdks/SDK_fms.cpp src/sdks/SDK_fms.h
-        )
+        src/storage/storage_overrides.cpp src/storage/storage_overrides.h src/RESTAPI/RESTAPI_overrides_handler.cpp src/RESTAPI/RESTAPI_overrides_handler.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}

@@ -1195,6 +1195,48 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void ConfigurationOverride::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj,"source",source);
+        field_to_json(Obj,"reason",reason);
+        field_to_json(Obj,"parameterName",parameterName);
+        field_to_json(Obj,"parameterType",parameterType);
+        field_to_json(Obj,"parameterValue",parameterValue);
+        field_to_json(Obj,"modified",modified);
+    }
+
+    bool ConfigurationOverride::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj,"source",source);
+            field_from_json(Obj,"reason",reason);
+            field_from_json(Obj,"parameterName",parameterName);
+            field_from_json(Obj,"parameterType",parameterType);
+            field_from_json(Obj,"parameterValue",parameterValue);
+            field_from_json(Obj,"modified",modified);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
+    void ConfigurationOverrideList::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj,"serialNumber",serialNumber);
+        field_to_json(Obj,"managementPolicy",managementPolicy);
+        field_to_json(Obj,"overrides",overrides);
+    }
+
+    bool ConfigurationOverrideList::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj,"serialNumber",serialNumber);
+            field_from_json(Obj,"managementPolicy",managementPolicy);
+            field_from_json(Obj,"overrides",overrides);
+            return true;
+        } catch(...) {
+
+        }
+        return false;
+    }
+
 }
 
 

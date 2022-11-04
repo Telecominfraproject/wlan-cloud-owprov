@@ -693,6 +693,27 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct ConfigurationOverride {
+        std::string     source;
+        std::string     reason;
+        std::string     parameterName;
+        std::string     parameterType;
+        std::string     parameterValue;
+        std::uint64_t   modified;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct ConfigurationOverrideList {
+        std::string     serialNumber;
+        Types::UUID_t   managementPolicy;
+        std::vector<ConfigurationOverride>  overrides;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
     bool UpdateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);
     bool CreateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U, ObjectInfo &I);
     bool CreateObjectInfo(const SecurityObjects::UserInfo &U, ObjectInfo &I);

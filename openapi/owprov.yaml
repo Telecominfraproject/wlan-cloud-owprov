@@ -1220,6 +1220,40 @@ components:
           items:
             $ref: '#/components/schemas/SubscriberDevice'
 
+    ConfigurationOverride:
+      type: object
+      properties:
+        source:
+          type: string
+        reason:
+          type: string
+        parameterName:
+          type: string
+        parameterType:
+          enum:
+            - string
+            - integer
+            - boolean
+        parameterValue:
+          type: string
+        modified:
+          type: integer
+          format: int64
+
+    ConfigurationOverrideList:
+      type: object
+      properties:
+        serialNumber:
+          type: string
+        managementPolicy:
+          type: string
+          format: uuid
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfigurationOverride'
+
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the OPenWiFI stack must provide
@@ -2210,6 +2244,94 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+
+  /configurationOverrides/{serialNumber}:
+    get:
+      tags:
+        - Configuration Overrides
+      operationId: getCponfigurationOverrides
+      summary: retrieve a list of configuration overrides for a given device
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Return a list of configuration overrides.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationOverrideList'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Configuration Overrides
+      operationId: deleteCponfigurationOverrides
+      summary: delete all configuration overrides for a given device from a given source
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: source
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Configuration Overrides
+      operationId: modifyConfigurationOverrides
+      summary: modify configuration overrides for a given device for a given source
+      parameters:
+        - in: path
+          name: serialNumber
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: source
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Information used to modify the override list
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigurationOverrideList'
+      responses:
+        200:
+          description: Return the modified configuration overrides.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationOverrideList'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+
 
   /venue:
     get:

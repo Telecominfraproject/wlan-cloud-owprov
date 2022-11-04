@@ -37,6 +37,7 @@ namespace OpenWifi {
         SubscriberDeviceDB_ = std::make_unique<OpenWifi::SubscriberDeviceDB>(dbType_, *Pool_, Logger());
         OpLocationDB_ = std::make_unique<OpenWifi::OpLocationDB>(dbType_, *Pool_, Logger());
         OpContactDB_ = std::make_unique<OpenWifi::OpContactDB>(dbType_, *Pool_, Logger());
+        OverridesDB_ = std::make_unique<OpenWifi::OverridesDB>(dbType_, *Pool_, Logger());
 
         EntityDB_->Create();
         PolicyDB_->Create();
@@ -56,6 +57,7 @@ namespace OpenWifi {
         SubscriberDeviceDB_->Create();
         OpLocationDB_->Create();
         OpContactDB_->Create();
+        OverridesDB_->Create();
 
         ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return EntityDB_->Exists(F,V); };
         ExistFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V) -> bool { return PolicyDB_->Exists(F,V); };
@@ -75,6 +77,7 @@ namespace OpenWifi {
         ExistFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return SubscriberDeviceDB_->Exists(F,V); };
         ExistFunc_[OpLocationDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OpLocationDB_->Exists(F,V); };
         ExistFunc_[OpContactDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OpContactDB_->Exists(F,V); };
+        ExistFunc_[OverridesDB_->Prefix()] = [=](const char *F, std::string &V) ->bool { return OverridesDB_->Exists(F,V); };
 
         ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return EntityDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[PolicyDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) -> bool { return PolicyDB_->GetNameAndDescription(F,V, Name, Description); };
@@ -94,6 +97,7 @@ namespace OpenWifi {
         ExpandFunc_[SubscriberDeviceDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return SubscriberDeviceDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[OpLocationDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OpLocationDB_->GetNameAndDescription(F,V, Name, Description); };
         ExpandFunc_[OpContactDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name, std::string & Description) ->bool { return OpContactDB_->GetNameAndDescription(F,V, Name, Description); };
+        ExpandFunc_[OverridesDB_->Prefix()] = [=]( [[maybe_unused]] const char *F, [[maybe_unused]] std::string &V, [[maybe_unused]] std::string &Name, [[maybe_unused]] std::string & Description) ->bool { return false; };
 
         InventoryDB_->InitializeSerialCache();
 

@@ -34,6 +34,7 @@
 #include "RESTAPI/RESTAPI_op_contact_list_handler.h"
 #include "RESTAPI/RESTAPI_op_location_handler.h"
 #include "RESTAPI/RESTAPI_op_location_list_handler.h"
+#include "RESTAPI/RESTAPI_overrides_handler.h"
 
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
@@ -76,7 +77,8 @@ namespace OpenWifi {
                     RESTAPI_op_contact_list_handler,
                     RESTAPI_op_location_handler,
                     RESTAPI_op_location_list_handler,
-                    RESTAPI_asset_server
+                    RESTAPI_asset_server,
+                    RESTAPI_overrides_handler
                 >(Path,Bindings,L, S, TransactionId);
     }
 
@@ -115,7 +117,8 @@ namespace OpenWifi {
                 RESTAPI_op_contact_handler,
                 RESTAPI_op_contact_list_handler,
                 RESTAPI_op_location_handler,
-                RESTAPI_op_location_list_handler
+                RESTAPI_op_location_list_handler,
+                RESTAPI_overrides_handler
         >(Path, Bindings, L, S, TransactionId);
     }
 }
