@@ -602,6 +602,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json( Obj, "devClass",devClass);
         field_to_json( Obj, "locale",locale);
         field_to_json( Obj, "realMacAddress",realMacAddress);
+        field_to_json( Obj, "doNotAllowOverrides",doNotAllowOverrides);
     }
 
     bool InventoryTag::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -623,6 +624,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json( Obj,"devClass",devClass);
             field_from_json( Obj,"locale",locale);
             field_from_json( Obj,"realMacAddress",realMacAddress);
+            field_from_json( Obj, "doNotAllowOverrides",doNotAllowOverrides);
             return true;
         } catch(...) {
 

@@ -386,6 +386,8 @@ namespace OpenWifi{
             }
         }
 
+        AssignIfPresent(RawObject, "doNotAllowOverrides", Existing.doNotAllowOverrides);
+
         if( RawObject->has("devClass") && NewObject.devClass!= Existing.devClass) {
             Existing.devClass = NewObject.devClass;
         }

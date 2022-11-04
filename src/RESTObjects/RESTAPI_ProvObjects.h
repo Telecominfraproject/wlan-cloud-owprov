@@ -428,6 +428,7 @@ namespace OpenWifi::ProvObjects {
         std::string     devClass;
         std::string     locale;
         std::string     realMacAddress;
+        bool            doNotAllowOverrides=false;
 
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
