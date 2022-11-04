@@ -2,9 +2,11 @@
 // Created by stephane bourque on 2022-01-11.
 //
 
-#include "framework/MicroService.h"
 #include "SDK_gw.h"
 
+#include "framework/MicroServiceNames.h"
+#include "framework/OpenAPIRequests.h"
+#include "framework/utils.h"
 
 namespace OpenWifi::SDK::GW {
     namespace Device {
@@ -213,7 +215,7 @@ namespace OpenWifi::SDK::GW {
             Poco::JSON::Object      Body;
 
             Poco::JSON::Parser P;
-            uint64_t now = OpenWifi::Now();
+            uint64_t now = Utils::Now();
 
             Configuration->set("uuid", now);
             Body.set("serialNumber", SerialNumber);

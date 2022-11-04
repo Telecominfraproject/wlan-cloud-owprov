@@ -5,6 +5,8 @@
 #include "APConfig.h"
 #include "StorageService.h"
 
+#include "Poco/JSON/Parser.h"
+
 namespace OpenWifi {
 
     APConfig::APConfig(const std::string &SerialNumber, const std::string &DeviceType, Poco::Logger &L, bool Explain)

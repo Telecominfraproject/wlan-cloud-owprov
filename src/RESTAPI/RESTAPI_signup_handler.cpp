@@ -5,6 +5,10 @@
 #include "RESTAPI_signup_handler.h"
 #include "StorageService.h"
 #include "Signup.h"
+#include "framework/OpenAPIRequests.h"
+#include "framework/MicroServiceNames.h"
+#include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -93,7 +97,7 @@ namespace OpenWifi {
         //  OK, we can claim this device, can we create a userid?
         //  Let's create one
         //  If sec.signup("email",uuid);
-        auto SignupUUID = MicroService::instance().CreateUUID();
+        auto SignupUUID = MicroServiceCreateUUID();
         Logger().information(fmt::format("SIGNUP: Creating signup entry for '{}', uuid='{}'",UserName, SignupUUID));
 
         Poco::JSON::Object  Body;
@@ -116,7 +120,7 @@ namespace OpenWifi {
             //  so create the Signup entry and modify the inventory
             ProvObjects::SignupEntry    SE;
             SE.info.id = SignupUUID;
-            SE.info.created = SE.info.modified = SE.submitted = OpenWifi::Now();
+            SE.info.created = SE.info.modified = SE.submitted = Utils::Now();
             SE.completed = 0 ;
             SE.macAddress = macAddress;
             SE.error = 0 ;
@@ -137,13 +141,13 @@ namespace OpenWifi {
                 StateDoc.set("claimerId", UI.id);
                 StateDoc.set("signupUUID", SignupUUID);
                 StateDoc.set("errorCode",0);
-                StateDoc.set("date", OpenWifi::Now());
+                StateDoc.set("date", Utils::Now());
                 StateDoc.set("status", "waiting for email-verification");
                 std::ostringstream os2;
                 StateDoc.stringify(os2);
                 IT.realMacAddress = macAddress;
                 IT.state = os2.str();
-                IT.info.modified = OpenWifi::Now();
+                IT.info.modified = Utils::Now();
                 std::cout << "Updating inventory entry: " << SE.macAddress << std::endl;
                 StorageService()->InventoryDB().UpdateRecord("id",IT.info.id,IT);
             }
@@ -175,7 +179,7 @@ namespace OpenWifi {
         if(Operation == "emailVerified" && SE.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForEmail) {
             Logger().information(fmt::format("{}: email {} verified.",SE.info.id, SE.email));
             std::cout << "Verified email for : " << SE.email << std::endl;
-            SE.info.modified = OpenWifi::Now();
+            SE.info.modified = Utils::Now();
             SE.status = "emailVerified";
             SE.statusCode = ProvObjects::SignupStatusCodes::SignupWaitingForDevice;
             StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);

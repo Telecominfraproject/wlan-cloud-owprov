@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
 #include "Poco/Timer.h"
 
 namespace OpenWifi {

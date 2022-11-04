@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "framework/RESTAPI_Handler.h"
 #include "RESTObjects/RESTAPI_GWobjects.h"
 
 namespace OpenWifi::SDK::GW {

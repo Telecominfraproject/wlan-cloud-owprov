@@ -6,8 +6,6 @@
 //	Arilia Wireless Inc.
 //
 
-#include "framework/MicroService.h"
-
 #include "RESTAPI_configurations_handler.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"

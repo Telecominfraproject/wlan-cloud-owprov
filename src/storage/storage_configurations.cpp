@@ -9,7 +9,7 @@
 
 #include "storage_configurations.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_utils.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
 

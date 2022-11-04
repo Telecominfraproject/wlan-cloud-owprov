@@ -16,6 +16,7 @@
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "SerialNumberCache.h"
 #include "DeviceTypeCache.h"
+#include "framework/utils.h"
 
 namespace OpenWifi{
 
@@ -294,7 +295,7 @@ namespace OpenWifi{
                 }
                 Existing.subscriber = "";
                 Poco::JSON::Object state;
-                state.set("date",OpenWifi::Now());
+                state.set("date",Utils::Now());
                 state.set("method","auto-discovery");
                 state.set("last-operation", "returned to inventory");
                 std::ostringstream OO;
@@ -384,6 +385,8 @@ namespace OpenWifi{
                 Existing.subscriber = "";
             }
         }
+
+        AssignIfPresent(RawObject, "doNotAllowOverrides", Existing.doNotAllowOverrides);
 
         if( RawObject->has("devClass") && NewObject.devClass!= Existing.devClass) {
             Existing.devClass = NewObject.devClass;

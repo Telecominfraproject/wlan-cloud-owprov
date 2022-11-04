@@ -9,13 +9,14 @@
 
 #include "storage_inventory.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_utils.h"
+#include "framework/MicroServiceFuncs.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "StorageService.h"
 #include "sdks/SDK_gw.h"
-#include "AutoDiscovery.h"
 #include "SerialNumberCache.h"
-#include "Daemon.h"
+#include "nlohmann/json.hpp"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -43,7 +44,8 @@ namespace OpenWifi {
         ORM::Field{"state",ORM::FieldType::FT_TEXT},
         ORM::Field{"devClass",ORM::FieldType::FT_TEXT},
         ORM::Field{"locale",ORM::FieldType::FT_TEXT},
-        ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT}
+        ORM::Field{"realMacAddress",ORM::FieldType::FT_TEXT},
+        ORM::Field{"doNotAllowOverrides",ORM::FieldType::FT_BOOLEAN}
     };
 
     static  ORM::IndexVec    InventoryDB_Indexes{
@@ -64,7 +66,8 @@ namespace OpenWifi {
             "alter table " + TableName_ + " add column locale varchar(16)" ,
             "alter table " + TableName_ + " add column realMacAddress text" ,
             "alter table " + TableName_ + " add column devClass text",
-            "alter table " + TableName_ + " add column deviceRules text"
+            "alter table " + TableName_ + " add column deviceRules text",
+            "alter table " + TableName_ + " add column doNotAllowOverrides boolean"
         };
 
         for(const auto &i:Script) {
@@ -92,14 +95,14 @@ namespace OpenWifi {
         auto SerialNumber = Poco::toLower(SerialNumberRaw);
         if(!GetRecord("serialNumber",SerialNumber,ExistingDevice)) {
             ProvObjects::InventoryTag   NewDevice;
-            uint64_t Now = OpenWifi::Now();
+            uint64_t Now = Utils::Now();
 
             auto Tokens = Poco::StringTokenizer(ConnectionInfo,"@:");
             std::string IP;
             if(Tokens.count()==3) {
                 IP = Tokens[1];
             }
-            NewDevice.info.id = MicroService::CreateUUID();
+            NewDevice.info.id = MicroServiceCreateUUID();
             NewDevice.info.name = SerialNumber;
             NewDevice.info.created = NewDevice.info.modified = Now;
             NewDevice.info.notes.push_back(SecurityObjects::NoteInfo{.created=Now,.createdBy="*system",.note="Auto discovered"});
@@ -108,7 +111,7 @@ namespace OpenWifi {
             NewDevice.locale = Locale;
             nlohmann::json StateDoc;
             StateDoc["method"] = "auto-discovery";
-            StateDoc["date"] = OpenWifi::Now();
+            StateDoc["date"] = Utils::Now();
             NewDevice.state = to_string(StateDoc);
             NewDevice.devClass = "any";
             if(!IP.empty()) {
@@ -157,11 +160,11 @@ namespace OpenWifi {
                 auto State = nlohmann::json::parse(ExistingDevice.state);
                 if(State["method"] == "claiming") {
                     uint64_t Date = State["date"];
-                    uint64_t Now = OpenWifi::Now();
+                    uint64_t Now = Utils::Now();
 
                     if((Now - Date)<(24*60*60)) {
                         State["method"] = "claimed";
-                        State["date"] = OpenWifi::Now();
+                        State["date"] = Utils::Now();
                         ExistingDevice.state = to_string(State);
                         modified = true;
                     } else {
@@ -180,7 +183,7 @@ namespace OpenWifi {
             }
 
             if(modified) {
-                ExistingDevice.info.modified = OpenWifi::Now();
+                ExistingDevice.info.modified = Utils::Now();
                 StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber, ExistingDevice);
             }
         }
@@ -256,6 +259,7 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.devClass = In.get<20>();
     Out.locale = In.get<21>();
     Out.realMacAddress = In.get<22>();
+    Out.doNotAllowOverrides = In.get<23>();
 }
 
 template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTag>::Convert(const OpenWifi::ProvObjects::InventoryTag &In, OpenWifi::InventoryDBRecordType &Out) {
@@ -282,4 +286,5 @@ template<> void ORM::DB<    OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjec
     Out.set<20>(In.devClass);
     Out.set<21>(In.locale);
     Out.set<22>(In.realMacAddress);
+    Out.set<23>(In.doNotAllowOverrides);
 }

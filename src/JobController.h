@@ -8,7 +8,9 @@
 #include <utility>
 #include <functional>
 #include <list>
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -30,10 +32,10 @@ namespace OpenWifi {
         const std::string & JobId() const { return jobId_; }
         const std::string & Parameter(int x) const { return parameters_[x];}
         uint64_t When() const { return when_; }
-        void Start() { started_ = OpenWifi::Now(); }
+        void Start() { started_ = Utils::Now(); }
         uint64_t Started() const { return started_; }
         uint64_t Completed() const { return completed_;}
-        void Complete() { completed_ = OpenWifi::Now(); }
+        void Complete() { completed_ = Utils::Now(); }
 
     private:
         std::string                 jobId_;

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "StorageService.h"
 #include "APConfig.h"
 #include "sdks/SDK_gw.h"
-#include "framework/WebSocketClientNotifications.h"
 #include "JobController.h"
+#include "framework/MicroServiceFuncs.h"
+#include "UI_Prov_WebSocketNotifications.h"
 
 namespace OpenWifi {
 
@@ -99,7 +99,7 @@ namespace OpenWifi {
             Utils::SetThreadName("venue-update");
             VenueUUID_ = Parameter(0);
 
-            WebSocketNotification<WebSocketNotificationJobContent> N;
+            ProvWebSocketNotifications::ConfigUpdateList_t N;
 
             ProvObjects::Venue  Venue;
             uint64_t Updated = 0, Failed = 0 , BadConfigs = 0 ;
@@ -176,7 +176,7 @@ namespace OpenWifi {
             }
 
             // std::cout << N.content.details << std::endl;
-            WebSocketClientNotificationVenueUpdateJobCompletionToUser(UserInfo().email, N);
+            ProvWebSocketNotifications::VenueConfigUpdateCompletion(UserInfo().email, N);
             Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
                                              JobId(), Updated ,Failed, BadConfigs));
             Utils::SetThreadName("free");

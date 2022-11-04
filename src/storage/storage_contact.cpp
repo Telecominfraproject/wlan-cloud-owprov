@@ -9,7 +9,7 @@
 
 #include "storage_contact.h"
 #include "framework/OpenWifiTypes.h"
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_utils.h"
 
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 

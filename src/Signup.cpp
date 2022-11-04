@@ -5,12 +5,15 @@
 #include "Signup.h"
 #include "StorageService.h"
 #include "sdks/SDK_gw.h"
+#include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
     int Signup::Start() {
-        GracePeriod_ = MicroService::instance().ConfigGetInt("signup.graceperiod", 60*60);
-        LingerPeriod_ = MicroService::instance().ConfigGetInt("signup.lingerperiod", 24*60*60);
+        poco_information(Logger(),"Starting...");
+        GracePeriod_ = MicroServiceConfigGetInt("signup.graceperiod", 60*60);
+        LingerPeriod_ = MicroServiceConfigGetInt("signup.lingerperiod", 24*60*60);
 
         SignupDB::RecordVec Signups_;
         StorageService()->SignupDB().GetIncompleteSignups(Signups_);
@@ -29,10 +32,12 @@ namespace OpenWifi {
     }
 
     void Signup::Stop() {
+        poco_information(Logger(),"Stopping...");
         Running_ = false;
         Timer_.stop();
         Worker_.wakeUp();
         Worker_.join();
+        poco_information(Logger(),"Stopped...");
     }
 
     void Signup::onTimer([[maybe_unused]] Poco::Timer &timer) {
@@ -68,7 +73,7 @@ namespace OpenWifi {
                             //  We must now complete the device transfer to this new subscriber and complete the
                             //  signup job.
                             IT.subscriber = SE.userId;
-                            IT.info.modified = OpenWifi::Now();
+                            IT.info.modified = Utils::Now();
                             IT.realMacAddress = SE.macAddress;
                             if(IT.entity.empty()) {
 
@@ -77,7 +82,7 @@ namespace OpenWifi {
                             }
                             Poco::JSON::Object NewState;
                             NewState.set("method", "signup");
-                            NewState.set("date", OpenWifi::Now());
+                            NewState.set("date", Utils::Now());
                             NewState.set("status", "completed");
                             std::ostringstream OS;
                             NewState.stringify(OS);
@@ -86,8 +91,8 @@ namespace OpenWifi {
 
                             // we need to move this device to the SubscriberDevice DB
                             ProvObjects::SubscriberDevice   SD;
-                            SD.info.id = MicroService::CreateUUID();
-                            SD.info.modified = SD.info.created = OpenWifi::Now();
+                            SD.info.id = MicroServiceCreateUUID();
+                            SD.info.modified = SD.info.created = Utils::Now();
                             SD.info.name = IT.realMacAddress;
                             SD.operatorId = SE.operatorId;
                             SD.serialNumber = SerialNumber;
@@ -109,8 +114,8 @@ namespace OpenWifi {
                             SE.status = "signup completed";
                             SE.serialNumber = SerialNumber;
                             SE.statusCode = ProvObjects::SignupStatusCodes::SignupSuccess;
-                            SE.completed = OpenWifi::Now();
-                            SE.info.modified = OpenWifi::Now();
+                            SE.completed = Utils::Now();
+                            SE.info.modified = Utils::Now();
                             SE.error = 0;
                             Logger().information(fmt::format("Completed signup for {}",SD.serialNumber));
                             StorageService()->SignupDB().UpdateRecord("id", SE.info.id, SE);

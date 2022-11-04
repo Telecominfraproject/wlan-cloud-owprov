@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
+#include "framework/KafkaTopics.h"
+#include "framework/KafkaManager.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 
 namespace OpenWifi {

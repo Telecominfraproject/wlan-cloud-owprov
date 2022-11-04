@@ -4,6 +4,7 @@
 
 #include "RESTAPI_operators_handler.h"
 #include "RESTAPI_db_helpers.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -83,10 +84,10 @@ namespace OpenWifi {
 
             // Create the default service...
             ProvObjects::ServiceClass DefSer;
-            DefSer.info.id = MicroService::CreateUUID();
+            DefSer.info.id = MicroServiceCreateUUID();
             DefSer.info.name = "Default Service Class";
             DefSer.defaultService = true;
-            DefSer.info.created = DefSer.info.modified = OpenWifi::Now();
+            DefSer.info.created = DefSer.info.modified = Utils::Now();
             DefSer.operatorId = NewObject.info.id;
             DefSer.period = "monthly";
             DefSer.billingCode = "basic";

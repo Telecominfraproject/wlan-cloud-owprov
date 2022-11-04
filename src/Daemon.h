@@ -16,6 +16,7 @@
 
 #include "Dashboard.h"
 #include "framework/MicroService.h"
+#include "framework/MicroServiceNames.h"
 #include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "ProvWebSocketClient.h"
@@ -54,8 +55,6 @@ namespace OpenWifi {
     };
 
 	inline Daemon * Daemon() { return Daemon::instance(); }
-    inline void DaemonPostInitialization(Poco::Util::Application &self) {
-        Daemon()->PostInitialization(self);
-    }
+    void DaemonPostInitialization(Poco::Util::Application &self);
 }
 

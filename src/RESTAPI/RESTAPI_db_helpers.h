@@ -6,7 +6,6 @@
 
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 #include "StorageService.h"
-#include "framework/MicroService.h"
 #include "framework/ConfigurationValidator.h"
 #include "sdks/SDK_sec.h"
 #include "Poco/StringTokenizer.h"

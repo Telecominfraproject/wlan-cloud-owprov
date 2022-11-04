@@ -4,8 +4,11 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "Poco/Net/IPAddress.h"
+
+#include "framework/SubSystemServer.h"
+#include "framework/MicroServiceFuncs.h"
+
 #include "nlohmann/json.hpp"
 
 namespace OpenWifi {
@@ -23,7 +26,7 @@ namespace OpenWifi {
 	  public:
 		static std::string Name() { return "ipinfo"; }
 		inline bool Init() override {
-			Key_ = MicroService::instance().ConfigGetString("iptocountry.ipinfo.token", "");
+			Key_ = MicroServiceConfigGetString("iptocountry.ipinfo.token", "");
 			return !Key_.empty();
 		}
 
@@ -55,7 +58,7 @@ namespace OpenWifi {
 	  public:
 		static std::string Name() { return "ipdata"; }
 		inline bool Init() override {
-			Key_ = MicroService::instance().ConfigGetString("iptocountry.ipdata.apikey", "");
+			Key_ = MicroServiceConfigGetString("iptocountry.ipdata.apikey", "");
 			return !Key_.empty();
 		}
 
@@ -85,7 +88,7 @@ namespace OpenWifi {
 	  public:
 		static std::string Name() { return "ip2location"; }
 		inline bool Init() override {
-			Key_ = MicroService::instance().ConfigGetString("iptocountry.ip2location.apikey", "");
+			Key_ = MicroServiceConfigGetString("iptocountry.ip2location.apikey", "");
 			return !Key_.empty();
 		}
 
@@ -133,18 +136,22 @@ namespace OpenWifi {
 		}
 
 		inline int Start() final {
-			ProviderName_ = MicroService::instance().ConfigGetString("iptocountry.provider","");
+			poco_notice(Logger(),"Starting...");
+			ProviderName_ = MicroServiceConfigGetString("iptocountry.provider","");
 			if(!ProviderName_.empty()) {
 				Provider_ = IPLocationProvider<IPToCountryProvider, IPInfo, IPData, IP2Location>(ProviderName_);
 				if(Provider_!= nullptr) {
 					Enabled_ = Provider_->Init();
 				}
 			}
-			Default_ = MicroService::instance().ConfigGetString("iptocountry.default", "US");
+			Default_ = MicroServiceConfigGetString("iptocountry.default", "US");
 			return 0;
 		}
 
 		inline void Stop() final {
+			poco_notice(Logger(),"Stopping...");
+			//	Nothing to do - just to provide the same look at the others.
+			poco_notice(Logger(),"Stopped...");
 		}
 
 		[[nodiscard]] static inline std::string ReformatAddress(const std::string & I )

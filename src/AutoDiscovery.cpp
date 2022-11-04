@@ -5,11 +5,14 @@
 #include "AutoDiscovery.h"
 #include "framework/ow_constants.h"
 #include "framework/KafkaTopics.h"
+#include "framework/KafkaManager.h"
 #include "StorageService.h"
+#include "Poco/JSON/Parser.h"
 
 namespace OpenWifi {
 
     int AutoDiscovery::Start() {
+        poco_information(Logger(),"Starting...");
         Running_ = true;
         Types::TopicNotifyFunction F = [this](const std::string &Key, const std::string &Payload) { this->ConnectionReceived(Key,Payload); };
         ConnectionWatcherId_ = KafkaManager()->RegisterTopicWatcher(KafkaTopics::CONNECTION, F);
@@ -18,10 +21,12 @@ namespace OpenWifi {
     };
 
     void AutoDiscovery::Stop() {
+        poco_information(Logger(),"Stopping...");
         Running_ = false;
         KafkaManager()->UnregisterTopicWatcher(KafkaTopics::CONNECTION, ConnectionWatcherId_);
         Queue_.wakeUpAll();
         Worker_.join();
+        poco_information(Logger(),"Stopped...");
     };
 
     void AutoDiscovery::run() {
