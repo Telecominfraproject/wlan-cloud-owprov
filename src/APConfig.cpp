@@ -295,6 +295,7 @@ namespace OpenWifi {
 
         ProvObjects::DeviceConfiguration    Config;
         if(StorageService()->ConfigurationDB().GetRecord("id", UUID, Config)) {
+            std::cout << "Device configuration from DB" << std::endl;
             if(!Config.configuration.empty()) {
                 if(DeviceTypeMatch(DeviceType_,Config.deviceTypes)) {
                     for(const auto &i:Config.configuration) {
@@ -311,6 +312,7 @@ namespace OpenWifi {
                         }
                     }
                 } else {
+                    std::cout << "Device type does match : " << DeviceType_ << std::endl;
                     Poco::JSON::Object  ExObj;
                     ExObj.set("from-uuid", Config.info.id);
                     ExObj.set("from-name",Config.info.name );
@@ -318,7 +320,11 @@ namespace OpenWifi {
                     ExObj.set("reason", "deviceType mismatch");
                     Explanation_.add(ExObj);
                 }
+            } else {
+                std::cout << "Device configuration from DB is empty" << std::endl;
             }
+        } else {
+            std::cout << "Invalid UUID for Device configuration from DB" << std::endl;
         }
     }
 
