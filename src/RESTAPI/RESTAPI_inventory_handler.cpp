@@ -38,7 +38,7 @@ namespace OpenWifi{
 
         ProvObjects::InventoryTag Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER, "");
-        poco_debug(Logger(),fmt::format("{}}: Retrieving inventory information.", SerialNumber));
+        poco_debug(Logger(),fmt::format("{}: Retrieving inventory information.", SerialNumber));
         if (SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER, SerialNumber, Existing)) {
             return NotFound();
         }
@@ -96,7 +96,7 @@ namespace OpenWifi{
                 auto Response=Poco::makeShared<Poco::JSON::Object>();
                 poco_debug(Logger(), fmt::format("{}: Sending configuration push.",Existing.serialNumber));
                 if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
-                    poco_debug(Logger(), fmt::format("{}}: Sending configuration pushed.",Existing.serialNumber));
+                    poco_debug(Logger(), fmt::format("{}: Sending configuration pushed.",Existing.serialNumber));
                     GetRejectedLines(Response, Results.warnings);
                     Results.errorCode = 0;
                 } else {

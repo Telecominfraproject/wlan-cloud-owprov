@@ -233,8 +233,11 @@ namespace OpenWifi {
                                         ExObj.set("value", col.parameterValue);
                                         Explanation_.add(ExObj);
                                     }
+                                    RadioArray->set(RadioIndex, IndexedRadio);
+                                    Configuration->set("radios", RadioArray);
                                 } else if (Tokens[2] == "channel") {
                                     IndexedRadio->set("channel", std::strtoull(col.parameterValue.c_str(), nullptr,10));
+                                    std::cout << "Setting channel in radio " << RadioIndex << std::endl;
                                     if (Explain_) {
                                         Poco::JSON::Object ExObj;
                                         ExObj.set("overrides", col.parameterName);
@@ -243,8 +246,9 @@ namespace OpenWifi {
                                         ExObj.set("value", col.parameterValue);
                                         Explanation_.add(ExObj);
                                     }
+                                    RadioArray->set(RadioIndex, IndexedRadio);
+                                    Configuration->set("radios", RadioArray);
                                 }
-                                RadioArray->set(RadioIndex,IndexedRadio);
                             }
                         }
                     }
