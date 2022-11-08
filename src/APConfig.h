@@ -10,6 +10,8 @@
 
 namespace OpenWifi {
 
+    constexpr std::uint64_t MaximumPossibleRadios=6;
+
     struct VerboseElement {
         ProvObjects::DeviceConfigurationElement     element;
         ProvObjects::ObjectInfo                     info;

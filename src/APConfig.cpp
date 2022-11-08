@@ -6,6 +6,7 @@
 #include "StorageService.h"
 
 #include "Poco/JSON/Parser.h"
+#include "Poco/StringTokenizer.h"
 
 namespace OpenWifi {
 
@@ -203,6 +204,45 @@ namespace OpenWifi {
                             ExObj.set("reason", "weight insufficient");
                             ExObj.set("element", O->get(SectionName));
                             Explanation_.add(ExObj);
+                        }
+                    }
+                }
+            }
+
+            //  Apply overrides...
+            ProvObjects::ConfigurationOverrideList  COL;
+            if(StorageService()->OverridesDB().GetRecord("serialNumber", SerialNumber_, COL)) {
+                for(const auto &col: COL.overrides) {
+                    const auto Tokens = Poco::StringTokenizer(col.parameterName,".");
+                    if(Tokens[0] == "radios" && Tokens.count()==3) {
+                        std::uint64_t RadioIndex = std::strtoull(Tokens[1].c_str(), nullptr,10);
+                        if(RadioIndex<MaximumPossibleRadios) {
+                            auto RadioArray = Configuration->getArray("radios");
+                            if(RadioIndex<RadioArray->size()) {
+                                auto IndexedRadio = RadioArray->get(RadioIndex).extract<Poco::JSON::Object::Ptr>();
+                                if (Tokens[2] == "tx-power") {
+                                    IndexedRadio->set("rx-power", std::strtoull(col.parameterValue.c_str(), nullptr,10));
+                                    if (Explain_) {
+                                        Poco::JSON::Object ExObj;
+                                        ExObj.set("overrides", col.parameterName);
+                                        ExObj.set("source", col.source);
+                                        ExObj.set("reason", col.reason);
+                                        ExObj.set("value", col.parameterValue);
+                                        Explanation_.add(ExObj);
+                                    }
+                                } else if (Tokens[2] == "channel") {
+                                    IndexedRadio->set("channel", std::strtoull(col.parameterValue.c_str(), nullptr,10));
+                                    if (Explain_) {
+                                        Poco::JSON::Object ExObj;
+                                        ExObj.set("overrides", col.parameterName);
+                                        ExObj.set("source", col.source);
+                                        ExObj.set("reason", col.reason);
+                                        ExObj.set("value", col.parameterValue);
+                                        Explanation_.add(ExObj);
+                                    }
+                                }
+                                RadioArray->set(RadioIndex,IndexedRadio);
+                            }
                         }
                     }
                 }
