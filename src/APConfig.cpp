@@ -214,16 +214,25 @@ namespace OpenWifi {
 
             //  Apply overrides...
             ProvObjects::ConfigurationOverrideList  COL;
+            std::cout << __LINE__ << std::endl;
             if(StorageService()->OverridesDB().GetRecord("serialNumber", SerialNumber_, COL)) {
+                std::cout << __LINE__ << std::endl;
                 for(const auto &col: COL.overrides) {
+                    std::cout << __LINE__ << std::endl;
                     const auto Tokens = Poco::StringTokenizer(col.parameterName,".");
+                    std::cout << __LINE__ << std::endl;
                     if(Tokens[0] == "radios" && Tokens.count()==3) {
+                        std::cout << __LINE__ << std::endl;
                         std::uint64_t RadioIndex = std::strtoull(Tokens[1].c_str(), nullptr,10);
                         if(RadioIndex<MaximumPossibleRadios) {
+                            std::cout << __LINE__ << std::endl;
                             auto RadioArray = Configuration->getArray("radios");
                             if(RadioIndex<RadioArray->size()) {
+                                std::cout << __LINE__ << std::endl;
                                 auto IndexedRadio = RadioArray->get(RadioIndex).extract<Poco::JSON::Object::Ptr>();
+                                std::cout << __LINE__ << std::endl;
                                 if (Tokens[2] == "tx-power") {
+                                    std::cout << __LINE__ << std::endl;
                                     IndexedRadio->set("rx-power", std::strtoull(col.parameterValue.c_str(), nullptr,10));
                                     if (Explain_) {
                                         Poco::JSON::Object ExObj;
@@ -236,6 +245,7 @@ namespace OpenWifi {
                                     RadioArray->set(RadioIndex, IndexedRadio);
                                     Configuration->set("radios", RadioArray);
                                 } else if (Tokens[2] == "channel") {
+                                    std::cout << __LINE__ << std::endl;
                                     IndexedRadio->set("channel", std::strtoull(col.parameterValue.c_str(), nullptr,10));
                                     std::cout << "Setting channel in radio " << RadioIndex << std::endl;
                                     if (Explain_) {
@@ -248,6 +258,8 @@ namespace OpenWifi {
                                     }
                                     RadioArray->set(RadioIndex, IndexedRadio);
                                     Configuration->set("radios", RadioArray);
+                                } else {
+                                    std::cout << __LINE__ << std::endl;
                                 }
                             }
                         }
