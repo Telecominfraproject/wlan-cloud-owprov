@@ -239,8 +239,12 @@ namespace OpenWifi {
                                     RadioArray->set(RadioIndex, IndexedRadio);
                                     Configuration->set("radios", RadioArray);
                                 } else if (Tokens[2] == "channel") {
-                                    IndexedRadio->set("channel",
-                                                      std::strtoull(col.parameterValue.c_str(), nullptr, 10));
+                                    if(col.parameterValue=="auto") {
+                                        IndexedRadio->set("channel", "auto");
+                                    } else {
+                                        IndexedRadio->set("channel",
+                                                          std::strtoull(col.parameterValue.c_str(), nullptr, 10));
+                                    }
                                     std::cout << "Setting channel in radio " << RadioIndex << std::endl;
                                     if (Explain_) {
                                         Poco::JSON::Object ExObj;
