@@ -7,6 +7,7 @@
 
 #include "Poco/JSON/Parser.h"
 #include "Poco/StringTokenizer.h"
+#include "fmt/format.h"
 
 namespace OpenWifi {
 
@@ -214,29 +215,22 @@ namespace OpenWifi {
 
             //  Apply overrides...
             ProvObjects::ConfigurationOverrideList  COL;
-            std::cout << __LINE__ << std::endl;
             if(StorageService()->OverridesDB().GetRecord("serialNumber", SerialNumber_, COL)) {
-                std::cout << __LINE__ << std::endl;
-                for(const auto &col: COL.overrides) {
-                    std::cout << __LINE__ << std::endl;
-                    const auto Tokens = Poco::StringTokenizer(col.parameterName,".");
-                    std::cout << __LINE__ << std::endl;
-                    if(Tokens[0] == "radios" && Tokens.count()==3) {
-                        std::cout << __LINE__ << std::endl;
-                        std::uint64_t RadioIndex = std::strtoull(Tokens[1].c_str(), nullptr,10);
-                        if(RadioIndex<MaximumPossibleRadios) {
-                            std::cout << __LINE__ << std::endl;
+                for (const auto &col: COL.overrides) {
+                    const auto Tokens = Poco::StringTokenizer(col.parameterName, ".");
+                    if (Tokens[0] == "radios" && Tokens.count() == 3) {
+                        std::uint64_t RadioIndex = std::strtoull(Tokens[1].c_str(), nullptr, 10);
+                        if (RadioIndex < MaximumPossibleRadios) {
                             auto RadioArray = Configuration->getArray("radios");
-                            if(RadioIndex<RadioArray->size()) {
-                                std::cout << __LINE__ << std::endl;
+                            if (RadioIndex < RadioArray->size()) {
                                 auto IndexedRadio = RadioArray->get(RadioIndex).extract<Poco::JSON::Object::Ptr>();
-                                std::cout << __LINE__ << std::endl;
                                 if (Tokens[2] == "tx-power") {
-                                    std::cout << __LINE__ << std::endl;
-                                    IndexedRadio->set("rx-power", std::strtoull(col.parameterValue.c_str(), nullptr,10));
+                                    IndexedRadio->set("rx-power",
+                                                      std::strtoull(col.parameterValue.c_str(), nullptr, 10));
                                     if (Explain_) {
                                         Poco::JSON::Object ExObj;
-                                        ExObj.set("overrides", col.parameterName);
+                                        ExObj.set("from-name", "overrides");
+                                        ExObj.set("override", col.parameterName);
                                         ExObj.set("source", col.source);
                                         ExObj.set("reason", col.reason);
                                         ExObj.set("value", col.parameterValue);
@@ -245,12 +239,13 @@ namespace OpenWifi {
                                     RadioArray->set(RadioIndex, IndexedRadio);
                                     Configuration->set("radios", RadioArray);
                                 } else if (Tokens[2] == "channel") {
-                                    std::cout << __LINE__ << std::endl;
-                                    IndexedRadio->set("channel", std::strtoull(col.parameterValue.c_str(), nullptr,10));
+                                    IndexedRadio->set("channel",
+                                                      std::strtoull(col.parameterValue.c_str(), nullptr, 10));
                                     std::cout << "Setting channel in radio " << RadioIndex << std::endl;
                                     if (Explain_) {
                                         Poco::JSON::Object ExObj;
-                                        ExObj.set("overrides", col.parameterName);
+                                        ExObj.set("from-name", "overrides");
+                                        ExObj.set("override", col.parameterName);
                                         ExObj.set("source", col.source);
                                         ExObj.set("reason", col.reason);
                                         ExObj.set("value", col.parameterValue);
@@ -259,10 +254,16 @@ namespace OpenWifi {
                                     RadioArray->set(RadioIndex, IndexedRadio);
                                     Configuration->set("radios", RadioArray);
                                 } else {
-                                    std::cout << __LINE__ << std::endl;
+                                    poco_error(Logger(), fmt::format("{}: Unsupported override variable name {}",
+                                                                     col.parameterName));
                                 }
                             }
+                        } else {
+                            poco_error(Logger(), fmt::format("{}: radio index out of range in {}", col.parameterName));
                         }
+                    } else {
+                        poco_error(Logger(),
+                                   fmt::format("{}: Unsupported override variable name {}", col.parameterName));
                     }
                 }
             }

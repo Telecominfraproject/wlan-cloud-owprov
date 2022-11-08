@@ -575,7 +575,7 @@ listoverrides() {
 }
 
 addoverride() {
-    payload="{ \"serialNumber\" : \"$1\" , \"overrides\" : [ { \"reason\" : \"test\" , \"parameterName\" : \"radio.0.channel\" , \"parameterType\" : \"string\" , \"parameterValue\" : \"16\"} ] }"
+    payload="{ \"serialNumber\" : \"$1\" , \"overrides\" : [ { \"reason\" : \"test\" , \"parameterName\" : \"radios.0.channel\" , \"parameterType\" : \"string\" , \"parameterValue\" : \"14\"} ] }"
     curl    ${FLAGS} -X PUT "https://${OWPROV}/api/v1/configurationOverrides/$1?source=test" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${token}" \
