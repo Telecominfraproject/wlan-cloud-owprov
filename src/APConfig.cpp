@@ -134,7 +134,10 @@ namespace OpenWifi {
                     ProvObjects::InventoryTag D;
                     if (StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_, D)) {
                         if (!D.deviceConfiguration.empty()) {
+                            std::cout << "Adding device specific configuration: " << D.deviceConfiguration.size() << std::endl;
                             AddConfiguration(D.deviceConfiguration);
+                        } else {
+                            std::cout << "No device specific configuration." << std::endl;
                         }
                         if (!D.entity.empty()) {
                             AddEntityConfig(D.entity);

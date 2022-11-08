@@ -38,17 +38,17 @@ namespace OpenWifi{
 
         ProvObjects::InventoryTag Existing;
         std::string SerialNumber = GetBinding(RESTAPI::Protocol::SERIALNUMBER, "");
-        Logger().debug(Poco::format("%s: Retrieving inventory information.", SerialNumber));
+        poco_debug(Logger(),fmt::format("{}}: Retrieving inventory information.", SerialNumber));
         if (SerialNumber.empty() || !DB_.GetRecord(RESTAPI::Protocol::SERIALNUMBER, SerialNumber, Existing)) {
             return NotFound();
         }
-        Logger().debug(
-                Poco::format("%s,%s: Retrieving inventory information.", Existing.serialNumber, Existing.info.id));
+        poco_debug(Logger(), fmt::format("{},{}: Retrieving inventory information.", Existing.serialNumber, Existing.info.id));
 
         Poco::JSON::Object Answer;
         std::string Arg;
-        if (HasParameter("config", Arg) && Arg == "true") {
-            bool Explain = (HasParameter("explain", Arg) && Arg == "true");
+        if (GetBoolParameter("config", false)) {
+            bool Explain = GetBoolParameter("explain", false);
+
             APConfig Device(SerialNumber, Existing.deviceType, Logger(), Explain);
 
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
@@ -83,28 +83,28 @@ namespace OpenWifi{
             }
             return ReturnObject(Answer);
         } else if(GetBoolParameter("applyConfiguration", false)) {
-            Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
+            poco_debug(Logger(), fmt::format("{}: Retrieving configuration.",Existing.serialNumber));
             auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             Poco::JSON::Object ErrorsObj, WarningsObj;
             ProvObjects::InventoryConfigApplyResult Results;
-            Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
+            poco_debug(Logger(), fmt::format("{}: Computing configuration.",Existing.serialNumber));
             if (Device->Get(Configuration)) {
                 std::ostringstream OS;
                 Configuration->stringify(OS);
                 Results.appliedConfiguration = OS.str();
                 auto Response=Poco::makeShared<Poco::JSON::Object>();
-                Logger().debug(Poco::format("%s: Sending configuration push.",Existing.serialNumber));
+                poco_debug(Logger(), fmt::format("{}: Sending configuration push.",Existing.serialNumber));
                 if (SDK::GW::Device::Configure(this, SerialNumber, Configuration, Response)) {
-                    Logger().debug(Poco::format("%s: Sending configuration pushed.",Existing.serialNumber));
+                    poco_debug(Logger(), fmt::format("{}}: Sending configuration pushed.",Existing.serialNumber));
                     GetRejectedLines(Response, Results.warnings);
                     Results.errorCode = 0;
                 } else {
-                    Logger().debug(Poco::format("%s: Sending configuration failed.",Existing.serialNumber));
+                    poco_debug(Logger(), fmt::format("{}: Sending configuration failed.",Existing.serialNumber));
                     Results.errorCode = 1;
                 }
             } else {
-                Logger().debug(Poco::format("%s: Configuration is bad.",Existing.serialNumber));
+                poco_debug(Logger(), fmt::format("{}: Configuration is bad.",Existing.serialNumber));
                 Results.errorCode = 1;
             }
             Results.to_json(Answer);
