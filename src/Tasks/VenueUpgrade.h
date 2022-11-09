@@ -42,11 +42,11 @@ namespace OpenWifi {
                         Logger().debug(fmt::format("{}: Upgraded.",Device.serialNumber));
                         upgraded_++;
                     } else {
-                        Logger().information(fmt::format("{}: Not Upgraded.", Device.serialNumber));
+                        poco_information(Logger(),fmt::format("{}: Not Upgraded.", Device.serialNumber));
                         not_connected_++;
                     }
                 } else {
-                    Logger().information(fmt::format("{}: Not Upgraded. No firmware available.", Device.serialNumber));
+                    poco_information(Logger(),fmt::format("{}: Not Upgraded. No firmware available.", Device.serialNumber));
                     no_firmware_++;
                 }
             }
@@ -172,7 +172,7 @@ namespace OpenWifi {
 
             // std::cout << N.content.details << std::endl;
             ProvWebSocketNotifications::VenueFWUpgradeCompletion(UserInfo().email,N);
-            Logger().information(N.content.details);
+            poco_information(Logger(),N.content.details);
             Utils::SetThreadName("free");
             Complete();
         }

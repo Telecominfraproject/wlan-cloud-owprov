@@ -48,24 +48,24 @@ namespace OpenWifi {
                         std::ostringstream OS;
                         Configuration->stringify(OS);
                         auto Response = Poco::makeShared<Poco::JSON::Object>();
-                        Logger().debug(fmt::format("{}: Pushing configuration.", Device.serialNumber));
+                        poco_debug(Logger(),fmt::format("{}: Pushing configuration.", Device.serialNumber));
                         if (SDK::GW::Device::Configure(nullptr, Device.serialNumber, Configuration, Response)) {
                             Logger().debug(fmt::format("{}: Configuration pushed.", Device.serialNumber));
-                            Logger().information(fmt::format("{}: Updated.", Device.serialNumber));
+                            poco_information(Logger(),fmt::format("{}: Updated.", Device.serialNumber));
                             // std::cout << Device.serialNumber << ": Updated" << std::endl;
                             updated_++;
                         } else {
-                            Logger().information(fmt::format("{}: Not updated.", Device.serialNumber));
+                            poco_information(Logger(),fmt::format("{}: Not updated.", Device.serialNumber));
                             // std::cout << Device.serialNumber << ": Failed" << std::endl;
                             failed_++;
                         }
                     } else {
-                        Logger().debug(fmt::format("{}: Configuration is bad.", Device.serialNumber));
+                        poco_debug(Logger(),fmt::format("{}: Configuration is bad.", Device.serialNumber));
                         bad_config_++;
                         // std::cout << Device.serialNumber << ": Bad config" << std::endl;
                     }
                 } catch (...) {
-                    Logger().debug(fmt::format("{}: Configuration is bad (caused an exception).", Device.serialNumber));
+                    poco_debug(Logger(),fmt::format("{}: Configuration is bad (caused an exception).", Device.serialNumber));
                     bad_config_++;
                 }
             }
@@ -145,7 +145,7 @@ namespace OpenWifi {
                     }
                 }
 
-                Logger().debug("Waiting for outstanding update threads to finish.");
+                poco_debug(Logger(),"Waiting for outstanding update threads to finish.");
                 Pool_.joinAll();
                 for(auto job_it = JobList.begin(); job_it !=JobList.end();) {
                     VenueDeviceConfigUpdater * current_job = *job_it;
@@ -172,12 +172,12 @@ namespace OpenWifi {
 
             } else {
                 N.content.details = fmt::format("Venue {} no longer exists.",VenueUUID_);
-                Logger().warning(N.content.details);
+                poco_warning(Logger(),N.content.details);
             }
 
             // std::cout << N.content.details << std::endl;
             ProvWebSocketNotifications::VenueConfigUpdateCompletion(UserInfo().email, N);
-            Logger().information(fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
+            poco_information(Logger(),fmt::format("Job {} Completed: {} updated, {} failed to update , {} bad configurations.",
                                              JobId(), Updated ,Failed, BadConfigs));
             Utils::SetThreadName("free");
             Complete();

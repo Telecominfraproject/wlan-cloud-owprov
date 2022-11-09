@@ -110,12 +110,12 @@ namespace OpenWifi{
             Results.to_json(Answer);
             return ReturnObject(Answer);
         } else if(GetBoolParameter("resolveConfig", false)) {
-            Logger().debug(Poco::format("%s: Retrieving configuration.",Existing.serialNumber));
+            poco_debug(Logger(),fmt::format("{}: Retrieving configuration.",Existing.serialNumber));
             auto Device = std::make_shared<APConfig>(SerialNumber, Existing.deviceType, Logger(), false);
             auto Configuration = Poco::makeShared<Poco::JSON::Object>();
             Poco::JSON::Object ErrorsObj, WarningsObj;
             ProvObjects::InventoryConfigApplyResult Results;
-            Logger().debug(Poco::format("%s: Computing configuration.",Existing.serialNumber));
+            poco_debug(Logger(),Poco::format("{}: Computing configuration.",Existing.serialNumber));
             if (Device->Get(Configuration)) {
                 Answer.set("configuration", Configuration);
             } else {
@@ -279,17 +279,17 @@ namespace OpenWifi{
         auto RemoveSubscriber = GetParameter("removeSubscriber");
         if(!RemoveSubscriber.empty()) {
             if(Existing.subscriber == RemoveSubscriber) {
-                Logger().information(Poco::format("%s: removing subscriber (%s)", SerialNumber, RemoveSubscriber));
+                poco_information(Logger(),fmt::format("{}: removing subscriber ({})", SerialNumber, RemoveSubscriber));
                 ProvObjects::DeviceConfiguration    DC;
                 if(StorageService()->ConfigurationDB().GetRecord("id",Existing.deviceConfiguration,DC)) {
-                    Logger().information(Poco::format("%s: removing configuration for subscriber (%s)", SerialNumber, RemoveSubscriber));
+                    poco_information(Logger(),fmt::format("{}: removing configuration for subscriber ({})", SerialNumber, RemoveSubscriber));
                     if(DC.subscriberOnly) {
                         if(!StorageService()->ConfigurationDB().DeleteRecord("id", Existing.deviceConfiguration)) {
-                            Logger().debug("Could not delete the subscriber configuration");
+                            poco_debug(Logger(),"Could not delete the subscriber configuration");
                         }
                     }
                     else {
-                        Logger().debug("Configurations is not for a subscriber.");
+                        poco_debug(Logger(),"Configurations is not for a subscriber.");
                     }
                     Existing.deviceConfiguration = "";
                 }
@@ -308,7 +308,7 @@ namespace OpenWifi{
                 SDK::GW::Device::SetSubscriber(nullptr, SerialNumber, "");
                 return ReturnObject(Answer);
             } else {
-                Logger().information(Poco::format("%s: wrong subscriber (%s)", SerialNumber, RemoveSubscriber));
+                poco_information(Logger(),fmt::format("{}: wrong subscriber ({})", SerialNumber, RemoveSubscriber));
             }
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }

@@ -220,7 +220,7 @@ namespace OpenWifi {
             }
 
             if(modified) {
-                Logger().warning(fmt::format("  fixing venue: {}", V.info.name));
+                poco_warning(Logger(),fmt::format("  fixing venue: {}", V.info.name));
                 NewVenue.devices = NewDevices;
                 VenueDB().UpdateRecord("id", V.info.id, NewVenue);
             }
@@ -289,7 +289,7 @@ namespace OpenWifi {
 
             if(Modified)
             {
-                Logger().warning(fmt::format("  fixing entity: {}",E.info.name));
+                poco_warning(Logger(),fmt::format("  fixing entity: {}",E.info.name));
                 NewEntity.devices = NewDevices;
                 NewEntity.contacts = NewContacts;
                 NewEntity.locations = NewLocations;
@@ -330,7 +330,7 @@ namespace OpenWifi {
             }
 
             if(modified) {
-                Logger().warning(fmt::format("  fixing entity: {}",T.info.name));
+                poco_warning(Logger(),fmt::format("  fixing entity: {}",T.info.name));
                 InventoryDB().UpdateRecord("id", T.info.id, NewTag);
             }
             return true;
@@ -347,7 +347,7 @@ namespace OpenWifi {
             }
 
             if (modified) {
-                Logger().warning(fmt::format("  fixing configuration: {}", C.info.name));
+                poco_warning(Logger(),fmt::format("  fixing configuration: {}", C.info.name));
                 ConfigurationDB().UpdateRecord("id", C.info.id, NewConfig);
             }
             return true;
@@ -363,7 +363,7 @@ namespace OpenWifi {
             }
 
             if (modified) {
-                Logger().warning(fmt::format("  fixing operator: {}", O.info.name));
+                poco_warning(Logger(),fmt::format("  fixing operator: {}", O.info.name));
                 OperatorDB().UpdateRecord("id", O.info.id, NewOp);
             }
             return true;
@@ -379,23 +379,23 @@ namespace OpenWifi {
             }
 
             if (modified) {
-                Logger().warning(fmt::format("  fixing subscriber: {}", O.info.name));
+                poco_warning(Logger(),fmt::format("  fixing subscriber: {}", O.info.name));
                 SubscriberDeviceDB().UpdateRecord("id", O.info.id, NewSub);
             }
             return true;
         };
 
-        Logger().information("Checking DB consistency: venues");
+        poco_information(Logger(),"Checking DB consistency: venues");
         VenueDB().Iterate(FixVenueDevices);
-        Logger().information("Checking DB consistency: entities");
+        poco_information(Logger(),"Checking DB consistency: entities");
         EntityDB().Iterate(FixEntity);
-        Logger().information("Checking DB consistency: inventory");
+        poco_information(Logger(),"Checking DB consistency: inventory");
         InventoryDB().Iterate(FixInventory);
-        Logger().information("Checking DB consistency: configurations");
+        poco_information(Logger(),"Checking DB consistency: configurations");
         ConfigurationDB().Iterate(FixConfiguration);
-        Logger().information("Checking DB consistency: operators");
+        poco_information(Logger(),"Checking DB consistency: operators");
         OperatorDB().Iterate(FixOperator);
-        Logger().information("Checking DB consistency: subscribers");
+        poco_information(Logger(),"Checking DB consistency: subscribers");
         SubscriberDeviceDB().Iterate(FixSubscriber);
     }
 

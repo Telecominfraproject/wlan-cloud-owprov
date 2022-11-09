@@ -39,7 +39,7 @@ namespace OpenWifi {
             for(auto &current_job:jobs_) {
                 if(current_job!=nullptr) {
                     if(current_job->Started()==0 && Pool_.used()<Pool_.available()) {
-                        current_job->Logger().information(fmt::format("Starting {}: {}",current_job->JobId(),current_job->Name()));
+                        poco_information(current_job->Logger(),fmt::format("Starting {}: {}",current_job->JobId(),current_job->Name()));
                         current_job->Start();
                         Pool_.start(*current_job);
                     }
@@ -49,7 +49,7 @@ namespace OpenWifi {
             for(auto it = jobs_.begin(); it!=jobs_.end();) {\
                 auto current_job = *it;
                 if(current_job!=nullptr && current_job->Completed()!=0) {
-                    current_job->Logger().information(fmt::format("Completed {}: {}",current_job->JobId(),current_job->Name()));
+                    poco_information(current_job->Logger(),fmt::format("Completed {}: {}",current_job->JobId(),current_job->Name()));
                     it = jobs_.erase(it);
                     delete current_job;
                 } else {

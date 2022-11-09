@@ -63,7 +63,7 @@ namespace OpenWifi {
                 if (i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForEmail ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupWaitingForDevice ||
                     i.statusCode == ProvObjects::SignupStatusCodes::SignupSuccess ) {
-                    Logger().information(fmt::format("SIGNUP: Returning existing signup record for '{}'",i.email));
+                    poco_debug(Logger(),fmt::format("SIGNUP: Returning existing signup record for '{}'",i.email));
                     Poco::JSON::Object Answer;
                     i.to_json(Answer);
                     return ReturnObject(Answer);
@@ -98,7 +98,7 @@ namespace OpenWifi {
         //  Let's create one
         //  If sec.signup("email",uuid);
         auto SignupUUID = MicroServiceCreateUUID();
-        Logger().information(fmt::format("SIGNUP: Creating signup entry for '{}', uuid='{}'",UserName, SignupUUID));
+        poco_debug(Logger(),fmt::format("SIGNUP: Creating signup entry for '{}', uuid='{}'",UserName, SignupUUID));
 
         Poco::JSON::Object  Body;
         OpenAPIRequestPost  CreateUser( uSERVICE_SECURITY, "/api/v1/signup", {
@@ -115,7 +115,7 @@ namespace OpenWifi {
             UI.from_json(Answer);
             std::ostringstream os;
             Answer->stringify(os);
-            Logger().information(fmt::format("SIGNUP: email: '{}' signupID: '{}' userId: '{}'", UserName, SignupUUID, UI.id));
+            poco_debug(Logger(),fmt::format("SIGNUP: email: '{}' signupID: '{}' userId: '{}'", UserName, SignupUUID, UI.id));
 
             //  so create the Signup entry and modify the inventory
             ProvObjects::SignupEntry    SE;
@@ -164,20 +164,20 @@ namespace OpenWifi {
         auto SignupUUID = GetParameter("signupUUID");
         auto Operation = GetParameter("operation");
 
-        Logger().information(fmt::format("signup-progress: {} - {} ", SignupUUID, Operation));
+        poco_information(Logger(),fmt::format("signup-progress: {} - {} ", SignupUUID, Operation));
         if(SignupUUID.empty() || Operation.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         ProvObjects::SignupEntry    SE;
-        Logger().information(fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
+        poco_information(Logger(),fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
         if(!StorageService()->SignupDB().GetRecord("id",SignupUUID,SE)) {
             return NotFound();
         }
 
-        Logger().information(fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
+        poco_debug(Logger(),fmt::format("signup-progress: {} - {} fetching entry", SignupUUID, Operation));
         if(Operation == "emailVerified" && SE.statusCode==ProvObjects::SignupStatusCodes::SignupWaitingForEmail) {
-            Logger().information(fmt::format("{}: email {} verified.",SE.info.id, SE.email));
+            poco_information(Logger(),fmt::format("{}: email {} verified.",SE.info.id, SE.email));
             std::cout << "Verified email for : " << SE.email << std::endl;
             SE.info.modified = Utils::Now();
             SE.status = "emailVerified";
@@ -188,7 +188,7 @@ namespace OpenWifi {
             SE.to_json(Answer);
             return ReturnObject(Answer);
         }
-        Logger().information(fmt::format("signup-progress: {} - {} something is bad", SignupUUID, Operation));
+        poco_information(Logger(),fmt::format("signup-progress: {} - {} something is bad", SignupUUID, Operation));
 
         return BadRequest(RESTAPI::Errors::UnknownId);
     }
@@ -199,11 +199,11 @@ namespace OpenWifi {
         auto macAddress = GetParameter("macAddress");
         auto List = GetBoolParameter("listOnly",false);
 
-        Logger().information(fmt::format("Looking for signup for {}",EMail));
+        poco_information(Logger(),fmt::format("Looking for signup for {}",EMail));
         Poco::JSON::Object          Answer;
         ProvObjects::SignupEntry    SE;
         if(!SignupUUID.empty()) {
-            Logger().information(fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
+            poco_information(Logger(),fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
             if(StorageService()->SignupDB().GetRecord("id", SignupUUID, SE)) {
                 SE.to_json(Answer);
                 return ReturnObject(Answer);
@@ -211,25 +211,25 @@ namespace OpenWifi {
             return NotFound();
         } else if(!EMail.empty()) {
             SignupDB::RecordVec SEs;
-            Logger().information(fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
+            poco_information(Logger(),fmt::format("Looking for signup for {}: Signup {}",EMail, SignupUUID));
             if(StorageService()->SignupDB().GetRecords(0,100,SEs, " email='"+EMail+"' ")) {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
         } else if(!macAddress.empty()) {
             SignupDB::RecordVec SEs;
-            Logger().information(fmt::format("Looking for signup for {}: Mac {}",EMail, macAddress));
+            poco_information(Logger(),fmt::format("Looking for signup for {}: Mac {}",EMail, macAddress));
             if(StorageService()->SignupDB().GetRecords(0,100,SEs, " serialNumber='"+macAddress+"' ")) {
                 return ReturnObject("signups",SEs);
             }
             return NotFound();
         } else if(List) {
-            Logger().information(fmt::format("Returning list of signups...",EMail, macAddress));
+            poco_information(Logger(),fmt::format("Returning list of signups...",EMail, macAddress));
             SignupDB::RecordVec SEs;
             StorageService()->SignupDB().GetRecords(0,100,SEs);
             return ReturnObject("signups",SEs);
         }
-        Logger().information(fmt::format("Bad signup get",EMail, macAddress));
+        poco_information(Logger(),fmt::format("Bad signup get",EMail, macAddress));
         return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
 

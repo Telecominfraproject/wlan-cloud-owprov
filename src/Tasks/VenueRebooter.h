@@ -28,7 +28,7 @@ namespace OpenWifi {
                     Logger().debug(fmt::format("{}: Rebooted.",Device.serialNumber));
                     rebooted_++;
                 } else {
-                    Logger().information(fmt::format("{}: Not rebooted.", Device.serialNumber));
+                    poco_information(Logger(),fmt::format("{}: Not rebooted.", Device.serialNumber));
                     failed_++;
                 }
             }
@@ -128,7 +128,7 @@ namespace OpenWifi {
 
             // std::cout << N.content.details << std::endl;
             ProvWebSocketNotifications::VenueRebootCompletion(UserInfo().email,N);
-            Logger().information(fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
+            poco_information(Logger(),fmt::format("Job {} Completed: {} rebooted, {} failed to reboot.",
                                              JobId(), rebooted_ ,failed_));
             Utils::SetThreadName("free");
             Complete();
