@@ -68,6 +68,7 @@ namespace OpenWifi {
 				std::cout << "Erasing old WS UI connection..." << std::endl;
 				Clients_.erase(i);
 			}
+            ToBeRemoved_.clear();
 			UsersConnected_ = Clients_.size();
 		}
 
