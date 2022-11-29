@@ -1,5 +1,10 @@
 # OpenWiFi Provisioning
 
+## OpenAPI
+You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-owprov/).
+
+Also you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-owprov/main/openapi/owprov.yaml)) to get interactive docs page.
+
 ## Build from source.
 You need:
 - https://github.com/pboettch/json-schema-validator.git
