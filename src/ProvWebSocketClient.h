@@ -12,7 +12,7 @@ namespace OpenWifi {
     public:
         explicit ProvWebSocketClient(Poco::Logger &Logger);
         virtual ~ProvWebSocketClient();
-        virtual void Processor(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done );
+        virtual void Processor(const Poco::JSON::Object::Ptr &O, std::string &Answer, bool &Done, const SecurityObjects::UserInfo &UserInfo );
         void ws_command_serial_number_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
         void ws_command_address_completion( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);
         void ws_command_exit( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer);

@@ -110,7 +110,7 @@ namespace OpenWifi {
         Answer = SS.str();
     }
 
-    void ProvWebSocketClient::Processor(const Poco::JSON::Object::Ptr &O, std::string &Result, bool &Done ) {
+    void ProvWebSocketClient::Processor(const Poco::JSON::Object::Ptr &O, std::string &Result, bool &Done, [[maybe_unused]] const SecurityObjects::UserInfo &UserInfo ) {
         try {
             if (O->has("command") && O->has("id")) {
                 auto id = (uint64_t) O->get("id");
