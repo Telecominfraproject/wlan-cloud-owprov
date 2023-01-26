@@ -194,9 +194,9 @@ namespace OpenWifi {
     }
 
     void RESTAPI_signup_handler::DoGet() {
-        auto EMail = GetParameter("email");
+        auto EMail = ORM::Escape(GetParameter("email"));
         auto SignupUUID = GetParameter("signupUUID");
-        auto macAddress = GetParameter("macAddress");
+        auto macAddress = ORM::Escape(GetParameter("macAddress"));
         auto List = GetBoolParameter("listOnly",false);
 
         poco_information(Logger(),fmt::format("Looking for signup for {}",EMail));

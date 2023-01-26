@@ -23,7 +23,7 @@ namespace OpenWifi {
     void ProvWebSocketClient::ws_command_serial_number_search(const Poco::JSON::Object::Ptr &O,
                                                               bool &Done, std::string &Answer) {
         Done = false;
-        auto Prefix = O->get("serial_prefix").toString();
+        auto Prefix = ORM::Escape(O->get("serial_prefix").toString());
         Poco::toLowerInPlace(Prefix);
         Logger().information(Poco::format("serial_number_search: %s", Prefix));
         if (!Prefix.empty() && Prefix.length() < 13) {
@@ -58,7 +58,7 @@ namespace OpenWifi {
 
     void ProvWebSocketClient::ws_command_subuser_search( const Poco::JSON::Object::Ptr &O, bool &Done, std::string &Answer) {
         Done = false;
-        auto operatorId = O->get("operatorId").toString();
+        auto operatorId = ORM::Escape(O->get("operatorId").toString());
         std::string nameSearch, emailSearch;
         OpenWifi::RESTAPIHandler::AssignIfPresent(O,"nameSearch",nameSearch);
         OpenWifi::RESTAPIHandler::AssignIfPresent(O,"emailSearch",emailSearch);

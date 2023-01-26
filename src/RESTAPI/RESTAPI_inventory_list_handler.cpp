@@ -104,7 +104,7 @@ namespace OpenWifi{
         } else if (HasParameter("subscriber",Arg) && !Arg.empty()) {
             // looking for device(s) for a specific subscriber...
             ProvObjects::InventoryTagVec Tags;
-            DB_.GetRecords(0,100,Tags," subscriber='" + Arg + "'");
+            DB_.GetRecords(0,100,Tags," subscriber='" + ORM::Escape(Arg) + "'");
             if(SerialOnly) {
                 std::vector<std::string>    SerialNumbers;
                 std::transform(cbegin(Tags), cend(Tags), std::back_inserter(SerialNumbers), [](const auto &T) { return T.serialNumber; });

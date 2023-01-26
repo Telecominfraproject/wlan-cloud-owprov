@@ -9,8 +9,8 @@
 namespace OpenWifi {
 
     void RESTAPI_sub_devices_list_handler::DoGet() {
-        auto operatorId=GetParameter("operatorId");
-        auto subscriberId=GetParameter("subscriberId");
+        auto operatorId=ORM::Escape(GetParameter("operatorId"));
+        auto subscriberId=ORM::Escape(GetParameter("subscriberId"));
 
         if(!operatorId.empty() && !StorageService()->OperatorDB().Exists("id",operatorId)) {
             return BadRequest(RESTAPI::Errors::OperatorIdMustExist);
