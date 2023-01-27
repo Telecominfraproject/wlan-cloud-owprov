@@ -185,9 +185,10 @@ namespace OpenWifi{
         NewObject.children.clear();
 
         RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
-        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
+        std::vector<std::string>    Errors;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Errors);
         if(Error.err_num != 0) {
-            return BadRequest(Error);
+            return BadRequest(RESTAPI::Errors::InternalError);
         }
 
         if(DB_.CreateRecord(NewObject)) {
@@ -355,10 +356,10 @@ namespace OpenWifi{
         NewObject.parent = Existing.parent;
         NewObject.entity = Existing.entity;
 
-        RESTAPI::Errors::msg Error=RESTAPI::Errors::SUCCESS;
-        auto ObjectsCreated = CreateObjects(NewObject,*this,Error);
-        if(Error.err_num != 0) {
-            return BadRequest(Error);
+        std::vector<std::string>    Errors;
+        auto ObjectsCreated = CreateObjects(NewObject,*this,Errors);
+        if(!Errors.empty()) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
         }
 
         if(!ObjectsCreated.empty()) {
