@@ -50,8 +50,8 @@ WORKDIR /valijson
 RUN mkdir cmake-build
 WORKDIR cmake-build
 RUN cmake ..
-RUN make
-RUN make install
+RUN cmake --build . --config Release -j8
+RUN cmake --build . --target install
 
 FROM build-base AS owprov-build
 
