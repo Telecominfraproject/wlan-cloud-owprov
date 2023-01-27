@@ -87,8 +87,8 @@ namespace OpenWifi{
             }
             auto Config=RawObject->get("configuration").toString();
             Poco::JSON::Object  Answer;
-            std::string Error;
-            auto Res = ValidateUCentralConfiguration(Config,Error);
+            std::vector<std::string> Error;
+            auto Res = ValidateUCentralConfiguration(Config,Error, GetBoolParameter("strict",true));
             Answer.set("valid",Res);
             Answer.set("error", Error);
             return ReturnObject(Answer);
@@ -124,9 +124,9 @@ namespace OpenWifi{
             return BadRequest(RESTAPI::Errors::InvalidDeviceTypes);
         }
 
-        RESTAPI::Errors::msg Error;
-        if(!ValidateConfigBlock(NewObject,Error)) {
-            return BadRequest(Error);
+        std::vector<std::string>    Errors;
+        if(!ValidateConfigBlock(NewObject,Errors)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
         }
 
         if(DB_.CreateRecord(NewObject)) {
@@ -171,9 +171,9 @@ namespace OpenWifi{
         if(!NewObject.deviceTypes.empty())
             Existing.deviceTypes = NewObject.deviceTypes;
 
-        RESTAPI::Errors::msg Error;
-        if(!ValidateConfigBlock( NewObject,Error)) {
-            return BadRequest(Error);
+        std::vector<std::string> Errors;
+        if(!ValidateConfigBlock( NewObject,Errors)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
         }
 
         if(RawObject->has("configuration")) {

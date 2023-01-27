@@ -406,7 +406,7 @@ namespace OpenWifi {
         return EntityDB::RootUUID();
     }
 
-    inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, RESTAPI::Errors::msg & Error) {
+    inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config, std::vector<std::string> &Errors) {
         static const std::vector<std::string> SectionNames{ "globals", "interfaces", "metrics", "radios", "services",
                                                             "unit", "definitions", "ethernet", "switch", "config-raw",
                                                             "third-party" };
@@ -414,8 +414,7 @@ namespace OpenWifi {
         for(const auto &i:Config.configuration) {
             Poco::JSON::Parser  P;
             if(i.name.empty()) {
-                std::cout << "Name is empty" << std::endl;
-                Error = RESTAPI::Errors::NameMustBeSet;
+                Errors.push_back("Name is empty");
                 return false;
             }
 
@@ -424,25 +423,23 @@ namespace OpenWifi {
                 auto N = Blocks->getNames();
                 for (const auto &j: N) {
                     if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) == SectionNames.cend()) {
-                        Error = RESTAPI::Errors::UnknownConfigurationSection;
+                        Errors.push_back("Unknown block name");
                         return false;
                     }
                 }
             } catch (const Poco::JSON::JSONException &E ) {
-                Error = RESTAPI::Errors::InvalidJSONDocument;
+                Errors.push_back("Invalid JSON document");
                 return false;
             }
 
             try {
-                std::string ErrorText;
-                if (ValidateUCentralConfiguration(i.configuration, ErrorText)) {
+                if (ValidateUCentralConfiguration(i.configuration, Errors,true)) {
                     // std::cout << "Block: " << i.name << " is valid" << std::endl;
                 } else {
-                    Error =  RESTAPI::Errors::ConfigBlockInvalid ;
                     return false;
                 }
             } catch(...) {
-                std::cout << "Exception in validation" << std::endl;
+                Errors.push_back("Invalid configuration caused an exception");
                 return false;
             }
 
@@ -450,12 +447,11 @@ namespace OpenWifi {
         return true;
     }
 
-    template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, RESTAPI::Errors::msg & Error) {
+    template <typename Type> std::map<std::string,std::string>   CreateObjects(Type & NewObject, RESTAPIHandler & R, std::vector<std::string> & Errors) {
         std::map<std::string,std::string>   Result;
 
         auto createObjects = R.GetParameter("createObjects","");
         if(!createObjects.empty()) {
-            std::cout << "createObjects: " << createObjects << std::endl;
             Poco::JSON::Parser P;
             auto Objects = P.parse(createObjects).extract<Poco::JSON::Object::Ptr>();
             if(Objects->isArray("objects")) {
@@ -467,7 +463,6 @@ namespace OpenWifi {
                         ProvObjects::Location LC;
                         if (LC.from_json(LocationDetails)) {
                             if constexpr(std::is_same_v<Type,ProvObjects::Venue>) {
-                                std::cout << "Location decoded: " << LC.info.name << std::endl;
                                 std::string ParentEntity = FindParentEntity(NewObject);
                                 ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, LC.info);
                                 LC.entity = ParentEntity;
@@ -479,7 +474,6 @@ namespace OpenWifi {
                                 }
                             }
                             if constexpr(std::is_same_v<Type,ProvObjects::Operator>) {
-                                std::cout << "Location decoded: " << LC.info.name << std::endl;
                                 std::string ParentEntity = FindParentEntity(NewObject);
                                 ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, LC.info);
                                 LC.entity = ParentEntity;
@@ -491,7 +485,7 @@ namespace OpenWifi {
                                 }
                             }
                         } else {
-                            Error = RESTAPI::Errors::InvalidJSONDocument;
+                            Errors.push_back("Invalid JSON document");
                             break;
                         }
                     } else if (Object->has("contact")) {
@@ -507,10 +501,9 @@ namespace OpenWifi {
                         ProvObjects::DeviceConfiguration    DC;
                         if(DC.from_json(ConfigurationDetails)) {
                             if constexpr(std::is_same_v<Type, ProvObjects::InventoryTag>) {
-                                if(!ValidateConfigBlock(DC,Error)) {
+                                if(!ValidateConfigBlock(DC,Errors)) {
                                     break;
                                 }
-                                std::cout << "Configuration decoded: " << DC.info.name << std::endl;
                                 ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, DC.info);
                                 if (StorageService()->ConfigurationDB().CreateRecord(DC)) {
                                     NewObject.deviceConfiguration = DC.info.id;
@@ -518,7 +511,7 @@ namespace OpenWifi {
                                 }
                             }
                         } else {
-                            Error = RESTAPI::Errors::InvalidJSONDocument;
+                            Errors.push_back("Invalid JSON document");
                             break;
                         }
                     }
