@@ -15,9 +15,10 @@
 namespace OpenWifi {
     class VenueDeviceUpgrade : public Poco::Runnable {
     public:
-        VenueDeviceUpgrade(const std::string &UUID, const std::string &venue, const ProvObjects::DeviceRules &Rules, Poco::Logger &L) :
+        VenueDeviceUpgrade(const std::string &UUID, const std::string &venue, const std::string &revision, const ProvObjects::DeviceRules &Rules, Poco::Logger &L) :
                 uuid_(UUID),
                 venue_(venue),
+                revision_(revision),
                 rules_(Rules),
                 Logger_(L) {
         }
@@ -37,12 +38,12 @@ namespace OpenWifi {
                 }
 
                 FMSObjects::Firmware    F;
-                if(SDK::FMS::Firmware::GetLatest(Device.deviceType,Device.deviceRules.rcOnly=="yes",F)) {
+                if(SDK::FMS::Firmware::GetFirmware(Device.deviceType,revision_,F)) {
                     if (SDK::GW::Device::Upgrade(nullptr, Device.serialNumber, 0, F.uri)) {
-                        Logger().debug(fmt::format("{}: Upgraded.",Device.serialNumber));
+                        Logger().debug(fmt::format("{}: Upgraded to {}.",Device.serialNumber, revision_));
                         upgraded_++;
                     } else {
-                        poco_information(Logger(),fmt::format("{}: Not Upgraded.", Device.serialNumber));
+                        poco_information(Logger(),fmt::format("{}: Not Upgraded to {}.", Device.serialNumber, revision_));
                         not_connected_++;
                     }
                 } else {
@@ -65,6 +66,7 @@ namespace OpenWifi {
     private:
         std::string     uuid_;
         std::string     venue_;
+        std::string     revision_;
         ProvObjects::DeviceRules    rules_;
         Poco::Logger    &Logger_;
         inline Poco::Logger & Logger() { return Logger_; }
@@ -81,6 +83,7 @@ namespace OpenWifi {
 
             Utils::SetThreadName("venue-upgr");
             auto VenueUUID_ = Parameter(0);
+            auto Revision_ = Parameter(1);
 
             ProvWebSocketNotifications::VenueFWUpgradeList_t        N;
 
@@ -101,7 +104,7 @@ namespace OpenWifi {
                 StorageService()->VenueDB().EvaluateDeviceRules(Venue.info.id, Rules);
 
                 for(const auto &uuid:Venue.devices) {
-                    auto NewTask = new VenueDeviceUpgrade(uuid, Venue.info.name, Rules, Logger());
+                    auto NewTask = new VenueDeviceUpgrade(uuid, Venue.info.name, Revision_, Rules, Logger());
                     bool TaskAdded = false;
                     while (!TaskAdded) {
                         if (Pool_.available()) {
