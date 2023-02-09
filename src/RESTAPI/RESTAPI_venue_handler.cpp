@@ -208,6 +208,52 @@ namespace OpenWifi{
         InternalError(RESTAPI::Errors::RecordNotCreated);
     }
 
+    /*
+     *      Get all the device types for the devices in the venue
+     *      For each unique device type, get all the firmwares that apply for it
+     *      create the intersection of all resulting firmwares
+     *      create a list ordered in 3 types
+     *      - Releases
+     *      - RC of releases
+     *      - Dev
+     *
+     *      We obtain the revision by stripping and trimming the revision field previous to the "/"
+     *      The sets should be built on the revision and the URI of the images, all per devicetype
+     */
+
+    enum class RevisionTypes {
+        release,
+        release_candidate,
+        development
+    };
+
+    RevisionTypes RevisionIdentify(const std::string &r) {
+        auto it = r.find_first_of('/');
+        if(it==std::string::npos) {
+            return RevisionTypes::development;
+        }
+        ++it;
+        if(r.find("TIP-devel-", it)!=std::string::npos) {
+            return RevisionTypes::development;
+        }
+        if(r.find("-rc", it)!=std::string::npos) {
+            return RevisionTypes::release_candidate;
+        }
+        if(r.find("TIP-v", it)!=std::string::npos) {
+            return RevisionTypes::release;
+        }
+        return RevisionTypes::development;
+    }
+
+    std::uint64_t RevisionDate(const std::string &R, const std::vector<FMSObjects::Firmware> &F) {
+
+        for(const auto &f:F) {
+            if(f.revision==R)
+                return f.imageDate;
+        }
+        return 0;
+    }
+
     void RESTAPI_venue_handler::DoPut() {
         std::string UUID = GetBinding("uuid", "");
 
@@ -241,12 +287,92 @@ namespace OpenWifi{
         }
 
         if(GetBoolParameter("upgradeAllDevices")) {
+            if(GetBoolParameter("revisionsAvailable")) {
+                std::set<std::string> DeviceTypes;
+                for (const auto &serialNumber: Existing.devices) {
+                    ProvObjects::InventoryTag Device;
+                    if (StorageService()->InventoryDB().GetRecord("serialNumber", serialNumber, Device)) {
+                        DeviceTypes.insert(Device.deviceType);
+                    }
+                }
+
+                //  Get all the revisions for all the device types
+                using FirmwareList = std::vector<FMSObjects::Firmware>;
+                using FirmwareRevisions = std::set<std::string>;
+
+                std::map<std::string, FirmwareList> AllFMs;
+                FirmwareRevisions AllRevisions;
+                bool first_pass = true;
+                for (const auto &device_type: DeviceTypes) {
+                    FirmwareList list;
+                    if (SDK::FMS::Firmware::GetDeviceTypeFirmwares(device_type, list)) {
+                        AllFMs[device_type] = list;
+                        FirmwareRevisions DeviceRevisions;
+                        if (first_pass) {
+                            for (const auto &revision: list) {
+                                AllRevisions.insert(revision.revision);
+                            }
+                        } else {
+                            FirmwareRevisions DeviceTypeRevisions;
+                            for (const auto &revision: list) {
+                                DeviceTypeRevisions.insert(revision.revision);
+                            }
+                            FirmwareRevisions NewRevisions;
+                            std::set_intersection(AllRevisions.begin(), AllRevisions.end(),
+                                                            DeviceTypeRevisions.begin(), DeviceTypeRevisions.end(),
+                                                            std::inserter(NewRevisions, NewRevisions.begin()));
+                            AllRevisions = NewRevisions;
+                        }
+                    }
+                    first_pass = false;
+                }
+
+                //  OK we start the solution map with Our first device, and then we
+                Poco::JSON::Array Releases, ReleaseCandidates, DevelReleases;
+                for (const auto &revision: AllRevisions) {
+                    auto Date = AllFMs.begin()->second.begin()->imageDate;
+                    switch (RevisionIdentify(revision)) {
+                        case RevisionTypes::release_candidate: {
+                            Poco::JSON::Object  E;
+                            E.set("revision",revision);
+                            E.set("date",Date);
+                            ReleaseCandidates.add(E);
+                        }
+                            break;
+                        case RevisionTypes::release: {
+                            Poco::JSON::Object  E;
+                            E.set("revision",revision);
+                            E.set("date",Date);
+                            Releases.add(E);
+                        }
+                            break;
+                        case RevisionTypes::development:
+                        default: {
+                            Poco::JSON::Object  E;
+                            E.set("revision",revision);
+                            E.set("date",Date);
+                            DevelReleases.add(E);
+                        }
+                    }
+                }
+                Poco::JSON::Object Answer;
+                Answer.set("releases", Releases);
+                Answer.set("releasesCandidates", ReleaseCandidates);
+                Answer.set("releases", DevelReleases);
+                return ReturnObject(Answer);
+            }
+
             ProvObjects::SerialNumberList   SNL;
+
+            auto Revision = GetParameter("revision","");
+            if(Revision.empty()) {
+                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+            }
 
             Poco::JSON::Object  Answer;
             SNL.serialNumbers = Existing.devices;
             auto JobId = MicroServiceCreateUUID();
-            Types::StringVec Parameters{UUID};;
+            Types::StringVec Parameters{UUID, Revision};;
             auto NewJob = new VenueUpgrade(JobId,"VenueFirmwareUpgrade", Parameters, 0, UserInfo_.userinfo, Logger());
             JobController()->AddJob(dynamic_cast<Job*>(NewJob));
             SNL.to_json(Answer);

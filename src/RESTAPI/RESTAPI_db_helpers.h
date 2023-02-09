@@ -9,7 +9,6 @@
 #include "framework/ConfigurationValidator.h"
 #include "sdks/SDK_sec.h"
 #include "Poco/StringTokenizer.h"
-
 #include "libs/croncpp.h"
 
 namespace OpenWifi {

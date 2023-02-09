@@ -2525,6 +2525,17 @@ paths:
             type: boolean
             default: false
           required: false
+        - in: query
+          name: revisionsAvailable
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
+          name: revision
+          schema:
+            type: string
+          required: false
       requestBody:
         description: Information used to modify the new venue
         content:
