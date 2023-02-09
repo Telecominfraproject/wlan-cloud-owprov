@@ -296,8 +296,6 @@ namespace OpenWifi{
                     }
                 }
 
-                std::cout << " DeviceTypes.size() " << DeviceTypes.size() << std::endl;
-
                 //  Get all the revisions for all the device types
                 using FirmwareList = std::vector<FMSObjects::Firmware>;
                 using FirmwareRevisions = std::set<std::string>;
@@ -329,12 +327,9 @@ namespace OpenWifi{
                     first_pass = false;
                 }
 
-                std::cout << " Allrevision " << AllRevisions.size() << std::endl;
-
                 //  OK we start the solution map with Our first device, and then we
                 Poco::JSON::Array Releases, ReleaseCandidates, DevelReleases;
                 for (const auto &revision: AllRevisions) {
-                    std::cout << " R: " << revision << std::endl;
                     auto Date = AllFMs.begin()->second.begin()->imageDate;
                     switch (RevisionIdentify(revision)) {
                         case RevisionTypes::release_candidate: {
