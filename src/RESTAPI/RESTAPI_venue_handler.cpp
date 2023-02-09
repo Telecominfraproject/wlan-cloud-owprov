@@ -330,7 +330,7 @@ namespace OpenWifi{
                 //  OK we start the solution map with Our first device, and then we
                 Poco::JSON::Array Releases, ReleaseCandidates, DevelReleases;
                 for (const auto &revision: AllRevisions) {
-                    auto Date = AllFMs.begin()->second.begin()->imageDate;
+                    auto Date = RevisionDate(revision,AllFMs.begin()->second);
                     switch (RevisionIdentify(revision)) {
                         case RevisionTypes::release_candidate: {
                             Poco::JSON::Object  E;
