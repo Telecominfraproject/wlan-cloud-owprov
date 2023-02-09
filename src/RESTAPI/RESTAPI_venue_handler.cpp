@@ -291,7 +291,7 @@ namespace OpenWifi{
                 std::set<std::string> DeviceTypes;
                 for (const auto &serialNumber: Existing.devices) {
                     ProvObjects::InventoryTag Device;
-                    if (StorageService()->InventoryDB().GetRecord("serialNumber", serialNumber, Device)) {
+                    if (StorageService()->InventoryDB().GetRecord("id", serialNumber, Device)) {
                         DeviceTypes.insert(Device.deviceType);
                     }
                 }
