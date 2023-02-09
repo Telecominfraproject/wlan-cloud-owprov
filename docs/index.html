@@ -44857,7 +44857,7 @@ return the devices under a venue and its children. Must select getDevices&#x3D;t
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Accept: application/json" \
  -H "Content-Type: application/json" \
- "https://localhost:16005/api/v1/venue/{uuid}?updateAllDevices=true&rebootAllDevices=true&testUpdateOnly=true&upgradeAllDevices=true" \
+ "https://localhost:16005/api/v1/venue/{uuid}?updateAllDevices=true&rebootAllDevices=true&testUpdateOnly=true&upgradeAllDevices=true&revisionsAvailable=true&revision=revision_example" \
  -d '{
   &quot;parent&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
   &quot;variables&quot; : [ &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;, &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot; ],
@@ -44939,10 +44939,12 @@ public class VenuesApiExample {
         Boolean rebootAllDevices = true; // Boolean | 
         Boolean testUpdateOnly = true; // Boolean | 
         Boolean upgradeAllDevices = true; // Boolean | 
+        Boolean revisionsAvailable = true; // Boolean | 
+        String revision = revision_example; // String | 
         Venue venue = ; // Venue | 
 
         try {
-            modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, venue);
+            modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, revisionsAvailable, revision, venue);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling VenuesApi#modifyVenue");
@@ -44964,10 +44966,12 @@ public class VenuesApiExample {
         Boolean rebootAllDevices = true; // Boolean | 
         Boolean testUpdateOnly = true; // Boolean | 
         Boolean upgradeAllDevices = true; // Boolean | 
+        Boolean revisionsAvailable = true; // Boolean | 
+        String revision = revision_example; // String | 
         Venue venue = ; // Venue | 
 
         try {
-            modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, venue);
+            modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, revisionsAvailable, revision, venue);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling VenuesApi#modifyVenue");
@@ -44998,6 +45002,8 @@ Boolean *updateAllDevices = true; //  (optional) (default to false)
 Boolean *rebootAllDevices = true; //  (optional) (default to false)
 Boolean *testUpdateOnly = true; //  (optional) (default to false)
 Boolean *upgradeAllDevices = true; //  (optional) (default to false)
+Boolean *revisionsAvailable = true; //  (optional) (default to false)
+String *revision = revision_example; //  (optional) (default to null)
 Venue *venue = ; //  (optional)
 
 // Modify a specific venue.
@@ -45006,6 +45012,8 @@ Venue *venue = ; //  (optional)
     rebootAllDevices:rebootAllDevices
     testUpdateOnly:testUpdateOnly
     upgradeAllDevices:upgradeAllDevices
+    revisionsAvailable:revisionsAvailable
+    revision:revision
     venue:venue
               completionHandler: ^(modifyVenue_200_response output, NSError* error) {
     if (output) {
@@ -45040,6 +45048,8 @@ var opts = {
   'rebootAllDevices': true, // {Boolean} 
   'testUpdateOnly': true, // {Boolean} 
   'upgradeAllDevices': true, // {Boolean} 
+  'revisionsAvailable': true, // {Boolean} 
+  'revision': revision_example, // {String} 
   'venue':  // {Venue} 
 };
 
@@ -45084,11 +45094,13 @@ namespace Example
             var rebootAllDevices = true;  // Boolean |  (optional)  (default to false)
             var testUpdateOnly = true;  // Boolean |  (optional)  (default to false)
             var upgradeAllDevices = true;  // Boolean |  (optional)  (default to false)
+            var revisionsAvailable = true;  // Boolean |  (optional)  (default to false)
+            var revision = revision_example;  // String |  (optional)  (default to null)
             var venue = new Venue(); // Venue |  (optional) 
 
             try {
                 // Modify a specific venue.
-                modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, venue);
+                modifyVenue_200_response result = apiInstance.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, revisionsAvailable, revision, venue);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling VenuesApi.modifyVenue: " + e.Message );
@@ -45118,10 +45130,12 @@ $updateAllDevices = true; // Boolean |
 $rebootAllDevices = true; // Boolean | 
 $testUpdateOnly = true; // Boolean | 
 $upgradeAllDevices = true; // Boolean | 
+$revisionsAvailable = true; // Boolean | 
+$revision = revision_example; // String | 
 $venue = ; // Venue | 
 
 try {
-    $result = $api_instance->modifyVenue($uuid, $updateAllDevices, $rebootAllDevices, $testUpdateOnly, $upgradeAllDevices, $venue);
+    $result = $api_instance->modifyVenue($uuid, $updateAllDevices, $rebootAllDevices, $testUpdateOnly, $upgradeAllDevices, $revisionsAvailable, $revision, $venue);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling VenuesApi->modifyVenue: ', $e->getMessage(), PHP_EOL;
@@ -45149,10 +45163,12 @@ my $updateAllDevices = true; # Boolean |
 my $rebootAllDevices = true; # Boolean | 
 my $testUpdateOnly = true; # Boolean | 
 my $upgradeAllDevices = true; # Boolean | 
+my $revisionsAvailable = true; # Boolean | 
+my $revision = revision_example; # String | 
 my $venue = WWW::OPenAPIClient::Object::Venue->new(); # Venue | 
 
 eval {
-    my $result = $api_instance->modifyVenue(uuid => $uuid, updateAllDevices => $updateAllDevices, rebootAllDevices => $rebootAllDevices, testUpdateOnly => $testUpdateOnly, upgradeAllDevices => $upgradeAllDevices, venue => $venue);
+    my $result = $api_instance->modifyVenue(uuid => $uuid, updateAllDevices => $updateAllDevices, rebootAllDevices => $rebootAllDevices, testUpdateOnly => $testUpdateOnly, upgradeAllDevices => $upgradeAllDevices, revisionsAvailable => $revisionsAvailable, revision => $revision, venue => $venue);
     print Dumper($result);
 };
 if ($@) {
@@ -45182,11 +45198,13 @@ updateAllDevices = true # Boolean |  (optional) (default to false)
 rebootAllDevices = true # Boolean |  (optional) (default to false)
 testUpdateOnly = true # Boolean |  (optional) (default to false)
 upgradeAllDevices = true # Boolean |  (optional) (default to false)
+revisionsAvailable = true # Boolean |  (optional) (default to false)
+revision = revision_example # String |  (optional) (default to null)
 venue =  # Venue |  (optional)
 
 try:
     # Modify a specific venue.
-    api_response = api_instance.modify_venue(uuid, updateAllDevices=updateAllDevices, rebootAllDevices=rebootAllDevices, testUpdateOnly=testUpdateOnly, upgradeAllDevices=upgradeAllDevices, venue=venue)
+    api_response = api_instance.modify_venue(uuid, updateAllDevices=updateAllDevices, rebootAllDevices=rebootAllDevices, testUpdateOnly=testUpdateOnly, upgradeAllDevices=upgradeAllDevices, revisionsAvailable=revisionsAvailable, revision=revision, venue=venue)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling VenuesApi->modifyVenue: %s\n" % e)</code></pre>
@@ -45201,10 +45219,12 @@ pub fn main() {
     let rebootAllDevices = true; // Boolean
     let testUpdateOnly = true; // Boolean
     let upgradeAllDevices = true; // Boolean
+    let revisionsAvailable = true; // Boolean
+    let revision = revision_example; // String
     let venue = ; // Venue
 
     let mut context = VenuesApi::Context::default();
-    let result = client.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, venue, &context).wait();
+    let result = client.modifyVenue(uuid, updateAllDevices, rebootAllDevices, testUpdateOnly, upgradeAllDevices, revisionsAvailable, revision, venue, &context).wait();
 
     println!("{:?}", result);
 }
@@ -45365,6 +45385,40 @@ $(document).ready(function() {
             <div class="primitive">
                 <span class="type">
                     Boolean
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">revisionsAvailable</td>
+<td>
+
+
+    <div id="d2e199_modifyVenue_revisionsAvailable">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Boolean
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">revision</td>
+<td>
+
+
+    <div id="d2e199_modifyVenue_revision">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
                 </span>
 
             </div>
