@@ -8,17 +8,21 @@
 
 #pragma once
 
-#include "framework/OpenWifiTypes.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi {
 	class ProvisioningDashboard {
 	  public:
-			void Create();
-			[[nodiscard]] const ProvObjects::Report & Report() const { return DB_;}
-			inline void Reset() { LastRun_=0; DB_.reset(); }
+		void Create();
+		[[nodiscard]] const ProvObjects::Report &Report() const { return DB_; }
+		inline void Reset() {
+			LastRun_ = 0;
+			DB_.reset();
+		}
+
 	  private:
-	        ProvObjects::Report  	DB_{};
-			uint64_t 				LastRun_=0;
+		ProvObjects::Report DB_{};
+		uint64_t LastRun_ = 0;
 	};
-}
+} // namespace OpenWifi

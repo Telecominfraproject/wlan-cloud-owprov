@@ -8,57 +8,38 @@
 
 #pragma once
 
-#include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/orm.h"
 
 namespace OpenWifi {
-    typedef Poco::Tuple<
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        uint64_t,
-        uint64_t,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        bool
-    > InventoryDBRecordType;
+	typedef Poco::Tuple<std::string, std::string, std::string, std::string, uint64_t, uint64_t,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, bool>
+		InventoryDBRecordType;
 
-    class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
-        public:
-            InventoryDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-            virtual ~InventoryDB() {};
-            bool CreateFromConnection(const std::string & SerialNumber, const std::string & ConnectionInfo,
-                                      const std::string & DeviceType, const std::string &Locale );
+	class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {
+	  public:
+		InventoryDB(OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L);
+		virtual ~InventoryDB(){};
+		bool CreateFromConnection(const std::string &SerialNumber,
+								  const std::string &ConnectionInfo, const std::string &DeviceType,
+								  const std::string &Locale);
 
-            void InitializeSerialCache();
-            bool GetRRMDeviceList(Types::UUIDvec_t & DeviceList);
+		void InitializeSerialCache();
+		bool GetRRMDeviceList(Types::UUIDvec_t &DeviceList);
 
-            bool EvaluateDeviceIDRules(const std::string &id, ProvObjects::DeviceRules &Rules);
-            bool EvaluateDeviceSerialNumberRules(const std::string &serialNumber, ProvObjects::DeviceRules &Rules);
+		bool EvaluateDeviceIDRules(const std::string &id, ProvObjects::DeviceRules &Rules);
+		bool EvaluateDeviceSerialNumberRules(const std::string &serialNumber,
+											 ProvObjects::DeviceRules &Rules);
 
-            inline uint32_t Version() override {
-                return 1;
-            }
+		inline uint32_t Version() override { return 1; }
 
-            bool Upgrade(uint32_t from, uint32_t &to) override;
+		bool Upgrade(uint32_t from, uint32_t &to) override;
 
-        private:
-            bool EvaluateDeviceRules(const ProvObjects::InventoryTag &T, ProvObjects::DeviceRules &Rules);
-    };
-}
+	  private:
+		bool EvaluateDeviceRules(const ProvObjects::InventoryTag &T,
+								 ProvObjects::DeviceRules &Rules);
+	};
+} // namespace OpenWifi

@@ -8,36 +8,24 @@
 
 #pragma once
 
-#include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/orm.h"
 
 namespace OpenWifi {
-    typedef Poco::Tuple<
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    uint64_t,
-    uint64_t,
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    std::string,
-    bool,
-    std::string,
-    std::string,
-    std::string
-    > ConfigurationDBRecordType;
+	typedef Poco::Tuple<std::string, std::string, std::string, std::string, uint64_t, uint64_t,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, bool, std::string, std::string, std::string>
+		ConfigurationDBRecordType;
 
-    class ConfigurationDB : public ORM::DB<ConfigurationDBRecordType, ProvObjects::DeviceConfiguration> {
-    public:
-        ConfigurationDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-        bool GetListOfAffectedDevices(const Types::UUID_t & ConfigUUID, Types::UUIDvec_t & DeviceSerialNumbers );
-        bool Upgrade(uint32_t from, uint32_t &to) override;
-        virtual ~ConfigurationDB() {};
-    private:
-    };
-}
+	class ConfigurationDB
+		: public ORM::DB<ConfigurationDBRecordType, ProvObjects::DeviceConfiguration> {
+	  public:
+		ConfigurationDB(OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L);
+		bool GetListOfAffectedDevices(const Types::UUID_t &ConfigUUID,
+									  Types::UUIDvec_t &DeviceSerialNumbers);
+		bool Upgrade(uint32_t from, uint32_t &to) override;
+		virtual ~ConfigurationDB(){};
+
+	  private:
+	};
+} // namespace OpenWifi

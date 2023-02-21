@@ -5,18 +5,18 @@
 #include "RESTAPI_sub_devices_list_handler.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 
-
 namespace OpenWifi {
 
-    void RESTAPI_sub_devices_list_handler::DoGet() {
-        auto operatorId=ORM::Escape(GetParameter("operatorId"));
-        auto subscriberId=ORM::Escape(GetParameter("subscriberId"));
+	void RESTAPI_sub_devices_list_handler::DoGet() {
+		auto operatorId = ORM::Escape(GetParameter("operatorId"));
+		auto subscriberId = ORM::Escape(GetParameter("subscriberId"));
 
-        if(!operatorId.empty() && !StorageService()->OperatorDB().Exists("id",operatorId)) {
-            return BadRequest(RESTAPI::Errors::OperatorIdMustExist);
-        }
+		if (!operatorId.empty() && !StorageService()->OperatorDB().Exists("id", operatorId)) {
+			return BadRequest(RESTAPI::Errors::OperatorIdMustExist);
+		}
 
-        return ListHandlerForOperator<SubscriberDeviceDB>("subscriberDevices", DB_, *this, operatorId, subscriberId);
-    }
+		return ListHandlerForOperator<SubscriberDeviceDB>("subscriberDevices", DB_, *this,
+														  operatorId, subscriberId);
+	}
 
-}
+} // namespace OpenWifi

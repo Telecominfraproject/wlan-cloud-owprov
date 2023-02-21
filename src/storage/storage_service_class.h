@@ -14,34 +14,23 @@
 
 #pragma once
 
-#include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/orm.h"
 
 namespace OpenWifi {
 
-    typedef Poco::Tuple<
-            std::string,
-            std::string,
-            std::string,
-            std::string,
-            uint64_t,
-            uint64_t,
-            std::string,
-            std::string,
-            double,
-            std::string,
-            std::string,
-            std::string,
-            std::string,
-            bool
-    > ServiceClassDBRecordType;
+	typedef Poco::Tuple<std::string, std::string, std::string, std::string, uint64_t, uint64_t,
+						std::string, std::string, double, std::string, std::string, std::string,
+						std::string, bool>
+		ServiceClassDBRecordType;
 
-    class ServiceClassDB : public ORM::DB<ServiceClassDBRecordType, ProvObjects::ServiceClass> {
-    public:
-        ServiceClassDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-        virtual ~ServiceClassDB() {};
-        bool Upgrade(uint32_t from, uint32_t &to) override;
-        std::string DefaultForOperator(const std::string & OperatorId);
-    private:
-    };
-}
+	class ServiceClassDB : public ORM::DB<ServiceClassDBRecordType, ProvObjects::ServiceClass> {
+	  public:
+		ServiceClassDB(OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L);
+		virtual ~ServiceClassDB(){};
+		bool Upgrade(uint32_t from, uint32_t &to) override;
+		std::string DefaultForOperator(const std::string &OperatorId);
+
+	  private:
+	};
+} // namespace OpenWifi

@@ -3,32 +3,30 @@
 //
 
 #pragma once
-#include "framework/SubSystemServer.h"
 #include "Poco/Timer.h"
+#include "framework/SubSystemServer.h"
 
 namespace OpenWifi {
 
-    class FileDownloader : public SubSystemServer {
-    public:
+	class FileDownloader : public SubSystemServer {
+	  public:
+		static auto instance() {
+			static auto instance_ = new FileDownloader;
+			return instance_;
+		}
 
-        static auto instance() {
-            static auto instance_ = new FileDownloader;
-            return instance_;
-        }
+		int Start() override;
+		void Stop() override;
+		void onTimer(Poco::Timer &timer);
 
-        int Start() override;
-        void Stop() override;
-        void onTimer(Poco::Timer & timer);
+	  private:
+		Poco::Timer Timer_;
+		std::unique_ptr<Poco::TimerCallback<FileDownloader>> TimerCallback_;
+		std::atomic_bool Running_ = false;
 
-    private:
-        Poco::Timer                                         Timer_;
-        std::unique_ptr<Poco::TimerCallback<FileDownloader>>       TimerCallback_;
-        std::atomic_bool Running_ = false;
+		FileDownloader() noexcept
+			: SubSystemServer("FileDownloader", "FILE-DOWNLOADER", "downloader") {}
+	};
 
-        FileDownloader() noexcept:
-                SubSystemServer("FileDownloader", "FILE-DOWNLOADER", "downloader") {
-        }
-    };
-
-    inline auto FileDownloader() { return FileDownloader::instance(); }
-}
+	inline auto FileDownloader() { return FileDownloader::instance(); }
+} // namespace OpenWifi

@@ -7,8 +7,8 @@
 
 namespace OpenWifi {
 
-    void RESTAPI_variables_list_handler::DoGet() {
-        return ListHandler<VariablesDB>("variableBlocks", DB_, *this);
-    }
+	void RESTAPI_variables_list_handler::DoGet() {
+		return ListHandler<VariablesDB>("variableBlocks", DB_, *this);
+	}
 
-}
+} // namespace OpenWifi

@@ -7,136 +7,150 @@
 
 namespace OpenWifi {
 
-    void RESTAPI_variables_handler::DoGet() {
-        auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
+	void RESTAPI_variables_handler::DoGet() {
+		auto UUID = GetBinding("uuid", "");
+		if (UUID.empty()) {
+			return BadRequest(RESTAPI::Errors::MissingUUID);
+		}
 
-        VariablesDB::RecordName Existing;
-        if(!DB_.GetRecord("id",UUID,Existing)) {
-            return NotFound();
-        }
+		VariablesDB::RecordName Existing;
+		if (!DB_.GetRecord("id", UUID, Existing)) {
+			return NotFound();
+		}
 
-        Poco::JSON::Object Answer;
-        if(QB_.AdditionalInfo)
-            AddExtendedInfo(Existing, Answer);
-        Existing.to_json(Answer);
-        ReturnObject(Answer);
-    }
+		Poco::JSON::Object Answer;
+		if (QB_.AdditionalInfo)
+			AddExtendedInfo(Existing, Answer);
+		Existing.to_json(Answer);
+		ReturnObject(Answer);
+	}
 
-    void RESTAPI_variables_handler::DoDelete() {
-        auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
+	void RESTAPI_variables_handler::DoDelete() {
+		auto UUID = GetBinding("uuid", "");
+		if (UUID.empty()) {
+			return BadRequest(RESTAPI::Errors::MissingUUID);
+		}
 
-        VariablesDB::RecordName Existing;
-        if(!DB_.GetRecord("id",UUID,Existing)) {
-            return NotFound();
-        }
+		VariablesDB::RecordName Existing;
+		if (!DB_.GetRecord("id", UUID, Existing)) {
+			return NotFound();
+		}
 
-        if(!Existing.configurations.empty()) {
-            return BadRequest(RESTAPI::Errors::StillInUse);
-        }
-        MoveUsage(StorageService()->PolicyDB(),DB_,Existing.managementPolicy,"",Existing.info.id);
-        RemoveMembership(StorageService()->VenueDB(),&ProvObjects::Venue::variables,Existing.venue,Existing.info.id);
-        RemoveMembership(StorageService()->EntityDB(),&ProvObjects::Entity::variables,Existing.entity,Existing.info.id);
-        DB_.DeleteRecord("id", UUID);
+		if (!Existing.configurations.empty()) {
+			return BadRequest(RESTAPI::Errors::StillInUse);
+		}
+		MoveUsage(StorageService()->PolicyDB(), DB_, Existing.managementPolicy, "",
+				  Existing.info.id);
+		RemoveMembership(StorageService()->VenueDB(), &ProvObjects::Venue::variables,
+						 Existing.venue, Existing.info.id);
+		RemoveMembership(StorageService()->EntityDB(), &ProvObjects::Entity::variables,
+						 Existing.entity, Existing.info.id);
+		DB_.DeleteRecord("id", UUID);
 
-        return OK();
-    }
+		return OK();
+	}
 
-    void RESTAPI_variables_handler::DoPost() {
-        auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
+	void RESTAPI_variables_handler::DoPost() {
+		auto UUID = GetBinding("uuid", "");
+		if (UUID.empty()) {
+			return BadRequest(RESTAPI::Errors::MissingUUID);
+		}
 
-        const auto & RawObj = ParsedBody_;
-        VariablesDB::RecordName NewObject;
-        if(!NewObject.from_json(RawObj)) {
-            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-        }
+		const auto &RawObj = ParsedBody_;
+		VariablesDB::RecordName NewObject;
+		if (!NewObject.from_json(RawObj)) {
+			return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+		}
 
-        if(!NewObject.entity.empty() && !StorageService()->EntityDB().Exists("id",NewObject.entity)) {
-            return BadRequest(RESTAPI::Errors::EntityMustExist);
-        }
+		if (!NewObject.entity.empty() &&
+			!StorageService()->EntityDB().Exists("id", NewObject.entity)) {
+			return BadRequest(RESTAPI::Errors::EntityMustExist);
+		}
 
-        if(!NewObject.venue.empty() && !StorageService()->VenueDB().Exists("id",NewObject.venue)) {
-            return BadRequest(RESTAPI::Errors::VenueMustExist);
-        }
+		if (!NewObject.venue.empty() &&
+			!StorageService()->VenueDB().Exists("id", NewObject.venue)) {
+			return BadRequest(RESTAPI::Errors::VenueMustExist);
+		}
 
-        if(!NewObject.managementPolicy.empty() && !StorageService()->PolicyDB().Exists("id",NewObject.managementPolicy)) {
-            return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
-        }
+		if (!NewObject.managementPolicy.empty() &&
+			!StorageService()->PolicyDB().Exists("id", NewObject.managementPolicy)) {
+			return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
+		}
 
-        if(!ProvObjects::CreateObjectInfo(RawObj,UserInfo_.userinfo,NewObject.info)) {
-            return BadRequest((RESTAPI::Errors::MissingOrInvalidParameters));
-        }
+		if (!ProvObjects::CreateObjectInfo(RawObj, UserInfo_.userinfo, NewObject.info)) {
+			return BadRequest((RESTAPI::Errors::MissingOrInvalidParameters));
+		}
 
-        if(DB_.CreateRecord(NewObject)) {
-            MoveUsage(StorageService()->PolicyDB(),DB_,"",NewObject.managementPolicy,NewObject.info.id);
-            AddMembership(StorageService()->VenueDB(),&ProvObjects::Venue::variables,NewObject.venue, NewObject.info.id);
-            AddMembership(StorageService()->EntityDB(),&ProvObjects::Entity::variables,NewObject.entity, NewObject.info.id);
+		if (DB_.CreateRecord(NewObject)) {
+			MoveUsage(StorageService()->PolicyDB(), DB_, "", NewObject.managementPolicy,
+					  NewObject.info.id);
+			AddMembership(StorageService()->VenueDB(), &ProvObjects::Venue::variables,
+						  NewObject.venue, NewObject.info.id);
+			AddMembership(StorageService()->EntityDB(), &ProvObjects::Entity::variables,
+						  NewObject.entity, NewObject.info.id);
 
-            VariablesDB::RecordName Added;
-            DB_.GetRecord("id",NewObject.info.id,Added);
-            Poco::JSON::Object  Answer;
-            Added.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return BadRequest(RESTAPI::Errors::RecordNotCreated);
-    }
+			VariablesDB::RecordName Added;
+			DB_.GetRecord("id", NewObject.info.id, Added);
+			Poco::JSON::Object Answer;
+			Added.to_json(Answer);
+			return ReturnObject(Answer);
+		}
+		return BadRequest(RESTAPI::Errors::RecordNotCreated);
+	}
 
-    void RESTAPI_variables_handler::DoPut() {
-        auto UUID = GetBinding("uuid","");
-        if(UUID.empty()) {
-            return BadRequest(RESTAPI::Errors::MissingUUID);
-        }
+	void RESTAPI_variables_handler::DoPut() {
+		auto UUID = GetBinding("uuid", "");
+		if (UUID.empty()) {
+			return BadRequest(RESTAPI::Errors::MissingUUID);
+		}
 
-        VariablesDB::RecordName Existing;
-        if(!StorageService()->VariablesDB().GetRecord("id",UUID,Existing)) {
-            return NotFound();
-        }
+		VariablesDB::RecordName Existing;
+		if (!StorageService()->VariablesDB().GetRecord("id", UUID, Existing)) {
+			return NotFound();
+		}
 
-        const auto & RawObject = ParsedBody_;
-        VariablesDB::RecordName NewObj;
-        if(!NewObj.from_json(RawObject)) {
-            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-        }
+		const auto &RawObject = ParsedBody_;
+		VariablesDB::RecordName NewObj;
+		if (!NewObj.from_json(RawObject)) {
+			return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+		}
 
-        if(!ProvObjects::UpdateObjectInfo(RawObject,UserInfo_.userinfo,Existing.info)) {
-            return BadRequest((RESTAPI::Errors::MissingOrInvalidParameters));
-        }
+		if (!ProvObjects::UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info)) {
+			return BadRequest((RESTAPI::Errors::MissingOrInvalidParameters));
+		}
 
-        if(RawObject->has("variables"))
-            Existing.variables = NewObj.variables;
+		if (RawObject->has("variables"))
+			Existing.variables = NewObj.variables;
 
-        std::string FromPolicy, ToPolicy;
-        if(!CreateMove(RawObject,"managementPolicy",&VariablesDB::RecordName::managementPolicy, Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
-            return BadRequest(RESTAPI::Errors::EntityMustExist);
+		std::string FromPolicy, ToPolicy;
+		if (!CreateMove(RawObject, "managementPolicy", &VariablesDB::RecordName::managementPolicy,
+						Existing, FromPolicy, ToPolicy, StorageService()->PolicyDB()))
+			return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        std::string FromEntity, ToEntity;
-        if(!CreateMove(RawObject,"entity",&VariablesDB::RecordName::entity, Existing, FromEntity, ToEntity, StorageService()->EntityDB()))
-            return BadRequest(RESTAPI::Errors::EntityMustExist);
+		std::string FromEntity, ToEntity;
+		if (!CreateMove(RawObject, "entity", &VariablesDB::RecordName::entity, Existing, FromEntity,
+						ToEntity, StorageService()->EntityDB()))
+			return BadRequest(RESTAPI::Errors::EntityMustExist);
 
-        std::string FromVenue, ToVenue;
-        if(!CreateMove(RawObject,"venue",&VariablesDB::RecordName::venue, Existing, FromVenue, ToVenue, StorageService()->VenueDB()))
-            return BadRequest(RESTAPI::Errors::VenueMustExist);
+		std::string FromVenue, ToVenue;
+		if (!CreateMove(RawObject, "venue", &VariablesDB::RecordName::venue, Existing, FromVenue,
+						ToVenue, StorageService()->VenueDB()))
+			return BadRequest(RESTAPI::Errors::VenueMustExist);
 
-        if(DB_.UpdateRecord("id", UUID, Existing)) {
-            MoveUsage(StorageService()->PolicyDB(),DB_,FromPolicy,ToPolicy,Existing.info.id);
-            ManageMembership(StorageService()->VenueDB(), &ProvObjects::Venue::variables, FromVenue, ToVenue, Existing.info.id);
-            ManageMembership(StorageService()->EntityDB(), &ProvObjects::Entity::variables, FromEntity, ToEntity, Existing.info.id);
+		if (DB_.UpdateRecord("id", UUID, Existing)) {
+			MoveUsage(StorageService()->PolicyDB(), DB_, FromPolicy, ToPolicy, Existing.info.id);
+			ManageMembership(StorageService()->VenueDB(), &ProvObjects::Venue::variables, FromVenue,
+							 ToVenue, Existing.info.id);
+			ManageMembership(StorageService()->EntityDB(), &ProvObjects::Entity::variables,
+							 FromEntity, ToEntity, Existing.info.id);
 
-            VariablesDB::RecordName Added;
-            DB_.GetRecord("id",NewObj.info.id,Added);
-            Poco::JSON::Object  Answer;
-            Added.to_json(Answer);
-            return ReturnObject(Answer);
-        }
-        return BadRequest(RESTAPI::Errors::RecordNotCreated);
-    }
+			VariablesDB::RecordName Added;
+			DB_.GetRecord("id", NewObj.info.id, Added);
+			Poco::JSON::Object Answer;
+			Added.to_json(Answer);
+			return ReturnObject(Answer);
+		}
+		return BadRequest(RESTAPI::Errors::RecordNotCreated);
+	}
 
-}
+} // namespace OpenWifi

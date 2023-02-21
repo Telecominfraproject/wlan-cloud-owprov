@@ -8,32 +8,28 @@
 
 namespace OpenWifi {
 
-    class TagServer : public SubSystemServer, Poco::Runnable {
-    public:
+	class TagServer : public SubSystemServer, Poco::Runnable {
+	  public:
+		typedef std::map<std::string, uint32_t> DictMap;
+		typedef std::map<std::string, DictMap> EntityToDict;
 
-        typedef std::map<std::string,uint32_t>  DictMap;
-        typedef std::map<std::string,DictMap>   EntityToDict;
+		static auto instance() {
+			static auto instance_ = new TagServer;
+			return instance_;
+		}
 
-        static auto instance() {
-            static auto instance_ = new TagServer;
-            return instance_;
-        }
+		int Start() override;
+		void Stop() override;
+		void run() override;
 
-        int Start() override;
-        void Stop() override;
-        void run() override;
+	  private:
+		Poco::Thread Worker_;
+		std::atomic_bool Running_ = false;
+		EntityToDict E2D_;
 
-    private:
-        Poco::Thread                Worker_;
-        std::atomic_bool            Running_ = false;
-        EntityToDict                E2D_;
+		TagServer() noexcept : SubSystemServer("TagServer", "TAGS", "tags") {}
+	};
 
-        TagServer() noexcept:
-            SubSystemServer("TagServer", "TAGS", "tags")
-            {
-            }
-    };
+	inline auto TagServer() { return TagServer::instance(); }
 
-    inline auto TagServer() { return TagServer::instance(); }
-
-}
+} // namespace OpenWifi

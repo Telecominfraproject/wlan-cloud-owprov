@@ -8,39 +8,22 @@
 
 #pragma once
 
-#include "framework/orm.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
+#include "framework/orm.h"
 
 namespace OpenWifi {
-    typedef Poco::Tuple<
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        uint64_t,
-        uint64_t,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string,
-        std::string
-    > ContactDBRecordType;
+	typedef Poco::Tuple<std::string, std::string, std::string, std::string, uint64_t, uint64_t,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string, std::string, std::string, std::string, std::string,
+						std::string>
+		ContactDBRecordType;
 
-    class ContactDB : public ORM::DB<ContactDBRecordType, ProvObjects::Contact> {
-        public:
-            ContactDB( OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-            virtual ~ContactDB() {};
-        private:
-    };
-}
+	class ContactDB : public ORM::DB<ContactDBRecordType, ProvObjects::Contact> {
+	  public:
+		ContactDB(OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L);
+		virtual ~ContactDB(){};
+
+	  private:
+	};
+} // namespace OpenWifi

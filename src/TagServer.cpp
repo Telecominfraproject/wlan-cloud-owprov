@@ -7,22 +7,19 @@
 #include "framework/utils.h"
 
 namespace OpenWifi {
-    int TagServer::Start() {
+	int TagServer::Start() {
 
-        //  we need to get the entire dictionary in memory...
-        // std::function<bool(const TagsDictionary &)> Function = [](const TagsDictionary &D) -> bool { return  true; };
-        StorageService()->TagsDictionaryDB().Iterate([]([[maybe_unused]] const TagsDictionary &D) -> bool { return  true; });
+		//  we need to get the entire dictionary in memory...
+		// std::function<bool(const TagsDictionary &)> Function = [](const TagsDictionary &D) ->
+		// bool { return  true; };
+		StorageService()->TagsDictionaryDB().Iterate(
+			[]([[maybe_unused]] const TagsDictionary &D) -> bool { return true; });
 
+		return 0;
+	}
 
-        return 0;
-    }
+	void TagServer::Stop() {}
 
-    void TagServer::Stop() {
+	void TagServer::run() { Utils::SetThreadName("tag-server"); }
 
-    }
-
-    void TagServer::run() {
-        Utils::SetThreadName("tag-server");
-    }
-
-}
+} // namespace OpenWifi

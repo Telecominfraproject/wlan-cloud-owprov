@@ -4,8 +4,6 @@
 
 namespace OpenWifi {
 
-    void RegisterJobTypes() {
+	void RegisterJobTypes() {}
 
-    }
-
-}
+} // namespace OpenWifi
