@@ -5,7 +5,7 @@
 ## OpenAPI
 You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-owprov/).
 
-Also you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-owprov/main/openapi/owprov.yaml)) to get interactive docs page.
+Also, you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-owprov/main/openapi/owprov.yaml)) to get interactive docs page.
 
 ## Build from source.
 You need:
@@ -53,24 +53,33 @@ You may modify the following fields in the POST
 - You may include an array of devices UUIDs
 - Topology and design cannot be set
 
-## Geocoding
-To support geocoding help, you need to configuration the following in the configuration file. Geocoding is used
-when creating location and when reporting analytics.
-``` 
-geocodeapi = google
-google.apikey = **********************************
-```
-Currently, only google Geocoding is supported. Additional methods may be added in the future.
+### OWPROV Service Configuration
+The configuration is kept in a file called `owprov.properties`. To understand the content of this file,
+please look [here](https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/CONFIGURATION.md)
 
-## Default firmware management rules
-FMS is already integrated with OpenWifi. In order to allow it to upgrade devices automatically, you should 
-set the following values.
-``` 
-firmware.updater.upgrade = <true/false>
-firmware.updater.releaseonly = <true/false>
-```
-### firmware.updater.upgrade
-Should FMS attempt to upgrade devices by default.
+## Firewall Considerations
+| Port  | Description                                    | Configurable |
+|:------|:-----------------------------------------------|:------------:|
+| 16004 | Default port for REST API Access to the OWPROV |     yes      |
 
-### firmware.updater.releaseonly
-Should only RC software be used during upgrades.
+## Kafka topics
+Toe read more about Kafka, follow the [document](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/main/KAFKA.md)
+
+## Contributions
+We need more contributors. Should you wish to contribute,
+please follow the [contributions](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/CONTRIBUTING.md) document.
+
+## Pull Requests
+Please create a branch with the Jira addressing the issue you are fixing or the feature you are implementing.
+Create a pull-request from the branch into master.
+
+## Additional OWSDK Microservices
+Here is a list of additional OWSDK microservices
+| Name | Description | Link | OpenAPI |
+| :--- | :--- | :---: | :---: |
+| OWSEC | Security Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralsec) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml) |
+| OWGW | Controller Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/openapi/owgw.yaml) |
+| OWFMS | Firmware Management Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralfms) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralfms/blob/main/openapi/owfms.yaml) |
+| OWPROV | Provisioning Service | [here](https://github.com/Telecominfraproject/wlan-cloud-owprov) | [here](https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/openapi/owprov.yaml) |
+| OWANALYTICS | Analytics Service | [here](https://github.com/Telecominfraproject/wlan-cloud-analytics) | [here](https://github.com/Telecominfraproject/wlan-cloud-analytics/blob/main/openapi/owanalytics.yaml) |
+
