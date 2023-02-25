@@ -54,6 +54,15 @@ You may modify the following fields in the POST
 - You may include an array of devices UUIDs
 - Topology and design cannot be set
 
+### Environment variables
+The following environment variables should be set from the root directory of the service. They tell the OWGW process where to find
+the configuration and the root directory.
+```bash
+export OWGW_ROOT=`pwd`
+export OWGW_CONFIG=`pwd`
+```
+You can run the shell script `set_env.sh` from the microservice root.
+
 ### OWPROV Service Configuration
 The configuration is kept in a file called `owprov.properties`. To understand the content of this file,
 please look [here](https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/CONFIGURATION.md)
