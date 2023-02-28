@@ -1253,6 +1253,15 @@ components:
           items:
             $ref: '#/components/schemas/ConfigurationOverride'
 
+    ExtraSystemConfiguration:
+      type: array
+      items:
+        type: object
+        properties:
+          parameterName:
+            type: string
+          parameterValue:
+            type: string
 
     #########################################################################################
     ##
@@ -4415,6 +4424,69 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/SystemInfoResults'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /systemConfiguration:
+    get:
+      tags:
+        - SystemConfiguration
+      summary: Retrieve system configuration items
+      operationId: getSystemConfiguration
+      parameters:
+        - in: query
+          description: Which parameters you want to retrieve
+          name: elements
+          schema:
+            type: string
+            example:
+              - element1
+              - element1,element2,element3
+          required: false
+      responses:
+        200:
+          description: List of configuration elements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtraSystemConfiguration'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - SystemConfiguration
+      summary: Set some or all system configuration
+      operationId: setSystemConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtraSystemConfiguration'
+
+      responses:
+        200:
+          $ref: '#/components/schemas/ExtraSystemConfiguration'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - SystemConfiguration
+      summary: Delete all additional system configuration
+      operationId: deleteSystemConfiguration
+
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
