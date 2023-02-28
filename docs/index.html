@@ -42067,7 +42067,7 @@ pub fn main() {
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Accept: application/json" \
- "https://localhost:16005/api/v1/systemConfiguration?elements=["element1","element1,element2,element3"]"
+ "https://localhost:16005/api/v1/systemConfiguration?entries=["element1","element1,element2,element3"]"
 </code></pre>
                           </div>
                           <div class="tab-pane" id="examples-SystemConfiguration-getSystemConfiguration-0-java">
@@ -42095,10 +42095,10 @@ public class SystemConfigurationApiExample {
 
         // Create an instance of the API class
         SystemConfigurationApi apiInstance = new SystemConfigurationApi();
-        String elements = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
+        String entries = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
 
         try {
-            array[List] result = apiInstance.getSystemConfiguration(elements);
+            array[List] result = apiInstance.getSystemConfiguration(entries);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling SystemConfigurationApi#getSystemConfiguration");
@@ -42115,10 +42115,10 @@ public class SystemConfigurationApiExample {
 public class SystemConfigurationApiExample {
     public static void main(String[] args) {
         SystemConfigurationApi apiInstance = new SystemConfigurationApi();
-        String elements = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
+        String entries = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
 
         try {
-            array[List] result = apiInstance.getSystemConfiguration(elements);
+            array[List] result = apiInstance.getSystemConfiguration(entries);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling SystemConfigurationApi#getSystemConfiguration");
@@ -42144,10 +42144,10 @@ public class SystemConfigurationApiExample {
 
 // Create an instance of the API class
 SystemConfigurationApi *apiInstance = [[SystemConfigurationApi alloc] init];
-String *elements = ["element1","element1,element2,element3"]; // Which parameters you want to retrieve (optional) (default to null)
+String *entries = ["element1","element1,element2,element3"]; // Which parameters you want to retrieve (optional) (default to null)
 
 // Retrieve system configuration items
-[apiInstance getSystemConfigurationWith:elements
+[apiInstance getSystemConfigurationWith:entries
               completionHandler: ^(array[List] output, NSError* error) {
     if (output) {
         NSLog(@"%@", output);
@@ -42176,7 +42176,7 @@ bearerAuth.accessToken = "YOUR ACCESS TOKEN";
 // Create an instance of the API class
 var api = new OpenWiFiProvisioningModel.SystemConfigurationApi()
 var opts = {
-  'elements': ["element1","element1,element2,element3"] // {String} Which parameters you want to retrieve
+  'entries': ["element1","element1,element2,element3"] // {String} Which parameters you want to retrieve
 };
 
 var callback = function(error, data, response) {
@@ -42215,11 +42215,11 @@ namespace Example
 
             // Create an instance of the API class
             var apiInstance = new SystemConfigurationApi();
-            var elements = ["element1","element1,element2,element3"];  // String | Which parameters you want to retrieve (optional)  (default to null)
+            var entries = ["element1","element1,element2,element3"];  // String | Which parameters you want to retrieve (optional)  (default to null)
 
             try {
                 // Retrieve system configuration items
-                array[List] result = apiInstance.getSystemConfiguration(elements);
+                array[List] result = apiInstance.getSystemConfiguration(entries);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling SystemConfigurationApi.getSystemConfiguration: " + e.Message );
@@ -42244,10 +42244,10 @@ OpenAPITools\Client\Configuration::getDefaultConfiguration()->setAccessToken('',
 
 // Create an instance of the API class
 $api_instance = new OpenAPITools\Client\Api\SystemConfigurationApi();
-$elements = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
+$entries = ["element1","element1,element2,element3"]; // String | Which parameters you want to retrieve
 
 try {
-    $result = $api_instance->getSystemConfiguration($elements);
+    $result = $api_instance->getSystemConfiguration($entries);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling SystemConfigurationApi->getSystemConfiguration: ', $e->getMessage(), PHP_EOL;
@@ -42270,10 +42270,10 @@ $WWW::OPenAPIClient::Configuration::access_token = 'YOUR_ACCESS_TOKEN';
 
 # Create an instance of the API class
 my $api_instance = WWW::OPenAPIClient::SystemConfigurationApi->new();
-my $elements = ["element1","element1,element2,element3"]; # String | Which parameters you want to retrieve
+my $entries = ["element1","element1,element2,element3"]; # String | Which parameters you want to retrieve
 
 eval {
-    my $result = $api_instance->getSystemConfiguration(elements => $elements);
+    my $result = $api_instance->getSystemConfiguration(entries => $entries);
     print Dumper($result);
 };
 if ($@) {
@@ -42298,11 +42298,11 @@ openapi_client.configuration.access_token = 'YOUR_ACCESS_TOKEN'
 
 # Create an instance of the API class
 api_instance = openapi_client.SystemConfigurationApi()
-elements = ["element1","element1,element2,element3"] # String | Which parameters you want to retrieve (optional) (default to null)
+entries = ["element1","element1,element2,element3"] # String | Which parameters you want to retrieve (optional) (default to null)
 
 try:
     # Retrieve system configuration items
-    api_response = api_instance.get_system_configuration(elements=elements)
+    api_response = api_instance.get_system_configuration(entries=entries)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling SystemConfigurationApi->getSystemConfiguration: %s\n" % e)</code></pre>
@@ -42312,10 +42312,10 @@ except ApiException as e:
                               <pre class="prettyprint"><code class="language-rust">extern crate SystemConfigurationApi;
 
 pub fn main() {
-    let elements = ["element1","element1,element2,element3"]; // String
+    let entries = ["element1","element1,element2,element3"]; // String
 
     let mut context = SystemConfigurationApi::Context::default();
-    let result = client.getSystemConfiguration(elements, &context).wait();
+    let result = client.getSystemConfiguration(entries, &context).wait();
 
     println!("{:?}", result);
 }
@@ -42340,11 +42340,11 @@ pub fn main() {
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">elements</td>
+                                <tr><td style="width:150px;">entries</td>
 <td>
 
 
-    <div id="d2e199_getSystemConfiguration_elements">
+    <div id="d2e199_getSystemConfiguration_entries">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
