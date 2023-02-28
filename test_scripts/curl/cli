@@ -663,7 +663,7 @@ case "$1" in
     "addoverride") login; addoverride "$2"; logout;;
     "deleteoverride") login; deleteoverride "$2"; logout;;
     "venueupgraderevisions") login; venueupgraderevisions "$2"; logout;;
-    "getsystemconfiguration") login; getsystemconfiguration "$2"; logout
+    "getsystemconfiguration") login; getsystemconfiguration "$2"; logout;;
     *) help ;;
 esac
 

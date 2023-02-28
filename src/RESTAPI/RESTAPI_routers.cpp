@@ -38,6 +38,7 @@
 
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
+#include "framework/RESTAPI_SystemConfiguration.h"
 
 namespace OpenWifi {
 
@@ -45,7 +46,8 @@ namespace OpenWifi {
 	RESTAPI_ExtRouter(const std::string &Path, RESTAPIHandler::BindingMap &Bindings,
 					  Poco::Logger &L, RESTAPI_GenericServerAccounting &S, uint64_t TransactionId) {
 		return RESTAPI_Router<
-			RESTAPI_system_command, RESTAPI_entity_handler, RESTAPI_entity_list_handler,
+			RESTAPI_system_command, RESTAPI_system_configuration,
+            RESTAPI_entity_handler, RESTAPI_entity_list_handler,
 			RESTAPI_contact_handler, RESTAPI_contact_list_handler, RESTAPI_location_handler,
 			RESTAPI_location_list_handler, RESTAPI_venue_handler, RESTAPI_venue_list_handler,
 			RESTAPI_inventory_handler, RESTAPI_inventory_list_handler,
@@ -66,7 +68,8 @@ namespace OpenWifi {
 	RESTAPI_IntRouter(const std::string &Path, RESTAPIHandler::BindingMap &Bindings,
 					  Poco::Logger &L, RESTAPI_GenericServerAccounting &S, uint64_t TransactionId) {
 		return RESTAPI_Router_I<
-			RESTAPI_system_command, RESTAPI_entity_handler, RESTAPI_entity_list_handler,
+			RESTAPI_system_command, RESTAPI_system_configuration, RESTAPI_entity_handler,
+            RESTAPI_entity_list_handler,
 			RESTAPI_contact_handler, RESTAPI_contact_list_handler, RESTAPI_location_handler,
 			RESTAPI_location_list_handler, RESTAPI_venue_handler, RESTAPI_venue_list_handler,
 			RESTAPI_inventory_handler, RESTAPI_inventory_list_handler,
