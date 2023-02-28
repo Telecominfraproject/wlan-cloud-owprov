@@ -54,15 +54,14 @@ namespace OpenWifi {
 				return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 			}
 
-			return OK();
+			return BadRequest(RESTAPI::Errors::NotImplemented);
 		};
 
 		inline void DoDelete() final{
 			if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT) {
 				return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 			}
-			MicroServiceDeleteOverrideConfiguration();
-			return OK();
+            return BadRequest(RESTAPI::Errors::NotImplemented);
 		};
 	};
 
