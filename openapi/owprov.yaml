@@ -4438,7 +4438,7 @@ paths:
       parameters:
         - in: query
           description: Which parameters you want to retrieve
-          name: elements
+          name: entries
           schema:
             type: string
             example:
