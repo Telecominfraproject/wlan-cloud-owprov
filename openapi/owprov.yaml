@@ -1253,6 +1253,11 @@ components:
           items:
             $ref: '#/components/schemas/ConfigurationOverride'
 
+    #########################################################################################
+    ##
+    ## These are endpoints that all services in the OPenWiFI stack must provide
+    ##
+    #########################################################################################
     ExtraSystemConfiguration:
       type: array
       items:
@@ -1263,11 +1268,6 @@ components:
           parameterValue:
             type: string
 
-    #########################################################################################
-    ##
-    ## These are endpoints that all services in the OPenWiFI stack must provide
-    ##
-    #########################################################################################
     AnyPayload:
       type: object
       properties:
