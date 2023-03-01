@@ -13745,7 +13745,7 @@ pub fn main() {
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Accept: application/json" \
- "https://localhost:16005/api/v1/inventory/{serialNumber}?config=true&explain=true&firmwareOptions=true&applyConfiguration=true&subscriberEntity=38400000-8cf0-11bd-b23e-10b96e4ef00d"
+ "https://localhost:16005/api/v1/inventory/{serialNumber}?config=true&explain=true&firmwareOptions=true&applyConfiguration=true&subscriberEntity=38400000-8cf0-11bd-b23e-10b96e4ef00d&rrmSettings=true"
 </code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Inventory-getInventory-0-java">
@@ -13779,9 +13779,10 @@ public class InventoryApiExample {
         Boolean firmwareOptions = true; // Boolean | 
         Boolean applyConfiguration = true; // Boolean | 
         UUID subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+        Boolean rrmSettings = true; // Boolean | return RRM settings for a specific device
 
         try {
-            getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity);
+            getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity, rrmSettings);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling InventoryApi#getInventory");
@@ -13804,9 +13805,10 @@ public class InventoryApiExample {
         Boolean firmwareOptions = true; // Boolean | 
         Boolean applyConfiguration = true; // Boolean | 
         UUID subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+        Boolean rrmSettings = true; // Boolean | return RRM settings for a specific device
 
         try {
-            getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity);
+            getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity, rrmSettings);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling InventoryApi#getInventory");
@@ -13838,6 +13840,7 @@ Boolean *explain = true; //  (optional) (default to null)
 Boolean *firmwareOptions = true; //  (optional) (default to null)
 Boolean *applyConfiguration = true; //  (optional) (default to null)
 UUID *subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; //  (optional) (default to null)
+Boolean *rrmSettings = true; // return RRM settings for a specific device (optional) (default to false)
 
 // Retrieve a specific inventory tag.
 [apiInstance getInventoryWith:serialNumber
@@ -13846,6 +13849,7 @@ UUID *subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; //  (optional) (d
     firmwareOptions:firmwareOptions
     applyConfiguration:applyConfiguration
     subscriberEntity:subscriberEntity
+    rrmSettings:rrmSettings
               completionHandler: ^(getInventory_200_response output, NSError* error) {
     if (output) {
         NSLog(@"%@", output);
@@ -13879,7 +13883,8 @@ var opts = {
   'explain': true, // {Boolean} 
   'firmwareOptions': true, // {Boolean} 
   'applyConfiguration': true, // {Boolean} 
-  'subscriberEntity': 38400000-8cf0-11bd-b23e-10b96e4ef00d // {UUID} 
+  'subscriberEntity': 38400000-8cf0-11bd-b23e-10b96e4ef00d, // {UUID} 
+  'rrmSettings': true // {Boolean} return RRM settings for a specific device
 };
 
 var callback = function(error, data, response) {
@@ -13924,10 +13929,11 @@ namespace Example
             var firmwareOptions = true;  // Boolean |  (optional)  (default to null)
             var applyConfiguration = true;  // Boolean |  (optional)  (default to null)
             var subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d;  // UUID |  (optional)  (default to null)
+            var rrmSettings = true;  // Boolean | return RRM settings for a specific device (optional)  (default to false)
 
             try {
                 // Retrieve a specific inventory tag.
-                getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity);
+                getInventory_200_response result = apiInstance.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity, rrmSettings);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling InventoryApi.getInventory: " + e.Message );
@@ -13958,9 +13964,10 @@ $explain = true; // Boolean |
 $firmwareOptions = true; // Boolean | 
 $applyConfiguration = true; // Boolean | 
 $subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+$rrmSettings = true; // Boolean | return RRM settings for a specific device
 
 try {
-    $result = $api_instance->getInventory($serialNumber, $config, $explain, $firmwareOptions, $applyConfiguration, $subscriberEntity);
+    $result = $api_instance->getInventory($serialNumber, $config, $explain, $firmwareOptions, $applyConfiguration, $subscriberEntity, $rrmSettings);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling InventoryApi->getInventory: ', $e->getMessage(), PHP_EOL;
@@ -13989,9 +13996,10 @@ my $explain = true; # Boolean |
 my $firmwareOptions = true; # Boolean | 
 my $applyConfiguration = true; # Boolean | 
 my $subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; # UUID | 
+my $rrmSettings = true; # Boolean | return RRM settings for a specific device
 
 eval {
-    my $result = $api_instance->getInventory(serialNumber => $serialNumber, config => $config, explain => $explain, firmwareOptions => $firmwareOptions, applyConfiguration => $applyConfiguration, subscriberEntity => $subscriberEntity);
+    my $result = $api_instance->getInventory(serialNumber => $serialNumber, config => $config, explain => $explain, firmwareOptions => $firmwareOptions, applyConfiguration => $applyConfiguration, subscriberEntity => $subscriberEntity, rrmSettings => $rrmSettings);
     print Dumper($result);
 };
 if ($@) {
@@ -14022,10 +14030,11 @@ explain = true # Boolean |  (optional) (default to null)
 firmwareOptions = true # Boolean |  (optional) (default to null)
 applyConfiguration = true # Boolean |  (optional) (default to null)
 subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d # UUID |  (optional) (default to null)
+rrmSettings = true # Boolean | return RRM settings for a specific device (optional) (default to false)
 
 try:
     # Retrieve a specific inventory tag.
-    api_response = api_instance.get_inventory(serialNumber, config=config, explain=explain, firmwareOptions=firmwareOptions, applyConfiguration=applyConfiguration, subscriberEntity=subscriberEntity)
+    api_response = api_instance.get_inventory(serialNumber, config=config, explain=explain, firmwareOptions=firmwareOptions, applyConfiguration=applyConfiguration, subscriberEntity=subscriberEntity, rrmSettings=rrmSettings)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling InventoryApi->getInventory: %s\n" % e)</code></pre>
@@ -14041,9 +14050,10 @@ pub fn main() {
     let firmwareOptions = true; // Boolean
     let applyConfiguration = true; // Boolean
     let subscriberEntity = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID
+    let rrmSettings = true; // Boolean
 
     let mut context = InventoryApi::Context::default();
-    let result = client.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity, &context).wait();
+    let result = client.getInventory(serialNumber, config, explain, firmwareOptions, applyConfiguration, subscriberEntity, rrmSettings, &context).wait();
 
     println!("{:?}", result);
 }
@@ -14180,6 +14190,26 @@ pub fn main() {
                         (uuid)
                     </span>
 
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">rrmSettings</td>
+<td>
+
+
+    <div id="d2e199_getInventory_rrmSettings">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Boolean
+                </span>
+
+                    <div class="inner description marked">
+return RRM settings for a specific device
+                    </div>
             </div>
         </div>
     </div>
@@ -14357,7 +14387,7 @@ pub fn main() {
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Accept: application/json" \
- "https://localhost:16005/api/v1/inventory?entity=38400000-8cf0-11bd-b23e-10b96e4ef00d&venue=38400000-8cf0-11bd-b23e-10b96e4ef00d&unassigned=true&offset=56&limit=56&filter=filter_example&select=serial1,serial2,serial3&serialOnly=true&countOnly=true&withExtendedInfo=true&orderBy=serialNumber:a,created:d&orderSpec=true&rrmOnly=true&subscriber=38400000-8cf0-11bd-b23e-10b96e4ef00d&rrmSettings=true&resolveConfig=true"
+ "https://localhost:16005/api/v1/inventory?entity=38400000-8cf0-11bd-b23e-10b96e4ef00d&venue=38400000-8cf0-11bd-b23e-10b96e4ef00d&unassigned=true&offset=56&limit=56&filter=filter_example&select=serial1,serial2,serial3&serialOnly=true&countOnly=true&withExtendedInfo=true&orderBy=serialNumber:a,created:d&orderSpec=true&rrmOnly=true&subscriber=38400000-8cf0-11bd-b23e-10b96e4ef00d&resolveConfig=true"
 </code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Inventory-getInventoryTags-0-java">
@@ -14398,12 +14428,11 @@ public class InventoryApiExample {
         String orderBy = serialNumber:a,created:d; // String | return extended information
         Boolean orderSpec = true; // Boolean | return extended information
         Boolean rrmOnly = true; // Boolean | return the list of devices under RRM
-        UUID subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices under RRM
-        Boolean rrmSettings = true; // Boolean | return RRM settings for a specific device
+        UUID subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices for a subscriber
         Boolean resolveConfig = true; // Boolean | return the resolved configuration for a specific device
 
         try {
-            getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, rrmSettings, resolveConfig);
+            getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, resolveConfig);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling InventoryApi#getInventoryTags");
@@ -14433,12 +14462,11 @@ public class InventoryApiExample {
         String orderBy = serialNumber:a,created:d; // String | return extended information
         Boolean orderSpec = true; // Boolean | return extended information
         Boolean rrmOnly = true; // Boolean | return the list of devices under RRM
-        UUID subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices under RRM
-        Boolean rrmSettings = true; // Boolean | return RRM settings for a specific device
+        UUID subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices for a subscriber
         Boolean resolveConfig = true; // Boolean | return the resolved configuration for a specific device
 
         try {
-            getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, rrmSettings, resolveConfig);
+            getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, resolveConfig);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling InventoryApi#getInventoryTags");
@@ -14477,8 +14505,7 @@ Boolean *withExtendedInfo = true; // return extended information (optional) (def
 String *orderBy = serialNumber:a,created:d; // return extended information (optional) (default to null)
 Boolean *orderSpec = true; // return extended information (optional) (default to false)
 Boolean *rrmOnly = true; // return the list of devices under RRM (optional) (default to false)
-UUID *subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // return the list of devices under RRM (optional) (default to null)
-Boolean *rrmSettings = true; // return RRM settings for a specific device (optional) (default to false)
+UUID *subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // return the list of devices for a subscriber (optional) (default to null)
 Boolean *resolveConfig = true; // return the resolved configuration for a specific device (optional) (default to false)
 
 // Retrieve a list of inventory.
@@ -14496,7 +14523,6 @@ Boolean *resolveConfig = true; // return the resolved configuration for a specif
     orderSpec:orderSpec
     rrmOnly:rrmOnly
     subscriber:subscriber
-    rrmSettings:rrmSettings
     resolveConfig:resolveConfig
               completionHandler: ^(getInventoryTags_200_response output, NSError* error) {
     if (output) {
@@ -14539,8 +14565,7 @@ var opts = {
   'orderBy': serialNumber:a,created:d, // {String} return extended information
   'orderSpec': true, // {Boolean} return extended information
   'rrmOnly': true, // {Boolean} return the list of devices under RRM
-  'subscriber': 38400000-8cf0-11bd-b23e-10b96e4ef00d, // {UUID} return the list of devices under RRM
-  'rrmSettings': true, // {Boolean} return RRM settings for a specific device
+  'subscriber': 38400000-8cf0-11bd-b23e-10b96e4ef00d, // {UUID} return the list of devices for a subscriber
   'resolveConfig': true // {Boolean} return the resolved configuration for a specific device
 };
 
@@ -14593,13 +14618,12 @@ namespace Example
             var orderBy = serialNumber:a,created:d;  // String | return extended information (optional)  (default to null)
             var orderSpec = true;  // Boolean | return extended information (optional)  (default to false)
             var rrmOnly = true;  // Boolean | return the list of devices under RRM (optional)  (default to false)
-            var subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d;  // UUID | return the list of devices under RRM (optional)  (default to null)
-            var rrmSettings = true;  // Boolean | return RRM settings for a specific device (optional)  (default to false)
+            var subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d;  // UUID | return the list of devices for a subscriber (optional)  (default to null)
             var resolveConfig = true;  // Boolean | return the resolved configuration for a specific device (optional)  (default to false)
 
             try {
                 // Retrieve a list of inventory.
-                getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, rrmSettings, resolveConfig);
+                getInventoryTags_200_response result = apiInstance.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, resolveConfig);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling InventoryApi.getInventoryTags: " + e.Message );
@@ -14637,12 +14661,11 @@ $withExtendedInfo = true; // Boolean | return extended information
 $orderBy = serialNumber:a,created:d; // String | return extended information
 $orderSpec = true; // Boolean | return extended information
 $rrmOnly = true; // Boolean | return the list of devices under RRM
-$subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices under RRM
-$rrmSettings = true; // Boolean | return RRM settings for a specific device
+$subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | return the list of devices for a subscriber
 $resolveConfig = true; // Boolean | return the resolved configuration for a specific device
 
 try {
-    $result = $api_instance->getInventoryTags($entity, $venue, $unassigned, $offset, $limit, $filter, $select, $serialOnly, $countOnly, $withExtendedInfo, $orderBy, $orderSpec, $rrmOnly, $subscriber, $rrmSettings, $resolveConfig);
+    $result = $api_instance->getInventoryTags($entity, $venue, $unassigned, $offset, $limit, $filter, $select, $serialOnly, $countOnly, $withExtendedInfo, $orderBy, $orderSpec, $rrmOnly, $subscriber, $resolveConfig);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling InventoryApi->getInventoryTags: ', $e->getMessage(), PHP_EOL;
@@ -14678,12 +14701,11 @@ my $withExtendedInfo = true; # Boolean | return extended information
 my $orderBy = serialNumber:a,created:d; # String | return extended information
 my $orderSpec = true; # Boolean | return extended information
 my $rrmOnly = true; # Boolean | return the list of devices under RRM
-my $subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; # UUID | return the list of devices under RRM
-my $rrmSettings = true; # Boolean | return RRM settings for a specific device
+my $subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; # UUID | return the list of devices for a subscriber
 my $resolveConfig = true; # Boolean | return the resolved configuration for a specific device
 
 eval {
-    my $result = $api_instance->getInventoryTags(entity => $entity, venue => $venue, unassigned => $unassigned, offset => $offset, limit => $limit, filter => $filter, select => $select, serialOnly => $serialOnly, countOnly => $countOnly, withExtendedInfo => $withExtendedInfo, orderBy => $orderBy, orderSpec => $orderSpec, rrmOnly => $rrmOnly, subscriber => $subscriber, rrmSettings => $rrmSettings, resolveConfig => $resolveConfig);
+    my $result = $api_instance->getInventoryTags(entity => $entity, venue => $venue, unassigned => $unassigned, offset => $offset, limit => $limit, filter => $filter, select => $select, serialOnly => $serialOnly, countOnly => $countOnly, withExtendedInfo => $withExtendedInfo, orderBy => $orderBy, orderSpec => $orderSpec, rrmOnly => $rrmOnly, subscriber => $subscriber, resolveConfig => $resolveConfig);
     print Dumper($result);
 };
 if ($@) {
@@ -14721,13 +14743,12 @@ withExtendedInfo = true # Boolean | return extended information (optional) (defa
 orderBy = serialNumber:a,created:d # String | return extended information (optional) (default to null)
 orderSpec = true # Boolean | return extended information (optional) (default to false)
 rrmOnly = true # Boolean | return the list of devices under RRM (optional) (default to false)
-subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d # UUID | return the list of devices under RRM (optional) (default to null)
-rrmSettings = true # Boolean | return RRM settings for a specific device (optional) (default to false)
+subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d # UUID | return the list of devices for a subscriber (optional) (default to null)
 resolveConfig = true # Boolean | return the resolved configuration for a specific device (optional) (default to false)
 
 try:
     # Retrieve a list of inventory.
-    api_response = api_instance.get_inventory_tags(entity=entity, venue=venue, unassigned=unassigned, offset=offset, limit=limit, filter=filter, select=select, serialOnly=serialOnly, countOnly=countOnly, withExtendedInfo=withExtendedInfo, orderBy=orderBy, orderSpec=orderSpec, rrmOnly=rrmOnly, subscriber=subscriber, rrmSettings=rrmSettings, resolveConfig=resolveConfig)
+    api_response = api_instance.get_inventory_tags(entity=entity, venue=venue, unassigned=unassigned, offset=offset, limit=limit, filter=filter, select=select, serialOnly=serialOnly, countOnly=countOnly, withExtendedInfo=withExtendedInfo, orderBy=orderBy, orderSpec=orderSpec, rrmOnly=rrmOnly, subscriber=subscriber, resolveConfig=resolveConfig)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling InventoryApi->getInventoryTags: %s\n" % e)</code></pre>
@@ -14751,11 +14772,10 @@ pub fn main() {
     let orderSpec = true; // Boolean
     let rrmOnly = true; // Boolean
     let subscriber = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID
-    let rrmSettings = true; // Boolean
     let resolveConfig = true; // Boolean
 
     let mut context = InventoryApi::Context::default();
-    let result = client.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, rrmSettings, resolveConfig, &context).wait();
+    let result = client.getInventoryTags(entity, venue, unassigned, offset, limit, filter, select, serialOnly, countOnly, withExtendedInfo, orderBy, orderSpec, rrmOnly, subscriber, resolveConfig, &context).wait();
 
     println!("{:?}", result);
 }
@@ -15052,27 +15072,7 @@ return the list of devices under RRM
                     </span>
 
                     <div class="inner description marked">
-return the list of devices under RRM
-                    </div>
-            </div>
-        </div>
-    </div>
-</td>
-</tr>
-
-                                <tr><td style="width:150px;">rrmSettings</td>
-<td>
-
-
-    <div id="d2e199_getInventoryTags_rrmSettings">
-        <div class="json-schema-view">
-            <div class="primitive">
-                <span class="type">
-                    Boolean
-                </span>
-
-                    <div class="inner description marked">
-return RRM settings for a specific device
+return the list of devices for a subscriber
                     </div>
             </div>
         </div>
@@ -45332,7 +45332,7 @@ pub fn main() {
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Accept: application/json" \
- "https://localhost:16005/api/v1/venue?entity=38400000-8cf0-11bd-b23e-10b96e4ef00d&venue=38400000-8cf0-11bd-b23e-10b96e4ef00d&unassigned=true&deviceType=deviceType_example&offset=56&limit=56&filter=filter_example&select=serial1,serial2,serial3&countOnly=true&getDevices=true&getChildren=true"
+ "https://localhost:16005/api/v1/venue?entity=38400000-8cf0-11bd-b23e-10b96e4ef00d&venue=38400000-8cf0-11bd-b23e-10b96e4ef00d&unassigned=true&deviceType=deviceType_example&offset=56&limit=56&filter=filter_example&select=serial1,serial2,serial3&countOnly=true&getDevices=true&getChildren=true&RRMvendor=["this is the shortname of the RRM vendor"]"
 </code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Venues-getVenues-0-java">
@@ -45371,9 +45371,10 @@ public class VenuesApiExample {
         Boolean countOnly = true; // Boolean | return the number of devices
         Boolean getDevices = true; // Boolean | return the devices under a venue
         Boolean getChildren = true; // Boolean | return the devices under a venue and its children. Must select getDevices=true as well.
+        String rRMvendor = ["this is the shortname of the RRM vendor"]; // String | list venues that use a specific RRM vendor
 
         try {
-            getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren);
+            getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren, rRMvendor);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling VenuesApi#getVenues");
@@ -45401,9 +45402,10 @@ public class VenuesApiExample {
         Boolean countOnly = true; // Boolean | return the number of devices
         Boolean getDevices = true; // Boolean | return the devices under a venue
         Boolean getChildren = true; // Boolean | return the devices under a venue and its children. Must select getDevices=true as well.
+        String rRMvendor = ["this is the shortname of the RRM vendor"]; // String | list venues that use a specific RRM vendor
 
         try {
-            getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren);
+            getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren, rRMvendor);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling VenuesApi#getVenues");
@@ -45440,6 +45442,7 @@ String *select = serial1,serial2,serial3; // Supply a list of Venues comma separ
 Boolean *countOnly = true; // return the number of devices (optional) (default to null)
 Boolean *getDevices = true; // return the devices under a venue (optional) (default to false)
 Boolean *getChildren = true; // return the devices under a venue and its children. Must select getDevices=true as well. (optional) (default to false)
+String *rRMvendor = ["this is the shortname of the RRM vendor"]; // list venues that use a specific RRM vendor (optional) (default to null)
 
 // Retrieve a list of venues.
 [apiInstance getVenuesWith:entity
@@ -45453,6 +45456,7 @@ Boolean *getChildren = true; // return the devices under a venue and its childre
     countOnly:countOnly
     getDevices:getDevices
     getChildren:getChildren
+    rRMvendor:rRMvendor
               completionHandler: ^(getVenues_200_response output, NSError* error) {
     if (output) {
         NSLog(@"%@", output);
@@ -45491,7 +45495,8 @@ var opts = {
   'select': serial1,serial2,serial3, // {String} Supply a list of Venues comma separated
   'countOnly': true, // {Boolean} return the number of devices
   'getDevices': true, // {Boolean} return the devices under a venue
-  'getChildren': true // {Boolean} return the devices under a venue and its children. Must select getDevices=true as well.
+  'getChildren': true, // {Boolean} return the devices under a venue and its children. Must select getDevices=true as well.
+  'rRMvendor': ["this is the shortname of the RRM vendor"] // {String} list venues that use a specific RRM vendor
 };
 
 var callback = function(error, data, response) {
@@ -45541,10 +45546,11 @@ namespace Example
             var countOnly = true;  // Boolean | return the number of devices (optional)  (default to null)
             var getDevices = true;  // Boolean | return the devices under a venue (optional)  (default to false)
             var getChildren = true;  // Boolean | return the devices under a venue and its children. Must select getDevices=true as well. (optional)  (default to false)
+            var rRMvendor = ["this is the shortname of the RRM vendor"];  // String | list venues that use a specific RRM vendor (optional)  (default to null)
 
             try {
                 // Retrieve a list of venues.
-                getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren);
+                getVenues_200_response result = apiInstance.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren, rRMvendor);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling VenuesApi.getVenues: " + e.Message );
@@ -45580,9 +45586,10 @@ $select = serial1,serial2,serial3; // String | Supply a list of Venues comma sep
 $countOnly = true; // Boolean | return the number of devices
 $getDevices = true; // Boolean | return the devices under a venue
 $getChildren = true; // Boolean | return the devices under a venue and its children. Must select getDevices=true as well.
+$rRMvendor = ["this is the shortname of the RRM vendor"]; // String | list venues that use a specific RRM vendor
 
 try {
-    $result = $api_instance->getVenues($entity, $venue, $unassigned, $deviceType, $offset, $limit, $filter, $select, $countOnly, $getDevices, $getChildren);
+    $result = $api_instance->getVenues($entity, $venue, $unassigned, $deviceType, $offset, $limit, $filter, $select, $countOnly, $getDevices, $getChildren, $rRMvendor);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling VenuesApi->getVenues: ', $e->getMessage(), PHP_EOL;
@@ -45616,9 +45623,10 @@ my $select = serial1,serial2,serial3; # String | Supply a list of Venues comma s
 my $countOnly = true; # Boolean | return the number of devices
 my $getDevices = true; # Boolean | return the devices under a venue
 my $getChildren = true; # Boolean | return the devices under a venue and its children. Must select getDevices=true as well.
+my $rRMvendor = ["this is the shortname of the RRM vendor"]; # String | list venues that use a specific RRM vendor
 
 eval {
-    my $result = $api_instance->getVenues(entity => $entity, venue => $venue, unassigned => $unassigned, deviceType => $deviceType, offset => $offset, limit => $limit, filter => $filter, select => $select, countOnly => $countOnly, getDevices => $getDevices, getChildren => $getChildren);
+    my $result = $api_instance->getVenues(entity => $entity, venue => $venue, unassigned => $unassigned, deviceType => $deviceType, offset => $offset, limit => $limit, filter => $filter, select => $select, countOnly => $countOnly, getDevices => $getDevices, getChildren => $getChildren, rRMvendor => $rRMvendor);
     print Dumper($result);
 };
 if ($@) {
@@ -45654,10 +45662,11 @@ select = serial1,serial2,serial3 # String | Supply a list of Venues comma separa
 countOnly = true # Boolean | return the number of devices (optional) (default to null)
 getDevices = true # Boolean | return the devices under a venue (optional) (default to false)
 getChildren = true # Boolean | return the devices under a venue and its children. Must select getDevices=true as well. (optional) (default to false)
+rRMvendor = ["this is the shortname of the RRM vendor"] # String | list venues that use a specific RRM vendor (optional) (default to null)
 
 try:
     # Retrieve a list of venues.
-    api_response = api_instance.get_venues(entity=entity, venue=venue, unassigned=unassigned, deviceType=deviceType, offset=offset, limit=limit, filter=filter, select=select, countOnly=countOnly, getDevices=getDevices, getChildren=getChildren)
+    api_response = api_instance.get_venues(entity=entity, venue=venue, unassigned=unassigned, deviceType=deviceType, offset=offset, limit=limit, filter=filter, select=select, countOnly=countOnly, getDevices=getDevices, getChildren=getChildren, rRMvendor=rRMvendor)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling VenuesApi->getVenues: %s\n" % e)</code></pre>
@@ -45678,9 +45687,10 @@ pub fn main() {
     let countOnly = true; // Boolean
     let getDevices = true; // Boolean
     let getChildren = true; // Boolean
+    let rRMvendor = ["this is the shortname of the RRM vendor"]; // String
 
     let mut context = VenuesApi::Context::default();
-    let result = client.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren, &context).wait();
+    let result = client.getVenues(entity, venue, unassigned, deviceType, offset, limit, filter, select, countOnly, getDevices, getChildren, rRMvendor, &context).wait();
 
     println!("{:?}", result);
 }
@@ -45912,6 +45922,26 @@ return the devices under a venue
 
                     <div class="inner description marked">
 return the devices under a venue and its children. Must select getDevices&#x3D;true as well.
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">RRMvendor</td>
+<td>
+
+
+    <div id="d2e199_getVenues_rRMvendor">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description marked">
+list venues that use a specific RRM vendor
                     </div>
             </div>
         </div>
