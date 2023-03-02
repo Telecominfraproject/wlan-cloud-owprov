@@ -528,6 +528,14 @@ getvenuedevices() {
     jq < ${result_file}
 }
 
+getvenuesperrrm() {
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/venue?RRMvendor=$1" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
 listrrmalgos() {
     setrrm
     curl    ${FLAGS} -X GET "http://${OWRRM}/api/v1/algorithms" \
@@ -545,6 +553,7 @@ rrmprovider() {
         -H "Accept: application/json" > ${result_file}
     jq < ${result_file}
 }
+
 
 notifications() {
     if [[ -z "$1" ]]
@@ -664,6 +673,7 @@ case "$1" in
     "deleteoverride") login; deleteoverride "$2"; logout;;
     "venueupgraderevisions") login; venueupgraderevisions "$2"; logout;;
     "getsystemconfiguration") login; getsystemconfiguration "$2"; logout;;
+    "getvenuesperrrm") login; getvenuesperrrm "$2"; logout;;
     *) help ;;
 esac
 
