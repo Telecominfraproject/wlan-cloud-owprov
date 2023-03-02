@@ -85,7 +85,7 @@ namespace OpenWifi {
 		ProvObjects::InventoryTag ExistingDevice;
 		auto SerialNumber = Poco::toLower(SerialNumberRaw);
 		if (!GetRecord("serialNumber", SerialNumber, ExistingDevice)) {
-			ProvObjects::InventoryTag NewDevice;
+            ProvObjects::InventoryTag NewDevice;
 			uint64_t Now = Utils::Now();
 
 			auto Tokens = Poco::StringTokenizer(ConnectionInfo, "@:");
@@ -127,11 +127,9 @@ namespace OpenWifi {
 
 				if (!FullUUID.empty()) {
 					if (SDK::GW::Device::SetVenue(nullptr, NewDevice.serialNumber, FullUUID)) {
-						// std::cout << "Set GW done " << SerialNumber << std::endl;
 						Logger().information(Poco::format("%s: GW set entity/venue property.",
 														  NewDevice.serialNumber));
 					} else {
-						// std::cout << "Could not set GW " << SerialNumber << std::endl;
 						Logger().information(Poco::format(
 							"%s: could not set GW entity/venue property.", NewDevice.serialNumber));
 					}
@@ -178,7 +176,7 @@ namespace OpenWifi {
 
 			if (modified) {
 				ExistingDevice.info.modified = Utils::Now();
-				StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber,
+				StorageService()->InventoryDB().UpdateRecord("id", ExistingDevice.info.id,
 															 ExistingDevice);
 			}
 		}

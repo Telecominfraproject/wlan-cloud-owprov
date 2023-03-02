@@ -2066,18 +2066,11 @@ paths:
             default: false
           required: false
         - in: query
-          description: return the list of devices under RRM
+          description: return the list of devices for a subscriber
           name: subscriber
           schema:
             type: string
             format: uuid
-          required: false
-        - in: query
-          description: return RRM settings for a specific device
-          name: rrmSettings
-          schema:
-            type: boolean
-            default: false
           required: false
         - in: query
           description: return the resolved configuration for a specific device
@@ -2143,6 +2136,13 @@ paths:
           schema:
             type: string
             format: uuid
+          required: false
+        - in: query
+          description: return RRM settings for a specific device
+          name: rrmSettings
+          schema:
+            type: boolean
+            default: false
           required: false
       responses:
         200:
@@ -2415,6 +2415,14 @@ paths:
           schema:
             type: boolean
             default: false
+          required: false
+        - in: query
+          description: list venues that use a specific RRM vendor
+          name: RRMvendor
+          schema:
+            type: string
+            example:
+              - this is the shortname of the RRM vendor
           required: false
       responses:
         200:

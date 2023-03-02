@@ -132,11 +132,10 @@ namespace OpenWifi {
 					if (StorageService()->InventoryDB().GetRecord("serialNumber", SerialNumber_,
 																  D)) {
 						if (!D.deviceConfiguration.empty()) {
-							std::cout << "Adding device specific configuration: "
-									  << D.deviceConfiguration.size() << std::endl;
+							// std::cout << "Adding device specific configuration: " << D.deviceConfiguration.size() << std::endl;
 							AddConfiguration(D.deviceConfiguration);
 						} else {
-							std::cout << "No device specific configuration." << std::endl;
+							// std::cout << "No device specific configuration." << std::endl;
 						}
 						if (!D.entity.empty()) {
 							AddEntityConfig(D.entity);
@@ -196,8 +195,7 @@ namespace OpenWifi {
 							ReplaceVariablesInObject(OriginalSection, ExpandedSection);
 							Configuration->set(SectionName, ExpandedSection);
 						} else {
-							std::cout << " --- unknown element type --- "
-									  << O->get(SectionName).toString() << std::endl;
+                            poco_warning(Logger(), fmt::format("Unknown config element type: {}",O->get(SectionName).toString()));
 						}
 					} else {
 						if (Explain_) {
@@ -248,8 +246,7 @@ namespace OpenWifi {
 											"channel",
 											std::strtoull(col.parameterValue.c_str(), nullptr, 10));
 									}
-									std::cout << "Setting channel in radio " << RadioIndex
-											  << std::endl;
+									// std::cout << "Setting channel in radio " << RadioIndex << std::endl;
 									if (Explain_) {
 										Poco::JSON::Object ExObj;
 										ExObj.set("from-name", "overrides");
