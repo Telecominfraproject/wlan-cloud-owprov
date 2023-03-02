@@ -184,7 +184,7 @@ namespace OpenWifi {
 			if (modified) {
 				ExistingDevice.info.modified = Utils::Now();
                 std::cout << __LINE__ << std::endl;
-				StorageService()->InventoryDB().UpdateRecord("serialNumber", SerialNumber,
+				StorageService()->InventoryDB().UpdateRecord("id", ExistingDevice.info.id,
 															 ExistingDevice);
                 std::cout << __LINE__ << std::endl;
 			}
