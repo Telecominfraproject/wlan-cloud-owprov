@@ -85,7 +85,6 @@ namespace OpenWifi {
 		ProvObjects::InventoryTag ExistingDevice;
 		auto SerialNumber = Poco::toLower(SerialNumberRaw);
 		if (!GetRecord("serialNumber", SerialNumber, ExistingDevice)) {
-            std::cout << __LINE__ << std::endl;
             ProvObjects::InventoryTag NewDevice;
 			uint64_t Now = Utils::Now();
 
@@ -114,9 +113,7 @@ namespace OpenWifi {
 				}
 			}
 
-            std::cout << __LINE__ << std::endl;
 			if (CreateRecord(NewDevice)) {
-                std::cout << __LINE__ << std::endl;
 				SerialNumberCache()->AddSerialNumber(SerialNumber, DeviceType);
 				std::string FullUUID;
 				if (!NewDevice.entity.empty()) {
@@ -130,11 +127,9 @@ namespace OpenWifi {
 
 				if (!FullUUID.empty()) {
 					if (SDK::GW::Device::SetVenue(nullptr, NewDevice.serialNumber, FullUUID)) {
-						// std::cout << "Set GW done " << SerialNumber << std::endl;
 						Logger().information(Poco::format("%s: GW set entity/venue property.",
 														  NewDevice.serialNumber));
 					} else {
-						// std::cout << "Could not set GW " << SerialNumber << std::endl;
 						Logger().information(Poco::format(
 							"%s: could not set GW entity/venue property.", NewDevice.serialNumber));
 					}
@@ -146,7 +141,6 @@ namespace OpenWifi {
 			}
 		} else {
 			//  Device already exists, do we need to modify anything?
-            std::cout << __LINE__ << std::endl;
 			bool modified = false;
 			if (ExistingDevice.deviceType != DeviceType) {
 				ExistingDevice.deviceType = DeviceType;
@@ -180,13 +174,10 @@ namespace OpenWifi {
 				modified = true;
 			}
 
-            std::cout << __LINE__ << std::endl;
 			if (modified) {
 				ExistingDevice.info.modified = Utils::Now();
-                std::cout << __LINE__ << std::endl;
 				StorageService()->InventoryDB().UpdateRecord("id", ExistingDevice.info.id,
 															 ExistingDevice);
-                std::cout << __LINE__ << std::endl;
 			}
 		}
 		return false;
