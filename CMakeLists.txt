@@ -117,6 +117,7 @@ add_executable(owprov
         src/framework/MicroServiceExtra.h
         src/framework/ConfigurationValidator.cpp
         src/framework/ConfigurationValidator.h
+        src/framework/default_device_types.h
         src/UI_Prov_WebSocketNotifications.h
         src/UI_Prov_WebSocketNotifications.cpp
         src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
