@@ -42,6 +42,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' ]]; then
   STORAGE_TYPE_MYSQL_PASSWORD=${STORAGE_TYPE_MYSQL_PASSWORD:-"owprov"} \
   STORAGE_TYPE_MYSQL_DATABASE=${STORAGE_TYPE_MYSQL_DATABASE:-"owprov"} \
   STORAGE_TYPE_MYSQL_PORT=${STORAGE_TYPE_MYSQL_PORT:-"3306"} \
+  RRM_PROVIDERS=${RRM_PROVIDERS:-"owrrm"} \
   envsubst < /owprov.properties.tmpl > $OWPROV_CONFIG/owprov.properties
 fi
 
