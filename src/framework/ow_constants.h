@@ -397,6 +397,18 @@ namespace OpenWifi::RESTAPI::Errors {
 	static const struct msg FirmwareBDInProgress {
 		1170, "Firmware DB update already in progress."
 	};
+	static const struct msg SimulatedDeviceNotSupported {
+		1171, "Command not supported on simulated device."
+	};
+
+    static const struct msg SimulationDoesNotExist {
+        7000, "Simulation Instance ID does not exist."
+    };
+
+    static const struct msg SimulationIsAlreadyRunning {
+        7001, "There is an instance of this simulation already running.."
+    };
+
 
 } // namespace OpenWifi::RESTAPI::Errors
 
@@ -554,6 +566,7 @@ namespace OpenWifi::uCentralProtocol {
 	static const char *HEALTHCHECK = "healthcheck";
 	static const char *LOG = "log";
 	static const char *CRASHLOG = "crashlog";
+	static const char *REBOOTLOG = "rebootLog";
 	static const char *PING = "ping";
 	static const char *CFGPENDING = "cfgpending";
 	static const char *RECOVERY = "recovery";
@@ -612,6 +625,8 @@ namespace OpenWifi::uCentralProtocol {
 	static const char *DEVICEUPDATE = "deviceupdate";
 	static const char *FWSIGNATURE = "FWsignature";
 	static const char *SIGNATURE = "signature";
+	static const char *INFO = "info";
+	static const char *DATE = "date";
 
 	static const char *SERIALNUMBER = "serialNumber";
 	static const char *COMPATIBLE = "compatible";
@@ -642,6 +657,7 @@ namespace OpenWifi::uCentralProtocol::Events {
 	static const char *HEALTHCHECK = "healthcheck";
 	static const char *LOG = "log";
 	static const char *CRASHLOG = "crashlog";
+	static const char *REBOOTLOG = "rebootLog";
 	static const char *PING = "ping";
 	static const char *CFGPENDING = "cfgpending";
 	static const char *RECOVERY = "recovery";
@@ -665,7 +681,8 @@ namespace OpenWifi::uCentralProtocol::Events {
 		ET_VENUEBROADCAST,
 		ET_EVENT,
 		ET_WIFISCAN,
-		ET_ALARM
+		ET_ALARM,
+		ET_REBOOTLOG
 	};
 
 	inline EVENT_MSG EventFromString(const std::string &Method) {
@@ -696,8 +713,10 @@ namespace OpenWifi::uCentralProtocol::Events {
 		else if (strcmp(WIFISCAN, Method.c_str()) == 0)
 			return ET_WIFISCAN;
 		else if (strcmp(ALARM, Method.c_str()) == 0)
-			return ET_WIFISCAN;
-		return ET_ALARM;
+			return ET_ALARM;
+		else if (strcmp(REBOOTLOG, Method.c_str()) == 0)
+			return ET_REBOOTLOG;
+		return ET_UNKNOWN;
 	};
 } // namespace OpenWifi::uCentralProtocol::Events
 

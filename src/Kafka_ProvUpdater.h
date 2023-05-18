@@ -41,7 +41,7 @@ namespace OpenWifi {
 		Payload.set("ObjectType", OT);
 		std::ostringstream OS;
 		Payload.stringify(OS);
-		KafkaManager()->PostMessage(KafkaTopics::PROVISIONING_CHANGE, Ops[op], OS.str());
+		KafkaManager()->PostMessage(KafkaTopics::PROVISIONING_CHANGE, Ops[op], std::make_shared<std::string>(OS.str()));
 
 		return true;
 	}
