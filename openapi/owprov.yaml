@@ -2258,7 +2258,7 @@ paths:
     get:
       tags:
         - Configuration Overrides
-      operationId: getCponfigurationOverrides
+      operationId: getConfigurationOverrides
       summary: retrieve a list of configuration overrides for a given device
       parameters:
         - in: path
@@ -2282,7 +2282,7 @@ paths:
     delete:
       tags:
         - Configuration Overrides
-      operationId: deleteCponfigurationOverrides
+      operationId: deleteConfigurationOverrides
       summary: delete all configuration overrides for a given device from a given source
       parameters:
         - in: path
