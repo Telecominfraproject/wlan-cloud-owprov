@@ -2910,11 +2910,11 @@ ul.nav-tabs {
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API Summary</a></li>
 
                   <li class="nav-header" data-group="ConfigurationOverrides"><a href="#api-ConfigurationOverrides">API Methods - ConfigurationOverrides</a></li>
-                    <li data-group="ConfigurationOverrides" data-name="deleteCponfigurationOverrides" class="">
-                      <a href="#api-ConfigurationOverrides-deleteCponfigurationOverrides">deleteCponfigurationOverrides</a>
+                    <li data-group="ConfigurationOverrides" data-name="deleteConfigurationOverrides" class="">
+                      <a href="#api-ConfigurationOverrides-deleteConfigurationOverrides">deleteConfigurationOverrides</a>
                     </li>
-                    <li data-group="ConfigurationOverrides" data-name="getCponfigurationOverrides" class="">
-                      <a href="#api-ConfigurationOverrides-getCponfigurationOverrides">getCponfigurationOverrides</a>
+                    <li data-group="ConfigurationOverrides" data-name="getConfigurationOverrides" class="">
+                      <a href="#api-ConfigurationOverrides-getConfigurationOverrides">getConfigurationOverrides</a>
                     </li>
                     <li data-group="ConfigurationOverrides" data-name="modifyConfigurationOverrides" class="">
                       <a href="#api-ConfigurationOverrides-modifyConfigurationOverrides">modifyConfigurationOverrides</a>
@@ -3208,10 +3208,10 @@ ul.nav-tabs {
         <div id="sections">
                 <section id="api-ConfigurationOverrides">
                   <h1>ConfigurationOverrides</h1>
-                    <div id="api-ConfigurationOverrides-deleteCponfigurationOverrides">
-                      <article id="api-ConfigurationOverrides-deleteCponfigurationOverrides-0" data-group="User" data-name="deleteCponfigurationOverrides" data-version="0">
+                    <div id="api-ConfigurationOverrides-deleteConfigurationOverrides">
+                      <article id="api-ConfigurationOverrides-deleteConfigurationOverrides-0" data-group="User" data-name="deleteConfigurationOverrides" data-version="0">
                         <div class="pull-left">
-                          <h1>deleteCponfigurationOverrides</h1>
+                          <h1>deleteConfigurationOverrides</h1>
                           <p>delete all configuration overrides for a given device from a given source</p>
                         </div>
                         <div class="pull-right"></div>
@@ -3225,29 +3225,29 @@ ul.nav-tabs {
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-java">Java</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-python">Python</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-java">Java</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-python">Python</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-deleteConfigurationOverrides-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-curl">
+                          <div class="tab-pane active" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X DELETE \
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  "https://localhost:16005/api/v1/configurationOverrides/{serialNumber}?source=source_example"
 </code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-java">
+                          <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -3276,9 +3276,9 @@ public class ConfigurationOverridesApiExample {
         String source = source_example; // String | 
 
         try {
-            apiInstance.deleteCponfigurationOverrides(serialNumber, source);
+            apiInstance.deleteConfigurationOverrides(serialNumber, source);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ConfigurationOverridesApi#deleteCponfigurationOverrides");
+            System.err.println("Exception when calling ConfigurationOverridesApi#deleteConfigurationOverrides");
             e.printStackTrace();
         }
     }
@@ -3286,7 +3286,7 @@ public class ConfigurationOverridesApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-android">
+                          <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.ConfigurationOverridesApi;
 
 public class ConfigurationOverridesApiExample {
@@ -3296,19 +3296,19 @@ public class ConfigurationOverridesApiExample {
         String source = source_example; // String | 
 
         try {
-            apiInstance.deleteCponfigurationOverrides(serialNumber, source);
+            apiInstance.deleteConfigurationOverrides(serialNumber, source);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ConfigurationOverridesApi#deleteCponfigurationOverrides");
+            System.err.println("Exception when calling ConfigurationOverridesApi#deleteConfigurationOverrides");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-groovy">
+  <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-objc">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 
 // Configure API key authorization: (authentication scheme: ApiKeyAuth)
@@ -3325,7 +3325,7 @@ String *serialNumber = serialNumber_example; //  (default to null)
 String *source = source_example; //  (default to null)
 
 // delete all configuration overrides for a given device from a given source
-[apiInstance deleteCponfigurationOverridesWith:serialNumber
+[apiInstance deleteConfigurationOverridesWith:serialNumber
     source:source
               completionHandler: ^(NSError* error) {
     if (error) {
@@ -3335,7 +3335,7 @@ String *source = source_example; //  (default to null)
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-javascript">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var OpenWiFiProvisioningModel = require('open_wi_fi_provisioning_model');
 var defaultClient = OpenWiFiProvisioningModel.ApiClient.instance;
 
@@ -3361,14 +3361,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.deleteCponfigurationOverrides(serialNumber, source, callback);
+api.deleteConfigurationOverrides(serialNumber, source, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-angular">
+                            <!--<div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-csharp">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -3377,7 +3377,7 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class deleteCponfigurationOverridesExample
+    public class deleteConfigurationOverridesExample
     {
         public void main()
         {
@@ -3395,9 +3395,9 @@ namespace Example
 
             try {
                 // delete all configuration overrides for a given device from a given source
-                apiInstance.deleteCponfigurationOverrides(serialNumber, source);
+                apiInstance.deleteConfigurationOverrides(serialNumber, source);
             } catch (Exception e) {
-                Debug.Print("Exception when calling ConfigurationOverridesApi.deleteCponfigurationOverrides: " + e.Message );
+                Debug.Print("Exception when calling ConfigurationOverridesApi.deleteConfigurationOverrides: " + e.Message );
             }
         }
     }
@@ -3405,7 +3405,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-php">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -3423,14 +3423,14 @@ $serialNumber = serialNumber_example; // String |
 $source = source_example; // String | 
 
 try {
-    $api_instance->deleteCponfigurationOverrides($serialNumber, $source);
+    $api_instance->deleteConfigurationOverrides($serialNumber, $source);
 } catch (Exception $e) {
-    echo 'Exception when calling ConfigurationOverridesApi->deleteCponfigurationOverrides: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling ConfigurationOverridesApi->deleteConfigurationOverrides: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-perl">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::ConfigurationOverridesApi;
@@ -3449,14 +3449,14 @@ my $serialNumber = serialNumber_example; # String |
 my $source = source_example; # String | 
 
 eval {
-    $api_instance->deleteCponfigurationOverrides(serialNumber => $serialNumber, source => $source);
+    $api_instance->deleteConfigurationOverrides(serialNumber => $serialNumber, source => $source);
 };
 if ($@) {
-    warn "Exception when calling ConfigurationOverridesApi->deleteCponfigurationOverrides: $@\n";
+    warn "Exception when calling ConfigurationOverridesApi->deleteConfigurationOverrides: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-python">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -3478,12 +3478,12 @@ source = source_example # String |  (default to null)
 
 try:
     # delete all configuration overrides for a given device from a given source
-    api_instance.delete_cponfiguration_overrides(serialNumber, source)
+    api_instance.delete_configuration_overrides(serialNumber, source)
 except ApiException as e:
-    print("Exception when calling ConfigurationOverridesApi->deleteCponfigurationOverrides: %s\n" % e)</code></pre>
+    print("Exception when calling ConfigurationOverridesApi->deleteConfigurationOverrides: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-0-rust">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-deleteConfigurationOverrides-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate ConfigurationOverridesApi;
 
 pub fn main() {
@@ -3491,7 +3491,7 @@ pub fn main() {
     let source = source_example; // String
 
     let mut context = ConfigurationOverridesApi::Context::default();
-    let result = client.deleteCponfigurationOverrides(serialNumber, source, &context).wait();
+    let result = client.deleteConfigurationOverrides(serialNumber, source, &context).wait();
 
     println!("{:?}", result);
 }
@@ -3516,7 +3516,7 @@ pub fn main() {
 <td>
 
 
-    <div id="d2e199_deleteCponfigurationOverrides_serialNumber">
+    <div id="d2e199_deleteConfigurationOverrides_serialNumber">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3547,7 +3547,7 @@ pub fn main() {
 <td>
 
 
-    <div id="d2e199_deleteCponfigurationOverrides_source">
+    <div id="d2e199_deleteConfigurationOverrides_source">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3566,101 +3566,101 @@ pub fn main() {
                             </table>
 
                           <h2>Responses</h2>
-                            <h3 id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-200"></h3>
-                            <p id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-200" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-deleteConfigurationOverrides-title-200"></h3>
+                            <p id="examples-ConfigurationOverrides-deleteConfigurationOverrides-description-200" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides200_description = ``;
                               var responseConfigurationOverrides200_description_break = responseConfigurationOverrides200_description.indexOf('\n');
                               if (responseConfigurationOverrides200_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description);
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description.substring(0, responseConfigurationOverrides200_description_break));
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-200").html(responseConfigurationOverrides200_description.substring(responseConfigurationOverrides200_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description.substring(0, responseConfigurationOverrides200_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-description-200").html(responseConfigurationOverrides200_description.substring(responseConfigurationOverrides200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-deleteCponfigurationOverrides-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-deleteConfigurationOverrides-200" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteCponfigurationOverrides-200-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteConfigurationOverrides-200-wrapper" style='margin-bottom: 10px;'>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-400"></h3>
-                            <p id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-400" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-deleteConfigurationOverrides-title-400"></h3>
+                            <p id="examples-ConfigurationOverrides-deleteConfigurationOverrides-description-400" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides400_description = ``;
                               var responseConfigurationOverrides400_description_break = responseConfigurationOverrides400_description.indexOf('\n');
                               if (responseConfigurationOverrides400_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description);
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description.substring(0, responseConfigurationOverrides400_description_break));
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-400").html(responseConfigurationOverrides400_description.substring(responseConfigurationOverrides400_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description.substring(0, responseConfigurationOverrides400_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-description-400").html(responseConfigurationOverrides400_description.substring(responseConfigurationOverrides400_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-deleteCponfigurationOverrides-400" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-deleteConfigurationOverrides-400" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteCponfigurationOverrides-400-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteConfigurationOverrides-400-wrapper" style='margin-bottom: 10px;'>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-403"></h3>
-                            <p id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-403" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-deleteConfigurationOverrides-title-403"></h3>
+                            <p id="examples-ConfigurationOverrides-deleteConfigurationOverrides-description-403" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides403_description = ``;
                               var responseConfigurationOverrides403_description_break = responseConfigurationOverrides403_description.indexOf('\n');
                               if (responseConfigurationOverrides403_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description);
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description.substring(0, responseConfigurationOverrides403_description_break));
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-403").html(responseConfigurationOverrides403_description.substring(responseConfigurationOverrides403_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description.substring(0, responseConfigurationOverrides403_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-description-403").html(responseConfigurationOverrides403_description.substring(responseConfigurationOverrides403_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-deleteCponfigurationOverrides-403" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-deleteConfigurationOverrides-403" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteCponfigurationOverrides-403-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteConfigurationOverrides-403-wrapper" style='margin-bottom: 10px;'>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-404"></h3>
-                            <p id="examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-404" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-deleteConfigurationOverrides-title-404"></h3>
+                            <p id="examples-ConfigurationOverrides-deleteConfigurationOverrides-description-404" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides404_description = ``;
                               var responseConfigurationOverrides404_description_break = responseConfigurationOverrides404_description.indexOf('\n');
                               if (responseConfigurationOverrides404_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description);
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description.substring(0, responseConfigurationOverrides404_description_break));
-                                $("#examples-ConfigurationOverrides-deleteCponfigurationOverrides-description-404").html(responseConfigurationOverrides404_description.substring(responseConfigurationOverrides404_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description.substring(0, responseConfigurationOverrides404_description_break));
+                                $("#examples-ConfigurationOverrides-deleteConfigurationOverrides-description-404").html(responseConfigurationOverrides404_description.substring(responseConfigurationOverrides404_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-deleteCponfigurationOverrides-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-deleteConfigurationOverrides-404" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteCponfigurationOverrides-404-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-deleteConfigurationOverrides-404-wrapper" style='margin-bottom: 10px;'>
                             </div>
                         </article>
                       </div>
                       <hr>
-                    <div id="api-ConfigurationOverrides-getCponfigurationOverrides">
-                      <article id="api-ConfigurationOverrides-getCponfigurationOverrides-0" data-group="User" data-name="getCponfigurationOverrides" data-version="0">
+                    <div id="api-ConfigurationOverrides-getConfigurationOverrides">
+                      <article id="api-ConfigurationOverrides-getConfigurationOverrides-0" data-group="User" data-name="getConfigurationOverrides" data-version="0">
                         <div class="pull-left">
-                          <h1>getCponfigurationOverrides</h1>
+                          <h1>getConfigurationOverrides</h1>
                           <p>retrieve a list of configuration overrides for a given device</p>
                         </div>
                         <div class="pull-right"></div>
@@ -3674,22 +3674,22 @@ pub fn main() {
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-java">Java</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-python">Python</a></li>
-                          <li class=""><a href="#examples-ConfigurationOverrides-getCponfigurationOverrides-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-java">Java</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-python">Python</a></li>
+                          <li class=""><a href="#examples-ConfigurationOverrides-getConfigurationOverrides-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-curl">
+                          <div class="tab-pane active" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X GET \
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
@@ -3697,7 +3697,7 @@ pub fn main() {
  "https://localhost:16005/api/v1/configurationOverrides/{serialNumber}"
 </code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-java">
+                          <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -3725,10 +3725,10 @@ public class ConfigurationOverridesApiExample {
         String serialNumber = serialNumber_example; // String | 
 
         try {
-            ConfigurationOverrideList result = apiInstance.getCponfigurationOverrides(serialNumber);
+            ConfigurationOverrideList result = apiInstance.getConfigurationOverrides(serialNumber);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ConfigurationOverridesApi#getCponfigurationOverrides");
+            System.err.println("Exception when calling ConfigurationOverridesApi#getConfigurationOverrides");
             e.printStackTrace();
         }
     }
@@ -3736,7 +3736,7 @@ public class ConfigurationOverridesApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-android">
+                          <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.ConfigurationOverridesApi;
 
 public class ConfigurationOverridesApiExample {
@@ -3745,20 +3745,20 @@ public class ConfigurationOverridesApiExample {
         String serialNumber = serialNumber_example; // String | 
 
         try {
-            ConfigurationOverrideList result = apiInstance.getCponfigurationOverrides(serialNumber);
+            ConfigurationOverrideList result = apiInstance.getConfigurationOverrides(serialNumber);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ConfigurationOverridesApi#getCponfigurationOverrides");
+            System.err.println("Exception when calling ConfigurationOverridesApi#getConfigurationOverrides");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-groovy">
+  <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-objc">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 
 // Configure API key authorization: (authentication scheme: ApiKeyAuth)
@@ -3774,7 +3774,7 @@ ConfigurationOverridesApi *apiInstance = [[ConfigurationOverridesApi alloc] init
 String *serialNumber = serialNumber_example; //  (default to null)
 
 // retrieve a list of configuration overrides for a given device
-[apiInstance getCponfigurationOverridesWith:serialNumber
+[apiInstance getConfigurationOverridesWith:serialNumber
               completionHandler: ^(ConfigurationOverrideList output, NSError* error) {
     if (output) {
         NSLog(@"%@", output);
@@ -3786,7 +3786,7 @@ String *serialNumber = serialNumber_example; //  (default to null)
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-javascript">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var OpenWiFiProvisioningModel = require('open_wi_fi_provisioning_model');
 var defaultClient = OpenWiFiProvisioningModel.ApiClient.instance;
 
@@ -3811,14 +3811,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.getCponfigurationOverrides(serialNumber, callback);
+api.getConfigurationOverrides(serialNumber, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-angular">
+                            <!--<div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-csharp">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -3827,7 +3827,7 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class getCponfigurationOverridesExample
+    public class getConfigurationOverridesExample
     {
         public void main()
         {
@@ -3844,10 +3844,10 @@ namespace Example
 
             try {
                 // retrieve a list of configuration overrides for a given device
-                ConfigurationOverrideList result = apiInstance.getCponfigurationOverrides(serialNumber);
+                ConfigurationOverrideList result = apiInstance.getConfigurationOverrides(serialNumber);
                 Debug.WriteLine(result);
             } catch (Exception e) {
-                Debug.Print("Exception when calling ConfigurationOverridesApi.getCponfigurationOverrides: " + e.Message );
+                Debug.Print("Exception when calling ConfigurationOverridesApi.getConfigurationOverrides: " + e.Message );
             }
         }
     }
@@ -3855,7 +3855,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-php">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -3872,15 +3872,15 @@ $api_instance = new OpenAPITools\Client\Api\ConfigurationOverridesApi();
 $serialNumber = serialNumber_example; // String | 
 
 try {
-    $result = $api_instance->getCponfigurationOverrides($serialNumber);
+    $result = $api_instance->getConfigurationOverrides($serialNumber);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling ConfigurationOverridesApi->getCponfigurationOverrides: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling ConfigurationOverridesApi->getConfigurationOverrides: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-perl">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::ConfigurationOverridesApi;
@@ -3898,15 +3898,15 @@ my $api_instance = WWW::OPenAPIClient::ConfigurationOverridesApi->new();
 my $serialNumber = serialNumber_example; # String | 
 
 eval {
-    my $result = $api_instance->getCponfigurationOverrides(serialNumber => $serialNumber);
+    my $result = $api_instance->getConfigurationOverrides(serialNumber => $serialNumber);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling ConfigurationOverridesApi->getCponfigurationOverrides: $@\n";
+    warn "Exception when calling ConfigurationOverridesApi->getConfigurationOverrides: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-python">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -3927,20 +3927,20 @@ serialNumber = serialNumber_example # String |  (default to null)
 
 try:
     # retrieve a list of configuration overrides for a given device
-    api_response = api_instance.get_cponfiguration_overrides(serialNumber)
+    api_response = api_instance.get_configuration_overrides(serialNumber)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling ConfigurationOverridesApi->getCponfigurationOverrides: %s\n" % e)</code></pre>
+    print("Exception when calling ConfigurationOverridesApi->getConfigurationOverrides: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-ConfigurationOverrides-getCponfigurationOverrides-0-rust">
+                            <div class="tab-pane" id="examples-ConfigurationOverrides-getConfigurationOverrides-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate ConfigurationOverridesApi;
 
 pub fn main() {
     let serialNumber = serialNumber_example; // String
 
     let mut context = ConfigurationOverridesApi::Context::default();
-    let result = client.getCponfigurationOverrides(serialNumber, &context).wait();
+    let result = client.getConfigurationOverrides(serialNumber, &context).wait();
 
     println!("{:?}", result);
 }
@@ -3965,7 +3965,7 @@ pub fn main() {
 <td>
 
 
-    <div id="d2e199_getCponfigurationOverrides_serialNumber">
+    <div id="d2e199_getConfigurationOverrides_serialNumber">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3988,23 +3988,23 @@ pub fn main() {
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-ConfigurationOverrides-getCponfigurationOverrides-title-200"></h3>
-                            <p id="examples-ConfigurationOverrides-getCponfigurationOverrides-description-200" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-getConfigurationOverrides-title-200"></h3>
+                            <p id="examples-ConfigurationOverrides-getConfigurationOverrides-description-200" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides200_description = `Return a list of configuration overrides.`;
                               var responseConfigurationOverrides200_description_break = responseConfigurationOverrides200_description.indexOf('\n');
                               if (responseConfigurationOverrides200_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description);
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description.substring(0, responseConfigurationOverrides200_description_break));
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-description-200").html(responseConfigurationOverrides200_description.substring(responseConfigurationOverrides200_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-200").text("Status: 200 - " + responseConfigurationOverrides200_description.substring(0, responseConfigurationOverrides200_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-description-200").html(responseConfigurationOverrides200_description.substring(responseConfigurationOverrides200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-getCponfigurationOverrides-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-getConfigurationOverrides-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-ConfigurationOverrides-getCponfigurationOverrides-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-ConfigurationOverrides-getConfigurationOverrides-200-schema">Schema</a>
                                 </li>
 
 
@@ -4013,9 +4013,9 @@ pub fn main() {
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-getCponfigurationOverrides-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-ConfigurationOverrides-getCponfigurationOverrides-200-schema">
-                                  <div id="responses-ConfigurationOverrides-getCponfigurationOverrides-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-ConfigurationOverrides-getConfigurationOverrides-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-ConfigurationOverrides-getConfigurationOverrides-200-schema">
+                                  <div id="responses-ConfigurationOverrides-getConfigurationOverrides-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = ;
@@ -4040,81 +4040,81 @@ pub fn main() {
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-ConfigurationOverrides-getCponfigurationOverrides-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-ConfigurationOverrides-getCponfigurationOverrides-schema-200');
+                                        $('#responses-ConfigurationOverrides-getConfigurationOverrides-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-ConfigurationOverrides-getConfigurationOverrides-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-ConfigurationOverrides-getCponfigurationOverrides-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-ConfigurationOverrides-getConfigurationOverrides-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-getCponfigurationOverrides-title-400"></h3>
-                            <p id="examples-ConfigurationOverrides-getCponfigurationOverrides-description-400" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-getConfigurationOverrides-title-400"></h3>
+                            <p id="examples-ConfigurationOverrides-getConfigurationOverrides-description-400" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides400_description = ``;
                               var responseConfigurationOverrides400_description_break = responseConfigurationOverrides400_description.indexOf('\n');
                               if (responseConfigurationOverrides400_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description);
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description.substring(0, responseConfigurationOverrides400_description_break));
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-description-400").html(responseConfigurationOverrides400_description.substring(responseConfigurationOverrides400_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-400").text("Status: 400 - " + responseConfigurationOverrides400_description.substring(0, responseConfigurationOverrides400_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-description-400").html(responseConfigurationOverrides400_description.substring(responseConfigurationOverrides400_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-getCponfigurationOverrides-400" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-getConfigurationOverrides-400" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-getCponfigurationOverrides-400-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-getConfigurationOverrides-400-wrapper" style='margin-bottom: 10px;'>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-getCponfigurationOverrides-title-403"></h3>
-                            <p id="examples-ConfigurationOverrides-getCponfigurationOverrides-description-403" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-getConfigurationOverrides-title-403"></h3>
+                            <p id="examples-ConfigurationOverrides-getConfigurationOverrides-description-403" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides403_description = ``;
                               var responseConfigurationOverrides403_description_break = responseConfigurationOverrides403_description.indexOf('\n');
                               if (responseConfigurationOverrides403_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description);
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description.substring(0, responseConfigurationOverrides403_description_break));
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-description-403").html(responseConfigurationOverrides403_description.substring(responseConfigurationOverrides403_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-403").text("Status: 403 - " + responseConfigurationOverrides403_description.substring(0, responseConfigurationOverrides403_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-description-403").html(responseConfigurationOverrides403_description.substring(responseConfigurationOverrides403_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-getCponfigurationOverrides-403" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-getConfigurationOverrides-403" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-getCponfigurationOverrides-403-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-getConfigurationOverrides-403-wrapper" style='margin-bottom: 10px;'>
                             </div>
-                            <h3 id="examples-ConfigurationOverrides-getCponfigurationOverrides-title-404"></h3>
-                            <p id="examples-ConfigurationOverrides-getCponfigurationOverrides-description-404" class="marked"></p>
+                            <h3 id="examples-ConfigurationOverrides-getConfigurationOverrides-title-404"></h3>
+                            <p id="examples-ConfigurationOverrides-getConfigurationOverrides-description-404" class="marked"></p>
                             <script>
                               var responseConfigurationOverrides404_description = ``;
                               var responseConfigurationOverrides404_description_break = responseConfigurationOverrides404_description.indexOf('\n');
                               if (responseConfigurationOverrides404_description_break == -1) {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description);
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description);
                               } else {
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description.substring(0, responseConfigurationOverrides404_description_break));
-                                $("#examples-ConfigurationOverrides-getCponfigurationOverrides-description-404").html(responseConfigurationOverrides404_description.substring(responseConfigurationOverrides404_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-title-404").text("Status: 404 - " + responseConfigurationOverrides404_description.substring(0, responseConfigurationOverrides404_description_break));
+                                $("#examples-ConfigurationOverrides-getConfigurationOverrides-description-404").html(responseConfigurationOverrides404_description.substring(responseConfigurationOverrides404_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-ConfigurationOverrides-getCponfigurationOverrides-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-ConfigurationOverrides-getConfigurationOverrides-404" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-ConfigurationOverrides-getCponfigurationOverrides-404-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-ConfigurationOverrides-getConfigurationOverrides-404-wrapper" style='margin-bottom: 10px;'>
                             </div>
                         </article>
                       </div>
