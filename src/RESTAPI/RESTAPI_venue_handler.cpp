@@ -90,9 +90,9 @@ namespace OpenWifi {
 		}
 
 		if (!Existing.contacts.empty()) {
-			for (const auto &i : Existing.contacts)
+			for (const auto &contact_uuid : Existing.contacts)
 				StorageService()->ContactDB().DeleteInUse(
-					"id", i, StorageService()->VenueDB().Prefix(), UUID);
+					"id", contact_uuid, StorageService()->VenueDB().Prefix(), UUID);
 		}
 		if (!Existing.location.empty())
 			StorageService()->LocationDB().DeleteInUse("id", Existing.location,
@@ -101,9 +101,9 @@ namespace OpenWifi {
 			StorageService()->PolicyDB().DeleteInUse("id", Existing.managementPolicy,
 													 StorageService()->VenueDB().Prefix(), UUID);
 		if (!Existing.deviceConfiguration.empty()) {
-			for (auto &i : Existing.deviceConfiguration)
+			for (auto &configuration_uuid : Existing.deviceConfiguration)
 				StorageService()->ConfigurationDB().DeleteInUse(
-					"id", i, StorageService()->VenueDB().Prefix(), UUID);
+					"id", configuration_uuid, StorageService()->VenueDB().Prefix(), UUID);
 		}
 		if (!Existing.parent.empty())
 			StorageService()->VenueDB().DeleteChild("id", Existing.parent, UUID);
@@ -156,6 +156,10 @@ namespace OpenWifi {
 			!StorageService()->EntityDB().Exists("id", NewObject.entity)) {
 			return BadRequest(RESTAPI::Errors::EntityMustExist);
 		}
+
+        if(StorageService()->VenueDB().DoesVenueNameAlreadyExist(NewObject.info.name,NewObject.entity, NewObject.parent)) {
+            return BadRequest(RESTAPI::Errors::VenuesNameAlreadyExists);
+        }
 
 		if (!NewObject.contacts.empty()) {
 			for (const auto &i : NewObject.contacts) {
@@ -432,7 +436,7 @@ namespace OpenWifi {
 
 		std::string MoveFromEntity, MoveToEntity;
 		if (AssignIfPresent(RawObject, "entity", MoveToEntity)) {
-			if (!MoveToEntity.empty() && !StorageService()->EntityDB().Exists("id", MoveToEntity)) {
+			if (MoveToEntity.empty() || !StorageService()->EntityDB().Exists("id", MoveToEntity)) {
 				return BadRequest(RESTAPI::Errors::EntityMustExist);
 			}
 			MoveFromEntity = Existing.entity;
@@ -441,7 +445,7 @@ namespace OpenWifi {
 
 		std::string MoveToVenue, MoveFromVenue;
 		if (AssignIfPresent(RawObject, "venue", MoveToVenue)) {
-			if (!MoveToVenue.empty() && !StorageService()->VenueDB().Exists("id", MoveToVenue)) {
+			if (MoveToVenue.empty() || !StorageService()->VenueDB().Exists("id", MoveToVenue)) {
 				return BadRequest(RESTAPI::Errors::VenueMustExist);
 			}
 			MoveFromVenue = Existing.parent;
@@ -450,7 +454,7 @@ namespace OpenWifi {
 
 		std::string MoveFromLocation, MoveToLocation;
 		if (AssignIfPresent(RawObject, "location", MoveToLocation)) {
-			if (!MoveToLocation.empty() &&
+			if (MoveToLocation.empty() ||
 				!StorageService()->LocationDB().Exists("id", MoveToLocation)) {
 				return BadRequest(RESTAPI::Errors::LocationMustExist);
 			}
@@ -460,8 +464,8 @@ namespace OpenWifi {
 
 		Types::UUIDvec_t MoveFromContacts, MoveToContacts;
 		if (AssignIfPresent(RawObject, "contacts", MoveToContacts)) {
-			for (const auto &i : NewObject.contacts) {
-				if (!StorageService()->ContactDB().Exists("id", i)) {
+			for (const auto &contact : NewObject.contacts) {
+				if (!StorageService()->ContactDB().Exists("id", contact)) {
 					return BadRequest(RESTAPI::Errors::ContactMustExist);
 				}
 			}
@@ -471,7 +475,7 @@ namespace OpenWifi {
 
 		std::string MoveFromPolicy, MoveToPolicy;
 		if (AssignIfPresent(RawObject, "managementPolicy", MoveToPolicy)) {
-			if (!MoveToPolicy.empty() && !StorageService()->PolicyDB().Exists("id", MoveToPolicy)) {
+			if (MoveToPolicy.empty() || !StorageService()->PolicyDB().Exists("id", MoveToPolicy)) {
 				return BadRequest(RESTAPI::Errors::UnknownManagementPolicyUUID);
 			}
 			MoveFromPolicy = Existing.managementPolicy;
@@ -481,8 +485,8 @@ namespace OpenWifi {
 		Types::UUIDvec_t MoveToConfigurations, MoveFromConfigurations;
 		if (RawObject->has("deviceConfiguration")) {
 			MoveToConfigurations = NewObject.deviceConfiguration;
-			for (auto &i : MoveToConfigurations) {
-				if (!StorageService()->ConfigurationDB().Exists("id", i)) {
+			for (auto &configuration : MoveToConfigurations) {
+				if (!StorageService()->ConfigurationDB().Exists("id", configuration)) {
 					return BadRequest(RESTAPI::Errors::ConfigurationMustExist);
 				}
 			}

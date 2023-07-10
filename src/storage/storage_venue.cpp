@@ -112,6 +112,31 @@ namespace OpenWifi {
 		return true;
 	}
 
+    bool VenueDB::DoesVenueNameAlreadyExist(const std::string &name, const std::string &entity_uuid, const std::string &parent_uuid) {
+
+        std::string Statement;
+        if(!entity_uuid.empty()) {
+            Statement = fmt::format("select count(*) from venues where entity='{}' and upper(name)='{}'",
+                                    entity_uuid, Poco::toUpper(name));
+        } else {
+            Statement = fmt::format("select count(*) from venues where parent='{}' and upper(name)='{}'",
+                                    parent_uuid, Poco::toUpper(name));
+        }
+
+        std::uint64_t RecordCount = 0;
+        try {
+            Poco::Data::Session Session = Pool_.get();
+            Poco::Data::Statement Command(Session);
+
+            Command << Statement,
+                    Poco::Data::Keywords::into(RecordCount);
+            Command.execute();
+        } catch (...) {
+
+        }
+        return RecordCount!=0;
+    }
+
 } // namespace OpenWifi
 
 template <>

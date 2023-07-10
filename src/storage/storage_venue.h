@@ -26,6 +26,7 @@ namespace OpenWifi {
 		bool GetByIP(const std::string &IP, std::string &uuid);
 		bool Upgrade(uint32_t from, uint32_t &to) override;
 		bool EvaluateDeviceRules(const std::string &id, ProvObjects::DeviceRules &Rules);
+        bool DoesVenueNameAlreadyExist(const std::string &name, const std::string &entity_uuid, const std::string &parent_uuid);
 
 	  private:
 	};
