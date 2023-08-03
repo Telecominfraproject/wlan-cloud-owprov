@@ -400,10 +400,9 @@ namespace OpenWifi::RESTAPI::Errors {
 	static const struct msg SimulatedDeviceNotSupported {
 		1171, "Command not supported on simulated device."
 	};
-    static const struct msg VenuesNameAlreadyExists {
-            1172, "Venue name already exists."
-    };
 
+
+	static const struct msg DefFirmwareNameExists { 1172, "Firmware name already exists." };
 
     static const struct msg SimulationDoesNotExist {
         7000, "Simulation Instance ID does not exist."
