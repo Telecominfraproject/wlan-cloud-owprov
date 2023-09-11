@@ -247,4 +247,6 @@ namespace OpenWifi::Utils {
 		return count;
 	}
 
+    bool  CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
+                    const std::string &Organization, const std::string &CommonName, int bits=2048);
 } // namespace OpenWifi::Utils

@@ -3,6 +3,7 @@
 //
 
 #include "Poco/Path.h"
+#include "Poco/TemporaryFile.h"
 
 #include "framework/AppServiceRegistry.h"
 #include "framework/utils.h"
@@ -607,5 +608,108 @@ namespace OpenWifi::Utils {
 		Poco::DateTimeParser::parse(Poco::DateTimeFormat::ISO8601_FORMAT, Date, DT, TZ);
 		return DT.timestamp().epochTime();
 	}
+
+    bool  CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
+                        const std::string &Organization, const std::string &CommonName, int bits ) {
+        int             ret = 0;
+        RSA             *r = nullptr;
+        BIGNUM          *bne = nullptr;
+
+        int             nVersion = 0;
+        unsigned long   e = RSA_F4;
+
+        X509_REQ        *x509_req = nullptr;
+        X509_NAME       *x509_name = nullptr;
+        EVP_PKEY        *pKey = nullptr;
+//        RSA             *tem = nullptr;
+        BIO             *out = nullptr;
+//        BIO             *bio_err = nullptr;
+
+        const char      *szCountry = Country.c_str();
+        const char      *szProvince = Province.c_str();
+        const char      *szCity = City.c_str();
+        const char      *szOrganization = Organization.c_str();
+        const char      *szCommon = CommonName.c_str();
+
+        Poco::TemporaryFile     CsrPath;
+
+// 1. generate rsa key
+        bne = BN_new();
+        ret = BN_set_word(bne,e);
+        if(ret != 1){
+            goto free_all;
+        }
+
+        r = RSA_new();
+        ret = RSA_generate_key_ex(r, bits, bne, nullptr);
+        if(ret != 1){
+            goto free_all;
+        }
+
+// 2. set version of x509 req
+        x509_req = X509_REQ_new();
+        ret = X509_REQ_set_version(x509_req, nVersion);
+        if (ret != 1){
+            goto free_all;
+        }
+
+// 3. set subject of x509 req
+        x509_name = X509_REQ_get_subject_name(x509_req);
+
+        ret = X509_NAME_add_entry_by_txt(x509_name,"C", MBSTRING_ASC, (const unsigned char*)szCountry, -1, -1, 0);
+        if (ret != 1){
+            goto free_all;
+        }
+
+        ret = X509_NAME_add_entry_by_txt(x509_name,"ST", MBSTRING_ASC, (const unsigned char*)szProvince, -1, -1, 0);
+        if (ret != 1){
+            goto free_all;
+        }
+
+        ret = X509_NAME_add_entry_by_txt(x509_name,"L", MBSTRING_ASC, (const unsigned char*)szCity, -1, -1, 0);
+        if (ret != 1){
+            goto free_all;
+        }
+
+        ret = X509_NAME_add_entry_by_txt(x509_name,"O", MBSTRING_ASC, (const unsigned char*)szOrganization, -1, -1, 0);
+        if (ret != 1){
+            goto free_all;
+        }
+
+        ret = X509_NAME_add_entry_by_txt(x509_name,"CN", MBSTRING_ASC, (const unsigned char*)szCommon, -1, -1, 0);
+        if (ret != 1){
+            goto free_all;
+        }
+
+// 4. set public key of x509 req
+        pKey = EVP_PKEY_new();
+        EVP_PKEY_assign_RSA(pKey, r);
+        r = nullptr;   // will be free rsa when EVP_PKEY_free(pKey)
+
+        ret = X509_REQ_set_pubkey(x509_req, pKey);
+        if (ret != 1){
+            goto free_all;
+        }
+
+// 5. set sign key of x509 req
+        ret = X509_REQ_sign(x509_req, pKey, EVP_sha1());    // return x509_req->signature->length
+        if (ret <= 0){
+            goto free_all;
+        }
+
+        out = BIO_new_file(CsrPath.path().c_str(),"w");
+        ret = PEM_write_bio_X509_REQ(out, x509_req);
+
+// 6. free
+    free_all:
+        X509_REQ_free(x509_req);
+        BIO_free_all(out);
+
+        EVP_PKEY_free(pKey);
+        BN_free(bne);
+
+        return (ret == 1);
+
+    }
 
 } // namespace OpenWifi::Utils

@@ -23,6 +23,7 @@
 #include "UI_Prov_WebSocketNotifications.h"
 #include "framework/ConfigurationValidator.h"
 #include "framework/UI_WebSocketClientServer.h"
+#include "OpenRoamin_GlobalReach.h"
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -35,7 +36,9 @@ namespace OpenWifi {
 												ConfigurationValidator(), SerialNumberCache(),
 												AutoDiscovery(), JobController(),
 												UI_WebSocketClientServer(), FindCountryFromIP(),
-												Signup(), FileDownloader()});
+												Signup(), FileDownloader(),
+                                                OpenRoaming_GlobalReach()
+            });
 		}
 		return instance_;
 	}

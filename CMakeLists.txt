@@ -209,7 +209,7 @@ add_executable(owprov
         src/ProvWebSocketClient.cpp src/ProvWebSocketClient.h
         src/Tasks/VenueRebooter.h src/Tasks/VenueUpgrade.h
         src/sdks/SDK_fms.cpp src/sdks/SDK_fms.h
-        src/RESTAPI/RESTAPI_overrides_handler.cpp src/RESTAPI/RESTAPI_overrides_handler.h)
+        src/RESTAPI/RESTAPI_overrides_handler.cpp src/RESTAPI/RESTAPI_overrides_handler.h src/OpenRoamin_GlobalReach.cpp src/OpenRoamin_GlobalReach.h src/storage/storage_glblraccounts.cpp src/storage/storage_glblraccounts.h src/storage/storage_glblrcerts.cpp src/storage/storage_glblrcerts.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}

@@ -28,6 +28,8 @@
 #include "storage/storage_tags.h"
 #include "storage/storage_variables.h"
 #include "storage/storage_venue.h"
+#include "storage/storage_glblraccounts.h"
+#include "storage/storage_glblrcerts.h"
 
 #include "Poco/URI.h"
 #include "framework/ow_constants.h"
@@ -47,25 +49,27 @@ namespace OpenWifi {
 		typedef std::list<ProvObjects::ExpandedUseEntry> ExpandedInUseList;
 		typedef std::map<std::string, ProvObjects::ExpandedUseEntryList> ExpandedListMap;
 
-		OpenWifi::EntityDB &EntityDB() { return *EntityDB_; };
-		OpenWifi::PolicyDB &PolicyDB() { return *PolicyDB_; };
-		OpenWifi::VenueDB &VenueDB() { return *VenueDB_; };
-		OpenWifi::LocationDB &LocationDB() { return *LocationDB_; };
-		OpenWifi::ContactDB &ContactDB() { return *ContactDB_; };
-		OpenWifi::InventoryDB &InventoryDB() { return *InventoryDB_; };
-		OpenWifi::ManagementRoleDB &RolesDB() { return *RolesDB_; };
-		OpenWifi::ConfigurationDB &ConfigurationDB() { return *ConfigurationDB_; };
-		OpenWifi::TagsDictionaryDB &TagsDictionaryDB() { return *TagsDictionaryDB_; };
-		OpenWifi::TagsObjectDB &TagsObjectDB() { return *TagsObjectDB_; };
-		OpenWifi::MapDB &MapDB() { return *MapDB_; };
-		OpenWifi::SignupDB &SignupDB() { return *SignupDB_; };
-		OpenWifi::VariablesDB &VariablesDB() { return *VariablesDB_; };
-		OpenWifi::OperatorDB &OperatorDB() { return *OperatorDB_; };
-		OpenWifi::ServiceClassDB &ServiceClassDB() { return *ServiceClassDB_; };
-		OpenWifi::SubscriberDeviceDB &SubscriberDeviceDB() { return *SubscriberDeviceDB_; };
-		OpenWifi::OpLocationDB &OpLocationDB() { return *OpLocationDB_; };
-		OpenWifi::OpContactDB &OpContactDB() { return *OpContactDB_; };
-		OpenWifi::OverridesDB &OverridesDB() { return *OverridesDB_; };
+		inline OpenWifi::EntityDB &EntityDB() { return *EntityDB_; };
+        inline OpenWifi::PolicyDB &PolicyDB() { return *PolicyDB_; };
+        inline OpenWifi::VenueDB &VenueDB() { return *VenueDB_; };
+        inline OpenWifi::LocationDB &LocationDB() { return *LocationDB_; };
+        inline OpenWifi::ContactDB &ContactDB() { return *ContactDB_; };
+        inline OpenWifi::InventoryDB &InventoryDB() { return *InventoryDB_; };
+        inline OpenWifi::ManagementRoleDB &RolesDB() { return *RolesDB_; };
+        inline OpenWifi::ConfigurationDB &ConfigurationDB() { return *ConfigurationDB_; };
+        inline OpenWifi::TagsDictionaryDB &TagsDictionaryDB() { return *TagsDictionaryDB_; };
+        inline OpenWifi::TagsObjectDB &TagsObjectDB() { return *TagsObjectDB_; };
+        inline OpenWifi::MapDB &MapDB() { return *MapDB_; };
+        inline OpenWifi::SignupDB &SignupDB() { return *SignupDB_; };
+        inline OpenWifi::VariablesDB &VariablesDB() { return *VariablesDB_; };
+        inline OpenWifi::OperatorDB &OperatorDB() { return *OperatorDB_; };
+        inline OpenWifi::ServiceClassDB &ServiceClassDB() { return *ServiceClassDB_; };
+        inline OpenWifi::SubscriberDeviceDB &SubscriberDeviceDB() { return *SubscriberDeviceDB_; };
+        inline OpenWifi::OpLocationDB &OpLocationDB() { return *OpLocationDB_; };
+        inline OpenWifi::OpContactDB &OpContactDB() { return *OpContactDB_; };
+        inline OpenWifi::OverridesDB &OverridesDB() { return *OverridesDB_; };
+        inline OpenWifi::GLBLRAccountInfoDB &GLBLRAccountInfoDB() { return *GLBLRAccountInfoDB_; }
+        inline OpenWifi::GLBLRCertsDB &GLBLRCertsDB() { return *GLBLRCertsDB_; }
 
 		bool Validate(const Poco::URI::QueryParameters &P, RESTAPI::Errors::msg &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
@@ -125,6 +129,8 @@ namespace OpenWifi {
 		std::unique_ptr<OpenWifi::OpLocationDB> OpLocationDB_;
 		std::unique_ptr<OpenWifi::OpContactDB> OpContactDB_;
 		std::unique_ptr<OpenWifi::OverridesDB> OverridesDB_;
+        std::unique_ptr<OpenWifi::GLBLRAccountInfoDB> GLBLRAccountInfoDB_;
+        std::unique_ptr<OpenWifi::GLBLRCertsDB> GLBLRCertsDB_;
 		std::string DefaultOperator_;
 
 		typedef std::function<bool(const char *FieldName, std::string &Value)> exist_func;

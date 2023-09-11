@@ -746,4 +746,29 @@ namespace OpenWifi::ProvObjects {
 	bool CreateObjectInfo(const Poco::JSON::Object::Ptr &O, const SecurityObjects::UserInfo &U,
 						  ObjectInfo &I);
 	bool CreateObjectInfo(const SecurityObjects::UserInfo &U, ObjectInfo &I);
+
+    struct GLBLRAccountInfo {
+        ObjectInfo      info;
+        std::string     privateKey;
+        std::string     country, province, city, organization, commonName;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    struct GLBLRCertificateInfo {
+        std::string     id;
+        std::string     name;
+        std::string     accountId;
+        std::string     csr;
+        std::string     certificate;
+        std::string     certificateChain;
+        std::string     certificateId;
+        std::uint64_t   expiresAt=0;
+        std::uint64_t   created=0;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
 }; // namespace OpenWifi::ProvObjects
