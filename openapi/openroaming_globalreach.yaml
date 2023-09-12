@@ -55,6 +55,8 @@ components:
           type: string
         CSR:
           type: string
+        GlobalReachAcctId:
+          type: string
 
     GLBLRCertificateInfo:
       type: object
