@@ -143,7 +143,7 @@ namespace OpenWifi {
             token.setType("JWT");
             token.setAlgorithm("ES256");
             token.setIssuedAt(std::time(nullptr));
-            std::cout << __LINE__ << ":" << GlobalReachAccountId << std::endl;
+            std::cout << __LINE__ << ":" << GlobalReachAccountId << " : " << PrivateKeys_.size() << std::endl;
 
             token.payload().set("iss", GlobalReachAccountId);
             token.payload().set("iat", (unsigned long) std::time(nullptr));
