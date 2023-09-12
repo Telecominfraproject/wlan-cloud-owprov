@@ -47,30 +47,40 @@ namespace OpenWifi {
             ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 
         try {
+            std::cout << __LINE__ << std::endl;
             auto BearerToken = MakeToken(GlobalReachAccountId);
             Poco::URI URI{"https://config.openro.am/v1/radsec/issue"};
             std::string Path(URI.getPathAndQuery());
+            std::cout << __LINE__ << std::endl;
             Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_POST, Path,
                                            Poco::Net::HTTPMessage::HTTP_1_1);
+            std::cout << __LINE__ << std::endl;
 
             Request.add("Authorization", "Bearer " + BearerToken);
+            std::cout << __LINE__ << std::endl;
 
             Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
             Session.setTimeout(Poco::Timespan(10000, 10000));
+            std::cout << __LINE__ << std::endl;
             Poco::JSON::Object CertRequestBody;
             CertRequestBody.set("name", Name);
             CertRequestBody.set("csr", CSR);
+            std::cout << __LINE__ << std::endl;
 
             std::ostringstream os;
+            std::cout << __LINE__ << std::endl;
             CertRequestBody.stringify(os);
             Request.setContentType("application/json");
             Request.setContentLength((long) os.str().size());
 
+            std::cout << __LINE__ << std::endl;
             auto &Body = Session.sendRequest(Request);
             Body << os.str();
 
+            std::cout << __LINE__ << std::endl;
             Poco::Net::HTTPResponse Response;
             std::istream &is = Session.receiveResponse(Response);
+            std::cout << __LINE__ << std::endl;
             if (Response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
                 Poco::JSON::Parser P;
                 auto Result = P.parse(is).extract<Poco::JSON::Object::Ptr>();
@@ -80,8 +90,10 @@ namespace OpenWifi {
                 NewCertificate.certificateChain = Result->get("certificate_chain").toString();
                 NewCertificate.certificateId = Result->get("certificate_id").toString();
                 NewCertificate.expiresAt = Result->get("expires_at");
+                std::cout << __LINE__ << std::endl;
                 return true;
             }
+            std::cout << Response.getStatus() << std::endl;
         } catch( const Poco::Exception &E) {
             poco_error(Logger(),fmt::format("Could not create a new RADSEC certificate: {},{}",E.name(),E.displayText()));
         }
