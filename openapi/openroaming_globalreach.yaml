@@ -1,0 +1,399 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi Provisioning Model
+  description: Definitions and APIs to manages an OpenWiFi network.
+  version: 2.5.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/NotFound'
+    Unauthorized:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Unauthorized'
+    Success:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Success'
+    BadRequest:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/BadRequest'
+
+  schemas:
+    GLBLRAccountInfo:
+      type: object
+      properties:
+        allOf:
+          $ref: 'https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/openpapi/owprov.yaml#/components/schemas/ObjectInfo'
+        privateKey:
+          type: string
+        country:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        organization:
+          type: string
+        commonName:
+          type: string
+        CSR:
+          type: string
+
+    GLBLRCertificateInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        csr:
+          type: string
+        certificate:
+          type: string
+        certificateChain:
+          type: string
+        certificateId:
+          type: string
+        expiresAt:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+
+paths:
+  /openroaming/globalreach/accounts:
+    get:
+      tags:
+        - OpenRoaming-Global Reach
+      operationId: getOpenRoaminGlobalReachAccountList
+      summary: Retrieve account list.
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: return the number of accounts
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: The list of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GLBLRAccountInfo'
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /openroaming/globalreach/account/{name}:
+    get:
+      tags:
+        - OpenRoaming-Global Reach
+      operationId: getOpenRoaminGlobalReachAccount
+      summary: Retrieve account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - OpenRoaming-Global Reach
+      operationId: deleteOpenRoaminGlobalReachAccount
+      summary: Delete account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - OpenRoaming-Global Reach
+      operationId: createOpenRoaminGlobalReachAccount
+      summary: Create account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GLBLRAccountInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - OpenRoaming-Global Reach
+      operationId: modifyOpenRoaminGlobalReachAccount
+      summary: Modify account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GLBLRAccountInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /openroaming/globalreach/certificates/{account}:
+    get:
+      tags:
+        - OpenRoaming-Global Reach Certificate
+      operationId: getOpenRoaminGlobalReachCertificateList
+      summary: Retrieve certificate list.
+      parameters:
+        - in: path
+          description: The account name
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: return the number of certificates
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: The list of certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GLBLRCertificateInfo'
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /openroaming/globalreach/certificate/{account}/{id}:
+    get:
+      tags:
+        - OpenRoaming-Global Reach Certificate
+      operationId: getOpenRoaminGlobalReachCertificate
+      summary: Retrieve certificate information.
+      parameters:
+        - in: path
+          description: The account name
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: path
+          description: The certificate id
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRCertificateInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - OpenRoaming-Global Reach Certificate
+      operationId: deleteOpenRoaminGlobalReachCertificate
+      summary: Delete certificate information.
+      parameters:
+        - in: path
+          description: The account name
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: path
+          description: The certificate id
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - OpenRoaming-Global Reach Certificate
+      operationId: createOpenRoaminGlobalReachCertificate
+      summary: Create certificate information.
+      parameters:
+        - in: path
+          description: The account name
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: path
+          description: The certificate id
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GLBLRCertificateInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRCertificateInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - OpenRoaming-Global Reach Certificate
+      operationId: modifyOpenRoaminGlobalReachCertificate
+      summary: Modify certificate information.
+      parameters:
+        - in: path
+          description: The account name
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: path
+          description: The certificate id
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GLBLRAccountInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+

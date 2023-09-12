@@ -1202,6 +1202,7 @@ namespace OpenWifi::ProvObjects {
         field_to_json(Obj, "city", city);
         field_to_json(Obj, "organization", organization);
         field_to_json(Obj, "commonName", commonName);
+        field_to_json(Obj, "CSR", CSR);
     }
 
     bool GLBLRAccountInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -1213,6 +1214,7 @@ namespace OpenWifi::ProvObjects {
             field_from_json(Obj, "city", city);
             field_from_json(Obj, "organization", organization);
             field_from_json(Obj, "commonName", commonName);
+            field_from_json(Obj, "CSR", CSR);
             return true;
         } catch (const Poco::Exception &E) {
 

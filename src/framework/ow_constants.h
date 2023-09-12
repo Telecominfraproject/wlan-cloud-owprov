@@ -407,6 +407,7 @@ namespace OpenWifi::RESTAPI::Errors {
     };
 
     static const struct msg DefFirmwareNameExists { 1172, "Firmware name already exists." };
+    static const struct msg NotAValidECKey { 1173, "Provided key supplied is not valid." };
 
     static const struct msg SimulationDoesNotExist {
         7000, "Simulation Instance ID does not exist."

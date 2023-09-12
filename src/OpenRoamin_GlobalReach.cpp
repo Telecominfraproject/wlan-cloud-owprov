@@ -16,7 +16,9 @@ namespace OpenWifi {
         poco_information(Logger(), "Stopped...");
     }
 
-    bool OpenRoaming_GlobalReach::GetAccountInfo(const std::string &AccountName, ProvObjects::GLBLRAccountInfo &Account) {
+    bool OpenRoaming_GlobalReach::GetAccountInfo(
+            [[maybe_unused]] const std::string &AccountName,
+            [[maybe_unused]] ProvObjects::GLBLRAccountInfo &Account) {
 /*        Poco::URI   URI{"https://config.openro.am/v1/config"};
 
         std::string Path(URI.getPathAndQuery());
@@ -43,7 +45,9 @@ namespace OpenWifi {
         return true;
     }
 
-    bool OpenRoaming_GlobalReach::CreateRadsecCertificate(const std::string &AccountName, ProvObjects::GLBLRCertificateInfo &NewCertificate) {
+    bool OpenRoaming_GlobalReach::CreateRadsecCertificate(
+            [[maybe_unused]] const std::string &AccountName,
+            [[maybe_unused]] ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 /*
         Poco::URI   URI{"https://config.openro.am/v1/radsec/issue"};
 
@@ -77,8 +81,10 @@ namespace OpenWifi {
         return true;
     }
 
-    bool OpenRoaming_GlobalReach::GetRadsecCertificate(const std::string &AccountName, std::string &CertificateId,
-                                                       ProvObjects::GLBLRCertificateInfo &NewCertificate) {
+    bool OpenRoaming_GlobalReach::GetRadsecCertificate(
+        [[maybe_unused]] const std::string &AccountName,
+        [[maybe_unused]] std::string &CertificateId,
+        [[maybe_unused]] ProvObjects::GLBLRCertificateInfo &NewCertificate) {
         return true;
     }
 

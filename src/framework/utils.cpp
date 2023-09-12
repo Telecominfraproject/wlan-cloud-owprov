@@ -4,7 +4,7 @@
 
 #include "Poco/Path.h"
 #include "Poco/TemporaryFile.h"
-
+#include "Poco/Crypto/ECKey.h"
 #include "framework/AppServiceRegistry.h"
 #include "framework/utils.h"
 
@@ -609,7 +609,7 @@ namespace OpenWifi::Utils {
 		return DT.timestamp().epochTime();
 	}
 
-    bool  CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
+    std::string  CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
                         const std::string &Organization, const std::string &CommonName, int bits ) {
         int             ret = 0;
         RSA             *r = nullptr;
@@ -632,8 +632,11 @@ namespace OpenWifi::Utils {
         const char      *szCommon = CommonName.c_str();
 
         Poco::TemporaryFile     CsrPath;
+        std::string             Result;
+        std::ifstream           ifs;
+        std::ostringstream      ss;
 
-// 1. generate rsa key
+    // 1. generate rsa key
         bne = BN_new();
         ret = BN_set_word(bne,e);
         if(ret != 1){
@@ -700,6 +703,10 @@ namespace OpenWifi::Utils {
         out = BIO_new_file(CsrPath.path().c_str(),"w");
         ret = PEM_write_bio_X509_REQ(out, x509_req);
 
+        ifs.open(CsrPath.path().c_str(),std::ios_base::binary|std::ios_base::in);
+        Poco::StreamCopier::copyStream(ifs,ss);
+        ifs.close();
+        Result = ss.str();
 // 6. free
     free_all:
         X509_REQ_free(x509_req);
@@ -708,8 +715,25 @@ namespace OpenWifi::Utils {
         EVP_PKEY_free(pKey);
         BN_free(bne);
 
-        return (ret == 1);
+        return Result;
+    }
 
+    bool VerifyECKey(const std::string &key) {
+        try {
+            Poco::TemporaryFile F;
+
+            std::ofstream of(F.path().c_str(), std::ios_base::trunc | std::ios_base::out | std::ios_base::binary);
+            of << key;
+            of.close();
+
+            auto Key = Poco::SharedPtr<Poco::Crypto::ECKey>(
+                    new Poco::Crypto::ECKey("", F.path(),""));
+
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
     }
 
 } // namespace OpenWifi::Utils

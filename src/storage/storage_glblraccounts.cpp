@@ -11,7 +11,7 @@
 
 namespace OpenWifi {
 
-    static ORM::FieldVec GLBLRAccountInfoDB_Fields{// object info
+    static ORM::FieldVec GLBLRAccountInfoDB_Fields{
             ORM::Field{"id", 64, true},
             ORM::Field{"name", ORM::FieldType::FT_TEXT},
             ORM::Field{"description", ORM::FieldType::FT_TEXT},
@@ -23,7 +23,8 @@ namespace OpenWifi {
             ORM::Field{"province", ORM::FieldType::FT_TEXT},
             ORM::Field{"city", ORM::FieldType::FT_TEXT},
             ORM::Field{"organization", ORM::FieldType::FT_TEXT},
-            ORM::Field{"commonName", ORM::FieldType::FT_TEXT}
+            ORM::Field{"commonName", ORM::FieldType::FT_TEXT},
+            ORM::Field{"CSR", ORM::FieldType::FT_TEXT}
     };
 
     static ORM::IndexVec GLBLRAccountInfoDB_Indexes{
@@ -65,6 +66,7 @@ void ORM::DB<OpenWifi::GLBLRAccountsDBRecordType, OpenWifi::ProvObjects::GLBLRAc
     Out.city = In.get<9>();
     Out.organization = In.get<10>();
     Out.commonName = In.get<11>();
+    Out.CSR = In.get<12>();
 }
 
 template <>
@@ -82,4 +84,5 @@ void ORM::DB<OpenWifi::GLBLRAccountsDBRecordType, OpenWifi::ProvObjects::GLBLRAc
     Out.set<9>(In.city);
     Out.set<10>(In.organization);
     Out.set<11>(In.commonName);
+    Out.set<12>(In.CSR);
 }
