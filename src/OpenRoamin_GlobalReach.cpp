@@ -163,7 +163,7 @@ namespace OpenWifi {
             auto KeyHash = Utils::ComputeHash(PrivateKey);
             auto KeyHint = PrivateKeys_.find(GlobalReachAccountId);
             DBGLINE
-            if (KeyHint != PrivateKeys_.end() && KeyHint->first == KeyHash) {
+            if (KeyHint != PrivateKeys_.end() && KeyHint->second.first == KeyHash) {
                 DBGLINE
                 Key = KeyHint->second.second;
             } else {
