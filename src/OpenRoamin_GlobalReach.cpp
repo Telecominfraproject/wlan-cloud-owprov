@@ -151,7 +151,7 @@ namespace OpenWifi {
             Poco::SharedPtr<Poco::Crypto::ECKey> Key;
             auto KeyHash = Utils::ComputeHash(PrivateKey);
             auto KeyHint = PrivateKeys_.find(GlobalReachAccountId);
-            if (KeyHint != PrivateKeys_.end() && KeyHint->second.first == KeyHash) {
+            if (KeyHint != PrivateKeys_.end() && PrivateKey.empty() ) {
                 Key = KeyHint->second.second;
             } else {
                 if (PrivateKey.empty()) {
