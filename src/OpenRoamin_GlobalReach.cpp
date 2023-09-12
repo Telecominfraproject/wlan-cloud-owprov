@@ -32,7 +32,9 @@ namespace OpenWifi {
         auto F=[&](const ProvObjects::GLBLRAccountInfo &Info) {
             poco_information(Logger(),fmt::format("Adding {} to cache.",Info.info.name));
             if(!Info.privateKey.empty() && !Info.GlobalReachAcctId.empty() ) {
+                DBGLINE
                 MakeToken(Info.GlobalReachAcctId, Info.privateKey);
+                DBGLINE
             }
             return true;
         };
@@ -160,10 +162,13 @@ namespace OpenWifi {
             Poco::SharedPtr<Poco::Crypto::ECKey> Key;
             auto KeyHash = Utils::ComputeHash(PrivateKey);
             auto KeyHint = PrivateKeys_.find(GlobalReachAccountId);
+            DBGLINE
             if (KeyHint != PrivateKeys_.end() && KeyHint->first == KeyHash) {
+                DBGLINE
                 Key = KeyHint->second.second;
             } else {
                 if (PrivateKey.empty()) {
+                    DBGLINE
                     return "";
                 }
                 Poco::TemporaryFile F;
@@ -174,6 +179,7 @@ namespace OpenWifi {
                         new Poco::Crypto::ECKey("", F.path(), ""));
                 Key = NewKey;
                 PrivateKeys_[GlobalReachAccountId] = std::make_pair(KeyHash, NewKey);
+                DBGLINE
             }
 
             Poco::JWT::Signer Signer;
