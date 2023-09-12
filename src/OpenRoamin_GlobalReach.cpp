@@ -32,9 +32,7 @@ namespace OpenWifi {
         auto F=[&](const ProvObjects::GLBLRAccountInfo &Info) {
             poco_information(Logger(),fmt::format("Adding {} to cache.",Info.info.name));
             if(!Info.privateKey.empty() && !Info.GlobalReachAcctId.empty() ) {
-                DBGLINE
                 MakeToken(Info.GlobalReachAcctId, Info.privateKey);
-                DBGLINE
             }
             return true;
         };
@@ -49,7 +47,7 @@ namespace OpenWifi {
             ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 
         try {
-            std::cout << __LINE__ << std::endl;
+            std::cout << __LINE__ << ":" << GlobalReachAccountId << std::endl;
             auto BearerToken = MakeToken(GlobalReachAccountId);
             Poco::URI URI{"https://config.openro.am/v1/radsec/issue"};
             std::string Path(URI.getPathAndQuery());
