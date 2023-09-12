@@ -8,7 +8,7 @@
 namespace OpenWifi {
 
     void RESTAPI_openroaming_gr_acct_handler::DoGet() {
-        auto Account = GetBinding("account","");
+        auto Account = GetBinding("id","");
         if(Account.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
@@ -21,7 +21,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_openroaming_gr_acct_handler::DoDelete() {
-        auto Account = GetBinding("account","");
+        auto Account = GetBinding("id","");
         if(Account.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
@@ -38,7 +38,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_openroaming_gr_acct_handler::DoPost() {
-        auto Account = GetBinding("account","");
+        auto Account = GetBinding("id","");
         if(Account.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
@@ -77,6 +77,10 @@ namespace OpenWifi {
         if(!Utils::CreateX509CSR(P,R)) {
             return BadRequest(RESTAPI::Errors::CannotCreateCSR);
         }
+
+        NewObject.CSR = R.CSR;
+        NewObject.CSRPublicKey = R.PublicKey;
+        NewObject.CSRPrivateKey = R.PrivateKey;
 
         ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info);
 

@@ -617,6 +617,18 @@ getsystemconfiguration() {
     jq < ${result_file}
 }
 
+creategraccount() {
+    payload="{ \"name\" : \"Test account\" , \"country\" : \"CA\", \"province\" : \"BC\" , \"city\" : \"Vancouver\", \"organization\" : \"Arilia Wireless Inc.\", \"commonName\" : \"arilia.com\", \"GlobalReachAcctId\" : \"bd63aaa7-b14d-4cdb-85ae-8de6cf2cfa31\", \"privateKey\" : \"-----BEGIN PRIVATE KEY-----MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgl1FpARtuOtw1F9sR2DD82jh6sZFGRn619IY0rmNIFEuhRANCAATB7ji6OF/+heGRCocgVNhw4QGvaL9Kp8F6ZqqZ3aMewRMOfzi3TQaXN12FNBsvXnptx5vk8GAzZk6UAzzvMBVK-----END PRIVATE KEY-----\" }"
+            echo $payload | jq
+
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/openroaming/globalreach/account/0" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; echo "You are logged in..."  ; logout ;;
@@ -673,6 +685,7 @@ case "$1" in
     "deleteoverride") login; deleteoverride "$2"; logout;;
     "venueupgraderevisions") login; venueupgraderevisions "$2"; logout;;
     "getsystemconfiguration") login; getsystemconfiguration "$2"; logout;;
+    "creategraccount") login; creategraccount ; logout;;
     "getvenuesperrrm") login; getvenuesperrrm "$2"; logout;;
     *) help ;;
 esac
