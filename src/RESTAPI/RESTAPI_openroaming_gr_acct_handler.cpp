@@ -3,6 +3,7 @@
 //
 
 #include "RESTAPI_openroaming_gr_acct_handler.h"
+#include "OpenRoamin_GlobalReach.h"
 
 namespace OpenWifi {
 
@@ -48,10 +49,17 @@ namespace OpenWifi {
             return BadRequest(OpenWifi::RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RawObject->has("privateKey")) {
-            if(!NewObject.privateKey.empty() && !Utils::VerifyECKey(NewObject.privateKey)) {
-                return BadRequest(RESTAPI::Errors::NotAValidECKey);
-            }
+        if(NewObject.privateKey.empty() || NewObject.GlobalReachAcctId.empty()) {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+        }
+
+        if(!NewObject.privateKey.empty() && !Utils::VerifyECKey(NewObject.privateKey)) {
+            return BadRequest(RESTAPI::Errors::NotAValidECKey);
+        }
+
+        std::string GlobalReachName;
+        if(!OpenRoaming_GlobalReach()->VerifyAccount(NewObject.GlobalReachAcctId,NewObject.privateKey,GlobalReachName)) {
+            return BadRequest(RESTAPI::Errors::InvalidGlobalReachAccount);
         }
 
         if( NewObject.commonName.empty() || NewObject.organization.empty() ||
@@ -98,6 +106,11 @@ namespace OpenWifi {
                 return BadRequest(RESTAPI::Errors::NotAValidECKey);
             }
             Existing.privateKey = Modify.privateKey;
+        }
+
+        std::string GlobalReachName;
+        if(!OpenRoaming_GlobalReach()->VerifyAccount(Existing.GlobalReachAcctId,Existing.privateKey,GlobalReachName)) {
+            return BadRequest(RESTAPI::Errors::InvalidGlobalReachAccount);
         }
 
         auto Modified = AssignIfPresent(RawObject,"country",Existing.country)   ||

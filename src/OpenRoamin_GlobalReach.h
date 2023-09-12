@@ -22,9 +22,12 @@ namespace OpenWifi {
         bool GetAccountInfo(const std::string &AccountName, ProvObjects::GLBLRAccountInfo &Account);
         bool CreateRadsecCertificate(const std::string &AccountName, ProvObjects::GLBLRCertificateInfo &NewCertificate);
         bool GetRadsecCertificate(const std::string &AccountName, std::string & CertificateId, ProvObjects::GLBLRCertificateInfo &NewCertificate);
+        bool VerifyAccount(const std::string &GlobalReachAccountId, const std::string &PrivateKey, std::string &Name);
 
     private:
-        std::string CreateJWTToken(const std::string &AccountName);
+        std::string MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey);
+
+        std::map<std::string,Poco::SharedPtr<Poco::Crypto::ECKey>>   PrivateKeys_;
 
         OpenRoaming_GlobalReach() noexcept
                 : SubSystemServer("OpenRoaming_GlobalReach", "GLBL-REACH", "globalreach") {
