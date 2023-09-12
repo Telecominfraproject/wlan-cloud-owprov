@@ -89,7 +89,7 @@ paths:
     get:
       tags:
         - OpenRoaming-Global Reach
-      operationId: getOpenRoaminGlobalReachAccountList
+      operationId: getOpenRoamingGlobalReachAccountList
       summary: Retrieve account list.
       parameters:
         - in: query
@@ -132,7 +132,7 @@ paths:
     get:
       tags:
         - OpenRoaming-Global Reach
-      operationId: getOpenRoaminGlobalReachAccount
+      operationId: getOpenRoamingGlobalReachAccount
       summary: Retrieve account information.
       parameters:
         - in: path
@@ -154,7 +154,7 @@ paths:
     delete:
       tags:
         - OpenRoaming-Global Reach
-      operationId: deleteOpenRoaminGlobalReachAccount
+      operationId: deleteOpenRoamingGlobalReachAccount
       summary: Delete account information.
       parameters:
         - in: path
@@ -176,7 +176,7 @@ paths:
     post:
       tags:
         - OpenRoaming-Global Reach
-      operationId: createOpenRoaminGlobalReachAccount
+      operationId: createOpenRoamingGlobalReachAccount
       summary: Create account information.
       parameters:
         - in: path
@@ -203,7 +203,7 @@ paths:
     put:
       tags:
         - OpenRoaming-Global Reach
-      operationId: modifyOpenRoaminGlobalReachAccount
+      operationId: modifyOpenRoamingGlobalReachAccount
       summary: Modify account information.
       parameters:
         - in: path
@@ -231,7 +231,7 @@ paths:
     get:
       tags:
         - OpenRoaming-Global Reach Certificate
-      operationId: getOpenRoaminGlobalReachCertificateList
+      operationId: getOpenRoamingGlobalReachCertificateList
       summary: Retrieve certificate list.
       parameters:
         - in: path
@@ -280,17 +280,17 @@ paths:
     get:
       tags:
         - OpenRoaming-Global Reach Certificate
-      operationId: getOpenRoaminGlobalReachCertificate
+      operationId: getOpenRoamingGlobalReachCertificate
       summary: Retrieve certificate information.
       parameters:
         - in: path
-          description: The account name
+          description: The account name - this is the provisioning ID for the account. Not the GlobalReach ID.
           name: account
           schema:
             type: string
           required: true
         - in: path
-          description: The certificate id
+          description: The certificate id in provisioning - not the certificate_id from GlobalReach
           name: id
           schema:
             type: string
@@ -308,17 +308,17 @@ paths:
     delete:
       tags:
         - OpenRoaming-Global Reach Certificate
-      operationId: deleteOpenRoaminGlobalReachCertificate
+      operationId: deleteOpenRoamingGlobalReachCertificate
       summary: Delete certificate information.
       parameters:
         - in: path
-          description: The account name
+          description: The account name - this is the provisioning ID for the account. Not the GlobalReach ID.
           name: account
           schema:
             type: string
           required: true
         - in: path
-          description: The certificate id
+          description: The certificate id in provisioning - not the certificate_id from GlobalReach
           name: id
           schema:
             type: string
@@ -336,17 +336,17 @@ paths:
     post:
       tags:
         - OpenRoaming-Global Reach Certificate
-      operationId: createOpenRoaminGlobalReachCertificate
+      operationId: createOpenRoamingGlobalReachCertificate
       summary: Create certificate information.
       parameters:
         - in: path
-          description: The account name
+          description: The account name - this is the provisioning ID for the account. Not the GlobalReach ID.
           name: account
           schema:
             type: string
           required: true
         - in: path
-          description: The certificate id
+          description: Must be set to "0"
           name: id
           schema:
             type: string
@@ -359,39 +359,6 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/GLBLRCertificateInfo'
-        400:
-          $ref: '#/components/responses/BadRequest'
-        403:
-          $ref: '#/components/responses/Unauthorized'
-        404:
-          $ref: '#/components/responses/NotFound'
-
-    put:
-      tags:
-        - OpenRoaming-Global Reach Certificate
-      operationId: modifyOpenRoaminGlobalReachCertificate
-      summary: Modify certificate information.
-      parameters:
-        - in: path
-          description: The account name
-          name: account
-          schema:
-            type: string
-          required: true
-        - in: path
-          description: The certificate id
-          name: id
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GLBLRAccountInfo'
-      responses:
-        200:
-          $ref: '#/components/schemas/GLBLRAccountInfo'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

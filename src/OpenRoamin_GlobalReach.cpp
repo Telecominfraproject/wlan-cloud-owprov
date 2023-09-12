@@ -12,11 +12,13 @@
 #include <Poco/JSON/Parser.h>
 
 #include <framework/MicroServiceFuncs.h>
+#include <StorageService.h>
 
 namespace OpenWifi {
 
     int OpenRoaming_GlobalReach::Start() {
         poco_information(Logger(), "Starting...");
+        InitCache();
         return 0;
     }
 
@@ -25,111 +27,150 @@ namespace OpenWifi {
         poco_information(Logger(), "Stopped...");
     }
 
-    bool OpenRoaming_GlobalReach::GetAccountInfo(
-            [[maybe_unused]] const std::string &AccountName,
-            [[maybe_unused]] ProvObjects::GLBLRAccountInfo &Account) {
-/*        Poco::URI   URI{"https://config.openro.am/v1/config"};
+    void OpenRoaming_GlobalReach::InitCache() {
 
-        std::string Path(URI.getPathAndQuery());
+        auto F=[&](const ProvObjects::GLBLRAccountInfo &Info) {
+            poco_information(Logger(),fmt::format("Adding {} to cache.",Info.info.name));
+            if(!Info.privateKey.empty() && !Info.GlobalReachAcctId.empty() ) {
+                MakeToken(Info.GlobalReachAcctId, Info.privateKey);
+            }
+            return true;
+        };
 
-        Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_GET, Path,
-                                       Poco::Net::HTTPMessage::HTTP_1_1);
-
-        Request.add("Authorization", "Bearer " + BearerToken);
-
-        Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
-        Session.setTimeout(Poco::Timespan(10000, 10000));
-
-        Session.sendRequest(Request);
-
-        Poco::Net::HTTPResponse Response;
-        std::istream &is = Session.receiveResponse(Response);
-        Poco::JSON::Parser P;
-        Result= P.parse(is).extract<Poco::JSON::Object::Ptr>();
-
-        std::cout << Response.getStatus() << " : " ;
-        Result->stringify(std::cout);
-        std::cout << std::endl;
-  */
-        return true;
+        StorageService()->GLBLRAccountInfoDB().Iterate(F);
     }
 
-    bool OpenRoaming_GlobalReach::CreateRadsecCertificate(
-            [[maybe_unused]] const std::string &AccountName,
-            [[maybe_unused]] ProvObjects::GLBLRCertificateInfo &NewCertificate) {
-/*
-        Poco::URI   URI{"https://config.openro.am/v1/radsec/issue"};
+    bool OpenRoaming_GlobalReach::CreateRADSECCertificate(
+            const std::string &GlobalReachAccountId,
+            const std::string &Name,
+            const std::string &CSR,
+            ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 
-        std::string Path(URI.getPathAndQuery());
+        try {
+            auto BearerToken = MakeToken(GlobalReachAccountId);
+            Poco::URI URI{"https://config.openro.am/v1/radsec/issue"};
+            std::string Path(URI.getPathAndQuery());
+            Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_POST, Path,
+                                           Poco::Net::HTTPMessage::HTTP_1_1);
 
-        Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_POST, Path,
-                                       Poco::Net::HTTPMessage::HTTP_1_1);
+            Request.add("Authorization", "Bearer " + BearerToken);
 
-        Request.add("Authorization", "Bearer " + BearerToken);
+            Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
+            Session.setTimeout(Poco::Timespan(10000, 10000));
+            Poco::JSON::Object CertRequestBody;
+            CertRequestBody.set("name", Name);
+            CertRequestBody.set("csr", CSR);
 
-        Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
-        Session.setTimeout(Poco::Timespan(10000, 10000));
+            std::ostringstream os;
+            CertRequestBody.stringify(os);
+            Request.setContentType("application/json");
+            Request.setContentLength((long) os.str().size());
 
-        std::ostringstream os;
-        Body.stringify(os);
-        Request.setContentType("application/json");
-        Request.setContentLength(os.str().size());
+            auto &Body = Session.sendRequest(Request);
+            Body << os.str();
 
-        auto &body = Session.sendRequest(Request);
-        body << os.str();
-
-        Poco::Net::HTTPResponse Response;
-        std::istream &is = Session.receiveResponse(Response);
-        Poco::JSON::Parser P;
-        Result= P.parse(is).extract<Poco::JSON::Object::Ptr>();
-
-        std::cout << Response.getStatus() << " : " ;
-        Result->stringify(std::cout);
-        std::cout << std::endl;
-*/
-        return true;
+            Poco::Net::HTTPResponse Response;
+            std::istream &is = Session.receiveResponse(Response);
+            if (Response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
+                Poco::JSON::Parser P;
+                auto Result = P.parse(is).extract<Poco::JSON::Object::Ptr>();
+                NewCertificate.csr = Result->get("csr").toString();
+                NewCertificate.certificate = Result->get("certificate").toString();
+                NewCertificate.name = Result->get("name").toString();
+                NewCertificate.certificateChain = Result->get("certificate_chain").toString();
+                NewCertificate.certificateId = Result->get("certificate_id").toString();
+                NewCertificate.expiresAt = Result->get("expires_at");
+                return true;
+            }
+        } catch( const Poco::Exception &E) {
+            poco_error(Logger(),fmt::format("Could not create a new RADSEC certificate: {},{}",E.name(),E.displayText()));
+        }
+        return false;
     }
 
-    bool OpenRoaming_GlobalReach::GetRadsecCertificate(
-        [[maybe_unused]] const std::string &AccountName,
-        [[maybe_unused]] std::string &CertificateId,
-        [[maybe_unused]] ProvObjects::GLBLRCertificateInfo &NewCertificate) {
-        return true;
+    bool OpenRoaming_GlobalReach::GetRADSECCertificate(
+        const std::string &GlobalReachAccountId,
+        std::string &CertificateId,
+        ProvObjects::GLBLRCertificateInfo &NewCertificate) {
+
+        try {
+            Poco::URI URI{fmt::format("https://config.openro.am/v1/radsec/cert/{}", CertificateId)};
+
+            std::string Path(URI.getPathAndQuery());
+
+            Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_GET, Path,
+                                           Poco::Net::HTTPMessage::HTTP_1_1);
+
+            auto BearerToken = MakeToken(GlobalReachAccountId);
+            Request.add("Authorization", "Bearer " + BearerToken);
+
+            Poco::Net::HTTPSClientSession Session(URI.getHost(), URI.getPort());
+            Session.setTimeout(Poco::Timespan(10000, 10000));
+
+            Session.sendRequest(Request);
+
+            Poco::Net::HTTPResponse Response;
+            std::istream &is = Session.receiveResponse(Response);
+            if (Response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
+                Poco::JSON::Parser P;
+                auto Result = P.parse(is).extract<Poco::JSON::Object::Ptr>();
+                NewCertificate.csr = Result->get("csr").toString();
+                NewCertificate.certificate = Result->get("certificate").toString();
+                NewCertificate.name = Result->get("name").toString();
+                NewCertificate.certificateChain = Result->get("certificate_chain").toString();
+                NewCertificate.certificateId = Result->get("certificate_id").toString();
+                NewCertificate.expiresAt = Result->get("expires_at");
+                std::cout << Response.getStatus() << " : ";
+                Result->stringify(std::cout);
+                std::cout << std::endl;
+                return true;
+            }
+        } catch( const Poco::Exception &E) {
+            poco_error(Logger(),fmt::format("Could not retrieve the certificate from GlobalReach: {},{}",E.name(),E.displayText()));
+        }
+        return false;
     }
 
     std::string OpenRoaming_GlobalReach::MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey) {
-        Poco::JWT::Token token;
+        try {
+            Poco::JWT::Token token;
+            token.setType("JWT");
+            token.setAlgorithm("ES256");
+            token.setIssuedAt(std::time(nullptr));
 
-        token.setType("JWT");
-        token.setAlgorithm("ES256");
-        token.setIssuedAt(std::time(nullptr));
+            token.payload().set("iss", GlobalReachAccountId);
+            token.payload().set("iat", (unsigned long) std::time(nullptr));
 
-        token.payload().set("iss", GlobalReachAccountId);
-        token.payload().set("iat", (unsigned long) std::time(nullptr));
+            Poco::SharedPtr<Poco::Crypto::ECKey> Key;
+            auto KeyHash = Utils::ComputeHash(PrivateKey);
+            auto KeyHint = PrivateKeys_.find(GlobalReachAccountId);
+            if (KeyHint != PrivateKeys_.end() && KeyHint->first == KeyHash) {
+                Key = KeyHint->second.second;
+            } else {
+                if (PrivateKey.empty()) {
+                    return "";
+                }
+                Poco::TemporaryFile F;
+                std::ofstream ofs(F.path().c_str(), std::ios_base::trunc | std::ios_base::out | std::ios_base::binary);
+                ofs << PrivateKey;
+                ofs.close();
+                auto NewKey = Poco::SharedPtr<Poco::Crypto::ECKey>(
+                        new Poco::Crypto::ECKey("", F.path(), ""));
+                Key = NewKey;
+                PrivateKeys_[GlobalReachAccountId] = std::make_pair(KeyHash, NewKey);
+            }
 
-        Poco::SharedPtr<Poco::Crypto::ECKey>    Key;
-        auto KeyHash = Utils::ComputeHash(PrivateKey);
-        auto KeyHint = PrivateKeys_.find(KeyHash);
-        if(KeyHint!=PrivateKeys_.end()) {
-            Key = KeyHint->second;
-        } else {
-            Poco::TemporaryFile F;
-            std::ofstream ofs(F.path().c_str(),std::ios_base::trunc|std::ios_base::out|std::ios_base::binary);
-            ofs << PrivateKey;
-            ofs.close();
-            auto NewKey = Poco::SharedPtr<Poco::Crypto::ECKey>(
-                    new Poco::Crypto::ECKey("", F.path(),""));
-            Key = PrivateKeys_[KeyHash] = NewKey;
+            Poco::JWT::Signer Signer;
+            Signer.setECKey(Key);
+            Signer.addAllAlgorithms();
+            return Signer.sign(token, Poco::JWT::Signer::ALGO_ES256);
+        } catch (const Poco::Exception &E) {
+            poco_error(Logger(),fmt::format("Cannot create a Global Reach token: {},{}",E.name(),E.displayText()));
         }
-
-        Poco::JWT::Signer Signer;
-        Signer.setECKey(Key);
-        Signer.addAllAlgorithms();
-        return Signer.sign(token, Poco::JWT::Signer::ALGO_ES256);
+        return "";
     }
 
-    bool OpenRoaming_GlobalReach::VerifyAccount(const std::string &GlobalReachAccountId, const std::string &PrivateKey, [[
-    maybe_unused]] std::string &Name) {
+    bool OpenRoaming_GlobalReach::VerifyAccount(const std::string &GlobalReachAccountId, const std::string &PrivateKey, std::string &Name) {
         auto BearerToken = MakeToken(GlobalReachAccountId, PrivateKey);
 
         Poco::URI   URI{"https://config.openro.am/v1/config"};
