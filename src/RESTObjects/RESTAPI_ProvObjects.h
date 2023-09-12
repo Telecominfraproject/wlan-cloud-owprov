@@ -751,7 +751,7 @@ namespace OpenWifi::ProvObjects {
         ObjectInfo      info;
         std::string     privateKey;
         std::string     country, province, city, organization, commonName;
-        std::string     CSR;
+        std::string     CSR, CSRPrivateKey, CSRPublicKey;
         std::string     GlobalReachAcctId;
 
         void to_json(Poco::JSON::Object &Obj) const;

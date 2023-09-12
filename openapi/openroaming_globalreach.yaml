@@ -55,6 +55,10 @@ components:
           type: string
         CSR:
           type: string
+        CSRPrivateKey:
+          type: string
+        CSRPublicKey:
+          type: string
         GlobalReachAcctId:
           type: string
 

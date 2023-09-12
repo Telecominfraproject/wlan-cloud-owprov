@@ -247,7 +247,17 @@ namespace OpenWifi::Utils {
 		return count;
 	}
 
-    std::string CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
-                    const std::string &Organization, const std::string &CommonName, int bits=2048);
+    struct CSRCreationParameters {
+        std::string Country, Province, City,
+                    Organization, CommonName;
+        int         bits=2048;
+    };
+
+    struct CSRCreationResults {
+        std::string     CSR, PublicKey, PrivateKey;
+    };
+
+    bool CreateX509CSR(const CSRCreationParameters & Parameters, CSRCreationResults & Results);
+
     bool VerifyECKey(const std::string &key);
 } // namespace OpenWifi::Utils

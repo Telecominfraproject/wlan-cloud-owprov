@@ -25,6 +25,8 @@ namespace OpenWifi {
             ORM::Field{"organization", ORM::FieldType::FT_TEXT},
             ORM::Field{"commonName", ORM::FieldType::FT_TEXT},
             ORM::Field{"CSR", ORM::FieldType::FT_TEXT},
+            ORM::Field{"CSRPrivateKey", ORM::FieldType::FT_TEXT},
+            ORM::Field{"CSRPublicKey", ORM::FieldType::FT_TEXT},
             ORM::Field{"GlobalReachAcctId", ORM::FieldType::FT_TEXT}
     };
 
@@ -68,7 +70,9 @@ void ORM::DB<OpenWifi::GLBLRAccountsDBRecordType, OpenWifi::ProvObjects::GLBLRAc
     Out.organization = In.get<10>();
     Out.commonName = In.get<11>();
     Out.CSR = In.get<12>();
-    Out.GlobalReachAcctId = In.get<13>();
+    Out.CSRPrivateKey = In.get<13>();
+    Out.CSRPublicKey = In.get<14>();
+    Out.GlobalReachAcctId = In.get<15>();
 }
 
 template <>
@@ -87,5 +91,7 @@ void ORM::DB<OpenWifi::GLBLRAccountsDBRecordType, OpenWifi::ProvObjects::GLBLRAc
     Out.set<10>(In.organization);
     Out.set<11>(In.commonName);
     Out.set<12>(In.CSR);
-    Out.set<13>(In.GlobalReachAcctId);
+    Out.set<13>(In.CSRPrivateKey);
+    Out.set<14>(In.CSRPublicKey);
+    Out.set<15>(In.GlobalReachAcctId);
 }

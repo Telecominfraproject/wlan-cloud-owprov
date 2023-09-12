@@ -609,8 +609,14 @@ namespace OpenWifi::Utils {
 		return DT.timestamp().epochTime();
 	}
 
-    std::string  CreateX509CSR(const std::string &Country, const std::string &Province, const std::string &City,
-                        const std::string &Organization, const std::string &CommonName, int bits ) {
+    static std::string FileToString(const std::string &Filename) {
+        std::ifstream   ifs(Filename.c_str(),std::ios_base::in|std::ios_base::binary);
+        std::ostringstream os;
+        Poco::StreamCopier::copyStream(ifs,os);
+        return os.str();
+    }
+
+    bool CreateX509CSR(const CSRCreationParameters & Parameters, CSRCreationResults & Results) {
         int             ret = 0;
         RSA             *r = nullptr;
         BIGNUM          *bne = nullptr;
@@ -622,21 +628,23 @@ namespace OpenWifi::Utils {
         X509_NAME       *x509_name = nullptr;
         EVP_PKEY        *pKey = nullptr;
 //        RSA             *tem = nullptr;
-        BIO             *out = nullptr;
 //        BIO             *bio_err = nullptr;
 
-        const char      *szCountry = Country.c_str();
-        const char      *szProvince = Province.c_str();
-        const char      *szCity = City.c_str();
-        const char      *szOrganization = Organization.c_str();
-        const char      *szCommon = CommonName.c_str();
+        const char      *szCountry = Parameters.Country.c_str();
+        const char      *szProvince = Parameters.Province.c_str();
+        const char      *szCity = Parameters.City.c_str();
+        const char      *szOrganization = Parameters.Organization.c_str();
+        const char      *szCommon = Parameters.CommonName.c_str();
 
-        Poco::TemporaryFile     CsrPath;
+        Poco::TemporaryFile     CsrPath, PubKey, PrivateKey;
         std::string             Result;
         std::ifstream           ifs;
         std::ostringstream      ss;
+        BIO                     *bp_public = nullptr,
+                *bp_private = nullptr,
+                *bp_csr = nullptr;
 
-    // 1. generate rsa key
+        // 1. generate rsa key
         bne = BN_new();
         ret = BN_set_word(bne,e);
         if(ret != 1){
@@ -644,8 +652,20 @@ namespace OpenWifi::Utils {
         }
 
         r = RSA_new();
-        ret = RSA_generate_key_ex(r, bits, bne, nullptr);
+        ret = RSA_generate_key_ex(r, Parameters.bits, bne, nullptr);
         if(ret != 1){
+            goto free_all;
+        }
+
+        bp_public = BIO_new_file(PubKey.path().c_str(), "w+");
+        ret = PEM_write_bio_RSAPublicKey(bp_public, r);
+        if(ret != 1) {
+            goto free_all;
+        }
+
+        bp_private = BIO_new_file(PrivateKey.path().c_str(), "w+");
+        ret = PEM_write_bio_RSAPrivateKey(bp_private, r, NULL, NULL, 0, NULL, NULL);
+        if(ret != 1) {
             goto free_all;
         }
 
@@ -700,22 +720,25 @@ namespace OpenWifi::Utils {
             goto free_all;
         }
 
-        out = BIO_new_file(CsrPath.path().c_str(),"w");
-        ret = PEM_write_bio_X509_REQ(out, x509_req);
+        bp_csr = BIO_new_file(CsrPath.path().c_str(),"w");
+        ret = PEM_write_bio_X509_REQ(bp_csr, x509_req);
 
-        ifs.open(CsrPath.path().c_str(),std::ios_base::binary|std::ios_base::in);
-        Poco::StreamCopier::copyStream(ifs,ss);
-        ifs.close();
-        Result = ss.str();
 // 6. free
-    free_all:
+        free_all:
         X509_REQ_free(x509_req);
-        BIO_free_all(out);
+        BIO_free_all(bp_csr);
+        BIO_free_all(bp_public);
+        BIO_free_all(bp_private);
 
         EVP_PKEY_free(pKey);
         BN_free(bne);
+        if(ret==1) {
+            Results.CSR = FileToString(CsrPath.path());
+            Results.PrivateKey = FileToString(PrivateKey.path());
+            Results.PublicKey = FileToString(PubKey.path());
+        }
 
-        return Result;
+        return ret;
     }
 
     bool VerifyECKey(const std::string &key) {

@@ -67,7 +67,16 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        NewObject.CSR = Utils::CreateX509CSR(NewObject.country,NewObject.province, NewObject.city, NewObject.organization, NewObject.commonName);
+        Utils::CSRCreationParameters    P;
+        P.Country = NewObject.country;
+        P.CommonName = NewObject.commonName;
+        P.Province = NewObject.province;
+        P.City = NewObject.city;
+        P.Organization = NewObject.organization;
+        Utils::CSRCreationResults       R;
+        if(!Utils::CreateX509CSR(P,R)) {
+            return BadRequest(RESTAPI::Errors::CannotCreateCSR);
+        }
 
         ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info);
 
@@ -99,27 +108,6 @@ namespace OpenWifi {
 
         if(!ProvObjects::UpdateObjectInfo(RawObject,UserInfo_.userinfo,Existing.info)) {
             return BadRequest(OpenWifi::RESTAPI::Errors::InvalidJSONDocument);
-        }
-
-        if(RawObject->has("privateKey")) {
-            if(!Modify.privateKey.empty() && !Utils::VerifyECKey(Modify.privateKey)) {
-                return BadRequest(RESTAPI::Errors::NotAValidECKey);
-            }
-            Existing.privateKey = Modify.privateKey;
-        }
-
-        std::string GlobalReachName;
-        if(!OpenRoaming_GlobalReach()->VerifyAccount(Existing.GlobalReachAcctId,Existing.privateKey,GlobalReachName)) {
-            return BadRequest(RESTAPI::Errors::InvalidGlobalReachAccount);
-        }
-
-        auto Modified = AssignIfPresent(RawObject,"country",Existing.country)   ||
-                        AssignIfPresent(RawObject,"commonName",Existing.commonName) ||
-                        AssignIfPresent(RawObject,"city",Existing.city) ||
-                        AssignIfPresent(RawObject,"province",Existing.province) ||
-                        AssignIfPresent(RawObject,"organization",Existing.organization);
-        if(Modified) {
-            Existing.CSR = Utils::CreateX509CSR(Existing.country,Existing.province, Existing.city, Existing.organization, Existing.commonName);
         }
 
         if(DB_.UpdateRecord("id",Existing.info.id,Existing)) {

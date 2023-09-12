@@ -1203,6 +1203,8 @@ namespace OpenWifi::ProvObjects {
         field_to_json(Obj, "organization", organization);
         field_to_json(Obj, "commonName", commonName);
         field_to_json(Obj, "CSR", CSR);
+        field_to_json(Obj, "CSRPrivateKey", CSRPrivateKey);
+        field_to_json(Obj, "CSRPublicKey", CSRPublicKey);
         field_to_json(Obj, "GlobalReachAcctId", GlobalReachAcctId);
     }
 
@@ -1216,6 +1218,8 @@ namespace OpenWifi::ProvObjects {
             field_from_json(Obj, "organization", organization);
             field_from_json(Obj, "commonName", commonName);
             field_from_json(Obj, "CSR", CSR);
+            field_from_json(Obj, "CSRPrivateKey", CSRPrivateKey);
+            field_from_json(Obj, "CSRPublicKey", CSRPublicKey);
             field_from_json(Obj, "GlobalReachAcctId", GlobalReachAcctId);
             return true;
         } catch (const Poco::Exception &E) {
