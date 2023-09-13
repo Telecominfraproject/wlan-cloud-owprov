@@ -84,10 +84,8 @@ namespace OpenWifi {
             std::ostringstream oos;
             auto Result = P.parse(is).extract<Poco::JSON::Object::Ptr>();
             Result->stringify(oos);
-            std::cout << oos.str() << std::endl;
         } catch( const Poco::Exception &E) {
             poco_error(Logger(),fmt::format("Could not create a new RADSEC certificate: {},{}",E.name(),E.displayText()));
-            std::cout << E.name() << " : "  << E.displayText() << std::endl;
         }
         return false;
     }
@@ -96,7 +94,6 @@ namespace OpenWifi {
         const std::string &GlobalReachAccountId,
         std::string &CertificateId,
         ProvObjects::GLBLRCertificateInfo &NewCertificate) {
-        std::cout << __LINE__ << ":" << GlobalReachAccountId << std::endl;
 
         try {
             Poco::URI URI{fmt::format("https://config.openro.am/v1/radsec/cert/{}", CertificateId)};
@@ -123,9 +120,6 @@ namespace OpenWifi {
                 RESTAPIHandler::AssignIfPresent(Result,"certificate_chain",NewCertificate.certificateChain);
                 RESTAPIHandler::AssignIfPresent(Result,"certificate_id",NewCertificate.certificateId);
                 RESTAPIHandler::AssignIfPresent(Result,"expires_at",NewCertificate.expiresAt);
-                std::cout << Response.getStatus() << " : ";
-                Result->stringify(std::cout);
-                std::cout << std::endl;
                 return true;
             }
         } catch( const Poco::Exception &E) {
@@ -140,7 +134,6 @@ namespace OpenWifi {
             token.setType("JWT");
             token.setAlgorithm("ES256");
             token.setIssuedAt(std::time(nullptr));
-            std::cout << __LINE__ << ":" << GlobalReachAccountId << " : " << PrivateKeys_.size() << std::endl;
 
             token.payload().set("iss", GlobalReachAccountId);
             token.payload().set("iat", (unsigned long) std::time(nullptr));
