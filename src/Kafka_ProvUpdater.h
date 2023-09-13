@@ -39,9 +39,7 @@ namespace OpenWifi {
 		Poco::JSON::Object Payload;
 		obj.to_json(Payload);
 		Payload.set("ObjectType", OT);
-		std::ostringstream OS;
-		Payload.stringify(OS);
-		KafkaManager()->PostMessage(KafkaTopics::PROVISIONING_CHANGE, Ops[op], std::make_shared<std::string>(OS.str()));
+		KafkaManager()->PostMessage(KafkaTopics::PROVISIONING_CHANGE, Ops[op], Payload);
 
 		return true;
 	}
