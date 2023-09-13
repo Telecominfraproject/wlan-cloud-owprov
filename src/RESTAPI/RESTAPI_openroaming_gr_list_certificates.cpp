@@ -8,7 +8,7 @@ namespace OpenWifi {
 
     void RESTAPI_openroaming_gr_list_certificates::DoGet() {
 
-        auto Account = GetParameter("account","");
+        auto Account = GetBinding("account","");
         if(Account.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
