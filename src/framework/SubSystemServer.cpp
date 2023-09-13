@@ -320,6 +320,8 @@ namespace OpenWifi {
 				} else if (L == "once")
 					M = Poco::Net::Context::VERIFY_ONCE;
 
+                std::cout << "Security level: " << level << " : " << L << " : " << M << std::endl;
+
 				PropertiesFileServerEntry entry(
 					MicroServiceConfigGetString(address, ""), MicroServiceConfigGetInt(port, 0),
 					MicroServiceConfigPath(key, ""), MicroServiceConfigPath(cert, ""),
