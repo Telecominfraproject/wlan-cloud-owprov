@@ -74,13 +74,10 @@ namespace OpenWifi {
             if (Response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
                 Poco::JSON::Parser P;
                 auto Result = P.parse(is).extract<Poco::JSON::Object::Ptr>();
-                RESTAPI::
-                NewCertificate.csr = Result->get("csr").toString();
-                NewCertificate.certificate = Result->get("certificate").toString();
-                NewCertificate.name = Result->get("name").toString();
-                NewCertificate.certificateChain = Result->get("certificate_chain").toString();
-                NewCertificate.certificateId = Result->get("certificate_id").toString();
-                NewCertificate.expiresAt = Result->get("expires_at");
+                RESTAPIHandler::AssignIfPresent(Result,"certificate",NewCertificate.certificate);
+                RESTAPIHandler::AssignIfPresent(Result,"certificate_chain",NewCertificate.certificateChain);
+                RESTAPIHandler::AssignIfPresent(Result,"certificate_id",NewCertificate.certificateId);
+                RESTAPIHandler::AssignIfPresent(Result,"expires_at",NewCertificate.expiresAt);
                 return true;
             }
             Poco::JSON::Parser P;
