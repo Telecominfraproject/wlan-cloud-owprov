@@ -89,6 +89,7 @@ namespace OpenWifi {
             std::cout << oos.str() << std::endl;
         } catch( const Poco::Exception &E) {
             poco_error(Logger(),fmt::format("Could not create a new RADSEC certificate: {},{}",E.name(),E.displayText()));
+            std::cout << E.name() << " : "  << E.displayText() << std::endl;
         }
         return false;
     }
