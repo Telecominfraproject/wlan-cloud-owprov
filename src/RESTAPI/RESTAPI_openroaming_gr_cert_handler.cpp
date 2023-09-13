@@ -68,6 +68,8 @@ namespace OpenWifi {
         if(OpenRoaming_GlobalReach()->CreateRADSECCertificate(AccountInfo.GlobalReachAcctId,NewObject.name,AccountInfo.CSR, NewObject)) {
             NewObject.id = MicroServiceCreateUUID();
             NewObject.accountId = Account;
+            NewObject.created = Utils::Now();
+            NewObject.csr = AccountInfo.CSR;
             DB_.CreateRecord(NewObject);
             ProvObjects::GLBLRCertificateInfo   CreatedObject;
             DB_.GetRecord("id",NewObject.id,CreatedObject);
