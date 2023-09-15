@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: OpenWiFi Provisioning Model
-  description: Definitions and APIs to manages an OpenWiFi network.
+  title: OpenWiFi OpenRoaming Provisioning Model for Global Reach
+  description: Definitions and APIs to Open Roaming WiFi.
   version: 2.5.0
   license:
     name: BSD3

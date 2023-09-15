@@ -1,0 +1,195 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi OpenRoaming Provisioning Model for Google Orion
+  description: Definitions and APIs to Open Roaming WiFi.
+  version: 2.5.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/NotFound'
+    Unauthorized:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Unauthorized'
+    Success:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Success'
+    BadRequest:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/BadRequest'
+
+  schemas:
+    GooglOrionAccountInfo:
+      type: object
+      properties:
+        allOf:
+          $ref: 'https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/openpapi/owprov.yaml#/components/schemas/ObjectInfo'
+        privateKey:
+          type: string
+        certificate:
+          type: string
+        cacerts:
+          type: array
+          items:
+            type: string
+
+paths:
+  /openroaming/orion/accounts:
+    get:
+      tags:
+        - OpenRoaming-Google Orion
+      operationId: getOpenRoamingGlobalReachAccountList
+      summary: Retrieve account list.
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+            type: integer
+          required: false
+        - in: query
+          description: return the number of accounts
+          name: countOnly
+          schema:
+            type: boolean
+          required: false
+
+      responses:
+        200:
+          description: The list of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GooglOrionAccountInfo'
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /openroaming/globalreach/account/{name}:
+    get:
+      tags:
+        - OpenRoaming-Google Orion
+      operationId: getOpenRoamingGlobalReachAccount
+      summary: Retrieve account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/GooglOrionAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - OpenRoaming-Google Orion
+      operationId: deleteOpenRoamingGlobalReachAccount
+      summary: Delete account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - OpenRoaming-Google Orion
+      operationId: createOpenRoamingGlobalReachAccount
+      summary: Create account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GooglOrionAccountInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GooglOrionAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - OpenRoaming-Google Orion
+      operationId: modifyOpenRoamingGlobalReachAccount
+      summary: Modify account information.
+      parameters:
+        - in: path
+          description: The account name
+          name: name
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GooglOrionAccountInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/GooglOrionAccountInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+

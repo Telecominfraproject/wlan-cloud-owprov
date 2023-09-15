@@ -1258,4 +1258,25 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void GooglOrionAccountInfo::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json(Obj, "privateKey", privateKey);
+        field_to_json(Obj, "certificate", certificate);
+        field_to_json(Obj, "cacerts", cacerts);
+    }
+
+    bool GooglOrionAccountInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json(Obj, "privateKey", privateKey);
+            field_from_json(Obj, "certificate", certificate);
+            field_from_json(Obj, "cacerts", cacerts);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+
 } // namespace OpenWifi::ProvObjects

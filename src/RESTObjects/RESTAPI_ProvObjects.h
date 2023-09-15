@@ -773,4 +773,14 @@ namespace OpenWifi::ProvObjects {
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
 
+    struct GooglOrionAccountInfo {
+        ObjectInfo                  info;
+        std::string                 privateKey;
+        std::string                 certificate;
+        std::vector<std::string>    cacerts;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
 }; // namespace OpenWifi::ProvObjects
