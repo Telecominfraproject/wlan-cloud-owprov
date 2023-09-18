@@ -41,6 +41,7 @@ namespace OpenWifi {
 		OverridesDB_ = std::make_unique<OpenWifi::OverridesDB>(dbType_, *Pool_, Logger());
         GLBLRAccountInfoDB_ = std::make_unique<OpenWifi::GLBLRAccountInfoDB>(dbType_, *Pool_, Logger());
         GLBLRCertsDB_ = std::make_unique<OpenWifi::GLBLRCertsDB>(dbType_, *Pool_, Logger());
+        OrionAccountsDB_ = std::make_unique<OpenWifi::OrionAccountsDB>(dbType_, *Pool_, Logger());
 
 		EntityDB_->Create();
 		PolicyDB_->Create();
@@ -63,6 +64,7 @@ namespace OpenWifi {
 		OverridesDB_->Create();
         GLBLRAccountInfoDB_->Create();
         GLBLRCertsDB_->Create();
+        OrionAccountsDB_->Create();
 
 		ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
 			return EntityDB_->Exists(F, V);
@@ -127,10 +129,13 @@ namespace OpenWifi {
         ExistFunc_[GLBLRCertsDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
             return GLBLRCertsDB_->Exists(F, V);
         };
+        ExistFunc_[GLBLRCertsDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
+            return OrionAccountsDB_->Exists(F, V);
+        };
 
 
 
-		ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name,
+        ExpandFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V, std::string &Name,
 											   std::string &Description) -> bool {
 			return EntityDB_->GetNameAndDescription(F, V, Name, Description);
 		};
@@ -218,7 +223,6 @@ namespace OpenWifi {
 			[=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
 				[[maybe_unused]] std::string &Name,
 				[[maybe_unused]] std::string &Description) -> bool { return false; };
-
         ExpandFunc_[GLBLRAccountInfoDB_->Prefix()] =
                 [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
                     [[maybe_unused]] std::string &Name,
@@ -227,14 +231,16 @@ namespace OpenWifi {
                 [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
                     [[maybe_unused]] std::string &Name,
                     [[maybe_unused]] std::string &Description) -> bool { return false; };
-
         ExpandFunc_[GLBLRCertsDB_->Prefix()] =
                 [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
                     [[maybe_unused]] std::string &Name,
                     [[maybe_unused]] std::string &Description) -> bool { return false; };
+        ExpandFunc_[OrionAccountsDB_->Prefix()] =
+                [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
+                    [[maybe_unused]] std::string &Name,
+                    [[maybe_unused]] std::string &Description) -> bool { return false; };
 
-		InventoryDB_->InitializeSerialCache();
-
+        InventoryDB_->InitializeSerialCache();
 		ConsistencyCheck();
 		InitializeSystemDBs();
 

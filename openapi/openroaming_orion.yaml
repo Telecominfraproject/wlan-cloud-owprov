@@ -94,7 +94,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /openroaming/globalreach/account/{name}:
+  /openroaming/globalreach/account/{id}:
     get:
       tags:
         - OpenRoaming-Google Orion
