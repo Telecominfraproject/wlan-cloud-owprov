@@ -52,7 +52,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        if( !Utils::VerifyRSAKey(NewObject.privateKey)           ||
+        if( !Utils::VerifyECKey(NewObject.privateKey)           ||
             !Utils::ValidX509Certificate(NewObject.certificate) ||
             !Utils::ValidX509Certificate(NewObject.cacerts)) {
             return BadRequest(RESTAPI::Errors::NotAValidECKey);
