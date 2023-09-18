@@ -69,7 +69,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_openroaming_orion_acct_handler::DoPut() {
-        auto Account = GetBinding("account","");
+        auto Account = GetBinding("id","");
         if(Account.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
