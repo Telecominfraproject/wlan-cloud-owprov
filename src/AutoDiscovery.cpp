@@ -38,23 +38,33 @@ namespace OpenWifi {
 			auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
 			if (Msg != nullptr) {
 				try {
+                    DBGLINE
 					Poco::JSON::Parser Parser;
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
+                    DBGLINE
 
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
+                        DBGLINE
 						auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
 						std::string ConnectedIP, SerialNumber, DeviceType;
+                        DBGLINE
 						if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
+                            DBGLINE
 							ConnectedIP =
 								PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
 						if (PayloadObj->has(uCentralProtocol::CAPABILITIES)) {
+                            DBGLINE
 							auto CapObj = PayloadObj->getObject(uCentralProtocol::CAPABILITIES);
 							if (CapObj->has(uCentralProtocol::COMPATIBLE)) {
+                                DBGLINE
 								DeviceType = CapObj->get(uCentralProtocol::COMPATIBLE).toString();
 								SerialNumber = PayloadObj->get(uCentralProtocol::SERIAL).toString();
+                                DBGLINE
 							}
 						} else if (PayloadObj->has(uCentralProtocol::PING)) {
+                            DBGLINE
 							auto PingMessage = PayloadObj->getObject(uCentralProtocol::PING);
+                            DBGLINE
 							if (PingMessage->has(uCentralProtocol::FIRMWARE) &&
 								PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
 								PingMessage->has(uCentralProtocol::COMPATIBLE)) {
@@ -65,24 +75,36 @@ namespace OpenWifi {
 									PingMessage->get(uCentralProtocol::SERIALNUMBER).toString();
 								DeviceType =
 									PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
+                                DBGLINE
 							}
+                            DBGLINE
 						}
 						std::string Locale;
-						if (PayloadObj->has("locale"))
-							Locale = PayloadObj->get("locale").toString();
+						if (PayloadObj->has("locale")) {
+                            DBGLINE
+                            Locale = PayloadObj->get("locale").toString();
+                            DBGLINE
+                        }
 
 						if (!SerialNumber.empty()) {
+                            DBGLINE
 							StorageService()->InventoryDB().CreateFromConnection(
 								SerialNumber, ConnectedIP, DeviceType, Locale);
 						}
 					}
 				} catch (const Poco::Exception &E) {
+                    DBGLINE
 					Logger().log(E);
+                    DBGLINE
 				} catch (...) {
+                    DBGLINE
 				}
 			} else {
+                DBGLINE
 			}
+            DBGLINE
 			Note = Queue_.waitDequeueNotification();
+            DBGLINE
 		}
 	}
 
