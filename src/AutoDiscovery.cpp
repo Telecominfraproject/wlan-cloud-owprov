@@ -43,58 +43,62 @@ namespace OpenWifi {
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
                     DBGLINE
 
+                    std::cout << Msg->Payload() << std::endl;
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
                         DBGLINE
-						auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
-						std::string ConnectedIP, SerialNumber, DeviceType;
-                        DBGLINE
-						if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
+                        auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
+                        if (PayloadObj->has("ping")) {
+                            auto PingObj = PayloadObj->getObject("ping");
+                            std::string ConnectedIP, SerialNumber, DeviceType;
                             DBGLINE
-							ConnectedIP =
-								PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
-						if (PayloadObj->has(uCentralProtocol::CAPABILITIES)) {
-                            DBGLINE
-							auto CapObj = PayloadObj->getObject(uCentralProtocol::CAPABILITIES);
-							if (CapObj->has(uCentralProtocol::COMPATIBLE)) {
+                            if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
                                 DBGLINE
-								DeviceType = CapObj->get(uCentralProtocol::COMPATIBLE).toString();
-								SerialNumber = PayloadObj->get(uCentralProtocol::SERIAL).toString();
+                            ConnectedIP =
+                                    PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
+                            if (PayloadObj->has(uCentralProtocol::CAPABILITIES)) {
                                 DBGLINE
-							}
-						} else if (PayloadObj->has(uCentralProtocol::PING)) {
-                            DBGLINE
-							auto PingMessage = PayloadObj->getObject(uCentralProtocol::PING);
-                            DBGLINE
-							if (PingMessage->has(uCentralProtocol::FIRMWARE) &&
-								PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
-								PingMessage->has(uCentralProtocol::COMPATIBLE)) {
-								if (PingMessage->has(uCentralProtocol::CONNECTIONIP))
-									ConnectedIP =
-										PingMessage->get(uCentralProtocol::CONNECTIONIP).toString();
-								SerialNumber =
-									PingMessage->get(uCentralProtocol::SERIALNUMBER).toString();
-								DeviceType =
-									PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
+                                auto CapObj = PayloadObj->getObject(uCentralProtocol::CAPABILITIES);
+                                if (CapObj->has(uCentralProtocol::COMPATIBLE)) {
+                                    DBGLINE
+                                    DeviceType = CapObj->get(uCentralProtocol::COMPATIBLE).toString();
+                                    SerialNumber = PayloadObj->get(uCentralProtocol::SERIAL).toString();
+                                    DBGLINE
+                                }
+                            } else if (PayloadObj->has(uCentralProtocol::PING)) {
                                 DBGLINE
-							}
-                            DBGLINE
-						}
-						std::string Locale;
-						if (PayloadObj->has("locale")) {
-                            DBGLINE
-                            Locale = PayloadObj->get("locale").toString();
-                            DBGLINE
-                        }
+                                auto PingMessage = PayloadObj->getObject(uCentralProtocol::PING);
+                                DBGLINE
+                                if (PingMessage->has(uCentralProtocol::FIRMWARE) &&
+                                    PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
+                                    PingMessage->has(uCentralProtocol::COMPATIBLE)) {
+                                    if (PingMessage->has(uCentralProtocol::CONNECTIONIP))
+                                        ConnectedIP =
+                                                PingMessage->get(uCentralProtocol::CONNECTIONIP).toString();
+                                    SerialNumber =
+                                            PingMessage->get(uCentralProtocol::SERIALNUMBER).toString();
+                                    DeviceType =
+                                            PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
+                                    DBGLINE
+                                }
+                                DBGLINE
+                            }
+                            std::string Locale;
+                            if (PayloadObj->has("locale")) {
+                                DBGLINE
+                                Locale = PayloadObj->get("locale").toString();
+                                DBGLINE
+                            }
 
-						if (!SerialNumber.empty()) {
-                            DBGLINE
-							StorageService()->InventoryDB().CreateFromConnection(
-								SerialNumber, ConnectedIP, DeviceType, Locale);
-						}
-					}
+                            if (!SerialNumber.empty()) {
+                                DBGLINE
+                                StorageService()->InventoryDB().CreateFromConnection(
+                                        SerialNumber, ConnectedIP, DeviceType, Locale);
+                            }
+                        }
+                    }
 				} catch (const Poco::Exception &E) {
                     DBGLINE
-                    std::cout << Msg->Payload() << std::endl;
+                    std::cout << "EX:" << Msg->Payload() << std::endl;
 					Logger().log(E);
                     DBGLINE
 				} catch (...) {
