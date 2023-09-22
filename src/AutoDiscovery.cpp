@@ -94,6 +94,7 @@ namespace OpenWifi {
 					}
 				} catch (const Poco::Exception &E) {
                     DBGLINE
+                    std::cout << Msg->Payload() << std::endl;
 					Logger().log(E);
                     DBGLINE
 				} catch (...) {
