@@ -71,14 +71,11 @@ namespace OpenWifi {
 			auto Msg = dynamic_cast<DiscoveryMessage *>(Note.get());
 			if (Msg != nullptr) {
 				try {
-                    DBGLINE
 					Poco::JSON::Parser Parser;
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
-                    DBGLINE
 
                     std::cout << Msg->Payload() << std::endl;
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
-                        DBGLINE
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
                         std::string ConnectedIP, SerialNumber, Compatible, Firmware, Locale ;
                         if (PayloadObj->has(uCentralProtocol::PING)) {
@@ -86,28 +83,23 @@ namespace OpenWifi {
                             ProcessPing(PingObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
                         } else if(PayloadObj->has("capabilities")) {
                             ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
+                        } else {
+                            std::cout << Msg->Payload() << std::endl;
                         }
 
                         if (!SerialNumber.empty()) {
-                            DBGLINE
                             StorageService()->InventoryDB().CreateFromConnection(
                                     SerialNumber, ConnectedIP, Compatible, Locale);
                         }
                     }
 				} catch (const Poco::Exception &E) {
-                    DBGLINE
                     std::cout << "EX:" << Msg->Payload() << std::endl;
 					Logger().log(E);
-                    DBGLINE
 				} catch (...) {
-                    DBGLINE
 				}
 			} else {
-                DBGLINE
 			}
-            DBGLINE
 			Note = Queue_.waitDequeueNotification();
-            DBGLINE
 		}
 	}
 
