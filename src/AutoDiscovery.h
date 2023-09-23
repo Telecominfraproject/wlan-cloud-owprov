@@ -51,6 +51,8 @@ namespace OpenWifi {
                                         std::string &Compat, std::string &Conn, std::string &locale) ;
         void ProcessConnect(const Poco::JSON::Object::Ptr & P, std::string &FW, std::string &SN,
                          std::string &Compat, std::string &Conn, std::string &locale) ;
+        void ProcessDisconnect(const Poco::JSON::Object::Ptr & P, std::string &FW, std::string &SN,
+                            std::string &Compat, std::string &Conn, std::string &locale) ;
 
         AutoDiscovery() noexcept
 			: SubSystemServer("AutoDiscovery", "AUTO-DISCOVERY", "discovery") {}

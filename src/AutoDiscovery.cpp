@@ -64,7 +64,16 @@ namespace OpenWifi {
         }
     }
 
-	void AutoDiscovery::run() {
+    void AutoDiscovery::ProcessDisconnect(const Poco::JSON::Object::Ptr &P, [[maybe_unused]] std::string &FW,
+                                            std::string &SN,
+                                          [[maybe_unused]] std::string &Compat,
+                                          [[maybe_unused]] std::string &Conn,
+                                          [[maybe_unused]] std::string &locale) {
+        if (P->has(uCentralProtocol::SERIALNUMBER))
+            SN = P->get(uCentralProtocol::SERIALNUMBER).toString();
+    }
+
+    void AutoDiscovery::run() {
 		Poco::AutoPtr<Poco::Notification> Note(Queue_.waitDequeueNotification());
 		Utils::SetThreadName("auto-discovery");
 		while (Note && Running_) {
@@ -73,6 +82,7 @@ namespace OpenWifi {
 				try {
 					Poco::JSON::Parser Parser;
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
+                    bool    Connected=true;
 
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
@@ -82,11 +92,15 @@ namespace OpenWifi {
                             ProcessPing(PingObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
                         } else if(PayloadObj->has("capabilities")) {
                             ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
+                        } else if(PayloadObj->has("disconnection")) {
+                            //  we ignore disconnection in provisioning
+                            Connected=false;
+                            ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
                         } else {
-                            std::cout << Msg->Payload() << std::endl;
+                            poco_debug(Logger(),fmt::format("Unknown message on 'connection' topic: {}",Msg->Payload()));
                         }
 
-                        if (!SerialNumber.empty()) {
+                        if (!SerialNumber.empty() && Connected) {
                             StorageService()->InventoryDB().CreateFromConnection(
                                     SerialNumber, ConnectedIP, Compatible, Locale);
                         }
