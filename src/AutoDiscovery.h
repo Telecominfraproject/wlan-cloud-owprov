@@ -9,6 +9,7 @@
 
 #include "Poco/Notification.h"
 #include "Poco/NotificationQueue.h"
+#include "Poco/JSON/Object.h"
 
 namespace OpenWifi {
 
@@ -46,7 +47,12 @@ namespace OpenWifi {
 		Poco::Thread Worker_;
 		std::atomic_bool Running_ = false;
 
-		AutoDiscovery() noexcept
+        void ProcessPing(const Poco::JSON::Object::Ptr & P, std::string &FW, std::string &SN,
+                                        std::string &Compat, std::string &Conn, std::string &locale) ;
+        void ProcessConnect(const Poco::JSON::Object::Ptr & P, std::string &FW, std::string &SN,
+                         std::string &Compat, std::string &Conn, std::string &locale) ;
+
+        AutoDiscovery() noexcept
 			: SubSystemServer("AutoDiscovery", "AUTO-DISCOVERY", "discovery") {}
 	};
 
