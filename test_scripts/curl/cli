@@ -617,6 +617,51 @@ getsystemconfiguration() {
     jq < ${result_file}
 }
 
+creategraccount() {
+    payload="{ \"name\" : \"Test account\" , \"country\" : \"CA\", \"province\" : \"BC\" , \"city\" : \"Vancouver\", \"organization\" : \"Arilia Wireless Inc.\", \"commonName\" : \"arilia.com\", \"GlobalReachAcctId\" : \"bd63aaa7-b14d-4cdb-85ae-8de6cf2cfa31\", \"privateKey\" : \"-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgl1FpARtuOtw1F9sR2DD82jh6sZFGRn619IY0rmNIFEuhRANCAATB7ji6OF/+heGRCocgVNhw4QGvaL9Kp8F6ZqqZ3aMewRMOfzi3TQaXN12FNBsvXnptx5vk8GAzZk6UAzzvMBVK\n-----END PRIVATE KEY-----\" }"
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/openroaming/globalreach/account/0" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
+getgraccount() {
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/openroaming/globalreach/account/$1" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
+deletegraccount() {
+    curl    ${FLAGS} -X DELETE "https://${OWPROV}/api/v1/openroaming/globalreach/account/$1" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
+getgraccounts() {
+    curl    ${FLAGS} -X GET "https://${OWPROV}/api/v1/openroaming/globalreach/accounts" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" > ${result_file}
+    jq < ${result_file}
+}
+
+creategrcert() {
+    payload="{ \"name\" : \"$2\" }"
+    curl    ${FLAGS} -X POST "https://${OWPROV}/api/v1/openroaming/globalreach/certificate/$1/0" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Accept: application/json" \
+        -d "$payload"  > ${result_file}
+    jq < ${result_file}
+
+}
+
 shopt -s nocasematch
 case "$1" in
     "login") login; echo "You are logged in..."  ; logout ;;
@@ -673,6 +718,11 @@ case "$1" in
     "deleteoverride") login; deleteoverride "$2"; logout;;
     "venueupgraderevisions") login; venueupgraderevisions "$2"; logout;;
     "getsystemconfiguration") login; getsystemconfiguration "$2"; logout;;
+    "creategraccount") login; creategraccount ; logout;;
+    "getgraccount") login; getgraccount "$2"; logout;;
+    "getgraccounts") login; getgraccounts ; logout;;
+    "creategrcert") login; creategrcert "$2" "$3"; logout;;
+    "deletegraccount") login; deletegraccount "$2"; logout;;
     "getvenuesperrrm") login; getvenuesperrrm "$2"; logout;;
     *) help ;;
 esac

@@ -31,7 +31,49 @@ namespace OpenWifi {
 		poco_information(Logger(), "Stopped...");
 	};
 
-	void AutoDiscovery::run() {
+    void AutoDiscovery::ProcessPing(const Poco::JSON::Object::Ptr & P, std::string &FW, std::string &SN,
+                                    std::string &Compat, std::string &Conn, std::string &locale) {
+        if (P->has(uCentralProtocol::CONNECTIONIP))
+            Conn = P->get(uCentralProtocol::CONNECTIONIP).toString();
+        if (P->has(uCentralProtocol::FIRMWARE))
+            FW = P->get(uCentralProtocol::FIRMWARE).toString();
+        if (P->has(uCentralProtocol::SERIALNUMBER))
+            SN = P->get(uCentralProtocol::SERIALNUMBER).toString();
+        if (P->has(uCentralProtocol::COMPATIBLE))
+            Compat = P->get(uCentralProtocol::COMPATIBLE).toString();
+        if (P->has("locale")) {
+            locale = P->get("locale").toString();
+        }
+    }
+
+    void AutoDiscovery::ProcessConnect(const Poco::JSON::Object::Ptr &P, std::string &FW, std::string &SN,
+                                       std::string &Compat, std::string &Conn, std::string &locale) {
+        if (P->has(uCentralProtocol::CONNECTIONIP))
+            Conn = P->get(uCentralProtocol::CONNECTIONIP).toString();
+        if (P->has(uCentralProtocol::FIRMWARE))
+            FW = P->get(uCentralProtocol::FIRMWARE).toString();
+        if (P->has(uCentralProtocol::SERIALNUMBER))
+            SN = P->get(uCentralProtocol::SERIALNUMBER).toString();
+        if (P->has("locale")) {
+            locale = P->get("locale").toString();
+        }
+        if(P->has(uCentralProtocol::CAPABILITIES)) {
+            auto CapObj = P->getObject(uCentralProtocol::CAPABILITIES);
+            if (CapObj->has(uCentralProtocol::COMPATIBLE))
+                Compat = CapObj->get(uCentralProtocol::COMPATIBLE).toString();
+        }
+    }
+
+    void AutoDiscovery::ProcessDisconnect(const Poco::JSON::Object::Ptr &P, [[maybe_unused]] std::string &FW,
+                                            std::string &SN,
+                                          [[maybe_unused]] std::string &Compat,
+                                          [[maybe_unused]] std::string &Conn,
+                                          [[maybe_unused]] std::string &locale) {
+        if (P->has(uCentralProtocol::SERIALNUMBER))
+            SN = P->get(uCentralProtocol::SERIALNUMBER).toString();
+    }
+
+    void AutoDiscovery::run() {
 		Poco::AutoPtr<Poco::Notification> Note(Queue_.waitDequeueNotification());
 		Utils::SetThreadName("auto-discovery");
 		while (Note && Running_) {
@@ -40,43 +82,31 @@ namespace OpenWifi {
 				try {
 					Poco::JSON::Parser Parser;
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
+                    bool    Connected=true;
 
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
-						auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
-						std::string ConnectedIP, SerialNumber, DeviceType;
-						if (PayloadObj->has(uCentralProtocol::CONNECTIONIP))
-							ConnectedIP =
-								PayloadObj->get(uCentralProtocol::CONNECTIONIP).toString();
-						if (PayloadObj->has(uCentralProtocol::CAPABILITIES)) {
-							auto CapObj = PayloadObj->getObject(uCentralProtocol::CAPABILITIES);
-							if (CapObj->has(uCentralProtocol::COMPATIBLE)) {
-								DeviceType = CapObj->get(uCentralProtocol::COMPATIBLE).toString();
-								SerialNumber = PayloadObj->get(uCentralProtocol::SERIAL).toString();
-							}
-						} else if (PayloadObj->has(uCentralProtocol::PING)) {
-							auto PingMessage = PayloadObj->getObject(uCentralProtocol::PING);
-							if (PingMessage->has(uCentralProtocol::FIRMWARE) &&
-								PingMessage->has(uCentralProtocol::SERIALNUMBER) &&
-								PingMessage->has(uCentralProtocol::COMPATIBLE)) {
-								if (PingMessage->has(uCentralProtocol::CONNECTIONIP))
-									ConnectedIP =
-										PingMessage->get(uCentralProtocol::CONNECTIONIP).toString();
-								SerialNumber =
-									PingMessage->get(uCentralProtocol::SERIALNUMBER).toString();
-								DeviceType =
-									PingMessage->get(uCentralProtocol::COMPATIBLE).toString();
-							}
-						}
-						std::string Locale;
-						if (PayloadObj->has("locale"))
-							Locale = PayloadObj->get("locale").toString();
+                        auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
+                        std::string ConnectedIP, SerialNumber, Compatible, Firmware, Locale ;
+                        if (PayloadObj->has(uCentralProtocol::PING)) {
+                            auto PingObj = PayloadObj->getObject("ping");
+                            ProcessPing(PingObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
+                        } else if(PayloadObj->has("capabilities")) {
+                            ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
+                        } else if(PayloadObj->has("disconnection")) {
+                            //  we ignore disconnection in provisioning
+                            Connected=false;
+                            ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
+                        } else {
+                            poco_debug(Logger(),fmt::format("Unknown message on 'connection' topic: {}",Msg->Payload()));
+                        }
 
-						if (!SerialNumber.empty()) {
-							StorageService()->InventoryDB().CreateFromConnection(
-								SerialNumber, ConnectedIP, DeviceType, Locale);
-						}
-					}
+                        if (!SerialNumber.empty() && Connected) {
+                            StorageService()->InventoryDB().CreateFromConnection(
+                                    SerialNumber, ConnectedIP, Compatible, Locale);
+                        }
+                    }
 				} catch (const Poco::Exception &E) {
+                    std::cout << "EX:" << Msg->Payload() << std::endl;
 					Logger().log(E);
 				} catch (...) {
 				}

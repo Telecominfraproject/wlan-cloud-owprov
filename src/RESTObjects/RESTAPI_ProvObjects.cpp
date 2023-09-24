@@ -1194,4 +1194,89 @@ namespace OpenWifi::ProvObjects {
 		return false;
 	}
 
+    void GLBLRAccountInfo::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json(Obj, "privateKey", privateKey);
+        field_to_json(Obj, "country", country);
+        field_to_json(Obj, "province", province);
+        field_to_json(Obj, "city", city);
+        field_to_json(Obj, "organization", organization);
+        field_to_json(Obj, "commonName", commonName);
+        field_to_json(Obj, "CSR", CSR);
+        field_to_json(Obj, "CSRPrivateKey", CSRPrivateKey);
+        field_to_json(Obj, "CSRPublicKey", CSRPublicKey);
+        field_to_json(Obj, "GlobalReachAcctId", GlobalReachAcctId);
+    }
+
+    bool GLBLRAccountInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json(Obj, "privateKey", privateKey);
+            field_from_json(Obj, "country", country);
+            field_from_json(Obj, "province", province);
+            field_from_json(Obj, "city", city);
+            field_from_json(Obj, "organization", organization);
+            field_from_json(Obj, "commonName", commonName);
+            field_from_json(Obj, "CSR", CSR);
+            field_from_json(Obj, "CSRPrivateKey", CSRPrivateKey);
+            field_from_json(Obj, "CSRPublicKey", CSRPublicKey);
+            field_from_json(Obj, "GlobalReachAcctId", GlobalReachAcctId);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    void GLBLRCertificateInfo::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj, "id", id);
+        field_to_json(Obj, "name", name);
+        field_to_json(Obj, "accountId", accountId);
+        field_to_json(Obj, "csr", csr);
+        field_to_json(Obj, "certificate", certificate);
+        field_to_json(Obj, "certificateChain", certificateChain);
+        field_to_json(Obj, "certificateId", certificateId);
+        field_to_json(Obj, "expiresAt", expiresAt);
+        field_to_json(Obj, "created", created);
+    }
+
+    bool GLBLRCertificateInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj, "id", id);
+            field_from_json(Obj, "name", name);
+            field_from_json(Obj, "accountId", accountId);
+            field_from_json(Obj, "csr", csr);
+            field_from_json(Obj, "certificate", certificate);
+            field_from_json(Obj, "certificateChain", certificateChain);
+            field_from_json(Obj, "certificateId", certificateId);
+            field_from_json(Obj, "expiresAt", expiresAt);
+            field_from_json(Obj, "created", created);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    void GooglOrionAccountInfo::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json(Obj, "privateKey", privateKey);
+        field_to_json(Obj, "certificate", certificate);
+        field_to_json(Obj, "cacerts", cacerts);
+    }
+
+    bool GooglOrionAccountInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json(Obj, "privateKey", privateKey);
+            field_from_json(Obj, "certificate", certificate);
+            field_from_json(Obj, "cacerts", cacerts);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+
 } // namespace OpenWifi::ProvObjects

@@ -37,7 +37,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     string(REGEX REPLACE "\n$" "" GIT_HASH "${GIT_HASH}")
 endif()
 
-add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT)
+add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT -DBOOST_NO_CXX98_FUNCTION_BASE=1)
 
 find_package(OpenSSL    REQUIRED)
 find_package(ZLIB       REQUIRED)
@@ -209,7 +209,7 @@ add_executable(owprov
         src/ProvWebSocketClient.cpp src/ProvWebSocketClient.h
         src/Tasks/VenueRebooter.h src/Tasks/VenueUpgrade.h
         src/sdks/SDK_fms.cpp src/sdks/SDK_fms.h
-        src/RESTAPI/RESTAPI_overrides_handler.cpp src/RESTAPI/RESTAPI_overrides_handler.h)
+        src/RESTAPI/RESTAPI_overrides_handler.cpp src/RESTAPI/RESTAPI_overrides_handler.h src/OpenRoamin_GlobalReach.cpp src/OpenRoamin_GlobalReach.h src/storage/storage_glblraccounts.cpp src/storage/storage_glblraccounts.h src/storage/storage_glblrcerts.cpp src/storage/storage_glblrcerts.h src/RESTAPI/RESTAPI_openroaming_gr_list_acct_handler.cpp src/RESTAPI/RESTAPI_openroaming_gr_list_acct_handler.h src/RESTAPI/RESTAPI_openroaming_gr_acct_handler.cpp src/RESTAPI/RESTAPI_openroaming_gr_acct_handler.h src/RESTAPI/RESTAPI_openroaming_gr_list_certificates.cpp src/RESTAPI/RESTAPI_openroaming_gr_list_certificates.h src/RESTAPI/RESTAPI_openroaming_gr_cert_handler.cpp src/RESTAPI/RESTAPI_openroaming_gr_cert_handler.h src/RESTAPI/RESTAPI_openroaming_orion_list_acct_handler.cpp src/RESTAPI/RESTAPI_openroaming_orion_list_acct_handler.h src/RESTAPI/RESTAPI_openroaming_orion_acct_handler.cpp src/RESTAPI/RESTAPI_openroaming_orion_acct_handler.h src/storage/storage_orion_accounts.cpp src/storage/storage_orion_accounts.h)
 
 target_link_libraries(owprov PUBLIC
         ${Poco_LIBRARIES}
