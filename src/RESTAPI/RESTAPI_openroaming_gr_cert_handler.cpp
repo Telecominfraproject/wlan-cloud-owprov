@@ -19,7 +19,7 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        std::vector<ProvObjects::GLBLRCertificateInfo>  Certificates;
+        std::vector<RecordType>  Certificates;
         DB_.GetRecords(0,1,Certificates,fmt::format(" accountId='{}' and id='{}' ", Account, Id));
         if(Certificates.empty()) {
             return NotFound();
@@ -51,7 +51,7 @@ namespace OpenWifi {
         }
 
         const auto &RawObject = ParsedBody_;
-        ProvObjects::GLBLRCertificateInfo   NewObject;
+        RecordType   NewObject;
         if( !NewObject.from_json(RawObject)) {
             return BadRequest(OpenWifi::RESTAPI::Errors::InvalidJSONDocument);
         }
@@ -71,7 +71,7 @@ namespace OpenWifi {
             NewObject.created = Utils::Now();
             NewObject.csr = AccountInfo.CSR;
             DB_.CreateRecord(NewObject);
-            ProvObjects::GLBLRCertificateInfo   CreatedObject;
+            RecordType   CreatedObject;
             DB_.GetRecord("id",NewObject.id,CreatedObject);
             return ReturnObject(CreatedObject);
         }

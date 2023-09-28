@@ -12,7 +12,7 @@ namespace OpenWifi {
             return ReturnCountOnly(DB_.Count());
         }
 
-        std::vector<ProvObjects::RADIUSEndPoint>    Records;
+        std::vector<RecordType>    Records;
         if(DB_.GetRecords(QB_.Offset,QB_.Limit,Records)) {
             return ReturnObject(Records);
         }

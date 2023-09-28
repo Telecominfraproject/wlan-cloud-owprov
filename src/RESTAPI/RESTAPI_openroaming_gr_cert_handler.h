@@ -21,6 +21,7 @@ namespace OpenWifi {
         static auto PathName() { return std::list<std::string>{"/api/v1/openroaming/globalreach/certificate/{account}/{id}"}; };
 
     private:
+        using RecordType = ProvObjects::GLBLRCertificateInfo;
         GLBLRCertsDB &DB_ = StorageService()->GLBLRCertsDB();
         void DoGet() final;
         void DoPost() final;

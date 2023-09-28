@@ -13,7 +13,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        ProvObjects::GooglOrionAccountInfo   Record;
+        RecordType   Record;
         if(DB_.GetRecord("id",Account,Record)) {
             return ReturnObject(Record);
         }
@@ -26,7 +26,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        ProvObjects::GooglOrionAccountInfo   Record;
+        RecordType   Record;
         if(!DB_.GetRecord("id",Account,Record)) {
             return NotFound();
         }
@@ -41,7 +41,7 @@ namespace OpenWifi {
         }
 
         const auto &RawObject = ParsedBody_;
-        ProvObjects::GooglOrionAccountInfo    NewObject;
+        RecordType    NewObject;
         if( !NewObject.from_json(RawObject)) {
             return BadRequest(OpenWifi::RESTAPI::Errors::InvalidJSONDocument);
         }
@@ -61,7 +61,7 @@ namespace OpenWifi {
         ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewObject.info);
 
         if(DB_.CreateRecord(NewObject)) {
-            ProvObjects::GooglOrionAccountInfo StoredObject;
+            RecordType StoredObject;
             DB_.GetRecord("id",NewObject.info.id,StoredObject);
             return ReturnObject(StoredObject);
         }
@@ -75,12 +75,12 @@ namespace OpenWifi {
         }
 
         const auto &RawObject = ParsedBody_;
-        ProvObjects::GLBLRAccountInfo    Modify;
+        RecordType    Modify;
         if(!Modify.from_json(RawObject)) {
             return BadRequest(OpenWifi::RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        ProvObjects::GooglOrionAccountInfo    Existing;
+        RecordType    Existing;
         if(!DB_.GetRecord("id",Account,Existing)) {
             return NotFound();
         }
@@ -90,7 +90,7 @@ namespace OpenWifi {
         }
 
         if(DB_.UpdateRecord("id",Existing.info.id,Existing)) {
-            ProvObjects::GooglOrionAccountInfo StoredObject;
+            RecordType StoredObject;
             DB_.GetRecord("id",Existing.info.id,StoredObject);
             return ReturnObject(StoredObject);
         }

@@ -22,6 +22,7 @@ namespace OpenWifi {
         static auto PathName() { return std::list<std::string>{"/api/v1/openroaming/globalreach/account/{id}"}; };
 
     private:
+        using RecordType = ProvObjects::GLBLRAccountInfo;
         GLBLRAccountInfoDB &DB_ = StorageService()->GLBLRAccountInfoDB();
         void DoGet() final;
         void DoPost() final;

@@ -19,6 +19,7 @@ namespace OpenWifi {
         static auto PathName() { return std::list<std::string>{"/api/v1/openroaming/orion/accounts"}; };
 
     private:
+        using RecordType = ProvObjects::GooglOrionAccountInfo;
         OrionAccountsDB &DB_ = StorageService()->OrionAccountsDB();
         void DoGet() final;
         void DoPost() final{};

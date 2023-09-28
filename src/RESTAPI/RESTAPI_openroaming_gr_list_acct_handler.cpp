@@ -12,7 +12,7 @@ namespace OpenWifi {
             return ReturnCountOnly(DB_.Count());
         }
 
-        std::vector<ProvObjects::GLBLRAccountInfo>  Accounts;
+        std::vector<RecordType>  Accounts;
         DB_.GetRecords(QB_.Offset,QB_.Limit,Accounts);
         return ReturnObject(Accounts);
     }

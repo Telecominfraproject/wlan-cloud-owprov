@@ -19,6 +19,7 @@ namespace OpenWifi {
         static auto PathName() { return std::list<std::string>{"/api/v1/RADIUSEndPoints"}; };
 
     private:
+        using RecordType = ProvObjects::RADIUSEndPoint;
         RadiusEndpointDB &DB_ = StorageService()->RadiusEndpointDB();
         void DoGet() final;
         void DoPost() final{};
