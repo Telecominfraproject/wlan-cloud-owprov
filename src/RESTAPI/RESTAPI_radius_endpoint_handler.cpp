@@ -6,11 +6,11 @@
 
 namespace OpenWifi {
     static inline bool ValidEndpointTypes(const std::string &T) {
-        return T=="radius" || T=="radsec";
+        return T=="radius" || T=="radsec" || T=="globalreach" || T=="orion";
     }
 
     static inline bool ValidPoolStrategy(const std::string &T) {
-        return T=="none" || T=="tandom" || T=="weighted";
+        return T=="none" || T=="random" || T=="weighted";
     }
 
     void RESTAPI_radius_endpoint_handler::DoGet() {

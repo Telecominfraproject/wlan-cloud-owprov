@@ -92,12 +92,6 @@ components:
         AllowSelfSigned:
           type: boolean
           default: false
-        PoolType:
-          type: string
-          enum:
-            - globalreach
-            - orion
-            - generic
 
     RADIUSEndPoint:
       type: object
@@ -109,6 +103,8 @@ components:
           enum:
             - radius
             - radsec
+            - globalreach
+            - orion
           default: radius
         RadsecServers:
           type: array
@@ -130,7 +126,7 @@ components:
         Index:
           type: string
           example:
-            - 0.0.1.0: a ficticious IP address that should begin with 0.0. ...
+            - 0.0.1.1: a ficticious IP address that should be between 0.0.1.1 and 0.0.2.254
         UsedBy:
           type: array
           description: list of configuration using this endpoint
