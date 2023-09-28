@@ -414,10 +414,12 @@ namespace OpenWifi::RESTAPI::Errors {
     };
 
     static const struct msg DefFirmwareNameExists { 1175, "Firmware name already exists." };
-
     static const struct msg NotAValidECKey { 1176, "Not a valid Signing Key." };
-
 	static const struct msg NotAValidRadiusPoolType { 1177, "Not a valid RADIUS pool type." };
+    static const struct msg InvalidRadiusTypeEndpoint { 1178, "Invalid RADIUS Server Endpoint type." };
+    static const struct msg InvalidRadiusEndpointPoolStrategy { 1179, "Invalid RADIUS Server Endpoint Pool strategy." };
+    static const struct msg EndpointMustHaveOneTypeOfServers { 1180, "All servers must be either RADIUS or RADSEC." };
+    static const struct msg RadiusEndpointIndexInvalid { 1181, "Index must be an address between 0.0.1.1 and 0.0.2.254" };
 
     static const struct msg SimulationDoesNotExist {
         7000, "Simulation Instance ID does not exist."

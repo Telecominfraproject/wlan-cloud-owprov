@@ -5,6 +5,14 @@
 #include "RESTAPI_radius_endpoint_handler.h"
 
 namespace OpenWifi {
+    static inline bool ValidEndpointTypes(const std::string &T) {
+        return T=="radius" || T=="radsec";
+    }
+
+    static inline bool ValidPoolStrategy(const std::string &T) {
+        return T=="none" || T=="tandom" || T=="weighted";
+    }
+
     void RESTAPI_radius_endpoint_handler::DoGet() {
         auto id = GetBinding("id");
         if(id.empty()) {
@@ -42,6 +50,19 @@ namespace OpenWifi {
         RecordType     NewRecord;
         if(!NewRecord.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
+        if(!ValidEndpointTypes(NewRecord.Type)) {
+            return BadRequest(RESTAPI::Errors::InvalidRadiusTypeEndpoint);
+        }
+        if(!ValidPoolStrategy(NewRecord.PoolStrategy)) {
+            return BadRequest(RESTAPI::Errors::InvalidRadiusEndpointPoolStrategy);
+        }
+        if(!NewRecord.RadiusServers.empty() && !NewRecord.RadsecServers.empty()) {
+            return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
+        }
+        if(NewRecord.Index.empty()) {
+            return BadRequest(RESTAPI::Errors::RadiusEndpointIndexInvalid);
         }
 
         ProvObjects::CreateObjectInfo(RawObject,UserInfo_.userinfo,NewRecord.info);
