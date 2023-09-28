@@ -38,4 +38,9 @@ namespace OpenWifi::SDK::GW {
 						  const std::string &entity, const std::string &venue,
 						  const std::string &subscriber);
 	} // namespace Device
+    namespace RADIUS {
+        bool GetConfiguration(RESTAPIHandler *client, GWObjects::RadiusProxyPoolList &Pools);
+        bool SetConfiguration(RESTAPIHandler *client, const GWObjects::RadiusProxyPoolList &Pools,
+                              GWObjects::RadiusProxyPoolList &NewPools);
+    }
 } // namespace OpenWifi::SDK::GW

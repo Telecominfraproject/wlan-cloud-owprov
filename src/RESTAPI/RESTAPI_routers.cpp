@@ -41,6 +41,8 @@
 #include "RESTAPI/RESTAPI_openroaming_gr_list_certificates.h"
 #include "RESTAPI/RESTAPI_openroaming_orion_acct_handler.h"
 #include "RESTAPI/RESTAPI_openroaming_orion_list_acct_handler.h"
+#include "RESTAPI/RESTAPI_radiusendpoint_list_handler.h"
+#include "RESTAPI/RESTAPI_radius_endpoint_handler.h"
 
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
@@ -69,7 +71,8 @@ namespace OpenWifi {
 			RESTAPI_op_location_list_handler, RESTAPI_asset_server, RESTAPI_overrides_handler,
             RESTAPI_openroaming_gr_acct_handler, RESTAPI_openroaming_gr_list_acct_handler,
             RESTAPI_openroaming_gr_cert_handler, RESTAPI_openroaming_gr_list_certificates,
-            RESTAPI_openroaming_orion_acct_handler, RESTAPI_openroaming_orion_list_acct_handler>(
+            RESTAPI_openroaming_orion_acct_handler, RESTAPI_openroaming_orion_list_acct_handler,
+            RESTAPI_radiusendpoint_list_handler, RESTAPI_radius_endpoint_handler>(
 			Path, Bindings, L, S, TransactionId);
 	}
 
@@ -94,7 +97,8 @@ namespace OpenWifi {
 			RESTAPI_op_location_list_handler, RESTAPI_overrides_handler,
             RESTAPI_openroaming_gr_acct_handler, RESTAPI_openroaming_gr_list_acct_handler,
             RESTAPI_openroaming_gr_cert_handler, RESTAPI_openroaming_gr_list_certificates,
-            RESTAPI_openroaming_orion_acct_handler, RESTAPI_openroaming_orion_list_acct_handler>(Path, Bindings, L, S,
-																		 TransactionId);
+            RESTAPI_openroaming_orion_acct_handler, RESTAPI_openroaming_orion_list_acct_handler,
+            RESTAPI_radiusendpoint_list_handler, RESTAPI_radius_endpoint_handler>(
+                    Path, Bindings, L, S,TransactionId);
 	}
 } // namespace OpenWifi

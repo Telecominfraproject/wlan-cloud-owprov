@@ -31,6 +31,7 @@
 #include "storage/storage_glblraccounts.h"
 #include "storage/storage_glblrcerts.h"
 #include "storage/storage_orion_accounts.h"
+#include "storage/storage_radius_endpoints.h"
 
 #include "Poco/URI.h"
 #include "framework/ow_constants.h"
@@ -72,6 +73,7 @@ namespace OpenWifi {
         inline OpenWifi::GLBLRAccountInfoDB &GLBLRAccountInfoDB() { return *GLBLRAccountInfoDB_; }
         inline OpenWifi::GLBLRCertsDB &GLBLRCertsDB() { return *GLBLRCertsDB_; }
         inline OpenWifi::OrionAccountsDB &OrionAccountsDB() { return *OrionAccountsDB_; }
+        inline OpenWifi::RadiusEndpointDB &RadiusEndpointDB() { return *RadiusEndpointDB_; }
 
 		bool Validate(const Poco::URI::QueryParameters &P, RESTAPI::Errors::msg &Error);
 		bool Validate(const Types::StringVec &P, std::string &Error);
@@ -134,6 +136,7 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::GLBLRAccountInfoDB> GLBLRAccountInfoDB_;
         std::unique_ptr<OpenWifi::GLBLRCertsDB> GLBLRCertsDB_;
         std::unique_ptr<OpenWifi::OrionAccountsDB> OrionAccountsDB_;
+        std::unique_ptr<OpenWifi::RadiusEndpointDB> RadiusEndpointDB_;
 		std::string DefaultOperator_;
 
 		typedef std::function<bool(const char *FieldName, std::string &Value)> exist_func;

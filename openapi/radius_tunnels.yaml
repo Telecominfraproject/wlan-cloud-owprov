@@ -1,0 +1,284 @@
+openapi: 3.0.1
+info:
+  title: OpenWiFi RADIUS Resource Model
+  description: Definitions and APIs to manage RADIUS Resources.
+  version: 1.0.0
+  license:
+    name: BSD3
+    url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
+
+servers:
+  - url: 'https://localhost:16005/api/v1'
+
+security:
+  - bearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/NotFound'
+    Unauthorized:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Unauthorized'
+    Success:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/Success'
+    BadRequest:
+      $ref: 'https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml#/components/responses/BadRequest'
+
+  schemas:
+
+    RADIUSServer:
+      type: object
+      properties:
+        Hostname:
+          type: string
+        IP:
+          type: string
+        Port:
+          type: integer
+          format: int32
+        Secret:
+          type: string
+
+    RADIUSEndPointRadiusType:
+      type: object
+      properties:
+        Authentication:
+          $ref: '#/components/schemas/RADIUSServer'
+        Accounting:
+          $ref: '#/components/schemas/RADIUSServer'
+        CoA:
+          $ref: '#/components/schemas/RADIUSServer'
+        AccountingInterval:
+          type: integer
+          format: int32
+
+    RADIUSEndPointRadsecType:
+      type: object
+      properties:
+        Hostname:
+          type: string
+        IP:
+          type: string
+        Port:
+          type: string
+        Secret:
+          type: string
+          default: radsec
+        UseOpenRoamingAccount:
+          type: string
+          format: uuid
+        Weight:
+          type: integer
+          format: int32
+        Certificate:
+          type: string
+        PrivateKey:
+          type: string
+        CaCerts:
+          type: array
+          items:
+            type: string
+        AllowSelfSigned:
+          type: boolean
+          default: false
+        PoolType:
+          type: string
+          enum:
+            - globalreach
+            - orion
+            - generic
+
+    RADIUSEndPoint:
+      type: object
+      properties:
+        allOf:
+          $ref: 'https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/openpapi/owprov.yaml#/components/schemas/ObjectInfo'
+        Type:
+          type: string
+          enum:
+            - radius
+            - radsec
+          default: radius
+        RadsecServers:
+          type: array
+          items:
+            $ref: '#/components/schemas/RADIUSEndPointRadsecType'
+        RadiusServers:
+          type: array
+          items:
+            $ref: '#/components/schemas/RADIUSEndPointRadiusType'
+        PoolStrategy:
+          type: string
+          enum:
+            - none
+            - weighted
+            - random
+        UseGWProxy:
+          type: boolean
+          default: true
+        Index:
+          type: string
+          example:
+            - 0.0.1.0: a ficticious IP address that should begin with 0.0. ...
+        UsedBy:
+          type: array
+          description: list of configuration using this endpoint
+          items:
+            type: string
+            format: uuid
+
+paths:
+  /RADIUSEndPoints:
+    get:
+      tags:
+        - RADIUS Endpoints
+      operationId: getRADIUSEndPoints
+      summary: Retrieve the lists of RADIUSendPoints
+      parameters:
+        - in: query
+          description: Pagination start (starts at 1. If not specified, 1 is assumed)
+          name: offset
+          schema:
+          type: integer
+          required: false
+        - in: query
+          description: Maximum number of entries to return (if absent, no limit is assumed)
+          name: limit
+          schema:
+          type: integer
+          required: false
+        - in: query
+          description: return the number of certificates
+          name: countOnly
+          schema:
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: The list of endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RADIUSEndPoint'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /RADIUSEndPoint/{id}:
+    get:
+      tags:
+        - RADIUS Endpoints
+      operationId: getRADIUSEndPoint
+      summary: Retrieve a RADIUSendPoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: The endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RADIUSEndPoint'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - RADIUS Endpoints
+      operationId: deleteRADIUSEndPoint
+      summary: Delete a RADIUSendPoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - RADIUS Endpoints
+      operationId: createRADIUSEndPoint
+      summary: Create a RADIUSendPoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RADIUSEndPoint'
+      responses:
+        200:
+          $ref: '#/components/schemas/RADIUSEndPoint'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - RADIUS Endpoints
+      operationId: modifyRADIUSEndPoint
+      summary: Modify a RADIUSendPoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RADIUSEndPoint'
+      responses:
+        200:
+          $ref: '#/components/schemas/RADIUSEndPoint'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'

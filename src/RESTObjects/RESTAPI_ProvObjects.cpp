@@ -1278,5 +1278,106 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void RADIUSServer::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj, "Hostname", Hostname);
+        field_to_json(Obj, "IP", IP);
+        field_to_json(Obj, "Port", Port);
+        field_to_json(Obj, "Secret", Secret);
+    }
+
+    bool RADIUSServer::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj, "Hostname", Hostname);
+            field_from_json(Obj, "IP", IP);
+            field_from_json(Obj, "Port", Port);
+            field_from_json(Obj, "Secret", Secret);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    void RADIUSEndPointRadiusType::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj, "Authentication", Authentication);
+        field_to_json(Obj, "Accounting", Accounting);
+        field_to_json(Obj, "CoA", CoA);
+        field_to_json(Obj, "AccountingInterval", AccountingInterval);
+    }
+
+    bool RADIUSEndPointRadiusType::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj, "Authentication", Authentication);
+            field_from_json(Obj, "Accounting", Accounting);
+            field_from_json(Obj, "CoA", CoA);
+            field_from_json(Obj, "AccountingInterval", AccountingInterval);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    void RADIUSEndPointRadsecType::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj, "Authentication", Hostname);
+        field_to_json(Obj, "Accounting", IP);
+        field_to_json(Obj, "CoA", Port);
+        field_to_json(Obj, "AccountingInterval", Secret);
+        field_to_json(Obj, "OpenRoamingType", OpenRoamingType);
+        field_to_json(Obj, "UseOpenRoamingAccount", UseOpenRoamingAccount);
+        field_to_json(Obj, "Weight", Weight);
+        field_to_json(Obj, "Certificate", Certificate);
+        field_to_json(Obj, "PrivateKey", PrivateKey);
+        field_to_json(Obj, "CaCerts", CaCerts);
+        field_to_json(Obj, "AllowSelfSigned", AllowSelfSigned);
+    }
+
+    bool RADIUSEndPointRadsecType::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj, "Authentication", Hostname);
+            field_from_json(Obj, "Accounting", IP);
+            field_from_json(Obj, "CoA", Port);
+            field_from_json(Obj, "AccountingInterval", Secret);
+            field_from_json(Obj, "OpenRoamingType", OpenRoamingType);
+            field_from_json(Obj, "UseOpenRoamingAccount", UseOpenRoamingAccount);
+            field_from_json(Obj, "Weight", Weight);
+            field_from_json(Obj, "Certificate", Certificate);
+            field_from_json(Obj, "PrivateKey", PrivateKey);
+            field_from_json(Obj, "CaCerts", CaCerts);
+            field_from_json(Obj, "AllowSelfSigned", AllowSelfSigned);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    void RADIUSEndPoint::to_json(Poco::JSON::Object &Obj) const {
+        info.to_json(Obj);
+        field_to_json(Obj, "Type", Type);
+        field_to_json(Obj, "RadsecServers", RadsecServers);
+        field_to_json(Obj, "RadiusServers", RadiusServers);
+        field_to_json(Obj, "PoolStrategy", PoolStrategy);
+        field_to_json(Obj, "Index", Index);
+        field_to_json(Obj, "UsedBy", UsedBy);
+        field_to_json(Obj, "UseGWProxy", UseGWProxy);
+    }
+
+    bool RADIUSEndPoint::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            info.from_json(Obj);
+            field_from_json(Obj, "Type", Type);
+            field_from_json(Obj, "RadsecServers", RadsecServers);
+            field_from_json(Obj, "RadiusServers", RadiusServers);
+            field_from_json(Obj, "PoolStrategy", PoolStrategy);
+            field_from_json(Obj, "Index", Index);
+            field_from_json(Obj, "UsedBy", UsedBy);
+            field_from_json(Obj, "UseGWProxy", UseGWProxy);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
 
 } // namespace OpenWifi::ProvObjects

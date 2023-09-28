@@ -238,4 +238,39 @@ namespace OpenWifi::SDK::GW {
 			return false;
 		}
 	} // namespace Device
+
+    namespace RADIUS {
+
+        bool GetConfiguration(RESTAPIHandler *client, GWObjects::RadiusProxyPoolList &Pools) {
+            OpenWifi::OpenAPIRequestGet R(OpenWifi::uSERVICE_GATEWAY,
+                                           "/api/v1/radiusProxyConfig", {},
+                                           60000);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto ResponseStatus =
+                    R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
+            if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
+                return Pools.from_json(CallResponse);
+            }
+            return false;
+        }
+
+        bool SetConfiguration(RESTAPIHandler *client, const GWObjects::RadiusProxyPoolList &Pools,
+                              GWObjects::RadiusProxyPoolList &NewPools) {
+            Poco::JSON::Object  Body;
+            Pools.to_json(Body);
+
+            OpenWifi::OpenAPIRequestPut R(OpenWifi::uSERVICE_GATEWAY,
+                                          "/api/v1/radiusProxyConfig", {}, Body,
+                                          60000);
+            auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
+            auto ResponseStatus =
+                    R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
+            if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
+                return NewPools.from_json(CallResponse);
+            }
+            return false;
+        }
+
+    }
+
 } // namespace OpenWifi::SDK::GW

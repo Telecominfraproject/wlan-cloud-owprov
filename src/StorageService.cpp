@@ -42,6 +42,7 @@ namespace OpenWifi {
         GLBLRAccountInfoDB_ = std::make_unique<OpenWifi::GLBLRAccountInfoDB>(dbType_, *Pool_, Logger());
         GLBLRCertsDB_ = std::make_unique<OpenWifi::GLBLRCertsDB>(dbType_, *Pool_, Logger());
         OrionAccountsDB_ = std::make_unique<OpenWifi::OrionAccountsDB>(dbType_, *Pool_, Logger());
+        RadiusEndpointDB_ = std::make_unique<OpenWifi::RadiusEndpointDB>(dbType_, *Pool_, Logger());
 
 		EntityDB_->Create();
 		PolicyDB_->Create();
@@ -65,6 +66,7 @@ namespace OpenWifi {
         GLBLRAccountInfoDB_->Create();
         GLBLRCertsDB_->Create();
         OrionAccountsDB_->Create();
+        RadiusEndpointDB_->Create();
 
 		ExistFunc_[EntityDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
 			return EntityDB_->Exists(F, V);
@@ -129,8 +131,11 @@ namespace OpenWifi {
         ExistFunc_[GLBLRCertsDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
             return GLBLRCertsDB_->Exists(F, V);
         };
-        ExistFunc_[GLBLRCertsDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
+        ExistFunc_[OrionAccountsDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
             return OrionAccountsDB_->Exists(F, V);
+        };
+        ExistFunc_[RadiusEndpointDB_->Prefix()] = [=](const char *F, std::string &V) -> bool {
+            return RadiusEndpointDB_->Exists(F, V);
         };
 
 
@@ -236,6 +241,11 @@ namespace OpenWifi {
                     [[maybe_unused]] std::string &Name,
                     [[maybe_unused]] std::string &Description) -> bool { return false; };
         ExpandFunc_[OrionAccountsDB_->Prefix()] =
+                [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
+                    [[maybe_unused]] std::string &Name,
+                    [[maybe_unused]] std::string &Description) -> bool { return false; };
+
+        ExpandFunc_[RadiusEndpointDB_->Prefix()] =
                 [=]([[maybe_unused]] const char *F, [[maybe_unused]] std::string &V,
                     [[maybe_unused]] std::string &Name,
                     [[maybe_unused]] std::string &Description) -> bool { return false; };
