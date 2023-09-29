@@ -71,7 +71,7 @@ components:
         IP:
           type: string
         Port:
-          type: string
+          type: integer
         Secret:
           type: string
           default: radsec
