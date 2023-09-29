@@ -216,6 +216,7 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_radiusendpoint_list_handler.h
         src/RESTAPI/RESTAPI_radius_endpoint_handler.cpp
         src/RESTAPI/RESTAPI_radius_endpoint_handler.h
+        src/OrionWifi.h
 )
 
 target_link_libraries(owprov PUBLIC

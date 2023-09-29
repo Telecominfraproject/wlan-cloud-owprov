@@ -10,34 +10,43 @@
 
 namespace OpenWifi {
 
-    class OpenRoaming_GlobalReach : public SubSystemServer {
-    public:
-        static auto instance() {
-            static auto instance_ = new OpenRoaming_GlobalReach;
-            return instance_;
-        }
+    namespace GlobalReach {
+        class OpenRoaming : public SubSystemServer {
+        public:
+            static auto instance() {
+                static auto instance_ = new OpenRoaming;
+                return instance_;
+            }
 
-        int Start() override;
-        void Stop() override;
-        bool CreateRADSECCertificate(const std::string &AccountName,
-                                     const std::string &Name,
-                                     const std::string &CSR,
-                                     ProvObjects::GLBLRCertificateInfo &NewCertificate);
-        bool GetRADSECCertificate(const std::string &AccountName, std::string & CertificateId, ProvObjects::GLBLRCertificateInfo &NewCertificate);
-        bool VerifyAccount(const std::string &GlobalReachAccountId, const std::string &PrivateKey, std::string &Name);
-        void InitCache();
+            int Start() override;
 
-    private:
-        std::string MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey="");
+            void Stop() override;
 
-        std::map<std::string,std::pair<std::string,Poco::SharedPtr<Poco::Crypto::ECKey>>>   PrivateKeys_;
+            bool CreateRADSECCertificate(const std::string &AccountName,
+                                         const std::string &Name,
+                                         const std::string &CSR,
+                                         ProvObjects::GLBLRCertificateInfo &NewCertificate);
 
-        OpenRoaming_GlobalReach() noexcept
-                : SubSystemServer("OpenRoaming_GlobalReach", "GLBL-REACH", "globalreach") {
-        }
-    };
+            bool GetRADSECCertificate(const std::string &AccountName, std::string &CertificateId,
+                                      ProvObjects::GLBLRCertificateInfo &NewCertificate);
 
-    inline auto OpenRoaming_GlobalReach() { return OpenRoaming_GlobalReach::instance(); }
+            bool
+            VerifyAccount(const std::string &GlobalReachAccountId, const std::string &PrivateKey, std::string &Name);
+
+            void InitCache();
+
+        private:
+            std::string MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey = "");
+
+            std::map<std::string, std::pair<std::string, Poco::SharedPtr<Poco::Crypto::ECKey>>> PrivateKeys_;
+
+            OpenRoaming() noexcept
+                    : SubSystemServer("OpenRoaming_GlobalReach", "GLBL-REACH", "globalreach") {
+            }
+        };
+    }
+
+    inline auto OpenRoaming_GlobalReach() { return GlobalReach::OpenRoaming::instance(); }
 
 } // OpenWifi
 
