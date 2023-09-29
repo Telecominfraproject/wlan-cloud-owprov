@@ -2,7 +2,7 @@
 // Created by stephane bourque on 2023-09-11.
 //
 
-#include "OpenRoamin_GlobalReach.h"
+#include "GlobalReach.h"
 #include <Poco/JWT/Token.h>
 #include <Poco/JWT/Signer.h>
 #include <Poco/Net/HTTPSClientSession.h>
