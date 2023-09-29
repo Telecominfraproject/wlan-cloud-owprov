@@ -7,16 +7,12 @@
 namespace OpenWifi {
 
     void RESTAPI_radiusendpoint_list_handler::DoGet() {
-
         if(QB_.CountOnly) {
             return ReturnCountOnly(DB_.Count());
         }
-
         std::vector<RecordType>    Records;
-        if(DB_.GetRecords(QB_.Offset,QB_.Limit,Records)) {
-            return ReturnObject(Records);
-        }
-        return NotFound();
+        DB_.GetRecords(QB_.Offset,QB_.Limit,Records);
+        return ReturnObject(Records);
     }
 
 } // OpenWifi
