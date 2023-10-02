@@ -227,6 +227,8 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_radius_endpoint_handler.h
         src/OpenRoaming/GlobalReach.cpp src/OpenRoaming/GlobalReach.h
         src/OpenRoaming/OrionWifi.h
+        src/RadiusEndpoint.cpp
+        src/RadiusEndpoint.h
 )
 
 target_link_libraries(owprov PUBLIC
@@ -234,5 +236,6 @@ target_link_libraries(owprov PUBLIC
         ${MySQL_LIBRARIES}
         ${ZLIB_LIBRARIES}
         CppKafka::cppkafka
+        resolv
         fmt::fmt)
 

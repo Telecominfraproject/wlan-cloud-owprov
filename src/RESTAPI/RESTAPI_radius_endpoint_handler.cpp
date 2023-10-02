@@ -57,10 +57,10 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RadiusEndpointDB::EndpointType(NewRecord.Type)!=RadiusEndpointDB::EndpointType::unknown) {
+        if(RadiusEndpointDB::EndpointType(NewRecord.Type)==RadiusEndpointDB::EndpointType::unknown) {
             return BadRequest(RESTAPI::Errors::InvalidRadiusTypeEndpoint);
         }
-        if(RadiusEndpointDB::PoolStrategy(NewRecord.PoolStrategy)!=RadiusEndpointDB::PoolStrategy::unknown) {
+        if(RadiusEndpointDB::PoolStrategy(NewRecord.PoolStrategy)==RadiusEndpointDB::PoolStrategy::unknown) {
             return BadRequest(RESTAPI::Errors::InvalidRadiusEndpointPoolStrategy);
         }
         if(!NewRecord.RadiusServers.empty() && !NewRecord.RadsecServers.empty()) {

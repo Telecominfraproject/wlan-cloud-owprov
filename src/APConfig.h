@@ -58,5 +58,6 @@ namespace OpenWifi {
 				   Poco::JSON::Object::Ptr &C);
 		bool RemoveBand(const std::string &Band, const Poco::JSON::Array::Ptr &A_in,
 						Poco::JSON::Array::Ptr &A_Out);
+        bool InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &EP, Poco::JSON::Object::Ptr &Result);
 	};
 } // namespace OpenWifi

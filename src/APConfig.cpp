@@ -9,6 +9,9 @@
 #include "Poco/StringTokenizer.h"
 #include "fmt/format.h"
 
+#include <OpenRoaming/OrionWifi.h>
+#include <OpenRoaming/GlobalReach.h>
+
 namespace OpenWifi {
 
 	APConfig::APConfig(const std::string &SerialNumber, const std::string &DeviceType,
@@ -55,29 +58,57 @@ namespace OpenWifi {
 		 */
 	}
 
-	bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object::Ptr &Original,
+    bool APConfig::InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result) {
+        if(RE.UseGWProxy) {
+            Poco::JSON::Object  ServerSettings;
+            if (RE.Type == "orion") {
+                auto OrionServers = Orion::GetServers();
+
+            } else if (RE.Type == "globalreach") {
+                auto GRServers = GlobalReach::GetServers();
+
+            } else if (RE.Type == "radsec") {
+
+            } else if (RE.Type == "radius") {
+
+            }
+            Result->set( "radius" , ServerSettings);
+        }
+        return false;
+    }
+
+    bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object::Ptr &Original,
 											Poco::JSON::Object::Ptr &Result) {
 		// get all the names and expand
 		auto Names = Original->getNames();
 		for (const auto &i : Names) {
 			if (i == "__variableBlock") {
-				if (Original->isArray(i)) {
-					auto UUIDs = Original->getArray(i);
-					for (const auto &uuid : *UUIDs) {
-						ProvObjects::VariableBlock VB;
-						if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-							for (const auto &var : VB.variables) {
-								Poco::JSON::Parser P;
-								auto VariableBlockInfo =
-									P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-								auto VarNames = VariableBlockInfo->getNames();
-								for (const auto &j : VarNames) {
-									Result->set(j, VariableBlockInfo->get(j));
-								}
-							}
-						}
-					}
-				}
+                if (Original->isArray(i)) {
+                    auto UUIDs = Original->getArray(i);
+                    for (const auto &uuid: *UUIDs) {
+                        ProvObjects::VariableBlock VB;
+                        if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+                            for (const auto &var: VB.variables) {
+                                Poco::JSON::Parser P;
+                                auto VariableBlockInfo =
+                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+                                auto VarNames = VariableBlockInfo->getNames();
+                                for (const auto &j: VarNames) {
+                                    Result->set(j, VariableBlockInfo->get(j));
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (i == "__radiusEndpoint") {
+                auto EndPointId = Original->get("__radiusEndpoint").toString();
+                ProvObjects::RADIUSEndPoint RE;
+                if(!StorageService()->RadiusEndpointDB().GetRecord("id",EndPointId,RE)) {
+                    InsertRadiusEndPoint(RE, Result);
+                } else {
+                    poco_error(Logger_, fmt::format("RADIUS Endpoint {} could not be found. Please delete this configuration and recreate it."));
+                    return false;
+                }
 			} else if (Original->isArray(i)) {
 				auto Arr = Poco::makeShared<Poco::JSON::Array>();
 				auto Obj = Original->getArray(i);

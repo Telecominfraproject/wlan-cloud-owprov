@@ -200,6 +200,23 @@ namespace OpenWifi {
             return false;
         }
 
+        std::vector<Utils::HostNameServerResult> GetServers() {
+            const std::string &domain = "openro.am";
+            auto Naptrs = Utils::getNAPTRRecords(domain);
+            std::vector<Utils::HostNameServerResult>   Results;
+
+            for(const auto &rec:Naptrs) {
+                if(rec.service=="\"aaa+auth:radius.tls.tcp\"") {
+                    auto Srvs = Utils::getSRVRecords(rec.replacement);
+                    for(const auto &srv:Srvs) {
+                        Utils::HostNameServerResult    R{srv.srvname,srv.port};
+                        Results.emplace_back(R);
+                    }
+                }
+            }
+            return Results;
+        }
+
     }
 
 } // OpenWifi

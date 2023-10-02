@@ -5,6 +5,7 @@
 #pragma once
 
 #include "framework/SubSystemServer.h"
+#include "framework/utils.h"
 #include "Poco/JSON/Object.h"
 #include "RESTObjects/RESTAPI_ProvObjects.h"
 
@@ -44,6 +45,8 @@ namespace OpenWifi {
                     : SubSystemServer("OpenRoaming_GlobalReach", "GLBL-REACH", "globalreach") {
             }
         };
+
+        std::vector<Utils::HostNameServerResult> GetServers();
     }
 
     inline auto OpenRoaming_GlobalReach() { return GlobalReach::OpenRoaming::instance(); }
