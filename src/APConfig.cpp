@@ -100,6 +100,7 @@ namespace OpenWifi {
                                         P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for (const auto &j: VarNames) {
+                                    std::cout << "Name: " << j << std::endl;
                                     Result->set(j, VariableBlockInfo->get(j));
                                 }
                             }
