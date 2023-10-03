@@ -87,7 +87,8 @@ namespace OpenWifi {
 		// get all the names and expand
 		auto Names = Original->getNames();
 		for (const auto &i : Names) {
-			if (i == "__variableBlock") {
+            DBGLINE
+            if (i == "__variableBlock") {
                 if (Original->isArray(i)) {
                     auto UUIDs = Original->getArray(i);
                     for (const auto &uuid: *UUIDs) {
@@ -142,7 +143,7 @@ namespace OpenWifi {
 										   Poco::JSON::Array::Ptr &ResultArray) {
 
 		for (const auto &element : *Original) {
-
+            std::cout << element.toString() << std::endl;
 			if (element.isArray()) {
 				auto Expanded = Poco::makeShared<Poco::JSON::Array>();
 				const auto &Object = element.extract<Poco::JSON::Array::Ptr>();
