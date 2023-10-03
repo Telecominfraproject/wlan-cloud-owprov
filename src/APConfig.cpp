@@ -106,14 +106,21 @@ namespace OpenWifi {
                     }
                 }
             } else if (i == "__radiusEndpoint") {
+                DBGLINE
                 auto EndPointId = Original->get("__radiusEndpoint").toString();
+                DBGLINE
                 ProvObjects::RADIUSEndPoint RE;
+                DBGLINE
                 if(!StorageService()->RadiusEndpointDB().GetRecord("id",EndPointId,RE)) {
+                    DBGLINE
                     InsertRadiusEndPoint(RE, Result);
+                    DBGLINE
                 } else {
+                    DBGLINE
                     poco_error(Logger_, fmt::format("RADIUS Endpoint {} could not be found. Please delete this configuration and recreate it."));
                     return false;
                 }
+                DBGLINE
 			} else if (Original->isArray(i)) {
 				auto Arr = Poco::makeShared<Poco::JSON::Array>();
 				auto Obj = Original->getArray(i);
