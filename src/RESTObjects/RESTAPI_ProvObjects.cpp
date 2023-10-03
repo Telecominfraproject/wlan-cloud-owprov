@@ -1319,10 +1319,10 @@ namespace OpenWifi::ProvObjects {
     }
 
     void RADIUSEndPointRadsecType::to_json(Poco::JSON::Object &Obj) const {
-        field_to_json(Obj, "Authentication", Hostname);
-        field_to_json(Obj, "Accounting", IP);
-        field_to_json(Obj, "CoA", Port);
-        field_to_json(Obj, "AccountingInterval", Secret);
+        field_to_json(Obj, "Hostname", Hostname);
+        field_to_json(Obj, "IP", IP);
+        field_to_json(Obj, "Port", Port);
+        field_to_json(Obj, "Secret", Secret);
         field_to_json(Obj, "OpenRoamingType", OpenRoamingType);
         field_to_json(Obj, "UseOpenRoamingAccount", UseOpenRoamingAccount);
         field_to_json(Obj, "Weight", Weight);
@@ -1334,10 +1334,10 @@ namespace OpenWifi::ProvObjects {
 
     bool RADIUSEndPointRadsecType::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
-            field_from_json(Obj, "Authentication", Hostname);
-            field_from_json(Obj, "Accounting", IP);
-            field_from_json(Obj, "CoA", Port);
-            field_from_json(Obj, "AccountingInterval", Secret);
+            field_from_json(Obj, "Hostname", Hostname);
+            field_from_json(Obj, "IP", IP);
+            field_from_json(Obj, "Port", Port);
+            field_from_json(Obj, "Secret", Secret);
             field_from_json(Obj, "OpenRoamingType", OpenRoamingType);
             field_from_json(Obj, "UseOpenRoamingAccount", UseOpenRoamingAccount);
             field_from_json(Obj, "Weight", Weight);
