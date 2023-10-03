@@ -133,6 +133,11 @@ components:
           items:
             type: string
             format: uuid
+        NasIdentifier:
+          type: string
+        AccountingInterval:
+          type: integer
+          format: int64
 
 paths:
   /RADIUSEndPoints:

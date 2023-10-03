@@ -19,7 +19,9 @@ namespace OpenWifi {
             ORM::Field{"PoolStrategy", ORM::FieldType::FT_TEXT},
             ORM::Field{"Index", ORM::FieldType::FT_TEXT},
             ORM::Field{"UsedBy", ORM::FieldType::FT_TEXT},
-            ORM::Field{"UseGWProxy", ORM::FieldType::FT_BOOLEAN}
+            ORM::Field{"UseGWProxy", ORM::FieldType::FT_BOOLEAN},
+            ORM::Field{"NasIdentifier", ORM::FieldType::FT_TEXT},
+            ORM::Field{"AccountingInterval", ORM::FieldType::FT_BIGINT}
     };
 
     static ORM::IndexVec RadiusEndpointDB_Indexes{
@@ -31,7 +33,10 @@ namespace OpenWifi {
 
     bool RadiusEndpointDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         to = Version();
-        std::vector<std::string> Script{};
+        std::vector<std::string> Script{
+            "alter table " + TableName_ + " add column NasIdentifier TEXT;"
+            "alter table " + TableName_ + " add column AccountingInterval BIGINT;",
+        };
 
         for (const auto &i : Script) {
             try {
@@ -62,6 +67,8 @@ void ORM::DB<OpenWifi::RadiusEndpointDbRecordType, OpenWifi::ProvObjects::RADIUS
     Out.Index = In.get<10>();
     Out.UsedBy = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
     Out.UseGWProxy = In.get<12>();
+    Out.NasIdentifier = In.get<13>();
+    Out.AccountingInterval = In.get<14>();
 }
 
 template <>
@@ -80,4 +87,6 @@ void ORM::DB<OpenWifi::RadiusEndpointDbRecordType, OpenWifi::ProvObjects::RADIUS
     Out.set<10>(In.Index);
     Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.UsedBy));
     Out.set<12>(In.UseGWProxy);
+    Out.set<13>(In.NasIdentifier);
+    Out.set<14>(In.AccountingInterval);
 }

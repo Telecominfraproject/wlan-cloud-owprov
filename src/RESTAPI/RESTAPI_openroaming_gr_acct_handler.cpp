@@ -3,7 +3,7 @@
 //
 
 #include "RESTAPI_openroaming_gr_acct_handler.h"
-#include <OpenRoaming/GlobalReach.h>
+#include <RadiusEndpointTypes/GlobalReach.h>
 
 namespace OpenWifi {
 

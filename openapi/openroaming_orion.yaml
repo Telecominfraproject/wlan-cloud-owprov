@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: OpenWiFi OpenRoaming Provisioning Model for Google Orion
+  title: OpenWiFi RadiusEndpointTypes Provisioning Model for Google Orion
   description: Definitions and APIs to Open Roaming WiFi.
   version: 2.5.0
   license:
@@ -54,7 +54,7 @@ paths:
   /openroaming/orion/accounts:
     get:
       tags:
-        - OpenRoaming-Google Orion
+        - RadiusEndpointTypes-Google Orion
       operationId: getOpenRoamingGlobalReachAccountList
       summary: Retrieve account list.
       parameters:
@@ -97,7 +97,7 @@ paths:
   /openroaming/orion/account/{id}:
     get:
       tags:
-        - OpenRoaming-Google Orion
+        - RadiusEndpointTypes-Google Orion
       operationId: getOpenRoamingGlobalReachAccount
       summary: Retrieve account information.
       parameters:
@@ -119,7 +119,7 @@ paths:
 
     delete:
       tags:
-        - OpenRoaming-Google Orion
+        - RadiusEndpointTypes-Google Orion
       operationId: deleteOpenRoamingGlobalReachAccount
       summary: Delete account information.
       parameters:
@@ -141,7 +141,7 @@ paths:
 
     post:
       tags:
-        - OpenRoaming-Google Orion
+        - RadiusEndpointTypes-Google Orion
       operationId: createOpenRoamingGlobalReachAccount
       summary: Create account information.
       parameters:
@@ -168,7 +168,7 @@ paths:
 
     put:
       tags:
-        - OpenRoaming-Google Orion
+        - RadiusEndpointTypes-Google Orion
       operationId: modifyOpenRoamingGlobalReachAccount
       summary: Modify account information.
       parameters:

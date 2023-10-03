@@ -9,8 +9,8 @@
 #include "Poco/StringTokenizer.h"
 #include "fmt/format.h"
 
-#include <OpenRoaming/OrionWifi.h>
-#include <OpenRoaming/GlobalReach.h>
+#include <RadiusEndpointTypes/OrionWifi.h>
+#include <RadiusEndpointTypes/GlobalReach.h>
 
 namespace OpenWifi {
 
@@ -62,11 +62,9 @@ namespace OpenWifi {
         if(RE.UseGWProxy) {
             Poco::JSON::Object  ServerSettings;
             if (RE.Type == "orion") {
-                auto OrionServers = Orion::GetServers();
-
+                OpenRoaming_Orion()->Render(RE, Result);
             } else if (RE.Type == "globalreach") {
-                auto GRServers = GlobalReach::GetServers();
-
+                OpenRoaming_GlobalReach()->Render(RE, Result);
             } else if (RE.Type == "radsec") {
 
             } else if (RE.Type == "radius") {

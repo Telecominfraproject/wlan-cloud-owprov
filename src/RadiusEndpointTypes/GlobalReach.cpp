@@ -41,11 +41,38 @@ namespace OpenWifi {
             StorageService()->GLBLRAccountInfoDB().Iterate(F);
         }
 
+        bool OpenRoaming::Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result) {
+            if(RE.UseGWProxy) {
+                Poco::JSON::Object  Auth, Acct, CoA;
+
+                Auth.set("host", RE.Index);
+                Auth.set("port", 1812 );
+                Auth.set("secret", RE.RadsecServers[0].Secret);
+
+                Acct.set("host", RE.Index);
+                Acct.set("port", 1813);
+                Acct.set("secret", RE.RadsecServers[0].Secret);
+                Acct.set("interval", RE.AccountingInterval);
+
+                CoA.set("host", RE.Index);
+                CoA.set("port", 3799);
+                CoA.set("secret", RE.RadsecServers[0].Secret);
+
+                Result->set("nas-identifier", RE.NasIdentifier);
+                Result->set("authentication", Auth);
+                Result->set("accounting", Acct);
+                Result->set("dynamic-authorization", CoA);
+            } else {
+
+            }
+            return false;
+        }
+
         bool OpenRoaming::CreateRADSECCertificate(
-                const std::string &GlobalReachAccountId,
-                const std::string &Name,
-                const std::string &CSR,
-                ProvObjects::GLBLRCertificateInfo &NewCertificate) {
+            const std::string &GlobalReachAccountId,
+            const std::string &Name,
+            const std::string &CSR,
+            ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 
             try {
                 std::cout << __LINE__ << ":" << GlobalReachAccountId << std::endl;

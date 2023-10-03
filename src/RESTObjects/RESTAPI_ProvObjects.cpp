@@ -1361,6 +1361,8 @@ namespace OpenWifi::ProvObjects {
         field_to_json(Obj, "Index", Index);
         field_to_json(Obj, "UsedBy", UsedBy);
         field_to_json(Obj, "UseGWProxy", UseGWProxy);
+        field_to_json(Obj, "NasIdentifier", NasIdentifier);
+        field_to_json(Obj, "AccountingInterval", AccountingInterval);
     }
 
     bool RADIUSEndPoint::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -1373,6 +1375,8 @@ namespace OpenWifi::ProvObjects {
             field_from_json(Obj, "Index", Index);
             field_from_json(Obj, "UsedBy", UsedBy);
             field_from_json(Obj, "UseGWProxy", UseGWProxy);
+            field_from_json(Obj, "NasIdentifier", NasIdentifier);
+            field_from_json(Obj, "AccountingInterval", AccountingInterval);
             return true;
         } catch (const Poco::Exception &E) {
 

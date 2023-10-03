@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: OpenWiFi OpenRoaming Provisioning Model for Global Reach
+  title: OpenWiFi RadiusEndpointTypes Provisioning Model for Global Reach
   description: Definitions and APIs to Open Roaming WiFi.
   version: 2.5.0
   license:
@@ -92,7 +92,7 @@ paths:
   /openroaming/globalreach/accounts:
     get:
       tags:
-        - OpenRoaming-Global Reach
+        - RadiusEndpointTypes-Global Reach
       operationId: getOpenRoamingGlobalReachAccountList
       summary: Retrieve account list.
       parameters:
@@ -135,7 +135,7 @@ paths:
   /openroaming/globalreach/account/{name}:
     get:
       tags:
-        - OpenRoaming-Global Reach
+        - RadiusEndpointTypes-Global Reach
       operationId: getOpenRoamingGlobalReachAccount
       summary: Retrieve account information.
       parameters:
@@ -157,7 +157,7 @@ paths:
 
     delete:
       tags:
-        - OpenRoaming-Global Reach
+        - RadiusEndpointTypes-Global Reach
       operationId: deleteOpenRoamingGlobalReachAccount
       summary: Delete account information.
       parameters:
@@ -179,7 +179,7 @@ paths:
 
     post:
       tags:
-        - OpenRoaming-Global Reach
+        - RadiusEndpointTypes-Global Reach
       operationId: createOpenRoamingGlobalReachAccount
       summary: Create account information.
       parameters:
@@ -206,7 +206,7 @@ paths:
 
     put:
       tags:
-        - OpenRoaming-Global Reach
+        - RadiusEndpointTypes-Global Reach
       operationId: modifyOpenRoamingGlobalReachAccount
       summary: Modify account information.
       parameters:
@@ -234,7 +234,7 @@ paths:
   /openroaming/globalreach/certificates/{account}:
     get:
       tags:
-        - OpenRoaming-Global Reach Certificate
+        - RadiusEndpointTypes-Global Reach Certificate
       operationId: getOpenRoamingGlobalReachCertificateList
       summary: Retrieve certificate list.
       parameters:
@@ -283,7 +283,7 @@ paths:
   /openroaming/globalreach/certificate/{account}/{id}:
     get:
       tags:
-        - OpenRoaming-Global Reach Certificate
+        - RadiusEndpointTypes-Global Reach Certificate
       operationId: getOpenRoamingGlobalReachCertificate
       summary: Retrieve certificate information.
       parameters:
@@ -311,7 +311,7 @@ paths:
 
     delete:
       tags:
-        - OpenRoaming-Global Reach Certificate
+        - RadiusEndpointTypes-Global Reach Certificate
       operationId: deleteOpenRoamingGlobalReachCertificate
       summary: Delete certificate information.
       parameters:
@@ -339,7 +339,7 @@ paths:
 
     post:
       tags:
-        - OpenRoaming-Global Reach Certificate
+        - RadiusEndpointTypes-Global Reach Certificate
       operationId: createOpenRoamingGlobalReachCertificate
       summary: Create certificate information.
       parameters:

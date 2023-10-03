@@ -22,7 +22,9 @@ namespace OpenWifi {
             std::string,
             std::string,
             std::string,
-            bool
+            bool,
+            std::string,
+            std::uint64_t
     >   RadiusEndpointDbRecordType;
 
     class RadiusEndpointDB : public ORM::DB<RadiusEndpointDbRecordType, ProvObjects::RADIUSEndPoint> {
