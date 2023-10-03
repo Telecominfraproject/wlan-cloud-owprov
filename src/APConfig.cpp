@@ -59,19 +59,26 @@ namespace OpenWifi {
 	}
 
     bool APConfig::InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result) {
+        DBGLINE
         if(RE.UseGWProxy) {
+            DBGLINE
             Poco::JSON::Object  ServerSettings;
             if (RE.Type == "orion") {
-                OpenRoaming_Orion()->Render(RE, Result);
+                DBGLINE
+                return OpenRoaming_Orion()->Render(RE, Result);
             } else if (RE.Type == "globalreach") {
-                OpenRoaming_GlobalReach()->Render(RE, Result);
+                DBGLINE
+                return OpenRoaming_GlobalReach()->Render(RE, Result);
             } else if (RE.Type == "radsec") {
+                DBGLINE
 
             } else if (RE.Type == "radius") {
+                DBGLINE
 
             }
             Result->set( "radius" , ServerSettings);
         }
+        DBGLINE
         return false;
     }
 
