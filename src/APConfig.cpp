@@ -102,8 +102,18 @@ namespace OpenWifi {
                                 for (const auto &j: VarNames) {
                                     std::cout << "Name: " << j << std::endl;
                                     Poco::JSON::Object::Ptr InnerEval;
-                                    ReplaceVariablesInObject(VariableBlockInfo->getObject(j),InnerEval);
-                                    Result->set(j, InnerEval);
+                                    if(VariableBlockInfo->isArray(j)) {
+                                        auto Arr = VariableBlockInfo->getArray(j);
+//                                        ReplaceVariablesInObject(,InnerEval);
+  //                                      Result->set(j, InnerEval);
+                                        std::cout << "Array!!!" << std::endl;
+                                    } else if(VariableBlockInfo->isObject(j)) {
+                                        std::cout << "Visiting object " << j << std::endl;
+                                        ReplaceVariablesInObject(VariableBlockInfo->getObject(j),InnerEval);
+                                        Result->set(j, InnerEval);
+                                    } else {
+                                        Result->set(j, VariableBlockInfo->get(j));
+                                    }
                                 }
                             }
                         }
