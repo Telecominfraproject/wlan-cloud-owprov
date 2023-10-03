@@ -137,17 +137,23 @@ namespace OpenWifi {
                 }
                 DBGLINE
 			} else if (Original->isArray(i)) {
+                DBGLINE
 				auto Arr = Poco::makeShared<Poco::JSON::Array>();
 				auto Obj = Original->getArray(i);
 				ReplaceVariablesInArray(Obj, Arr);
 				Result->set(i, Arr);
+                DBGLINE
 			} else if (Original->isObject(i)) {
+                DBGLINE
 				auto Expanded = Poco::makeShared<Poco::JSON::Object>();
 				auto Obj = Original->getObject(i);
 				ReplaceVariablesInObject(Obj, Expanded);
 				Result->set(i, Expanded);
+                DBGLINE
 			} else {
+                DBGLINE
 				Result->set(i, Original->get(i));
+                DBGLINE
 			}
 		}
 		return true;
