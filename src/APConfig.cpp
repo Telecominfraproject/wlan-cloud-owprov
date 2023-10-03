@@ -122,10 +122,11 @@ namespace OpenWifi {
                 }
             } else if (i == "__radiusEndpoint") {
                 DBGLINE
-                auto EndPointId = Original.get("__radiusEndpoint").toString();
+                auto EndPointId = Original.get(i).toString();
                 DBGLINE
                 ProvObjects::RADIUSEndPoint RE;
                 DBGLINE
+                std::cout << "ID->" << EndPointId << std::endl;
                 if(!StorageService()->RadiusEndpointDB().GetRecord("id",EndPointId,RE)) {
                     DBGLINE
                     InsertRadiusEndPoint(RE, Result);
