@@ -41,7 +41,7 @@ namespace OpenWifi {
             StorageService()->GLBLRAccountInfoDB().Iterate(F);
         }
 
-        bool OpenRoaming::Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result) {
+        bool OpenRoaming::Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object &Result) {
             if(RE.UseGWProxy) {
                 Poco::JSON::Object  Auth, Acct, CoA;
 
@@ -58,10 +58,10 @@ namespace OpenWifi {
                 CoA.set("port", 3799);
                 CoA.set("secret", RE.RadsecServers[0].Secret);
 
-                Result->set("nas-identifier", RE.NasIdentifier);
-                Result->set("authentication", Auth);
-                Result->set("accounting", Acct);
-                Result->set("dynamic-authorization", CoA);
+                Result.set("nas-identifier", RE.NasIdentifier);
+                Result.set("authentication", Auth);
+                Result.set("accounting", Acct);
+                Result.set("dynamic-authorization", CoA);
             } else {
 
             }

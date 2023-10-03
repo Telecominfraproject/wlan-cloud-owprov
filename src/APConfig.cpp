@@ -58,7 +58,7 @@ namespace OpenWifi {
 		 */
 	}
 
-    bool APConfig::InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result) {
+    bool APConfig::InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object &Result) {
         DBGLINE
         if(RE.UseGWProxy) {
             DBGLINE
@@ -76,21 +76,21 @@ namespace OpenWifi {
                 DBGLINE
 
             }
-            Result->set( "radius" , ServerSettings);
+            Result.set( "radius" , ServerSettings);
         }
         DBGLINE
         return false;
     }
 
-    bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object::Ptr &Original,
-											Poco::JSON::Object::Ptr &Result) {
+    bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object &Original,
+											Poco::JSON::Object &Result) {
 		// get all the names and expand
-		auto Names = Original->getNames();
+		auto Names = Original.getNames();
 		for (const auto &i : Names) {
             DBGLINE
             if (i == "__variableBlock") {
-                if (Original->isArray(i)) {
-                    auto UUIDs = Original->getArray(i);
+                if (Original.isArray(i)) {
+                    auto UUIDs = Original.getArray(i);
                     for (const auto &uuid: *UUIDs) {
                         ProvObjects::VariableBlock VB;
                         if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
@@ -101,7 +101,7 @@ namespace OpenWifi {
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for (const auto &j: VarNames) {
                                     std::cout << "Name: " << j << std::endl;
-                                    Poco::JSON::Object::Ptr InnerEval = Poco::SharedPtr<Poco::JSON::Object>();
+                                    Poco::JSON::Object  InnerEval;
                                     if(VariableBlockInfo->isArray(j)) {
                                         auto Arr = VariableBlockInfo->getArray(j);
 //                                        ReplaceVariablesInObject(,InnerEval);
@@ -110,10 +110,10 @@ namespace OpenWifi {
                                     } else if(VariableBlockInfo->isObject(j)) {
                                         std::cout << "Visiting object " << j << std::endl;
                                         auto O = VariableBlockInfo->getObject(j);
-                                        ReplaceVariablesInObject(O,InnerEval);
-                                        Result->set(j, InnerEval);
+                                        ReplaceVariablesInObject(*O,InnerEval);
+                                        Result.set(j, InnerEval);
                                     } else {
-                                        Result->set(j, VariableBlockInfo->get(j));
+                                        Result.set(j, VariableBlockInfo->get(j));
                                     }
                                 }
                             }
@@ -122,7 +122,7 @@ namespace OpenWifi {
                 }
             } else if (i == "__radiusEndpoint") {
                 DBGLINE
-                auto EndPointId = Original->get("__radiusEndpoint").toString();
+                auto EndPointId = Original.get("__radiusEndpoint").toString();
                 DBGLINE
                 ProvObjects::RADIUSEndPoint RE;
                 DBGLINE
@@ -136,52 +136,52 @@ namespace OpenWifi {
                     return false;
                 }
                 DBGLINE
-			} else if (Original->isArray(i)) {
+			} else if (Original.isArray(i)) {
                 DBGLINE
-				auto Arr = Poco::makeShared<Poco::JSON::Array>();
-				auto Obj = Original->getArray(i);
-				ReplaceVariablesInArray(Obj, Arr);
-				Result->set(i, Arr);
+                Poco::JSON::Array Arr;
+				auto Obj = Original.getArray(i);
+				ReplaceVariablesInArray(*Obj, Arr);
+				Result.set(i, Arr);
                 DBGLINE
-			} else if (Original->isObject(i)) {
+			} else if (Original.isObject(i)) {
                 DBGLINE
-				auto Expanded = Poco::makeShared<Poco::JSON::Object>();
-				auto Obj = Original->getObject(i);
-				ReplaceVariablesInObject(Obj, Expanded);
-				Result->set(i, Expanded);
+                Poco::JSON::Object Expanded;
+				auto Obj = Original.getObject(i);
+				ReplaceVariablesInObject(*Obj, Expanded);
+				Result.set(i, Expanded);
                 DBGLINE
 			} else {
                 DBGLINE
-				Result->set(i, Original->get(i));
+				Result.set(i, Original.get(i));
                 DBGLINE
 			}
 		}
 		return true;
 	}
 
-	bool APConfig::ReplaceVariablesInArray(const Poco::JSON::Array::Ptr &Original,
-										   Poco::JSON::Array::Ptr &ResultArray) {
+	bool APConfig::ReplaceVariablesInArray(const Poco::JSON::Array &Original,
+										   Poco::JSON::Array &ResultArray) {
 
-		for (const auto &element : *Original) {
+		for (const auto &element : Original) {
             std::cout << element.toString() << std::endl;
 			if (element.isArray()) {
-				auto Expanded = Poco::makeShared<Poco::JSON::Array>();
-				const auto &Object = element.extract<Poco::JSON::Array::Ptr>();
-				ReplaceVariablesInArray(Object, Expanded);
-				ResultArray->add(Expanded);
+                Poco::JSON::Array  Expanded;
+				const auto Object = element.extract<Poco::JSON::Array::Ptr>();
+				ReplaceVariablesInArray(*Object, Expanded);
+				ResultArray.add(Expanded);
 			} else if (element.isStruct()) {
-				auto Expanded = Poco::makeShared<Poco::JSON::Object>();
+                Poco::JSON::Object  Expanded;
 				const auto &Object = element.extract<Poco::JSON::Object::Ptr>();
-				ReplaceVariablesInObject(Object, Expanded);
-				ResultArray->add(Expanded);
+				ReplaceVariablesInObject(*Object, Expanded);
+				ResultArray.add(Expanded);
 			} else if (element.isString() || element.isNumeric() || element.isBoolean() ||
 					   element.isInteger() || element.isSigned()) {
-				ResultArray->add(element);
+				ResultArray.add(element);
 			} else {
-				auto Expanded = Poco::makeShared<Poco::JSON::Object>();
+                Poco::JSON::Object  Expanded;
 				const auto &Object = element.extract<Poco::JSON::Object::Ptr>();
-				ReplaceVariablesInObject(Object, Expanded);
-				ResultArray->add(Expanded);
+				ReplaceVariablesInObject(*Object, Expanded);
+				ResultArray.add(Expanded);
 			}
 		}
 		return true;
@@ -241,8 +241,8 @@ namespace OpenWifi {
 								ExObj.set("element", OriginalArray);
 								Explanation_.add(ExObj);
 							}
-							auto ExpandedArray = Poco::makeShared<Poco::JSON::Array>();
-							ReplaceVariablesInArray(OriginalArray, ExpandedArray);
+                            Poco::JSON::Array ExpandedArray;
+							ReplaceVariablesInArray(*OriginalArray, ExpandedArray);
 							Configuration->set(SectionName, ExpandedArray);
 						} else if (O->isObject(SectionName)) {
 							auto OriginalSection =
@@ -255,8 +255,8 @@ namespace OpenWifi {
 								ExObj.set("element", OriginalSection);
 								Explanation_.add(ExObj);
 							}
-							auto ExpandedSection = Poco::makeShared<Poco::JSON::Object>();
-							ReplaceVariablesInObject(OriginalSection, ExpandedSection);
+                            Poco::JSON::Object ExpandedSection;
+							ReplaceVariablesInObject(*OriginalSection, ExpandedSection);
 							Configuration->set(SectionName, ExpandedSection);
 						} else {
                             poco_warning(Logger(), fmt::format("Unknown config element type: {}",O->get(SectionName).toString()));

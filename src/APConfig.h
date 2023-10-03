@@ -45,10 +45,10 @@ namespace OpenWifi {
 		bool Sub_ = false;
 		Poco::Logger &Logger() { return Logger_; }
 
-		bool ReplaceVariablesInArray(const Poco::JSON::Array::Ptr &O,
-									 Poco::JSON::Array::Ptr &Result);
-		bool ReplaceVariablesInObject(const Poco::JSON::Object::Ptr &Original,
-									  Poco::JSON::Object::Ptr &Result);
+		bool ReplaceVariablesInArray(const Poco::JSON::Array &O,
+									 Poco::JSON::Array &Result);
+		bool ReplaceVariablesInObject(const Poco::JSON::Object &Original,
+									  Poco::JSON::Object &Result);
 
 		bool FindRadio(const std::string &Band, const Poco::JSON::Array::Ptr &Arr,
 					   Poco::JSON::Object::Ptr &Radio);
@@ -58,6 +58,6 @@ namespace OpenWifi {
 				   Poco::JSON::Object::Ptr &C);
 		bool RemoveBand(const std::string &Band, const Poco::JSON::Array::Ptr &A_in,
 						Poco::JSON::Array::Ptr &A_Out);
-        bool InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &EP, Poco::JSON::Object::Ptr &Result);
+        bool InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &EP, Poco::JSON::Object &Result);
 	};
 } // namespace OpenWifi

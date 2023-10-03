@@ -36,7 +36,7 @@ namespace OpenWifi {
 
             void InitCache();
 
-            bool Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object::Ptr &Result);
+            bool Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object &Result);
 
         private:
             std::string MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey = "");
