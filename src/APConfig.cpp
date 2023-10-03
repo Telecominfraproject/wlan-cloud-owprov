@@ -109,7 +109,8 @@ namespace OpenWifi {
                                         std::cout << "Array!!!" << std::endl;
                                     } else if(VariableBlockInfo->isObject(j)) {
                                         std::cout << "Visiting object " << j << std::endl;
-                                        ReplaceVariablesInObject(VariableBlockInfo->getObject(j),InnerEval);
+                                        auto O = VariableBlockInfo->getObject(j);
+                                        ReplaceVariablesInObject(O,InnerEval);
                                         Result->set(j, InnerEval);
                                     } else {
                                         Result->set(j, VariableBlockInfo->get(j));
