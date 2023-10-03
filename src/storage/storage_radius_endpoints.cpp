@@ -34,8 +34,8 @@ namespace OpenWifi {
     bool RadiusEndpointDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         to = Version();
         std::vector<std::string> Script{
-            "alter table " + TableName_ + " add column NasIdentifier TEXT;"
-            "alter table " + TableName_ + " add column AccountingInterval BIGINT;",
+            "alter table " + TableName_ + " add column NasIdentifier TEXT;",
+            "alter table " + TableName_ + " add column AccountingInterval BIGINT;"
         };
 
         for (const auto &i : Script) {
