@@ -860,9 +860,9 @@ namespace OpenWifi::ProvObjects {
     };
 
     struct RADIUSEndPointRadiusType {
-        RADIUSServer    Authentication;
-        RADIUSServer    Accounting;
-        RADIUSServer    CoA;
+        std::vector<RADIUSServer>    Authentication;
+        std::vector<RADIUSServer>    Accounting;
+        std::vector<RADIUSServer>    CoA;
         std::uint64_t AccountingInterval = 60;
 
         void to_json(Poco::JSON::Object &Obj) const;

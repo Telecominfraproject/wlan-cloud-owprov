@@ -54,11 +54,17 @@ components:
       type: object
       properties:
         Authentication:
-          $ref: '#/components/schemas/RADIUSServer'
+          type: array
+          items:
+            $ref: '#/components/schemas/RADIUSServer'
         Accounting:
-          $ref: '#/components/schemas/RADIUSServer'
+          type: array
+          items:
+            $ref: '#/components/schemas/RADIUSServer'
         CoA:
-          $ref: '#/components/schemas/RADIUSServer'
+          type: array
+          items:
+            $ref: '#/components/schemas/RADIUSServer'
         AccountingInterval:
           type: integer
           format: int32

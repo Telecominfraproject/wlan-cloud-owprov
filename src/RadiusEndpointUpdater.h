@@ -12,6 +12,28 @@
 namespace OpenWifi {
     class RadiusEndpointUpdater {
     public:
+
+        void AddServers(const  std::vector<ProvObjects::RADIUSServer> &ServerList, Poco::JSON::Object &O) {
+            O.set("methodParameters", Poco::JSON::Array());
+            O.set("monitor" , false);
+            O.set("monitorMethod", "none");
+            O.set("strategy", "random");
+            Poco::JSON::Array   ServerArray;
+            for(const auto &server:ServerList) {
+                Poco::JSON::Object  InnerServer;
+                InnerServer.set("allowSelfSigned", false);
+                InnerServer.set("certificate", "");
+                InnerServer.set("ignore", false);
+                InnerServer.set("ip",server.IP);
+                InnerServer.set("port", server.Port);
+                InnerServer.set("secret", server.Secret);
+                InnerServer.set("name", server.Hostname);
+                InnerServer.set("radsec", false);
+                ServerArray.add(InnerServer);
+            }
+            O.set("servers", ServerArray);
+        }
+
         inline bool UpdateEndpoints( [[maybe_unused]] std::string & Error,
                                      [[maybe_unused]] uint64_t &ErrorNum  ) {
 
@@ -45,6 +67,7 @@ namespace OpenWifi {
                         InnerServer.set("name", fmt::format("Server {}",i));
                         InnerServer.set("ip", Server.Hostname);
                         InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("radsec", true);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size()));
                         Poco::JSON::Array   CaCerts;
@@ -79,6 +102,7 @@ namespace OpenWifi {
                         InnerServer.set("ignore", false);
                         InnerServer.set("name", fmt::format("Server {}",i));
                         InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("radsec", true);
                         InnerServer.set("radsecPort", Server.Port);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
@@ -105,6 +129,7 @@ namespace OpenWifi {
                         InnerServer.set("ignore", false);
                         InnerServer.set("name", fmt::format("Server {}",i));
                         InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("radsec", true);
                         InnerServer.set("radsecPort", Server.Port);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)Server.PrivateKey.c_str(), Server.PrivateKey.size()));
@@ -122,9 +147,15 @@ namespace OpenWifi {
                     RadiusPools.add(PoolEntry);
                 } else if(Endpoint.Type=="radius") {
                     PoolEntry.set("radsecPoolType", "radius");
-                    for (const auto &Server: Endpoint.RadsecServers) {
-
-                    }
+                    const auto &server = Endpoint.RadiusServers[0];
+                    Poco::JSON::Object  ServerEntry;
+                    Poco::JSON::Object  AcctConfig, AuthConfig, CoAConfig, InnerServer;
+                    AddServers(server.Authentication,AuthConfig);
+                    AddServers(server.Accounting,AcctConfig);
+                    AddServers(server.CoA,CoAConfig);
+                    PoolEntry.set("authConfig", AuthConfig);
+                    PoolEntry.set("acctConfig", AcctConfig);
+                    PoolEntry.set("coaConfig", CoAConfig);
                 }
             }
 

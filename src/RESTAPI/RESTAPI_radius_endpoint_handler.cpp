@@ -45,6 +45,10 @@ namespace OpenWifi {
         return true;
     }
 
+    static bool ValidRadiusServer(const std::vector<ProvObjects::RADIUSServer> &ServerList) {
+        return std::all_of(ServerList.begin(),ServerList.end(),[](const ProvObjects::RADIUSServer &Server)->bool { return ValidRadiusServer(Server); });
+    }
+
     void RESTAPI_radius_endpoint_handler::DoPost() {
         auto id = GetBinding("id");
         if(id.empty()) {
