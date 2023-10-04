@@ -895,7 +895,7 @@ namespace OpenWifi::ProvObjects {
         std::vector<std::string>    UsedBy;
         std::vector<RADIUSEndPointRadiusType>   RadiusServers;
         std::vector<RADIUSEndPointRadsecType>   RadsecServers;
-        std::string                 NasIdentifier{"{{$serialNumber}}"};
+        std::string                 NasIdentifier;
         std::uint64_t               AccountingInterval=600;
 
         void to_json(Poco::JSON::Object &Obj) const;
