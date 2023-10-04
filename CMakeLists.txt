@@ -229,6 +229,8 @@ add_executable(owprov
         src/RadiusEndpointTypes/OrionWifi.h
         src/RadiusEndpointUpdater.cpp
         src/RadiusEndpointUpdater.h
+        src/RadiusEndpointTypes/Radsec.cpp
+        src/RadiusEndpointTypes/Radsec.h
 )
 
 target_link_libraries(owprov PUBLIC

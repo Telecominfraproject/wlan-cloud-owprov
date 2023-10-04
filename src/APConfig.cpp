@@ -11,6 +11,7 @@
 
 #include <RadiusEndpointTypes/OrionWifi.h>
 #include <RadiusEndpointTypes/GlobalReach.h>
+#include <RadiusEndpointTypes/Radsec.h>
 
 namespace OpenWifi {
 
@@ -66,7 +67,7 @@ namespace OpenWifi {
             } else if (RE.Type == "globalreach") {
                 return OpenRoaming_GlobalReach()->Render(RE, SerialNumber_, Result);
             } else if (RE.Type == "radsec") {
-
+                return OpenRoaming_Radsec()->Render(RE, SerialNumber_, Result);
             } else if (RE.Type == "radius") {
 
             }
