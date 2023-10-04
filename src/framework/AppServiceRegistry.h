@@ -66,7 +66,7 @@ namespace OpenWifi {
 		}
 
         bool Get(const char *key, std::vector<std::string> &Value) {
-            if(Registry_->has(key) && Registry_->isArray(key)) {
+            if(Registry_->has(key) && !Registry_->isNull(key) && Registry_->isArray(key)) {
                 auto Arr = Registry_->get(key);
                 for(const auto &v:Arr) {
                     Value.emplace_back(v);

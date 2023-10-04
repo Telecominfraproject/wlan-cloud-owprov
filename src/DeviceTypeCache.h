@@ -63,17 +63,9 @@ namespace OpenWifi {
 			std::lock_guard G(Mutex_);
 
 			Initialized_ = true;
-			std::string DeviceTypes;
-			if (AppServiceRegistry().Get("deviceTypes", DeviceTypes)) {
-				Poco::JSON::Parser P;
-				try {
-					auto O = P.parse(DeviceTypes).extract<Poco::JSON::Array::Ptr>();
-					for (const auto &i : *O) {
-						DeviceTypes_.insert(i.toString());
-					}
-				} catch (...) {
-				}
-			}
+			std::vector<std::string> DeviceTypes;
+			AppServiceRegistry().Get("deviceTypes", DeviceTypes);
+            std::for_each(DeviceTypes.begin(),DeviceTypes.end(),[&](const std::string &s){ DeviceTypes_.insert(s);});
 		}
 
 		inline bool UpdateDeviceTypes() {
@@ -107,15 +99,9 @@ namespace OpenWifi {
 
 		inline void SaveCache() {
 			std::lock_guard G(Mutex_);
-
-			Poco::JSON::Array Arr;
-			for (auto const &i : DeviceTypes_)
-				Arr.add(i);
-
-			std::stringstream OS;
-			Arr.stringify(OS);
-
-			AppServiceRegistry().Set("deviceTypes", OS.str());
+            std::vector<std::string>    DeviceTypes;
+            std::for_each(DeviceTypes_.begin(),DeviceTypes_.end(),[&](const std::string &s){DeviceTypes.emplace_back(s);});
+			AppServiceRegistry().Set("deviceTypes", DeviceTypes);
 		}
 	};
 
