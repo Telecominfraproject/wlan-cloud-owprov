@@ -8,6 +8,8 @@
 #include <StorageService.h>
 #include <RadiusEndpointTypes/OrionWifi.h>
 #include <RadiusEndpointTypes/GlobalReach.h>
+#include <sdks/SDK_gw.h>
+#include <RESTObjects/RESTAPI_GWobjects.h>
 
 namespace OpenWifi {
     class RadiusEndpointUpdater {
@@ -163,7 +165,14 @@ namespace OpenWifi {
             RadiusConfig.set("pools", RadiusPools);
             RadiusConfig.stringify(std::cout,4,2);
 
-            AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
+            GWObjects::RadiusProxyPoolList  NewPools;
+            if(SDK::GW::RADIUS::SetConfiguration(nullptr,RadiusConfig,NewPools)) {
+                AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
+                return true;
+            }
+            Error = "Could not update the controller.";
+            ErrorNum = 1;
+
             return false;
         }
     private:

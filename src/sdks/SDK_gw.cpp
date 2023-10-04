@@ -254,13 +254,10 @@ namespace OpenWifi::SDK::GW {
             return false;
         }
 
-        bool SetConfiguration(RESTAPIHandler *client, const GWObjects::RadiusProxyPoolList &Pools,
+        bool SetConfiguration(RESTAPIHandler *client, const Poco::JSON::Object &Configuration,
                               GWObjects::RadiusProxyPoolList &NewPools) {
-            Poco::JSON::Object  Body;
-            Pools.to_json(Body);
-
             OpenWifi::OpenAPIRequestPut R(OpenWifi::uSERVICE_GATEWAY,
-                                          "/api/v1/radiusProxyConfig", {}, Body,
+                                          "/api/v1/radiusProxyConfig", {}, Configuration,
                                           60000);
             auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
             auto ResponseStatus =
@@ -269,6 +266,13 @@ namespace OpenWifi::SDK::GW {
                 return NewPools.from_json(CallResponse);
             }
             return false;
+        }
+
+        bool SetConfiguration(RESTAPIHandler *client, const GWObjects::RadiusProxyPoolList &Pools,
+                              GWObjects::RadiusProxyPoolList &NewPools) {
+            Poco::JSON::Object  Body;
+            Pools.to_json(Body);
+            return SetConfiguration(client,Body,NewPools);
         }
 
     }
