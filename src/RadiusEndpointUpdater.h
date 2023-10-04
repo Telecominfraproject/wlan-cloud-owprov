@@ -29,43 +29,44 @@ namespace OpenWifi {
                 if(Endpoint.Type=="orion") {
                     PoolEntry.set("radsecPoolType","orion");
                     auto Servers = OpenRoaming_Orion()->GetServers();
-                    Poco::JSON::Object ServerDetails;
-                    ServerDetails.set("methodParameters", Poco::JSON::Array() );
-                    ServerDetails.set("monitor", false );
-                    ServerDetails.set("monitorMethod", "none" );
-                    ServerDetails.set("strategy","random");
+                    Poco::JSON::Object AuthConfig;
+                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
+                    AuthConfig.set("monitor", false );
+                    AuthConfig.set("monitorMethod", "none" );
+                    AuthConfig.set("strategy","random");
                     Poco::JSON::Array   ServerArray;
                     ProvObjects::GooglOrionAccountInfo  OA;
                     StorageService()->OrionAccountsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,OA);
                     int i=1;
                     for(const auto &Server:Servers) {
-                        Poco::JSON::Object  AuthConfig;
-                        AuthConfig.set("allowSelfSigned", false);
-                        AuthConfig.set("ignore", false);
-                        AuthConfig.set("name", fmt::format("Server {}",i));
-                        AuthConfig.set("ip", Server.Hostname);
-                        AuthConfig.set("radsecPort", Server.Port);
-                        AuthConfig.set("radsecCert", Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size()));
-                        AuthConfig.set("radsecKey", Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size()));
+                        Poco::JSON::Object  InnerServer;
+                        InnerServer.set("allowSelfSigned", false);
+                        InnerServer.set("ignore", false);
+                        InnerServer.set("name", fmt::format("Server {}",i));
+                        InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size()));
+                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size()));
                         Poco::JSON::Array   CaCerts;
                         for(const auto &cert:OA.cacerts) {
                             CaCerts.add(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
                         }
-                        AuthConfig.set("radsecCacerts", CaCerts);
-                        AuthConfig.set("radsecSecret","radsec");
+                        InnerServer.set("radsecCacerts", CaCerts);
+                        InnerServer.set("radsecSecret","radsec");
                         i++;
-                        ServerArray.add(AuthConfig);
+                        ServerArray.add(InnerServer);
                     }
-                    ServerDetails.set("servers",ServerArray);
-                    RadiusPools.add(ServerDetails);
+                    AuthConfig.set("servers",ServerArray);
+                    PoolEntry.set("authConfig", AuthConfig);
+                    RadiusPools.add(PoolEntry);
                 } else if(Endpoint.Type=="globalreach") {
                     PoolEntry.set("radsecPoolType","globalreach");
                     auto Servers = OpenRoaming_GlobalReach()->GetServers();
-                    Poco::JSON::Object ServerDetails;
-                    ServerDetails.set("methodParameters", Poco::JSON::Array() );
-                    ServerDetails.set("monitor", false );
-                    ServerDetails.set("monitorMethod", "none" );
-                    ServerDetails.set("strategy","random");
+                    Poco::JSON::Object AuthConfig;
+                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
+                    AuthConfig.set("monitor", false );
+                    AuthConfig.set("monitorMethod", "none" );
+                    AuthConfig.set("strategy","random");
                     Poco::JSON::Array   ServerArray;
                     ProvObjects::GLBLRCertificateInfo   GRCertificate;
                     ProvObjects::GLBLRAccountInfo       GRAccountInfo;
@@ -73,25 +74,26 @@ namespace OpenWifi {
                     StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo);
                     int i=1;
                     for(const auto &Server:Servers) {
-                        Poco::JSON::Object  AuthConfig;
-                        AuthConfig.set("allowSelfSigned", false);
-                        AuthConfig.set("ignore", false);
-                        AuthConfig.set("name", fmt::format("Server {}",i));
-                        AuthConfig.set("ip", Server.Hostname);
-                        AuthConfig.set("radsecPort", Server.Port);
-                        AuthConfig.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
-                        AuthConfig.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
+                        Poco::JSON::Object  InnerServer;
+                        InnerServer.set("allowSelfSigned", false);
+                        InnerServer.set("ignore", false);
+                        InnerServer.set("name", fmt::format("Server {}",i));
+                        InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
+                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
                         Poco::JSON::Array   CaCerts;
                         for(const auto &cert:GRCertificate.certificateChain) {
                             CaCerts.add(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
                         }
-                        AuthConfig.set("radsecCacerts", CaCerts);
-                        AuthConfig.set("radsecSecret","radsec");
+                        InnerServer.set("radsecCacerts", CaCerts);
+                        InnerServer.set("radsecSecret","radsec");
                         i++;
-                        ServerArray.add(AuthConfig);
+                        ServerArray.add(InnerServer);
                     }
-                    ServerDetails.set("servers",ServerArray);
-                    RadiusPools.add(ServerDetails);
+                    AuthConfig.set("servers",ServerArray);
+                    PoolEntry.set("authConfig", AuthConfig);
+                    RadiusPools.add(PoolEntry);
                 } else if(Endpoint.Type=="radius") {
                     PoolEntry.set("radsecPoolType","generic");
                     auto Servers = OpenRoaming_GlobalReach()->GetServers();
