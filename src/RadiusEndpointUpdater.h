@@ -57,6 +57,7 @@ namespace OpenWifi {
                         ServerArray.add(AuthConfig);
                     }
                     ServerDetails.set("servers",ServerArray);
+                    RadiusPools.add(ServerDetails);
                 } else if(Endpoint.Type=="radsec") {
                     PoolEntry.set("radsecPoolType","radsec");
                     for(const auto &Server:Endpoint.RadsecServers) {
