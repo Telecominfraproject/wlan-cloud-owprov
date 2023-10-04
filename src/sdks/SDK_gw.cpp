@@ -262,6 +262,7 @@ namespace OpenWifi::SDK::GW {
             auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
             auto ResponseStatus =
                     R.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
+            CallResponse->stringify(std::cout,2,2);
             if(ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
                 return NewPools.from_json(CallResponse);
             }
