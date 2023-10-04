@@ -38,7 +38,7 @@ namespace OpenWifi {
                 return OrionWifiServerAddresses;
             }
 
-            inline bool Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object &Result) {
+            inline bool Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, const std::string &SerialNumber, Poco::JSON::Object &Result) {
                 if(RE.UseGWProxy) {
                     Poco::JSON::Object  Auth, Acct, CoA;
 
@@ -55,7 +55,7 @@ namespace OpenWifi {
                     CoA.set("port", 3799);
                     CoA.set("secret", RE.RadsecServers[0].Secret);
 
-                    Result.set("nas-identifier", RE.NasIdentifier);
+                    Result.set("nas-identifier", RE.NasIdentifier.empty() ? SerialNumber : RE.NasIdentifier );
                     Result.set("authentication", Auth);
                     Result.set("accounting", Acct);
                     Result.set("dynamic-authorization", CoA);

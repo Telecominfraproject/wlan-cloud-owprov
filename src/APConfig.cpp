@@ -62,9 +62,9 @@ namespace OpenWifi {
         if(RE.UseGWProxy) {
             Poco::JSON::Object  ServerSettings;
             if (RE.Type == "orion") {
-                return OpenRoaming_Orion()->Render(RE, Result);
+                return OpenRoaming_Orion()->Render(RE, SerialNumber_, Result);
             } else if (RE.Type == "globalreach") {
-                return OpenRoaming_GlobalReach()->Render(RE, Result);
+                return OpenRoaming_GlobalReach()->Render(RE, SerialNumber_, Result);
             } else if (RE.Type == "radsec") {
 
             } else if (RE.Type == "radius") {
@@ -169,6 +169,7 @@ namespace OpenWifi {
 	}
 
 	bool APConfig::Get(Poco::JSON::Object::Ptr &Configuration) {
+
 		if (Config_.empty()) {
 			Explanation_.clear();
 			try {
