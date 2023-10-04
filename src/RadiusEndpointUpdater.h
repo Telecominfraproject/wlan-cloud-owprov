@@ -42,6 +42,8 @@ namespace OpenWifi {
             Poco::JSON::Object  RadiusConfig;
             RadiusConfig.set("pools", RadiusPools);
 
+            RadiusPools.stringify(std::cout,4,2);
+
             AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
             return false;
         }
