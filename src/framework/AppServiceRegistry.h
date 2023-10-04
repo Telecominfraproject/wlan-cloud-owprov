@@ -77,7 +77,7 @@ namespace OpenWifi {
         }
 
         template<class T> bool Get(const char *key, T &Value) {
-            if(Registry_->has(key)) {
+            if(Registry_->has(key) && !Registry_->isNull(key)) {
                 Value = Registry_->getValue<T>(key);
                 return true;
             }
