@@ -2,8 +2,9 @@
 // Created by stephane bourque on 2023-10-02.
 //
 
-#ifndef OWPROV_RADIUSENDPOINT_H
-#define OWPROV_RADIUSENDPOINT_H
+#pragma once
+#include <framework/AppServiceRegistry.h>
+#include <framework/utils.h>
 
 /*
 
@@ -110,12 +111,18 @@
 
 
  */
-namespace OpenWifi {
+#include <string>
 
-    class RadiusEndpoint {
+namespace OpenWifi {
+    class RadiusEndpointUpdater {
+    public:
+        inline bool UpdateEndpoints( [[maybe_unused]] std::string & Error,
+                                     [[maybe_unused]] uint64_t &ErrorNum  ) {
+
+            AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
+            return false;
+        }
+    private:
 
     };
-
 } // OpenWifi
-
-#endif //OWPROV_RADIUSENDPOINT_H

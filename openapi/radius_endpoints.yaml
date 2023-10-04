@@ -151,19 +151,25 @@ paths:
           description: Pagination start (starts at 1. If not specified, 1 is assumed)
           name: offset
           schema:
-          type: integer
+            type: integer
           required: false
         - in: query
           description: Maximum number of entries to return (if absent, no limit is assumed)
           name: limit
           schema:
-          type: integer
+            type: integer
           required: false
         - in: query
           description: return the number of certificates
           name: countOnly
           schema:
-          type: boolean
+            type: boolean
+          required: false
+        - in: query
+          description: return the last update time
+          name: lastUpdate
+          schema:
+            type: boolean
           required: false
       responses:
         200:
@@ -171,9 +177,46 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RADIUSEndPoint'
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/RADIUSEndPoint'
+                  - type: object
+                    properties:
+                      lastUpdate:
+                        type: integer
+                        format: int64
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - RADIUS Endpoints
+      operationId: updateRADIUSEndpoints
+      summary: Force an Update to teh RADIUSendPoints in the controller
+      parameters:
+        - in: query
+          name: updateEndpoints
+          schema:
+            type: boolean
+          required: false
+      responses:
+        200:
+          description: The list of endpoints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                  ErrorNum:
+                    type: integer
+          $ref: '#/components/responses/Success'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

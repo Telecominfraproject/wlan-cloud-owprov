@@ -227,8 +227,8 @@ add_executable(owprov
         src/RESTAPI/RESTAPI_radius_endpoint_handler.h
         src/RadiusEndpointTypes/GlobalReach.cpp src/RadiusEndpointTypes/GlobalReach.h
         src/RadiusEndpointTypes/OrionWifi.h
-        src/RadiusEndpoint.cpp
-        src/RadiusEndpoint.h
+        src/RadiusEndpointUpdater.cpp
+        src/RadiusEndpointUpdater.h
 )
 
 target_link_libraries(owprov PUBLIC

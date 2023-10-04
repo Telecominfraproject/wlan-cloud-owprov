@@ -59,26 +59,19 @@ namespace OpenWifi {
 	}
 
     bool APConfig::InsertRadiusEndPoint(const ProvObjects::RADIUSEndPoint &RE, Poco::JSON::Object &Result) {
-        DBGLINE
         if(RE.UseGWProxy) {
-            DBGLINE
             Poco::JSON::Object  ServerSettings;
             if (RE.Type == "orion") {
-                DBGLINE
                 return OpenRoaming_Orion()->Render(RE, Result);
             } else if (RE.Type == "globalreach") {
-                DBGLINE
                 return OpenRoaming_GlobalReach()->Render(RE, Result);
             } else if (RE.Type == "radsec") {
-                DBGLINE
 
             } else if (RE.Type == "radius") {
-                DBGLINE
 
             }
             Result.set( "radius" , ServerSettings);
         }
-        DBGLINE
         return false;
     }
 
@@ -87,7 +80,6 @@ namespace OpenWifi {
 		// get all the names and expand
 		auto Names = Original.getNames();
 		for (const auto &i : Names) {
-            DBGLINE
             if (i == "__variableBlock") {
                 if (Original.isArray(i)) {
                     auto UUIDs = Original.getArray(i);
@@ -101,13 +93,14 @@ namespace OpenWifi {
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for (const auto &j: VarNames) {
                                     std::cout << "Name: " << j << std::endl;
-                                    Poco::JSON::Object  InnerEval;
                                     if(VariableBlockInfo->isArray(j)) {
-                                        auto Arr = VariableBlockInfo->getArray(j);
-//                                        ReplaceVariablesInObject(,InnerEval);
-  //                                      Result->set(j, InnerEval);
+                                        auto Elements = VariableBlockInfo->getArray(j);
+                                        Poco::JSON::Array   InnerArray;
+                                        ReplaceVariablesInArray(*Elements,InnerArray);
+                                        Result.set(j,InnerArray);
                                         std::cout << "Array!!!" << std::endl;
                                     } else if(VariableBlockInfo->isObject(j)) {
+                                        Poco::JSON::Object  InnerEval;
                                         std::cout << "Visiting object " << j << std::endl;
                                         auto O = VariableBlockInfo->getObject(j);
                                         ReplaceVariablesInObject(*O,InnerEval);
@@ -121,40 +114,27 @@ namespace OpenWifi {
                     }
                 }
             } else if (i == "__radiusEndpoint") {
-                DBGLINE
                 auto EndPointId = Original.get(i).toString();
-                DBGLINE
                 ProvObjects::RADIUSEndPoint RE;
-                DBGLINE
                 std::cout << "ID->" << EndPointId << std::endl;
                 if(StorageService()->RadiusEndpointDB().GetRecord("id",EndPointId,RE)) {
-                    DBGLINE
                     InsertRadiusEndPoint(RE, Result);
-                    DBGLINE
                 } else {
-                    DBGLINE
                     poco_error(Logger_, fmt::format("RADIUS Endpoint {} could not be found. Please delete this configuration and recreate it."));
                     return false;
                 }
-                DBGLINE
 			} else if (Original.isArray(i)) {
-                DBGLINE
                 Poco::JSON::Array Arr;
 				auto Obj = Original.getArray(i);
 				ReplaceVariablesInArray(*Obj, Arr);
 				Result.set(i, Arr);
-                DBGLINE
 			} else if (Original.isObject(i)) {
-                DBGLINE
                 Poco::JSON::Object Expanded;
 				auto Obj = Original.getObject(i);
 				ReplaceVariablesInObject(*Obj, Expanded);
 				Result.set(i, Expanded);
-                DBGLINE
 			} else {
-                DBGLINE
 				Result.set(i, Original.get(i));
-                DBGLINE
 			}
 		}
 		return true;

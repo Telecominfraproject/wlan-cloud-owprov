@@ -12,6 +12,17 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
+        if(Account=="*") {
+            std::vector< ProvObjects::GLBLRCertificateInfo> Arr;
+            for(const auto &cert:QB_.Select) {
+                ProvObjects::GLBLRCertificateInfo CInfo;
+                if(StorageService()->GLBLRCertsDB().GetRecord("id",cert,CInfo)) {
+                    Arr.emplace_back(CInfo);
+                }
+            }
+            return ReturnObject(Arr);
+        }
+
         auto Where = fmt::format(" accountId='{}'", Account);
         if(GetBoolParameter("countOnly")) {
             return ReturnCountOnly(DB_.Count(Where));
