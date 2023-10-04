@@ -6,6 +6,7 @@
 #include <Poco/JWT/Token.h>
 #include <Poco/JWT/Signer.h>
 #include <Poco/Net/HTTPSClientSession.h>
+#include <Poco/Net/DNS.h>
 #include <Poco/URI.h>
 #include <Poco/TemporaryFile.h>
 #include <Poco/JSON/Object.h>
@@ -237,6 +238,12 @@ namespace OpenWifi {
                     auto Srvs = Utils::getSRVRecords(rec.replacement);
                     for(const auto &srv:Srvs) {
                         Utils::HostNameServerResult    R{srv.srvname,srv.port};
+                        if(!Utils::ValidIP(srv.srvname)) {
+                            auto Server = Poco::Net::DNS::hostByName(srv.srvname).addresses();
+                            if(!Server.empty()) {
+                                R.Hostname = Server[0].toString();
+                            }
+                        }
                         Results.emplace_back(R);
                     }
                 }

@@ -55,7 +55,7 @@ void ORM::DB<OpenWifi::GLBLRCertsDBRecordType, OpenWifi::ProvObjects::GLBLRCerti
     Out.accountId = In.get<2>();
     Out.csr = In.get<3>();
     Out.certificate = In.get<4>();
-    Out.certificateChain = In.get<5>();
+    Out.certificateChain = OpenWifi::RESTAPI_utils::to_object_array(In.get<5>());
     Out.certificateId = In.get<6>();
     Out.expiresAt = In.get<7>();
     Out.created = In.get<8>();
@@ -69,7 +69,7 @@ void ORM::DB<OpenWifi::GLBLRCertsDBRecordType, OpenWifi::ProvObjects::GLBLRCerti
     Out.set<2>(In.accountId);
     Out.set<3>(In.csr);
     Out.set<4>(In.certificate);
-    Out.set<5>(In.certificateChain);
+    Out.set<5>(OpenWifi::RESTAPI_utils::to_string(In.certificateChain));
     Out.set<6>(In.certificateId);
     Out.set<7>(In.expiresAt);
     Out.set<8>(In.created);

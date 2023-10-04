@@ -58,20 +58,51 @@ namespace OpenWifi {
                     }
                     ServerDetails.set("servers",ServerArray);
                     RadiusPools.add(ServerDetails);
-                } else if(Endpoint.Type=="radsec") {
-                    PoolEntry.set("radsecPoolType","radsec");
-                    for(const auto &Server:Endpoint.RadsecServers) {
-
+                } else if(Endpoint.Type=="globalreach") {
+                    PoolEntry.set("radsecPoolType","globalreach");
+                    auto Servers = OpenRoaming_GlobalReach()->GetServers();
+                    Poco::JSON::Object ServerDetails;
+                    ServerDetails.set("methodParameters", Poco::JSON::Array() );
+                    ServerDetails.set("monitor", false );
+                    ServerDetails.set("monitorMethod", "none" );
+                    ServerDetails.set("strategy","random");
+                    Poco::JSON::Array   ServerArray;
+                    ProvObjects::GLBLRCertificateInfo   GRCertificate;
+                    ProvObjects::GLBLRAccountInfo       GRAccountInfo;
+                    StorageService()->GLBLRCertsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,GRCertificate);
+                    StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo);
+                    int i=1;
+                    for(const auto &Server:Servers) {
+                        Poco::JSON::Object  AuthConfig;
+                        AuthConfig.set("allowSelfSigned", false);
+                        AuthConfig.set("ignore", false);
+                        AuthConfig.set("name", fmt::format("Server {}",i));
+                        AuthConfig.set("ip", Server.Hostname);
+                        AuthConfig.set("radsecPort", Server.Port);
+                        AuthConfig.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
+                        AuthConfig.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
+                        Poco::JSON::Array   CaCerts;
+                        for(const auto &cert:GRCertificate.certificateChain) {
+                            CaCerts.add(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
+                        }
+                        AuthConfig.set("radsecCacerts", CaCerts);
+                        AuthConfig.set("radsecSecret","radsec");
+                        i++;
+                        ServerArray.add(AuthConfig);
                     }
+                    ServerDetails.set("servers",ServerArray);
+                    RadiusPools.add(ServerDetails);
                 } else if(Endpoint.Type=="radius") {
                     PoolEntry.set("radsecPoolType","generic");
                     auto Servers = OpenRoaming_GlobalReach()->GetServers();
                     for(const auto &Server:Servers) {
 
                     }
-                } else if(Endpoint.Type=="globalreach") {
-                    PoolEntry.set("radsecPoolType","globalreach");
-                    auto Servers = OpenRoaming_GlobalReach()->GetServers();
+                } else if(Endpoint.Type=="radsec") {
+                    PoolEntry.set("radsecPoolType", "radsec");
+                    for (const auto &Server: Endpoint.RadsecServers) {
+
+                    }
                 }
                 RadiusPools.add(PoolEntry);
             }
