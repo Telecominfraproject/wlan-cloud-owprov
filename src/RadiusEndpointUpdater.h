@@ -165,14 +165,20 @@ namespace OpenWifi {
             RadiusConfig.set("pools", RadiusPools);
             RadiusConfig.stringify(std::cout,4,2);
 
+            DBGLINE
             GWObjects::RadiusProxyPoolList  NewPools;
+            DBGLINE
             if(SDK::GW::RADIUS::SetConfiguration(nullptr,RadiusConfig,NewPools)) {
+                DBGLINE
                 AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
+                DBGLINE
                 return true;
             }
+            DBGLINE
             Error = "Could not update the controller.";
             ErrorNum = 1;
 
+            DBGLINE
             return false;
         }
     private:
