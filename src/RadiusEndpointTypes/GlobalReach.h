@@ -37,6 +37,7 @@ namespace OpenWifi {
             void InitCache();
 
             bool Render(const OpenWifi::ProvObjects::RADIUSEndPoint &RE, const std::string & SerialNUmber, Poco::JSON::Object &Result);
+            std::vector<Utils::HostNameServerResult> GetServers();
 
         private:
             std::string MakeToken(const std::string &GlobalReachAccountId, const std::string &PrivateKey = "");
@@ -48,7 +49,6 @@ namespace OpenWifi {
             }
         };
 
-        std::vector<Utils::HostNameServerResult> GetServers();
     }
 
     inline auto OpenRoaming_GlobalReach() { return GlobalReach::OpenRoaming::instance(); }

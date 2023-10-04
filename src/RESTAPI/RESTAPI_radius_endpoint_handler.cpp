@@ -111,48 +111,12 @@ namespace OpenWifi {
                         if(!StorageService()->OrionAccountsDB().Exists("id",Server.UseOpenRoamingAccount)) {
                             return BadRequest(RESTAPI::Errors::OrionAccountMustExist);
                         }
-                        if(Server.Certificate.empty() || !Utils::ValidX509Certificate(Server.Certificate)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecMainCertificate);
-                        }
-                        if(Server.CaCerts.empty() || !Utils::ValidX509Certificate(Server.CaCerts)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecCaCertificate);
-                        }
-                        if(Server.PrivateKey.empty() || !Utils::VerifyPrivateKey(Server.PrivateKey)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecPrivteKey);
-                        }
-                        if(!Utils::ValidIP(Server.IP)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecIPAddress);
-                        }
-                        if(!(Server.Port>0 && Server.Port<65535)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecPort);
-                        }
-                        if(Server.Secret.empty()) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecSecret);
-                        }
                     }
                 } break;
                 case RadiusEndpointDB::EndpointType::globalreach: {
                     for(const auto &Server:NewRecord.RadsecServers) {
                         if(!StorageService()->GLBLRCertsDB().Exists("id",Server.UseOpenRoamingAccount)) {
                             return BadRequest(RESTAPI::Errors::GlobalReachCertMustExist);
-                        }
-                        if(Server.Certificate.empty() || !Utils::ValidX509Certificate(Server.Certificate)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecMainCertificate);
-                        }
-                        if(Server.CaCerts.empty() || !Utils::ValidX509Certificate(Server.CaCerts)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecCaCertificate);
-                        }
-                        if(Server.PrivateKey.empty() || !Utils::VerifyPrivateKey(Server.PrivateKey)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecPrivteKey);
-                        }
-                        if(!Utils::ValidIP(Server.IP)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecIPAddress);
-                        }
-                        if(!(Server.Port>0 && Server.Port<65535)) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecPort);
-                        }
-                        if(Server.Secret.empty()) {
-                            return BadRequest(RESTAPI::Errors::InvalidRadsecSecret);
                         }
                     }
                 } break;

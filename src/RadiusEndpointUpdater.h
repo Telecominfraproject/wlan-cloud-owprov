@@ -6,6 +6,8 @@
 #include <framework/AppServiceRegistry.h>
 #include <framework/utils.h>
 #include <StorageService.h>
+#include <RadiusEndpointTypes/OrionWifi.h>
+#include <RadiusEndpointTypes/GlobalReach.h>
 
 namespace OpenWifi {
     class RadiusEndpointUpdater {
@@ -26,12 +28,14 @@ namespace OpenWifi {
                 PoolEntry.set("radsecPoolKeepAlive",25);
                 if(Endpoint.Type=="orion") {
                     PoolEntry.set("radsecPoolType","orion");
+                    auto Servers = OpenRoaming_Orion()->GetServers();
                 } else if(Endpoint.Type=="radsec") {
                     PoolEntry.set("radsecPoolType","radsec");
                 } else if(Endpoint.Type=="radius") {
                     PoolEntry.set("radsecPoolType","generic");
                 } else if(Endpoint.Type=="globalreach") {
                     PoolEntry.set("radsecPoolType","globalreach");
+                    auto Servers = OpenRoaming_GlobalReach()->GetServers();
                 }
                 RadiusPools.add(PoolEntry);
             }

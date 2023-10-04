@@ -227,7 +227,7 @@ namespace OpenWifi {
             return false;
         }
 
-        std::vector<Utils::HostNameServerResult> GetServers() {
+        std::vector<Utils::HostNameServerResult> OpenRoaming::GetServers() {
             const std::string &domain = "openro.am";
             auto Naptrs = Utils::getNAPTRRecords(domain);
             std::vector<Utils::HostNameServerResult>   Results;
