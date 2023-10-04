@@ -132,7 +132,7 @@ namespace OpenWifi {
                         InnerServer.set("allowSelfSigned", false);
                         InnerServer.set("ignore", false);
                         InnerServer.set("name", fmt::format("Server {}",i));
-                        InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("ip", Server.IP);
                         InnerServer.set("radsec", true);
                         InnerServer.set("radsecPort", Server.Port);
                         InnerServer.set("port", Server.Port);
