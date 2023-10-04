@@ -82,11 +82,7 @@ namespace OpenWifi {
                         InnerServer.set("radsecPort", Server.Port);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
-                        Poco::JSON::Array   CaCerts;
-                        for(const auto &cert:GRCertificate.certificateChain) {
-                            CaCerts.add(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
-                        }
-                        InnerServer.set("radsecCacerts", CaCerts);
+                        InnerServer.set("radsecCacerts", Utils::base64encode((const u_char *)GRCertificate.certificateChain.c_str(),GRCertificate.certificateChain.size()));
                         InnerServer.set("radsecSecret","radsec");
                         i++;
                         ServerArray.add(InnerServer);

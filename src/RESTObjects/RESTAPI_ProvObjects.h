@@ -829,7 +829,7 @@ namespace OpenWifi::ProvObjects {
         std::string accountId;
         std::string csr;
         std::string certificate;
-        std::vector<std::string> certificateChain;
+        std::string certificateChain;
         std::string certificateId;
         std::uint64_t expiresAt = 0;
         std::uint64_t created = 0;
