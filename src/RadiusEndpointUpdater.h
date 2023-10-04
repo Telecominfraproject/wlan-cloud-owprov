@@ -36,7 +36,7 @@ namespace OpenWifi {
             O.set("servers", ServerArray);
         }
 
-        inline bool UpdateEndpoints( [[maybe_unused]] std::string & Error,
+        inline bool UpdateEndpoints( RESTAPIHandler *Client, [[maybe_unused]] std::string & Error,
                                      [[maybe_unused]] uint64_t &ErrorNum  ) {
 
             std::vector<ProvObjects::RADIUSEndPoint>    Endpoints;
@@ -168,7 +168,7 @@ namespace OpenWifi {
             DBGLINE
             GWObjects::RadiusProxyPoolList  NewPools;
             DBGLINE
-            if(SDK::GW::RADIUS::SetConfiguration(nullptr,RadiusConfig,NewPools)) {
+            if(SDK::GW::RADIUS::SetConfiguration(Client,RadiusConfig,NewPools)) {
                 DBGLINE
                 AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
                 DBGLINE

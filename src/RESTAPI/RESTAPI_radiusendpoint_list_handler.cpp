@@ -36,7 +36,7 @@ namespace OpenWifi {
 
             std::string Error;
             uint64_t ErrorNum = 0;
-            R.UpdateEndpoints(Error, ErrorNum);
+            R.UpdateEndpoints(this, Error, ErrorNum);
 
             Poco::JSON::Object  Answer;
             Answer.set("Error", Error);
