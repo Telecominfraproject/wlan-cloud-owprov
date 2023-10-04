@@ -69,6 +69,7 @@ namespace OpenWifi {
                         InnerServer.set("name", fmt::format("Server {}",i));
                         InnerServer.set("ip", Server.Hostname);
                         InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("port", Server.Port);
                         InnerServer.set("radsec", true);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size()));
@@ -106,6 +107,7 @@ namespace OpenWifi {
                         InnerServer.set("ip", Server.Hostname);
                         InnerServer.set("radsec", true);
                         InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("port", Server.Port);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
                         InnerServer.set("radsecCacerts", Utils::base64encode((const u_char *)GRCertificate.certificateChain.c_str(),GRCertificate.certificateChain.size()));
@@ -133,6 +135,7 @@ namespace OpenWifi {
                         InnerServer.set("ip", Server.Hostname);
                         InnerServer.set("radsec", true);
                         InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("port", Server.Port);
                         InnerServer.set("radsecCert", Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size()));
                         InnerServer.set("radsecKey", Utils::base64encode((const u_char *)Server.PrivateKey.c_str(), Server.PrivateKey.size()));
                         Poco::JSON::Array   CertArray;
