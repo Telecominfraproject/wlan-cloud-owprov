@@ -211,6 +211,9 @@ namespace OpenWifi {
             return NotFound();
         }
 
+        AssignIfPresent(RawObject,"NasIdentifier", Existing.NasIdentifier);
+        AssignIfPresent(RawObject,"AccountingInterval", Existing.AccountingInterval);
+
         ProvObjects::UpdateObjectInfo(RawObject, UserInfo_.userinfo, Existing.info);
         if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
             RecordType  AddedRecord;
