@@ -90,14 +90,38 @@ namespace OpenWifi {
                     AuthConfig.set("servers",ServerArray);
                     PoolEntry.set("authConfig", AuthConfig);
                     RadiusPools.add(PoolEntry);
-                } else if(Endpoint.Type=="radius") {
-                    PoolEntry.set("radsecPoolType","generic");
-                    auto Servers = OpenRoaming_GlobalReach()->GetServers();
-                    for(const auto &Server:Servers) {
-
-                    }
                 } else if(Endpoint.Type=="radsec") {
-                    PoolEntry.set("radsecPoolType", "radsec");
+                    PoolEntry.set("radsecPoolType","generic");
+                    Poco::JSON::Object AuthConfig;
+                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
+                    AuthConfig.set("monitor", false );
+                    AuthConfig.set("monitorMethod", "none" );
+                    AuthConfig.set("strategy","random");
+                    Poco::JSON::Array   ServerArray;
+                    int i=1;
+                    for(const auto &Server:Endpoint.RadsecServers) {
+                        Poco::JSON::Object  InnerServer;
+                        InnerServer.set("allowSelfSigned", false);
+                        InnerServer.set("ignore", false);
+                        InnerServer.set("name", fmt::format("Server {}",i));
+                        InnerServer.set("ip", Server.Hostname);
+                        InnerServer.set("radsecPort", Server.Port);
+                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size()));
+                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)Server.PrivateKey.c_str(), Server.PrivateKey.size()));
+                        Poco::JSON::Array   CertArray;
+                        for(const auto & cert : Server.CaCerts) {
+                            CertArray.add(Utils::base64encode((const u_char *)cert.c_str(), cert.size()));
+                        }
+                        InnerServer.set("radsecCacerts", CertArray);
+                        InnerServer.set("radsecSecret","radsec");
+                        i++;
+                        ServerArray.add(InnerServer);
+                    }
+                    AuthConfig.set("servers",ServerArray);
+                    PoolEntry.set("authConfig", AuthConfig);
+                    RadiusPools.add(PoolEntry);
+                } else if(Endpoint.Type=="radius") {
+                    PoolEntry.set("radsecPoolType", "radius");
                     for (const auto &Server: Endpoint.RadsecServers) {
 
                     }
