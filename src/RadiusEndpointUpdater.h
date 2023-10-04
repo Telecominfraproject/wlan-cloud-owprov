@@ -102,7 +102,6 @@ namespace OpenWifi {
 
                     }
                 }
-                RadiusPools.add(PoolEntry);
             }
 
             Poco::JSON::Object  RadiusConfig;
