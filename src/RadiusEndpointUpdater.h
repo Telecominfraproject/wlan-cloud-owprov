@@ -24,9 +24,6 @@ namespace OpenWifi {
 
             for(const auto &Endpoint:Endpoints) {
                 GWObjects::RadiusProxyPool  PP;
-                auto & AUTH = PP.authConfig;
-                auto & ACCT = PP.acctConfig;
-                auto & COA = PP.coaConfig;
 
                 PP.name = Endpoint.info.name;
                 PP.description = Endpoint.info.description;
@@ -40,9 +37,9 @@ namespace OpenWifi {
                     PP.radsecPoolType="orion";
                     ProvObjects::GooglOrionAccountInfo  OA;
                     if(StorageService()->OrionAccountsDB().GetRecord("id", Endpoint.RadsecServers[0].UseOpenRoamingAccount, OA)) {
-                        for(auto ServerType:{ AUTH, ACCT, COA}) {
-                            ServerType.monitor = false;
-                            ServerType.strategy = Endpoint.PoolStrategy;
+                        for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
+                            ServerType->monitor = false;
+                            ServerType->strategy = Endpoint.PoolStrategy;
                             int i=1;
                             for (const auto &Server: Svrs) {
                                 GWObjects::RadiusProxyServerEntry PE;
@@ -59,7 +56,7 @@ namespace OpenWifi {
                                 PE.allowSelfSigned = false;
                                 PE.weight = 10;
                                 PE.secret = PE.radsecSecret = "radsec";
-                                ServerType.servers.emplace_back(PE);
+                                ServerType->servers.emplace_back(PE);
                             }
                         }
                         Pools.pools.emplace_back(PP);
@@ -71,9 +68,9 @@ namespace OpenWifi {
                     ProvObjects::GLBLRAccountInfo       GRAccountInfo;
                     if( StorageService()->GLBLRCertsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,GRCertificate) &&
                         StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo)) {
-                        for(auto ServerType:{ AUTH, ACCT, COA}) {
-                            ServerType.monitor = false;
-                            ServerType.strategy = Endpoint.PoolStrategy;
+                        for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
+                            ServerType->monitor = false;
+                            ServerType->strategy = Endpoint.PoolStrategy;
                             int i = 1;
                             for (const auto &Server: Svrs) {
                                 GWObjects::RadiusProxyServerEntry PE;
@@ -88,16 +85,16 @@ namespace OpenWifi {
                                 PE.allowSelfSigned = false;
                                 PE.weight = 10;
                                 PE.secret = PE.radsecSecret = "radsec";
-                                ServerType.servers.emplace_back(PE);
+                                ServerType->servers.emplace_back(PE);
                             }
                         }
                         Pools.pools.emplace_back(PP);
                     }
                 } else if(Endpoint.Type=="radsec"  && !Endpoint.RadsecServers.empty()) {
                     PP.radsecPoolType="radsec";
-                    for(auto ServerType:{ AUTH, ACCT, COA}) {
-                        ServerType.monitor = false;
-                        ServerType.strategy = Endpoint.PoolStrategy;
+                    for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
+                        ServerType->monitor = false;
+                        ServerType->strategy = Endpoint.PoolStrategy;
                         for (const auto &Server: Endpoint.RadsecServers) {
                             GWObjects::RadiusProxyServerEntry PE;
                             PE.radsecCert = Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size());
@@ -115,7 +112,7 @@ namespace OpenWifi {
                             PE.allowSelfSigned = false;
                             PE.weight = 10;
                             PE.secret = PE.radsecSecret = "radsec";
-                            ServerType.servers.emplace_back(PE);
+                            ServerType->servers.emplace_back(PE);
                         }
                     }
                     Pools.pools.emplace_back(PP);
