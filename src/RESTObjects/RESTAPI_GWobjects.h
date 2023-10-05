@@ -42,12 +42,13 @@ namespace OpenWifi::GWObjects {
 		uint64_t sessionId = 0;
 		double connectionCompletionTime = 0.0;
 		std::uint64_t certificateExpiryDate = 0;
-		bool hasRADIUSSessions = false;
+		std::uint64_t hasRADIUSSessions = 0;
 		bool hasGPS = false;
 		std::uint64_t sanity=0;
 		std::double_t memoryUsed=0.0;
 		std::double_t load=0.0;
 		std::double_t temperature=0.0;
+		std::string 	connectReason;
 
 		void to_json(const std::string &SerialNumber, Poco::JSON::Object &Obj) ;
 	};
@@ -177,6 +178,26 @@ namespace OpenWifi::GWObjects {
 		std::string Description;
 		uint64_t Created;
 		uint64_t LastModified;
+		void to_json(Poco::JSON::Object &Obj) const;
+		bool from_json(const Poco::JSON::Object::Ptr &Obj);
+	};
+
+	struct DefaultFirmware {
+		std::string deviceType;
+		std::string Description;
+		std::string uri;
+		std::string revision;
+		uint64_t imageCreationDate;
+		uint64_t Created;
+		uint64_t LastModified;
+
+		void to_json(Poco::JSON::Object &Obj) const;
+		bool from_json(const Poco::JSON::Object::Ptr &Obj);
+	};
+
+	struct DefaultFirmwareList {
+		std::vector<DefaultFirmware>	firmwares;
+
 		void to_json(Poco::JSON::Object &Obj) const;
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
 	};
@@ -339,6 +360,10 @@ namespace OpenWifi::GWObjects {
 		RadiusProxyServerConfig acctConfig;
 		RadiusProxyServerConfig coaConfig;
 		bool useByDefault = false;
+		std::string 	radsecPoolType;
+		std::string 	poolProxyIp;
+		std::uint64_t 	radsecKeepAlive=25;
+		bool			enabled=true;
 
 		void to_json(Poco::JSON::Object &Obj) const;
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -393,7 +418,8 @@ namespace OpenWifi::GWObjects {
 					 			callingStationId,
 								chargeableUserIdentity,
 								secret,
-								interface;
+								interface,
+								nasId;
 		std::uint64_t 			inputPackets = 0,
 								outputPackets = 0,
 								inputOctets = 0,
@@ -401,6 +427,7 @@ namespace OpenWifi::GWObjects {
 								inputGigaWords = 0,
 								outputGigaWords = 0;
 		std::uint32_t 			sessionTime = 0;
+		std::string 			calledStationId;
 
 #ifdef TIP_GATEWAY_SERVICE
 		RADIUS::RadiusPacket	accountingPacket;
@@ -418,9 +445,11 @@ namespace OpenWifi::GWObjects {
 		std::string 			accountingSessionId,
 								accountingMultiSessionId,
 								callingStationId,
-								chargeableUserIdentity;
+								chargeableUserIdentity,
+								userName;
 
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
+		void to_json(Poco::JSON::Object &Obj) const;
 	};
 
 } // namespace OpenWifi::GWObjects

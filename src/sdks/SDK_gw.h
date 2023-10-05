@@ -41,8 +41,8 @@ namespace OpenWifi::SDK::GW {
     namespace RADIUS {
         bool GetConfiguration(RESTAPIHandler *client, GWObjects::RadiusProxyPoolList &Pools);
         bool SetConfiguration(RESTAPIHandler *client, const GWObjects::RadiusProxyPoolList &Pools,
-                              GWObjects::RadiusProxyPoolList &NewPools);
+                              GWObjects::RadiusProxyPoolList &NewPools, Poco::JSON::Object &ErrorObj);
         bool SetConfiguration(RESTAPIHandler *client, const Poco::JSON::Object &Configuration,
-                              GWObjects::RadiusProxyPoolList &NewPools);
+                              GWObjects::RadiusProxyPoolList &NewPools, Poco::JSON::Object &ErrorObj);
     }
 } // namespace OpenWifi::SDK::GW

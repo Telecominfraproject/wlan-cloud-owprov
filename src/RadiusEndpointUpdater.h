@@ -15,176 +15,158 @@ namespace OpenWifi {
     class RadiusEndpointUpdater {
     public:
 
-        void AddServers(const  std::vector<ProvObjects::RADIUSServer> &ServerList, Poco::JSON::Object &O) {
-            O.set("methodParameters", Poco::JSON::Array());
-            O.set("monitor" , false);
-            O.set("monitorMethod", "none");
-            O.set("strategy", "random");
-            Poco::JSON::Array   ServerArray;
-            for(const auto &server:ServerList) {
-                Poco::JSON::Object  InnerServer;
-                InnerServer.set("allowSelfSigned", false);
-                InnerServer.set("certificate", "");
-                InnerServer.set("ignore", false);
-                InnerServer.set("ip",server.IP);
-                InnerServer.set("port", server.Port);
-                InnerServer.set("secret", server.Secret);
-                InnerServer.set("name", server.Hostname);
-                InnerServer.set("radsec", false);
-                ServerArray.add(InnerServer);
-            }
-            O.set("servers", ServerArray);
-        }
-
         inline bool UpdateEndpoints( RESTAPIHandler *Client, [[maybe_unused]] std::string & Error,
                                      [[maybe_unused]] uint64_t &ErrorNum  ) {
 
             std::vector<ProvObjects::RADIUSEndPoint>    Endpoints;
+            GWObjects::RadiusProxyPoolList  Pools;
             StorageService()->RadiusEndpointDB().GetRecords(0,500,Endpoints);
-            Poco::JSON::Array   RadiusPools;
 
             for(const auto &Endpoint:Endpoints) {
-                Poco::JSON::Object  PoolEntry;
-                PoolEntry.set("description", Endpoint.info.description);
-                PoolEntry.set("name", Endpoint.info.name);
-                PoolEntry.set("useByDefault", false);
-                PoolEntry.set("poolProxyIp", Endpoint.Index);
-                PoolEntry.set("radsecPoolKeepAlive",25);
-                if(Endpoint.Type=="orion") {
-                    PoolEntry.set("radsecPoolType","orion");
-                    auto Servers = OpenRoaming_Orion()->GetServers();
-                    Poco::JSON::Object AuthConfig;
-                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
-                    AuthConfig.set("monitor", false );
-                    AuthConfig.set("monitorMethod", "none" );
-                    AuthConfig.set("strategy","random");
-                    Poco::JSON::Array   ServerArray;
+                GWObjects::RadiusProxyPool  PP;
+                auto & AUTH = PP.authConfig;
+                auto & ACCT = PP.acctConfig;
+                auto & COA = PP.coaConfig;
+
+                PP.name = Endpoint.info.name;
+                PP.description = Endpoint.info.description;
+                PP.useByDefault = false;
+                PP.poolProxyIp = Endpoint.Index;
+                PP.radsecKeepAlive = 25;
+                PP.enabled = true;
+
+                if(Endpoint.Type=="orion" && !Endpoint.RadsecServers.empty()) {
+                    auto Svrs = OpenRoaming_Orion()->GetServers();
+                    PP.radsecPoolType="orion";
                     ProvObjects::GooglOrionAccountInfo  OA;
-                    StorageService()->OrionAccountsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,OA);
-                    int i=1;
-                    for(const auto &Server:Servers) {
-                        Poco::JSON::Object  InnerServer;
-                        InnerServer.set("allowSelfSigned", false);
-                        InnerServer.set("ignore", false);
-                        InnerServer.set("name", fmt::format("Server {}",i));
-                        InnerServer.set("ip", Server.Hostname);
-                        InnerServer.set("radsecPort", Server.Port);
-                        InnerServer.set("port", Server.Port);
-                        InnerServer.set("radsec", true);
-                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size()));
-                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size()));
-                        Poco::JSON::Array   CaCerts;
-                        for(const auto &cert:OA.cacerts) {
-                            CaCerts.add(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
+                    if(StorageService()->OrionAccountsDB().GetRecord("id", Endpoint.RadsecServers[0].UseOpenRoamingAccount, OA)) {
+                        for(auto ServerType:{ AUTH, ACCT, COA}) {
+                            ServerType.monitor = false;
+                            ServerType.strategy = Endpoint.PoolStrategy;
+                            int i=1;
+                            for (const auto &Server: Svrs) {
+                                GWObjects::RadiusProxyServerEntry PE;
+                                PE.radsecCert = Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size());
+                                PE.radsecKey = Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size());
+                                for(const auto &cert:OA.cacerts) {
+                                    PE.radsecCacerts.emplace_back(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
+                                }
+                                PE.radsec = true;
+                                PE.name = fmt::format("Server {}",i++);
+                                PE.ignore = false;
+                                PE.ip = Server.Hostname;
+                                PE.port = PE.radsecPort = Server.Port;
+                                PE.allowSelfSigned = false;
+                                PE.weight = 10;
+                                PE.secret = PE.radsecSecret = "radsec";
+                                ServerType.servers.emplace_back(PE);
+                            }
                         }
-                        InnerServer.set("radsecCacerts", CaCerts);
-                        InnerServer.set("radsecSecret","radsec");
-                        i++;
-                        ServerArray.add(InnerServer);
+                        Pools.pools.emplace_back(PP);
                     }
-                    AuthConfig.set("servers",ServerArray);
-                    PoolEntry.set("authConfig", AuthConfig);
-                    RadiusPools.add(PoolEntry);
-                } else if(Endpoint.Type=="globalreach") {
-                    PoolEntry.set("radsecPoolType","globalreach");
-                    auto Servers = OpenRoaming_GlobalReach()->GetServers();
-                    Poco::JSON::Object AuthConfig;
-                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
-                    AuthConfig.set("monitor", false );
-                    AuthConfig.set("monitorMethod", "none" );
-                    AuthConfig.set("strategy","random");
-                    Poco::JSON::Array   ServerArray;
+                } else if(Endpoint.Type=="globalreach" && !Endpoint.RadsecServers.empty()) {
+                    auto Svrs = OpenRoaming_GlobalReach()->GetServers();
+                    PP.radsecPoolType="globalreach";
                     ProvObjects::GLBLRCertificateInfo   GRCertificate;
                     ProvObjects::GLBLRAccountInfo       GRAccountInfo;
-                    StorageService()->GLBLRCertsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,GRCertificate);
-                    StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo);
-                    int i=1;
-                    for(const auto &Server:Servers) {
-                        Poco::JSON::Object  InnerServer;
-                        InnerServer.set("allowSelfSigned", false);
-                        InnerServer.set("ignore", false);
-                        InnerServer.set("name", fmt::format("Server {}",i));
-                        InnerServer.set("ip", Server.Hostname);
-                        InnerServer.set("radsec", true);
-                        InnerServer.set("radsecPort", Server.Port);
-                        InnerServer.set("port", Server.Port);
-                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size()));
-                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size()));
-                        InnerServer.set("radsecCacerts", Utils::base64encode((const u_char *)GRCertificate.certificateChain.c_str(),GRCertificate.certificateChain.size()));
-                        InnerServer.set("radsecSecret","radsec");
-                        i++;
-                        ServerArray.add(InnerServer);
-                    }
-                    AuthConfig.set("servers",ServerArray);
-                    PoolEntry.set("authConfig", AuthConfig);
-                    RadiusPools.add(PoolEntry);
-                } else if(Endpoint.Type=="radsec") {
-                    PoolEntry.set("radsecPoolType","generic");
-                    Poco::JSON::Object AuthConfig;
-                    AuthConfig.set("methodParameters", Poco::JSON::Array() );
-                    AuthConfig.set("monitor", false );
-                    AuthConfig.set("monitorMethod", "none" );
-                    AuthConfig.set("strategy","random");
-                    Poco::JSON::Array   ServerArray;
-                    int i=1;
-                    for(const auto &Server:Endpoint.RadsecServers) {
-                        Poco::JSON::Object  InnerServer;
-                        InnerServer.set("allowSelfSigned", false);
-                        InnerServer.set("ignore", false);
-                        InnerServer.set("name", fmt::format("Server {}",i));
-                        InnerServer.set("ip", Server.IP);
-                        InnerServer.set("radsec", true);
-                        InnerServer.set("radsecPort", Server.Port);
-                        InnerServer.set("port", Server.Port);
-                        InnerServer.set("radsecCert", Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size()));
-                        InnerServer.set("radsecKey", Utils::base64encode((const u_char *)Server.PrivateKey.c_str(), Server.PrivateKey.size()));
-                        Poco::JSON::Array   CertArray;
-                        for(const auto & cert : Server.CaCerts) {
-                            CertArray.add(Utils::base64encode((const u_char *)cert.c_str(), cert.size()));
+                    if( StorageService()->GLBLRCertsDB().GetRecord("id",Endpoint.RadsecServers[0].UseOpenRoamingAccount,GRCertificate) &&
+                        StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo)) {
+                        for(auto ServerType:{ AUTH, ACCT, COA}) {
+                            ServerType.monitor = false;
+                            ServerType.strategy = Endpoint.PoolStrategy;
+                            int i = 1;
+                            for (const auto &Server: Svrs) {
+                                GWObjects::RadiusProxyServerEntry PE;
+                                PE.radsecCert = Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size());
+                                PE.radsecKey = Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size());
+                                PE.radsecCacerts.emplace_back( Utils::base64encode((const u_char *)GRCertificate.certificateChain.c_str(),GRCertificate.certificateChain.size()));
+                                PE.radsec = true;
+                                PE.name = fmt::format("Server {}", i++);
+                                PE.ignore = false;
+                                PE.ip = Server.Hostname;
+                                PE.port = PE.radsecPort = Server.Port;
+                                PE.allowSelfSigned = false;
+                                PE.weight = 10;
+                                PE.secret = PE.radsecSecret = "radsec";
+                                ServerType.servers.emplace_back(PE);
+                            }
                         }
-                        InnerServer.set("radsecCacerts", CertArray);
-                        InnerServer.set("radsecSecret","radsec");
-                        i++;
-                        ServerArray.add(InnerServer);
+                        Pools.pools.emplace_back(PP);
                     }
-                    AuthConfig.set("servers",ServerArray);
-                    PoolEntry.set("authConfig", AuthConfig);
-                    RadiusPools.add(PoolEntry);
-                } else if(Endpoint.Type=="radius") {
-                    PoolEntry.set("radsecPoolType", "radius");
-                    const auto &server = Endpoint.RadiusServers[0];
-                    Poco::JSON::Object  ServerEntry;
-                    Poco::JSON::Object  AcctConfig, AuthConfig, CoAConfig, InnerServer;
-                    AddServers(server.Authentication,AuthConfig);
-                    AddServers(server.Accounting,AcctConfig);
-                    AddServers(server.CoA,CoAConfig);
-                    PoolEntry.set("authConfig", AuthConfig);
-                    PoolEntry.set("acctConfig", AcctConfig);
-                    PoolEntry.set("coaConfig", CoAConfig);
-                }
+                } else if(Endpoint.Type=="radsec"  && !Endpoint.RadsecServers.empty()) {
+                    PP.radsecPoolType="radsec";
+                    for(auto ServerType:{ AUTH, ACCT, COA}) {
+                        ServerType.monitor = false;
+                        ServerType.strategy = Endpoint.PoolStrategy;
+                        for (const auto &Server: Endpoint.RadsecServers) {
+                            GWObjects::RadiusProxyServerEntry PE;
+                            PE.radsecCert = Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size());
+                            PE.radsecKey = Utils::base64encode((const u_char *)Server.PrivateKey.c_str(),Server.PrivateKey.size());
+                            for(const auto &C:Server.CaCerts) {
+                                PE.radsecCacerts.emplace_back(Utils::base64encode(
+                                        (const u_char *) C.c_str(),
+                                        C.size()));
+                            }
+                            PE.radsec = true;
+                            PE.name = Server.Hostname;
+                            PE.ignore = false;
+                            PE.ip = Server.IP;
+                            PE.port = PE.radsecPort = Server.Port;
+                            PE.allowSelfSigned = false;
+                            PE.weight = 10;
+                            PE.secret = PE.radsecSecret = "radsec";
+                            ServerType.servers.emplace_back(PE);
+                        }
+                    }
+                    Pools.pools.emplace_back(PP);
+                } else if(Endpoint.Type=="radius"  && !Endpoint.RadiusServers.empty()) {
+                    PP.radsecPoolType="generic";
+/*                    const auto &server = Endpoint.RadiusServers[0];
+                    for(auto &[ServerType,ServerInfo] : {
+                            {}AUTH, Endpoint.RadiusServers[0].Authentication[0]) ,
+                            std::pair(ACCT, Endpoint.RadiusServers[0].Accounting[0] ),
+                            std::pair(COA, Endpoint.RadiusServers[0].Accounting[0]) }
+                     ) {
+                        ServerType.
+                        ServerType.monitor = false;
+                        ServerType.strategy = Endpoint.PoolStrategy;
+                        GWObjects::RadiusProxyServerEntry PE;
+                        PE.radsec = false;
+                        PE.name = ServerInfo.Hostname;
+                        PE.ignore = false;
+                        PE.ip = ServerInfo.IP;
+                        PE.port = PE.radsecPort = ServerInfo.Port;
+                        PE.allowSelfSigned = false;
+                        PE.weight = 10;
+                        PE.secret = PE.radsecSecret = "radsec";
+                        ServerType.servers.emplace_back(PE);
+                    }
+                    Pools.pools.emplace_back(PP);
+  */              }
             }
 
-            Poco::JSON::Object  RadiusConfig;
-            RadiusConfig.set("pools", RadiusPools);
-            RadiusConfig.stringify(std::cout,4,2);
-
-            DBGLINE
             GWObjects::RadiusProxyPoolList  NewPools;
-            DBGLINE
-            if(SDK::GW::RADIUS::SetConfiguration(Client,RadiusConfig,NewPools)) {
+            Poco::JSON::Object ErrorObj;
+            if(SDK::GW::RADIUS::SetConfiguration(Client, Pools, NewPools, ErrorObj)) {
                 DBGLINE
                 AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
                 DBGLINE
                 return true;
             }
+
             DBGLINE
             Error = "Could not update the controller.";
             ErrorNum = 1;
 
             DBGLINE
+
             return false;
         }
+
     private:
 
     };
+
+
+
 } // OpenWifi
