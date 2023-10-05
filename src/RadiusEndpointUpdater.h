@@ -40,6 +40,8 @@ namespace OpenWifi {
                         for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
                             ServerType->monitor = false;
                             ServerType->strategy = Endpoint.PoolStrategy;
+                            ServerType->monitorMethod = "none";
+                            ServerType->strategy = "random";
                             int i=1;
                             for (const auto &Server: Svrs) {
                                 GWObjects::RadiusProxyServerEntry PE;
@@ -70,7 +72,9 @@ namespace OpenWifi {
                         StorageService()->GLBLRAccountInfoDB().GetRecord("id",GRCertificate.accountId,GRAccountInfo)) {
                         for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
                             ServerType->monitor = false;
+                            ServerType->monitorMethod = "none";
                             ServerType->strategy = Endpoint.PoolStrategy;
+                            ServerType->strategy = "random";
                             int i = 1;
                             for (const auto &Server: Svrs) {
                                 GWObjects::RadiusProxyServerEntry PE;
@@ -95,6 +99,8 @@ namespace OpenWifi {
                     for(auto *ServerType:{&PP.authConfig, &PP.acctConfig, &PP.coaConfig}) {
                         ServerType->monitor = false;
                         ServerType->strategy = Endpoint.PoolStrategy;
+                        ServerType->monitorMethod = "none";
+                        ServerType->strategy = "random";
                         for (const auto &Server: Endpoint.RadsecServers) {
                             GWObjects::RadiusProxyServerEntry PE;
                             PE.radsecCert = Utils::base64encode((const u_char *)Server.Certificate.c_str(), Server.Certificate.size());
