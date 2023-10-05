@@ -107,7 +107,7 @@ components:
         Type:
           type: string
           enum:
-            - radius
+            - generic
             - radsec
             - globalreach
             - orion
@@ -123,9 +123,10 @@ components:
         PoolStrategy:
           type: string
           enum:
-            - none
+            - round_robin
             - weighted
             - random
+          default: random
         UseGWProxy:
           type: boolean
           default: true
