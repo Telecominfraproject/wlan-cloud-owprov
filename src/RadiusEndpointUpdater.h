@@ -145,6 +145,10 @@ namespace OpenWifi {
   */              }
             }
 
+            Poco::JSON::Object  oo;
+            Pools.to_json(oo);
+            oo.stringify(std::cout,2,2);
+
             GWObjects::RadiusProxyPoolList  NewPools;
             Poco::JSON::Object ErrorObj;
             if(SDK::GW::RADIUS::SetConfiguration(Client, Pools, NewPools, ErrorObj)) {
