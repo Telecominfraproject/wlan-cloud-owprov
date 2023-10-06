@@ -15,6 +15,33 @@ namespace OpenWifi {
     class RadiusEndpointUpdater {
     public:
 
+        void ParseCertChain(const std::string &Chain, std::vector<std::string> &ChainVec) {
+            std::istringstream os(Chain);
+            std::string CurrentCert;
+            bool InCert = false;
+            while(os.good()) {
+                std::string Line;
+                os >> Line;
+                if(Line=="-----BEGIN CERTIFICATE-----") {
+                    InCert = true;
+                    CurrentCert += Line;
+                    CurrentCert += "\n";
+                    continue;
+                }
+                if(Line=="-----END CERTIFICATE-----" && InCert) {
+                    InCert = false;
+                    CurrentCert += Line;
+                    CurrentCert += "\n";
+                    ChainVec.emplace_back(CurrentCert);
+                    continue;
+                }
+                if(InCert) {
+                    CurrentCert += Line;
+                    CurrentCert += "\n";
+                }
+            }
+        }
+
         inline bool UpdateEndpoints( RESTAPIHandler *Client, [[maybe_unused]] std::string & Error,
                                      [[maybe_unused]] uint64_t &ErrorNum  ) {
 
@@ -80,7 +107,11 @@ namespace OpenWifi {
                                 GWObjects::RadiusProxyServerEntry PE;
                                 PE.radsecCert = Utils::base64encode((const u_char *)GRCertificate.certificate.c_str(),GRCertificate.certificate.size());
                                 PE.radsecKey = Utils::base64encode((const u_char *)GRAccountInfo.CSRPrivateKey.c_str(),GRAccountInfo.CSRPrivateKey.size());
-                                PE.radsecCacerts.emplace_back( Utils::base64encode((const u_char *)GRCertificate.certificateChain.c_str(),GRCertificate.certificateChain.size()));
+                                std::vector<std::string> Chain;
+                                ParseCertChain(GRCertificate.certificateChain,Chain);
+                                for(const auto &cert:Chain) {
+                                    PE.radsecCacerts.emplace_back( Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
+                                }
                                 PE.radsec = true;
                                 PE.name = fmt::format("Server {}", i++);
                                 PE.ignore = false;
@@ -122,7 +153,7 @@ namespace OpenWifi {
                         }
                     }
                     Pools.pools.emplace_back(PP);
-                } else if(Endpoint.Type=="radius"  && !Endpoint.RadiusServers.empty()) {
+                } else if(Endpoint.Type=="generic"  && !Endpoint.RadiusServers.empty()) {
                     PP.radsecPoolType="generic";
 /*                    const auto &server = Endpoint.RadiusServers[0];
                     for(auto &[ServerType,ServerInfo] : {

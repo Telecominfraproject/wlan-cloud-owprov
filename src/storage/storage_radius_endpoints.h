@@ -34,15 +34,15 @@ namespace OpenWifi {
         bool Upgrade(uint32_t from, uint32_t &to) override;
 
         enum class PoolStrategy {
-            none, random, weighted, unknown
+            round_robbin, random, weighted, unknown
         };
 
         enum class EndpointType {
-            radius, radsec, globalreach, orion, unknown
+            generic, radsec, globalreach, orion, unknown
         };
 
         static inline EndpointType EndpointType(const std::string &T) {
-            if(T=="radius") return EndpointType::radius;
+            if(T=="generic") return EndpointType::generic;
             if(T=="radsec") return EndpointType::radsec;
             if(T=="globalreach") return EndpointType::globalreach;
             if(T=="orion") return EndpointType::orion;
@@ -50,7 +50,7 @@ namespace OpenWifi {
         }
 
         static inline PoolStrategy PoolStrategy(const std::string &T) {
-            if(T=="none") return PoolStrategy::none;
+            if(T=="round_robbin") return PoolStrategy::round_robbin;
             if(T=="random") return PoolStrategy::random;
             if(T=="weighted") return PoolStrategy::weighted;
             return PoolStrategy::unknown;
@@ -58,7 +58,7 @@ namespace OpenWifi {
 
         static inline std::string to_string(enum EndpointType T) {
             switch(T) {
-                case EndpointType::radius: return "radius";
+                case EndpointType::generic: return "generic";
                 case EndpointType::radsec: return "radsec";
                 case EndpointType::globalreach: return "globalreach";
                 case EndpointType::orion: return "orion";
@@ -69,7 +69,7 @@ namespace OpenWifi {
 
         static inline std::string to_string(enum PoolStrategy T) {
             switch(T) {
-                case PoolStrategy::none: return "none";
+                case PoolStrategy::round_robbin: return "round_robbin";
                 case PoolStrategy::random: return "random";
                 case PoolStrategy::weighted: return "weighted";
                 default:

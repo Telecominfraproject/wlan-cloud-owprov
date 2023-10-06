@@ -81,7 +81,7 @@ namespace OpenWifi {
                     return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
                 }
             } break;
-            case RadiusEndpointDB::EndpointType::radius: {
+            case RadiusEndpointDB::EndpointType::generic: {
                 if(NewRecord.RadiusServers.empty()) {
                     return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
                 }
@@ -100,7 +100,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::RadiusEndpointIndexInvalid);
         }
 
-        if(EndPointType==RadiusEndpointDB::EndpointType::radius) {
+        if(EndPointType==RadiusEndpointDB::EndpointType::generic) {
             for(const auto &Server:NewRecord.RadiusServers) {
                 if(!ValidRadiusServer(Server.Authentication) ||
                 !ValidRadiusServer(Server.Accounting) ||
