@@ -22,6 +22,7 @@ namespace OpenWifi {
             while(os.good()) {
                 std::string Line;
                 os >> Line;
+                std::cout << Line << std::endl;
                 if(Line=="-----BEGIN CERTIFICATE-----") {
                     InCert = true;
                     CurrentCert += Line;
