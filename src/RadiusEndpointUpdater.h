@@ -19,9 +19,8 @@ namespace OpenWifi {
             std::istringstream os(Chain);
             std::string CurrentCert;
             bool InCert = false;
-            while(os.good()) {
-                std::string Line;
-                os >> Line;
+            std::string Line;
+            while(std::getline(os,Line)) {
                 std::cout << Line << std::endl;
                 if(Line=="-----BEGIN CERTIFICATE-----") {
                     InCert = true;
