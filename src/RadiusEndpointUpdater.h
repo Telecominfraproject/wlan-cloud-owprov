@@ -40,6 +40,7 @@ namespace OpenWifi {
                     CurrentCert += "\n";
                 }
             }
+
         }
 
         inline bool UpdateEndpoints( RESTAPIHandler *Client, [[maybe_unused]] std::string & Error,
@@ -75,7 +76,9 @@ namespace OpenWifi {
                                 PE.radsecCert = Utils::base64encode((const u_char *)OA.certificate.c_str(),OA.certificate.size());
                                 PE.radsecKey = Utils::base64encode((const u_char *)OA.privateKey.c_str(),OA.privateKey.size());
                                 for(const auto &cert:OA.cacerts) {
-                                    PE.radsecCacerts.emplace_back(Utils::base64encode((const u_char *)cert.c_str(),cert.size()));
+                                    auto C = Utils::base64encode((const u_char *)cert.c_str(),cert.size());
+                                    PE.radsecCacerts.emplace_back(C);
+                                    std::cout << C << std::endl;
                                 }
                                 PE.radsec = true;
                                 PE.name = fmt::format("Server {}",i++);
