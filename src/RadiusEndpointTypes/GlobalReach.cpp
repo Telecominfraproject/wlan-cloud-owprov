@@ -228,13 +228,16 @@ namespace OpenWifi {
             return false;
         }
 
+//        static std::string ServiceName{"aaa+auth:radius.tls.tcp"};
+        static std::string ServiceName{"x-openroam:radius.tls.tcp"};
+
         std::vector<Utils::HostNameServerResult> OpenRoaming::GetServers() {
             const std::string &domain = "openro.am";
             auto Naptrs = Utils::getNAPTRRecords(domain);
             std::vector<Utils::HostNameServerResult>   Results;
 
             for(const auto &rec:Naptrs) {
-                if(rec.service=="\"aaa+auth:radius.tls.tcp\"") {
+                if(rec.service==ServiceName) {
                     auto Srvs = Utils::getSRVRecords(rec.replacement);
                     for(const auto &srv:Srvs) {
                         Utils::HostNameServerResult    R{srv.srvname,srv.port};
