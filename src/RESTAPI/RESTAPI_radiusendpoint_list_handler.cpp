@@ -34,14 +34,14 @@ namespace OpenWifi {
         if(GetBoolParameter("updateEndpoints")) {
             RadiusEndpointUpdater R;
 
-            std::string Error;
-            uint64_t ErrorNum = 0;
-            R.UpdateEndpoints(this, Error, ErrorNum);
+            std::uint64_t ErrorCode;
+            std::string ErrorDetails;
+            std::string ErrorDescription;
 
-            Poco::JSON::Object  Answer;
-            Answer.set("Error", Error);
-            Answer.set("ErrorNum", ErrorNum);
-            return ReturnObject(Answer);
+            if(!R.UpdateEndpoints(this, ErrorCode, ErrorDetails,ErrorDescription)) {
+                return InternalError(RESTAPI::Errors::msg{.err_num = ErrorCode, .err_txt = ErrorDetails + ":" + ErrorDescription});
+            }
+            return OK();
         }
         return BadRequest(RESTAPI::Errors::MissingAuthenticationInformation);
     }

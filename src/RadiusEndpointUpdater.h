@@ -21,7 +21,6 @@ namespace OpenWifi {
             bool InCert = false;
             std::string Line;
             while(std::getline(os,Line)) {
-                std::cout << Line << std::endl;
                 if(Line=="-----BEGIN CERTIFICATE-----") {
                     InCert = true;
                     CurrentCert += Line;
@@ -40,11 +39,11 @@ namespace OpenWifi {
                     CurrentCert += "\n";
                 }
             }
-
         }
 
-        inline bool UpdateEndpoints( RESTAPIHandler *Client, [[maybe_unused]] std::string & Error,
-                                     [[maybe_unused]] uint64_t &ErrorNum  ) {
+        inline bool UpdateEndpoints( RESTAPIHandler *Client, std::uint64_t & ErrorCode,
+                                     std::string & ErrorDetails,
+                                     std::string & ErrorDescription) {
 
             std::vector<ProvObjects::RADIUSEndPoint>    Endpoints;
             GWObjects::RadiusProxyPoolList  Pools;
@@ -78,7 +77,6 @@ namespace OpenWifi {
                                 for(const auto &cert:OA.cacerts) {
                                     auto C = Utils::base64encode((const u_char *)cert.c_str(),cert.size());
                                     PE.radsecCacerts.emplace_back(C);
-                                    std::cout << C << std::endl;
                                 }
                                 PE.radsec = true;
                                 PE.name = fmt::format("Server {}",i++);
@@ -190,18 +188,23 @@ namespace OpenWifi {
             GWObjects::RadiusProxyPoolList  NewPools;
             Poco::JSON::Object ErrorObj;
             if(SDK::GW::RADIUS::SetConfiguration(Client, Pools, NewPools, ErrorObj)) {
-                DBGLINE
                 AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
-                DBGLINE
                 return true;
             }
-
-            DBGLINE
-            Error = "Could not update the controller.";
-            ErrorNum = 1;
-
-            DBGLINE
-
+/*
+            ErrorCode:
+            type: integer
+            ErrorDetails:
+            type: string
+            ErrorDescription:
+            type: string
+  */
+            if(ErrorObj.has("ErrorCode") && !ErrorObj.isNull("ErrorCode"))
+                ErrorCode = ErrorObj.get("ErrorCode");
+            if(ErrorObj.has("ErrorDescription") && !ErrorObj.isNull("ErrorDescription"))
+                ErrorDescription = ErrorObj.get("ErrorDescription").toString();
+            if(ErrorObj.has("ErrorDetails") && !ErrorObj.isNull("ErrorDetails"))
+                ErrorDetails += ErrorObj.get("ErrorDetails").toString();
             return false;
         }
 
