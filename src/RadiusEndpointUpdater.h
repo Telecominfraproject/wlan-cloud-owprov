@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include <vector>
+#include <utility>
 #include <framework/AppServiceRegistry.h>
 #include <framework/utils.h>
 #include <StorageService.h>
@@ -38,6 +40,27 @@ namespace OpenWifi {
                     CurrentCert += Line;
                     CurrentCert += "\n";
                 }
+            }
+        }
+
+        void UpdateRadiusServerEntry( GWObjects::RadiusProxyServerConfig &Config,
+                                      const ProvObjects::RADIUSEndPoint &Endpoint,
+                                      const std::vector<ProvObjects::RADIUSServer> &Servers) {
+            Config.monitor = false;
+            Config.strategy = Endpoint.PoolStrategy;
+            Config.monitorMethod = "none";
+            Config.strategy = "random";
+            for (const auto &Server: Servers) {
+                GWObjects::RadiusProxyServerEntry PE;
+                PE.radsec = false;
+                PE.name = Server.Hostname;
+                PE.ignore = false;
+                PE.ip = Server.IP;
+                PE.port = PE.radsecPort = Server.Port;
+                PE.allowSelfSigned = false;
+                PE.weight = 10;
+                PE.secret = PE.radsecSecret = "radsec";
+                Config.servers.emplace_back(PE);
             }
         }
 
@@ -156,28 +179,11 @@ namespace OpenWifi {
                     Pools.pools.emplace_back(PP);
                 } else if(Endpoint.Type=="generic"  && !Endpoint.RadiusServers.empty()) {
                     PP.radsecPoolType="generic";
-/*                    const auto &server = Endpoint.RadiusServers[0];
-                    for(auto &[ServerType,ServerInfo] : {
-                            {}AUTH, Endpoint.RadiusServers[0].Authentication[0]) ,
-                            std::pair(ACCT, Endpoint.RadiusServers[0].Accounting[0] ),
-                            std::pair(COA, Endpoint.RadiusServers[0].Accounting[0]) }
-                     ) {
-                        ServerType.
-                        ServerType.monitor = false;
-                        ServerType.strategy = Endpoint.PoolStrategy;
-                        GWObjects::RadiusProxyServerEntry PE;
-                        PE.radsec = false;
-                        PE.name = ServerInfo.Hostname;
-                        PE.ignore = false;
-                        PE.ip = ServerInfo.IP;
-                        PE.port = PE.radsecPort = ServerInfo.Port;
-                        PE.allowSelfSigned = false;
-                        PE.weight = 10;
-                        PE.secret = PE.radsecSecret = "radsec";
-                        ServerType.servers.emplace_back(PE);
-                    }
+                    UpdateRadiusServerEntry(PP.authConfig, Endpoint, Endpoint.RadiusServers[0].Authentication);
+                    UpdateRadiusServerEntry(PP.acctConfig, Endpoint, Endpoint.RadiusServers[0].Accounting);
+                    UpdateRadiusServerEntry(PP.coaConfig, Endpoint, Endpoint.RadiusServers[0].CoA);
                     Pools.pools.emplace_back(PP);
-  */              }
+                }
             }
 
 /*

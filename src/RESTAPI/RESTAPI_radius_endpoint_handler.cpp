@@ -4,6 +4,7 @@
 
 #include "RESTAPI_radius_endpoint_handler.h"
 #include <storage/storage_orion_accounts.h>
+#include <RESTObjects/RESTAPI_GWobjects.h>
 
 namespace OpenWifi {
 
@@ -61,27 +62,27 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        if(RadiusEndpointDB::EndpointType(NewRecord.Type)==RadiusEndpointDB::EndpointType::unknown) {
+        if(GWObjects::RadiusEndpointType(NewRecord.Type)==GWObjects::RadiusEndpointType::unknown) {
             return BadRequest(RESTAPI::Errors::InvalidRadiusTypeEndpoint);
         }
-        if(RadiusEndpointDB::PoolStrategy(NewRecord.PoolStrategy)==RadiusEndpointDB::PoolStrategy::unknown) {
+        if(GWObjects::RadiusPoolStrategy(NewRecord.PoolStrategy)==GWObjects::RadiusPoolStrategy::unknown) {
             return BadRequest(RESTAPI::Errors::InvalidRadiusEndpointPoolStrategy);
         }
         if(!NewRecord.RadiusServers.empty() && !NewRecord.RadsecServers.empty()) {
             return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
         }
 
-        auto EndPointType = RadiusEndpointDB::EndpointType(NewRecord.Type);
+        auto EndPointType = GWObjects::RadiusEndpointType(NewRecord.Type);
         switch(EndPointType) {
-            case RadiusEndpointDB::EndpointType::radsec:
-            case RadiusEndpointDB::EndpointType::orion:
-            case RadiusEndpointDB::EndpointType::globalreach:
+            case GWObjects::RadiusEndpointType::radsec:
+            case GWObjects::RadiusEndpointType::orion:
+            case GWObjects::RadiusEndpointType::globalreach:
             {
                 if(NewRecord.RadsecServers.empty()) {
                     return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
                 }
             } break;
-            case RadiusEndpointDB::EndpointType::generic: {
+            case GWObjects::RadiusEndpointType::generic: {
                 if(NewRecord.RadiusServers.empty()) {
                     return BadRequest(RESTAPI::Errors::EndpointMustHaveOneTypeOfServers);
                 }
@@ -100,7 +101,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::RadiusEndpointIndexInvalid);
         }
 
-        if(EndPointType==RadiusEndpointDB::EndpointType::generic) {
+        if(EndPointType==GWObjects::RadiusEndpointType::generic) {
             for(const auto &Server:NewRecord.RadiusServers) {
                 if(!ValidRadiusServer(Server.Authentication) ||
                 !ValidRadiusServer(Server.Accounting) ||
@@ -110,21 +111,21 @@ namespace OpenWifi {
             }
         } else {
             switch(EndPointType) {
-                case RadiusEndpointDB::EndpointType::orion: {
+                case GWObjects::RadiusEndpointType::orion: {
                     for(const auto &Server:NewRecord.RadsecServers) {
                         if(!StorageService()->OrionAccountsDB().Exists("id",Server.UseOpenRoamingAccount)) {
                             return BadRequest(RESTAPI::Errors::OrionAccountMustExist);
                         }
                     }
                 } break;
-                case RadiusEndpointDB::EndpointType::globalreach: {
+                case GWObjects::RadiusEndpointType::globalreach: {
                     for(const auto &Server:NewRecord.RadsecServers) {
                         if(!StorageService()->GLBLRCertsDB().Exists("id",Server.UseOpenRoamingAccount)) {
                             return BadRequest(RESTAPI::Errors::GlobalReachCertMustExist);
                         }
                     }
                 } break;
-                case RadiusEndpointDB::EndpointType::radsec: {
+                case GWObjects::RadiusEndpointType::radsec: {
                     for(const auto &Server:NewRecord.RadsecServers) {
                         if(Server.Certificate.empty() || !Utils::ValidX509Certificate(Server.Certificate)) {
                             return BadRequest(RESTAPI::Errors::InvalidRadsecMainCertificate);
