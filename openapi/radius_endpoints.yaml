@@ -200,8 +200,7 @@ paths:
                   - type: array
                     items:
                       $ref: '#/components/schemas/RADIUSEndPoint'
-                  - type:
-                      $ref: '#/components/schemas/RADIUSEndpointUpdateStatus'
+                  - $ref: '#/components/schemas/RADIUSEndpointUpdateStatus'
         400:
           $ref: '#/components/responses/BadRequest'
         403:
@@ -232,7 +231,6 @@ paths:
                     type: string
                   ErrorNum:
                     type: integer
-          $ref: '#/components/responses/Success'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

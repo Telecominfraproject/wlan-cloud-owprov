@@ -133,29 +133,32 @@ paths:
       summary: Run a specific or default RRM algorithm. The UI user or CLI user will have the ability to run an algorithm on demand.
       parameters:
         - in: query
-          description:
+          description: The venue this algorithm should be run on.
           name: venue
           schema:
             type: string
             format: uuid
           required: true
         - in: query
-          description: Perform RRM without updating anything. This may be used by an admin to see what RRM would do.
-          name: mock
+          description: Perform RRM asynchronously, synchronously or in mockRun mode (without updating anything, this may be used by an admin to see what RRM would do).
+          name: mode
           schema:
-            type: boolean
-            default: false
+            type: string
+            enum: [ async, sync, mockRun ]
           required: false
         - in: query
           description: Specify the RRM algorithm to use. If omitted, select the default algorithm.
+          name: algorithm
           schema:
             type: string
           required: false
         - in: query
-          description: Specify the parameters to use with the RRM algorithm to use. If omitted, select the default parameters.
+          description: Specify the comma separated name=value parameters to use with the RRM algorithm to use. If omitted, select the default parameters.
+          name: parameters
           schema:
             type: string
           required: false
+
       responses:
         200:
           description: Return the list of actions that were or would be performed.

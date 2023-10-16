@@ -102,10 +102,11 @@ paths:
       summary: Retrieve account information.
       parameters:
         - in: path
-          description: The account name
-          name: name
+          description: The account ID
+          name: id
           schema:
             type: string
+            format: uuid
           required: true
       responses:
         200:
@@ -124,10 +125,11 @@ paths:
       summary: Delete account information.
       parameters:
         - in: path
-          description: The account name
-          name: name
+          description: The account ID
+          name: id
           schema:
             type: string
+            format: uuid
           required: true
       responses:
         200:
@@ -146,10 +148,11 @@ paths:
       summary: Create account information.
       parameters:
         - in: path
-          description: The account name
-          name: name
+          description: The account ID
+          name: id
           schema:
             type: string
+            format: uuid
           required: true
       requestBody:
         content:
@@ -173,10 +176,11 @@ paths:
       summary: Modify account information.
       parameters:
         - in: path
-          description: The account name
-          name: name
+          description: The account ID
+          name: id
           schema:
             type: string
+            format: uuid
           required: true
       requestBody:
         content:
