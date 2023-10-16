@@ -99,7 +99,6 @@ namespace OpenWifi {
 			if (Device->Get(Configuration)) {
 				std::ostringstream OS;
 				Configuration->stringify(OS);
-                std::cout << OS.str() << std::endl;
 				Results.appliedConfiguration = OS.str();
 				auto Response = Poco::makeShared<Poco::JSON::Object>();
 				poco_debug(Logger(),

@@ -93,20 +93,20 @@ namespace OpenWifi {
                                         P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
                                 auto VarNames = VariableBlockInfo->getNames();
                                 for (const auto &j: VarNames) {
-                                    std::cout << "Name: " << j << std::endl;
+//                                    std::cout << "Name: " << j << std::endl;
                                     if(VariableBlockInfo->isArray(j)) {
                                         auto Elements = VariableBlockInfo->getArray(j);
                                         if(Elements->size()>0) {
                                             Poco::JSON::Array InnerArray;
                                             ReplaceVariablesInArray(*Elements, InnerArray);
                                             Result.set(j, InnerArray);
-                                            std::cout << "Array!!!" << std::endl;
+//                                            std::cout << "Array!!!" << std::endl;
                                         } else {
-                                            std::cout << "Empty Array!!!" << std::endl;
+//                                            std::cout << "Empty Array!!!" << std::endl;
                                         }
                                     } else if(VariableBlockInfo->isObject(j)) {
                                         Poco::JSON::Object  InnerEval;
-                                        std::cout << "Visiting object " << j << std::endl;
+//                                        std::cout << "Visiting object " << j << std::endl;
                                         auto O = VariableBlockInfo->getObject(j);
                                         ReplaceVariablesInObject(*O,InnerEval);
                                         Result.set(j, InnerEval);
@@ -121,7 +121,7 @@ namespace OpenWifi {
             } else if (i == "__radiusEndpoint") {
                 auto EndPointId = Original.get(i).toString();
                 ProvObjects::RADIUSEndPoint RE;
-                std::cout << "ID->" << EndPointId << std::endl;
+//                std::cout << "ID->" << EndPointId << std::endl;
                 if(StorageService()->RadiusEndpointDB().GetRecord("id",EndPointId,RE)) {
                     InsertRadiusEndPoint(RE, Result);
                 } else {
@@ -151,7 +151,7 @@ namespace OpenWifi {
 										   Poco::JSON::Array &ResultArray) {
 
 		for (const auto &element : Original) {
-            std::cout << element.toString() << std::endl;
+//            std::cout << element.toString() << std::endl;
 			if (element.isArray()) {
                 Poco::JSON::Array  Expanded;
 				const auto Object = element.extract<Poco::JSON::Array::Ptr>();
