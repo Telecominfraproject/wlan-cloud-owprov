@@ -131,8 +131,10 @@ namespace OpenWifi {
 			} else if (Original.isArray(i)) {
                 Poco::JSON::Array Arr;
 				auto Obj = Original.getArray(i);
-				ReplaceVariablesInArray(*Obj, Arr);
-				Result.set(i, Arr);
+                if(Obj->size()>0) {
+                    ReplaceVariablesInArray(*Obj, Arr);
+                    Result.set(i, Arr);
+                }
 			} else if (Original.isObject(i)) {
                 Poco::JSON::Object Expanded;
 				auto Obj = Original.getObject(i);
@@ -153,8 +155,10 @@ namespace OpenWifi {
 			if (element.isArray()) {
                 Poco::JSON::Array  Expanded;
 				const auto Object = element.extract<Poco::JSON::Array::Ptr>();
-				ReplaceVariablesInArray(*Object, Expanded);
-				ResultArray.add(Expanded);
+                if(Object->size()>0) {
+                    ReplaceVariablesInArray(*Object, Expanded);
+                    ResultArray.add(Expanded);
+                }
 			} else if (element.isStruct()) {
                 Poco::JSON::Object  Expanded;
 				const auto &Object = element.extract<Poco::JSON::Object::Ptr>();
