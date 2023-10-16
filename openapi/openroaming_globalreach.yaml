@@ -389,7 +389,7 @@ paths:
             type: string
           required: true
         - in: query
-          description: Must be set to "1"
+          description: Update an existing certificate
           name: updateCertificate
           schema:
             type: boolean
