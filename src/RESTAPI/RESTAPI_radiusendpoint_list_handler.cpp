@@ -17,6 +17,12 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
+        if(GetBoolParameter("currentStatus")) {
+            ProvObjects::RADIUSEndpointUpdateStatus Status;
+            Status.Read();
+            return ReturnObject(Status);
+        }
+
         if(QB_.CountOnly) {
             return ReturnCountOnly(DB_.Count());
         }

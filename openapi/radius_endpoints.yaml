@@ -146,6 +146,18 @@ components:
           type: integer
           format: int64
 
+    RADIUSEndpointUpdateStatus:
+      type: object
+      properties:
+        lastUpdate:
+          type: integer
+          format: int64
+        lastConfigurationChange:
+          type: integer
+          format: int64
+
+
+
 paths:
   /RADIUSEndPoints:
     get:
@@ -174,7 +186,7 @@ paths:
           required: false
         - in: query
           description: return the last update time
-          name: lastUpdate
+          name: currentStatus
           schema:
             type: boolean
           required: false
@@ -188,11 +200,8 @@ paths:
                   - type: array
                     items:
                       $ref: '#/components/schemas/RADIUSEndPoint'
-                  - type: object
-                    properties:
-                      lastUpdate:
-                        type: integer
-                        format: int64
+                  - type:
+                      $ref: '#/components/schemas/RADIUSEndpointUpdateStatus'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

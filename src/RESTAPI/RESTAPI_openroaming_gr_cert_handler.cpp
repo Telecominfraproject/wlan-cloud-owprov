@@ -79,4 +79,35 @@ namespace OpenWifi {
         return BadRequest(RESTAPI::Errors::RecordNotCreated);
     }
 
+    void RESTAPI_openroaming_gr_cert_handler::DoPut() {
+        auto Account = GetBinding("account","");
+        auto Id = GetBinding("id","");
+        auto UpdateCertificate = GetBoolParameter("updateCertificate",false);
+
+        if(Account.empty() || Id.empty() || !UpdateCertificate){
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+        }
+
+        ProvObjects::GLBLRAccountInfo   AccountInfo;
+        if(!StorageService()->GLBLRAccountInfoDB().GetRecord("id",Account, AccountInfo)) {
+            return BadRequest(RESTAPI::Errors::InvalidGlobalReachAccount);
+        }
+
+        ProvObjects::GLBLRCertificateInfo   Existing;
+        if(!DB_.GetRecord("id",Id,Existing)) {
+            return NotFound();
+        }
+
+        if(OpenRoaming_GlobalReach()->CreateRADSECCertificate(AccountInfo.GlobalReachAcctId,Existing.name,AccountInfo.CSR, Existing)) {
+            Existing.created = Utils::Now();
+            DB_.UpdateRecord("id",Existing.id,Existing);
+            RecordType   CreatedObject;
+            DB_.GetRecord("id",Existing.id,CreatedObject);
+            ProvObjects::RADIUSEndpointUpdateStatus Status;
+            Status.ChangeConfiguration();
+            return ReturnObject(CreatedObject);
+        }
+        return BadRequest(RESTAPI::Errors::RecordNotUpdated);
+    }
+
 } // OpenWifi

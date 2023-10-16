@@ -370,3 +370,38 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+    put:
+      tags:
+        - RadiusEndpointTypes-Global Reach Certificate
+      operationId: updateOpenRoamingGlobalReachCertificate
+      summary: Update certificate information.
+      parameters:
+        - in: path
+          description: The account name - this is the provisioning ID for the account. Not the GlobalReach ID.
+          name: account
+          schema:
+            type: string
+          required: true
+        - in: path
+          description: the UUID of the certificate
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          description: Must be set to "1"
+          name: updateCertificate
+          schema:
+            type: boolean
+            default: false
+          required: false
+      responses:
+        200:
+          $ref: '#/components/schemas/GLBLRCertificateInfo'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+

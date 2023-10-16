@@ -1384,4 +1384,53 @@ namespace OpenWifi::ProvObjects {
         return false;
     }
 
+    void RADIUSEndpointUpdateStatus::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj, "lastUpdate", lastUpdate);
+        field_to_json(Obj, "lastConfigurationChange", lastConfigurationChange);
+    }
+
+    bool RADIUSEndpointUpdateStatus::from_json(const Poco::JSON::Object::Ptr &Obj) {
+        try {
+            field_from_json(Obj, "lastUpdate", lastUpdate);
+            field_from_json(Obj, "lastConfigurationChange", lastConfigurationChange);
+            return true;
+        } catch (const Poco::Exception &E) {
+
+        }
+        return false;
+    }
+
+    bool RADIUSEndpointUpdateStatus::Read() {
+        Poco::File  F(OpenWifi::MicroServiceDataDirectory()+"/RADIUSEndpointUpdateStatus.json");
+        try {
+            if (F.exists()) {
+                Poco::JSON::Parser P;
+                std::ifstream ifs(F.path(), std::ios_base::in | std::ios_base::binary);
+                auto Obj = P.parse(ifs);
+                return from_json(Obj.extract<Poco::JSON::Object::Ptr>());
+            }
+        } catch (...) {
+        }
+        return false;
+    }
+
+    bool RADIUSEndpointUpdateStatus::Save() {
+        Poco::File  F(OpenWifi::MicroServiceDataDirectory()+"/RADIUSEndpointUpdateStatus.json");
+        try {
+            Poco::JSON::Object Obj;
+            to_json(Obj);
+            std::ofstream O(F.path(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+            Poco::JSON::Stringifier::stringify(Obj, O);
+            return true;
+        } catch (...) {
+        }
+        return false;
+    }
+
+    bool RADIUSEndpointUpdateStatus::ChangeConfiguration() {
+        Read();
+        lastConfigurationChange = Utils::Now();
+        return Save();
+    }
+
 } // namespace OpenWifi::ProvObjects

@@ -194,8 +194,10 @@ namespace OpenWifi {
             GWObjects::RadiusProxyPoolList  NewPools;
             Poco::JSON::Object ErrorObj;
             if(SDK::GW::RADIUS::SetConfiguration(Client, Pools, NewPools, ErrorObj)) {
-                AppServiceRegistry().Set("radiusEndpointLastUpdate", Utils::Now());
-                return true;
+                ProvObjects::RADIUSEndpointUpdateStatus Status;
+                Status.Read();
+                Status.lastConfigurationChange = Status.lastUpdate = Utils::Now();
+                return Status.Save();
             }
 /*
             ErrorCode:

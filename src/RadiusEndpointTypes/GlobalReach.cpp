@@ -76,7 +76,6 @@ namespace OpenWifi {
             ProvObjects::GLBLRCertificateInfo &NewCertificate) {
 
             try {
-                std::cout << __LINE__ << ":" << GlobalReachAccountId << std::endl;
                 auto BearerToken = MakeToken(GlobalReachAccountId);
                 Poco::URI URI{"https://config.openro.am/v1/radsec/issue"};
                 std::string Path(URI.getPathAndQuery());

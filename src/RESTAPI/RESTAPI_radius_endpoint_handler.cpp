@@ -30,6 +30,8 @@ namespace OpenWifi {
         RecordType Record;
         if(DB_.GetRecord("id",id,Record)) {
             DB_.DeleteRecord("id",id);
+            ProvObjects::RADIUSEndpointUpdateStatus Status;
+            Status.ChangeConfiguration();
             return OK();
         }
         return NotFound();
@@ -158,6 +160,8 @@ namespace OpenWifi {
         if(DB_.CreateRecord(NewRecord)) {
             RecordType  AddedRecord;
             DB_.GetRecord("id", NewRecord.info.id, AddedRecord);
+            ProvObjects::RADIUSEndpointUpdateStatus Status;
+            Status.ChangeConfiguration();
             return ReturnObject(AddedRecord);
         }
         return BadRequest(RESTAPI::Errors::RecordNotCreated);
@@ -187,6 +191,8 @@ namespace OpenWifi {
         if(DB_.UpdateRecord("id", Existing.info.id, Existing)) {
             RecordType  AddedRecord;
             DB_.GetRecord("id", Existing.info.id, AddedRecord);
+            ProvObjects::RADIUSEndpointUpdateStatus Status;
+            Status.ChangeConfiguration();
             return ReturnObject(AddedRecord);
         }
 

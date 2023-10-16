@@ -901,4 +901,17 @@ namespace OpenWifi::ProvObjects {
         void to_json(Poco::JSON::Object &Obj) const;
         bool from_json(const Poco::JSON::Object::Ptr &Obj);
     };
+
+    struct RADIUSEndpointUpdateStatus {
+        std::uint64_t   lastUpdate=0;
+        std::uint64_t   lastConfigurationChange=0;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+        bool Read();
+        bool Save();
+        bool ChangeConfiguration();
+    };
+
+
 }; // namespace OpenWifi::ProvObjects
