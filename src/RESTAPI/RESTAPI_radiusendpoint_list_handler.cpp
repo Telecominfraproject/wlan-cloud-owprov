@@ -9,13 +9,6 @@
 namespace OpenWifi {
 
     void RESTAPI_radiusendpoint_list_handler::DoGet() {
-        if(GetBoolParameter("lastUpdate")) {
-            uint64_t LastUpdate=0;
-            AppServiceRegistry().Get("radiusEndpointLastUpdate", LastUpdate);
-            Poco::JSON::Object  Answer;
-            Answer.set("lastUpdate",LastUpdate);
-            return ReturnObject(Answer);
-        }
 
         if(GetBoolParameter("currentStatus")) {
             ProvObjects::RADIUSEndpointUpdateStatus Status;
@@ -26,6 +19,7 @@ namespace OpenWifi {
         if(QB_.CountOnly) {
             return ReturnCountOnly(DB_.Count());
         }
+
         std::vector<RecordType>    Records;
         DB_.GetRecords(QB_.Offset,QB_.Limit,Records);
         return ReturnObject(Records);
