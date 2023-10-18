@@ -57,7 +57,7 @@ namespace OpenWifi {
 
         private:
             OpenRoaming() noexcept
-                    : SubSystemServer("OpenRoaming_Raadsec", "RADSEC", "radsec") {
+                    : SubSystemServer("OpenRoaming_GenericRadius", "GENRAD", "genrad") {
             }
         };
 
