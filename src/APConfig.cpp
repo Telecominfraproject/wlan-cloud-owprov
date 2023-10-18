@@ -69,7 +69,7 @@ namespace OpenWifi {
                 return OpenRoaming_GlobalReach()->Render(RE, SerialNumber_, Result);
             } else if (RE.Type == "radsec") {
                 return OpenRoaming_Radsec()->Render(RE, SerialNumber_, Result);
-            } else if (RE.Type == "radius") {
+            } else if (RE.Type == "generic") {
                 return OpenRoaming_GenericRadius()->Render(RE, SerialNumber_, Result);
             }
             Result.set( "radius" , ServerSettings);
