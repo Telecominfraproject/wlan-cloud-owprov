@@ -375,7 +375,7 @@ namespace OpenWifi {
 
 		ProvObjects::DeviceConfiguration Config;
 		if (StorageService()->ConfigurationDB().GetRecord("id", UUID, Config)) {
-            std::cout << Config.info.name << ":" << Config.configuration.size() << std::endl;
+//            std::cout << Config.info.name << ":" << Config.configuration.size() << std::endl;
 			if (!Config.configuration.empty()) {
 				if (DeviceTypeMatch(DeviceType_, Config.deviceTypes)) {
 					for (const auto &i : Config.configuration) {
