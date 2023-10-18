@@ -26,6 +26,7 @@
 #include <RadiusEndpointTypes/GlobalReach.h>
 #include <RadiusEndpointTypes/OrionWifi.h>
 #include <RadiusEndpointTypes/Radsec.h>
+#include <RadiusEndpointTypes/GenericRadius.h>
 
 namespace OpenWifi {
 	class Daemon *Daemon::instance_ = nullptr;
@@ -40,7 +41,8 @@ namespace OpenWifi {
 												UI_WebSocketClientServer(), FindCountryFromIP(),
 												Signup(), FileDownloader(),
                                                 OpenRoaming_GlobalReach(),
-                                                OpenRoaming_Orion(), OpenRoaming_Radsec()
+                                                OpenRoaming_Orion(), OpenRoaming_Radsec(),
+                                                OpenRoaming_GenericRadius()
             });
 		}
 		return instance_;

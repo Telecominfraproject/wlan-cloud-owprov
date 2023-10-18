@@ -231,6 +231,8 @@ add_executable(owprov
         src/RadiusEndpointUpdater.h
         src/RadiusEndpointTypes/Radsec.cpp
         src/RadiusEndpointTypes/Radsec.h
+        src/RadiusEndpointTypes/GenericRadius.cpp
+        src/RadiusEndpointTypes/GenericRadius.h
 )
 
 target_link_libraries(owprov PUBLIC
