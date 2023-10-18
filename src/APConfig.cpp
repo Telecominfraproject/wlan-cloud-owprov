@@ -72,6 +72,8 @@ namespace OpenWifi {
 
             }
             Result.set( "radius" , ServerSettings);
+        } else {
+            std::cout << "Radius proxy off" << RE.info.name << std::endl;
         }
         return false;
     }
