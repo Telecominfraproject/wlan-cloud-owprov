@@ -33,17 +33,17 @@ namespace OpenWifi {
                     Poco::JSON::Object Auth, Acct, CoA;
 
                     Auth.set("host", RE.Index);
-                    Auth.set("port", 1812);
-                    Auth.set("secret", RE.RadsecServers[0].Secret);
+                    Auth.set("port", RE.RadiusServers[0].Authentication[0].Port);
+                    Auth.set("secret", RE.RadiusServers[0].Authentication[0].Secret);
 
                     Acct.set("host", RE.Index);
-                    Acct.set("port", 1813);
-                    Acct.set("secret", RE.RadsecServers[0].Secret);
+                    Acct.set("port", RE.RadiusServers[0].Accounting[0].Port);
+                    Acct.set("secret", RE.RadiusServers[0].Accounting[0].Secret);
                     Acct.set("interval", RE.AccountingInterval);
 
                     CoA.set("host", RE.Index);
-                    CoA.set("port", 3799);
-                    CoA.set("secret", RE.RadsecServers[0].Secret);
+                    CoA.set("port", RE.RadiusServers[0].CoA[0].Port);
+                    CoA.set("secret", RE.RadiusServers[0].CoA[0].Secret);
 
                     Result.set("nas-identifier", RE.NasIdentifier.empty() ? SerialNumber : RE.NasIdentifier);
                     Result.set("authentication", Auth);
