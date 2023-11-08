@@ -283,7 +283,7 @@ namespace OpenWifi {
 									RadioArray->get(RadioIndex).extract<Poco::JSON::Object::Ptr>();
 								if (Tokens[2] == "tx-power") {
 									IndexedRadio->set(
-										"rx-power",
+										"tx-power",
 										std::strtoull(col.parameterValue.c_str(), nullptr, 10));
 									if (Explain_) {
 										Poco::JSON::Object ExObj;
