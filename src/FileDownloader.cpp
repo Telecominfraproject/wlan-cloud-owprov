@@ -29,8 +29,8 @@ namespace OpenWifi {
                 "ucentral.schema.pretty.json"
             },
             {
-                    "https://raw.githubusercontent.com/Telecominfraproject/wlan-ucentral-schema/main/ucentral.schema.json",
-                    "ucentral.schema.json"
+                "https://raw.githubusercontent.com/Telecominfraproject/wlan-ucentral-schema/main/ucentral.schema.json",
+                "ucentral.schema.json"
             }
         };
 
