@@ -24,8 +24,15 @@ namespace OpenWifi {
 
 	void FileDownloader::onTimer([[maybe_unused]] Poco::Timer &timer) {
 		const static std::vector<std::pair<std::string, std::string>> Files{
-        {   "https://raw.githubusercontent.com/Telecominfraproject/wlan-ucentral-schema/main/ucentral.schema.json",
-			 "ucentral.schema.json"} };
+            {
+                "https://raw.githubusercontent.com/Telecominfraproject/wlan-ucentral-schema/main/ucentral.schema.pretty.json",
+                "ucentral.schema.pretty.json"
+            },
+            {
+                    "https://raw.githubusercontent.com/Telecominfraproject/wlan-ucentral-schema/main/ucentral.schema.json",
+                    "ucentral.schema.json"
+            }
+        };
 
 		Utils::SetThreadName("file-dmnldr");
 
