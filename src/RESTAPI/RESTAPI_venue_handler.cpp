@@ -79,6 +79,10 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoDelete() {
+		if (!UserInfo_.userinfo.userPermissions["venues"]["delete"]) {
+			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
+		}
+
 		std::string UUID = GetBinding("uuid", "");
 		ProvObjects::Venue Existing;
 		if (UUID.empty() || !DB_.GetRecord("id", UUID, Existing)) {
@@ -117,6 +121,10 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoPost() {
+		if (!UserInfo_.userinfo.userPermissions["venues"]["create"]) {
+			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
+		}
+
 		std::string UUID = GetBinding("uuid", "");
 		if (UUID.empty()) {
 			return BadRequest(RESTAPI::Errors::MissingUUID);
