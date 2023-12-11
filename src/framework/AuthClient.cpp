@@ -136,7 +136,6 @@ namespace OpenWifi {
 		for(const std::string &token : tokens) {
 			auto UInfo = Cache_.get(token);
 			if (UInfo->userinfo.userRole == roleEnum) {
-				std::cout << "Removing token cache entry for " << role << " " << token << std::endl;
 				Cache_.remove(token);
 			}
 		}
@@ -145,7 +144,6 @@ namespace OpenWifi {
 		for(const std::string &token : tokens) {
 			auto UInfo = ApiKeyCache_.get(token);
 			if (UInfo->UserInfo.userinfo.userRole == roleEnum) {
-				std::cout << "Removing apikey cache entry for " << role << " " << token << std::endl;
 				ApiKeyCache_.remove(token);
 			}
 		}
