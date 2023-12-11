@@ -96,8 +96,10 @@ namespace OpenWifi {
 				ProvObjects::DeviceRules Rules;
 
 				StorageService()->VenueDB().EvaluateDeviceRules(Venue.info.id, Rules);
+                std::vector<std::string> DeviceList;
+                StorageService()->InventoryDB().GetDevicesUUIDForVenue(Venue.info.id, DeviceList);
 
-				for (const auto &uuid : Venue.devices) {
+				for (const auto &uuid : DeviceList) {
 					auto NewTask =
 						new VenueDeviceUpgrade(uuid, Venue.info.name, Revision_, Rules, Logger());
 					bool TaskAdded = false;

@@ -39,6 +39,7 @@ namespace OpenWifi {
 		bool Upgrade(uint32_t from, uint32_t &to) override;
 
         bool GetDevicesForVenue(const std::string &uuid, std::vector<std::string> &devices);
+        bool GetDevicesUUIDForVenue(const std::string &uuid, std::vector<std::string> &devices);
         bool GetDevicesForVenue(const std::string &uuid, std::vector<ProvObjects::InventoryTag> &devices);
 
 	  private:
