@@ -232,6 +232,47 @@ namespace OpenWifi {
 		}
 		return true;
 	}
+
+    bool InventoryDB::GetDevicesForVenue(const std::string &venue_uuid, std::vector<std::string> &devices) {
+        try {
+            std::vector<ProvObjects::InventoryTag> device_list;
+            if(GetRecords(1, 1000, device_list, fmt::format(" venue='{}' ", venue_uuid))) {
+                for(auto &i:device_list) {
+                    devices.push_back(i.serialNumber);
+                }
+                return true;
+            }
+        } catch(const Poco::Exception &E) {
+            Logger().log(E);
+            return false;
+        } catch(const std::exception &E) {
+            Logger().error(fmt::format("std::exception: {}",E.what()));
+            return false;
+        } catch(...) {
+            Logger().error("Unknown exception");
+            return false;
+        }
+        return false;
+    }
+
+    bool InventoryDB::GetDevicesForVenue(const std::string &venue_uuid, std::vector<ProvObjects::InventoryTag> &devices) {
+        try {
+            return GetRecords(1, 1000, devices, fmt::format(" venue='{}' ", venue_uuid));
+        } catch(const Poco::Exception &E) {
+            Logger().log(E);
+            return false;
+        } catch(const std::exception &E) {
+            Logger().error(fmt::format("std::exception: {}",E.what()));
+            return false;
+        } catch(...) {
+            Logger().error("Unknown exception");
+            return false;
+        }
+
+        return false;
+    }
+
+
 } // namespace OpenWifi
 
 template <>
