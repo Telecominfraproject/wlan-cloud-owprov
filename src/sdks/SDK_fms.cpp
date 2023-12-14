@@ -64,6 +64,7 @@ namespace OpenWifi::SDK::FMS {
 			if (GetDeviceTypeFirmwares(device_type, Firmwares)) {
                 std::cout << __LINE__ << std::endl;
 				for (const auto &firmware : Firmwares) {
+                    std::cout << "'" << firmware.revision << "' == '" << revision << "'" << std::endl;
 					if (firmware.revision == revision) {
                         std::cout << __LINE__ << std::endl;
 						Firmware = firmware;
