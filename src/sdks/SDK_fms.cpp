@@ -33,10 +33,12 @@ namespace OpenWifi::SDK::FMS {
 
 		bool GetDeviceTypeFirmwares(const std::string &device_type,
 									std::vector<FMSObjects::Firmware> &FirmWares) {
-			static const std::string EndPoint{"/api/v1/firmwares?offset=1&limit=1000"};
+			static const std::string EndPoint{"/api/v1/firmwares"};
 
 			OpenWifi::OpenAPIRequestGet API(uSERVICE_FIRMWARE, EndPoint,
-											{{"deviceType", device_type}}, 50000);
+											{{"deviceType", device_type},
+                                             {"offset","1"},
+                                             {"limit","1000"}}, 50000);
 
 			auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
 			auto StatusCode = API.Do(CallResponse);
