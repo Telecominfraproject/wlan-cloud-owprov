@@ -42,40 +42,33 @@ namespace OpenWifi::SDK::FMS {
 
 			auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
 			auto StatusCode = API.Do(CallResponse);
-            std::cout << __LINE__ << std::endl;
 			if (StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-                std::cout << __LINE__ << std::endl;
 				Poco::JSON::Array::Ptr FirmwareArr = CallResponse->getArray("firmwares");
-                std::cout << __LINE__ << std::endl;
 				for (uint64_t i = 0; i < FirmwareArr->size(); i++) {
 					FMSObjects::Firmware F;
 					F.from_json(FirmwareArr->getObject(i));
 					FirmWares.emplace_back(F);
 				}
-                std::cout << __LINE__ << std::endl;
 				return true;
 			}
-            std::cout << __LINE__ << std::endl;
+            std::cout << "GetDeviceTypeFirmwares:" << FirmWares.size() << std::endl;
 			return false;
 		}
 
 		bool GetFirmware(const std::string &device_type, const std::string &revision,
 						 FMSObjects::Firmware &Firmware) {
 			std::vector<FMSObjects::Firmware> Firmwares;
-            std::cout << __LINE__ << std::endl;
 			if (GetDeviceTypeFirmwares(device_type, Firmwares)) {
-                std::cout << __LINE__ << std::endl;
 				for (const auto &firmware : Firmwares) {
                     std::cout << "'" << firmware.revision << "' == '" << revision << "'" << std::endl;
 					if (firmware.revision == revision) {
-                        std::cout << __LINE__ << std::endl;
+                        std::cout << "Found match..." << std::endl;
 						Firmware = firmware;
 						return true;
 					}
 				}
-                std::cout << __LINE__ << std::endl;
+                std::cout << "No match: " << revision << std::endl;
 			}
-            std::cout << __LINE__ << std::endl;
 			return false;
 		}
 
