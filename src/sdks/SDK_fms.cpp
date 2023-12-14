@@ -33,7 +33,7 @@ namespace OpenWifi::SDK::FMS {
 
 		bool GetDeviceTypeFirmwares(const std::string &device_type,
 									std::vector<FMSObjects::Firmware> &FirmWares) {
-			static const std::string EndPoint{"/api/v1/firmwares?offset=0&limit=1000"};
+			static const std::string EndPoint{"/api/v1/firmwares?offset=1&limit=1000"};
 
 			OpenWifi::OpenAPIRequestGet API(uSERVICE_FIRMWARE, EndPoint,
 											{{"deviceType", device_type}}, 50000);
