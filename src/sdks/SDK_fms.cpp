@@ -49,11 +49,15 @@ namespace OpenWifi::SDK::FMS {
 					F.from_json(FirmwareArr->getObject(i));
 					FirmWares.emplace_back(F);
 				}
+                int done=0;
+                if(!done) {
+                    for (const auto &Firmware: FirmWares) {
+                        std::cout << "Firmware: " << Firmware.revision << std::endl;
+                    }
+                    done=1;
+                }
 				return true;
 			}
-            for (const auto &Firmware: FirmWares) {
-                std::cout << "Firmware: " << Firmware.revision << std::endl;
-            }
 			return false;
 		}
 
