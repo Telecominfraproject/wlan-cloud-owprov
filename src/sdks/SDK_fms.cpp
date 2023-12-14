@@ -37,7 +37,7 @@ namespace OpenWifi::SDK::FMS {
 
 			OpenWifi::OpenAPIRequestGet API(uSERVICE_FIRMWARE, EndPoint,
 											{{"deviceType", device_type},
-                                             {"offset","1"},
+                                             {"offset","0"},
                                              {"limit","1000"}}, 50000);
 
 			auto CallResponse = Poco::makeShared<Poco::JSON::Object>();
