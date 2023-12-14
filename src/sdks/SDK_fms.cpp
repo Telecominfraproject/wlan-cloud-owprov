@@ -51,7 +51,13 @@ namespace OpenWifi::SDK::FMS {
 				}
 				return true;
 			}
-            std::cout << "GetDeviceTypeFirmwares:" << FirmWares.size() << std::endl;
+            static int done=0;
+            if(!done) {
+                for (const auto &Firmware: FirmWares) {
+                    std::cout << "Firmware: " << Firmware.revision << std::endl;
+                }
+            }
+            done=1;
 			return false;
 		}
 
@@ -60,7 +66,6 @@ namespace OpenWifi::SDK::FMS {
 			std::vector<FMSObjects::Firmware> Firmwares;
 			if (GetDeviceTypeFirmwares(device_type, Firmwares)) {
 				for (const auto &firmware : Firmwares) {
-                    std::cout << "'" << firmware.revision << "' == '" << revision << "'" << std::endl;
 					if (firmware.revision == revision) {
                         std::cout << "Found match..." << std::endl;
 						Firmware = firmware;
