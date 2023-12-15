@@ -67,7 +67,7 @@ namespace OpenWifi::SDK::FMS {
 						return true;
 					}
 				}
-                std::cout << "No match: " << revision << std::endl;
+                std::cout << "No match(" << revision.size() << ")  '" << revision << "'" << std::endl;
 			}
 			return false;
 		}

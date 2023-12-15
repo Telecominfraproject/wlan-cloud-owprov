@@ -28,7 +28,7 @@ namespace OpenWifi {
 
 				Storage::ApplyRules(rules_, Device.deviceRules);
 				if (Device.deviceRules.firmwareUpgrade == "no") {
-					poco_debug(Logger(), fmt::format("Skipped Upgrade: {}", Device.serialNumber));
+					poco_debug(Logger(), fmt::format("Skipped Upgrade: {} : Venue rules prevent upgrading", Device.serialNumber));
 					skipped_++;
 					done_ = true;
 					return;
