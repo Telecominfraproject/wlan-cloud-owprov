@@ -99,7 +99,7 @@ namespace OpenWifi {
                 StorageService()->InventoryDB().GetDevicesUUIDForVenue(Venue.info.id, DeviceList);
 
                 for(const auto &i:DeviceList) {
-                    Logger().debug("Upgrade device list: {}", i);
+                    std::cout << "Upgrade device list:" << i << std::endl;
                 }
 
 				for (const auto &uuid : DeviceList) {
