@@ -36,10 +36,15 @@ namespace OpenWifi {
 
 				FMSObjects::Firmware F;
 				if (SDK::FMS::Firmware::GetFirmware(Device.deviceType, revision_, F)) {
-					if (SDK::GW::Device::Upgrade(nullptr, Device.serialNumber, 0, F.uri)) {
-						Logger().debug(
-							fmt::format("{}: Upgraded to {}.", Device.serialNumber, revision_));
-						upgraded_++;
+                    std::string Status;
+					if (SDK::GW::Device::Upgrade(nullptr, Device.serialNumber, 0, F.uri, Status)) {
+                        if(Status=="pending") {
+                            pending_++;
+                            poco_debug(Logger(), fmt::format("Upgrade Pending: {} : {}", Device.serialNumber, Status));
+                        } else {
+                            upgraded_++;
+                            poco_debug(Logger(), fmt::format("Upgrade Success: {} : {}", Device.serialNumber, Status));
+                        }
 					} else {
 						poco_information(Logger(), fmt::format("{}: Not Upgraded to {}.",
 															   Device.serialNumber, revision_));
@@ -55,7 +60,7 @@ namespace OpenWifi {
 			done_ = true;
 		}
 
-		std::uint64_t upgraded_ = 0, not_connected_ = 0, skipped_ = 0, no_firmware_ = 0;
+		std::uint64_t upgraded_ = 0, not_connected_ = 0, skipped_ = 0, no_firmware_ = 0, pending_ = 0;
 		bool started_ = false, done_ = false;
 		std::string SerialNumber;
 
@@ -84,7 +89,7 @@ namespace OpenWifi {
 			ProvWebSocketNotifications::VenueFWUpgradeList_t N;
 
 			ProvObjects::Venue Venue;
-			uint64_t upgraded_ = 0, not_connected_ = 0, skipped_ = 0, no_firmware_ = 0;
+			uint64_t upgraded_ = 0, not_connected_ = 0, skipped_ = 0, no_firmware_ = 0, pending_=0;
 			if (StorageService()->VenueDB().GetRecord("id", VenueUUID_, Venue)) {
 
 				N.content.title = fmt::format("Upgrading {} devices.", Venue.info.name);
@@ -126,10 +131,13 @@ namespace OpenWifi {
 								N.content.not_connected.push_back(current_job->SerialNumber);
 							else if (current_job->no_firmware_)
 								N.content.no_firmware.push_back(current_job->SerialNumber);
+                            else if (current_job->pending_)
+                                N.content.pending.push_back(current_job->SerialNumber);
 							upgraded_ += current_job->upgraded_;
 							skipped_ += current_job->skipped_;
 							no_firmware_ += current_job->no_firmware_;
 							not_connected_ += current_job->not_connected_;
+                            pending_ += current_job->pending_;
 							job_it = JobList.erase(job_it);
 							delete current_job;
 						} else {
@@ -151,10 +159,13 @@ namespace OpenWifi {
 							N.content.not_connected.push_back(current_job->SerialNumber);
 						else if (current_job->no_firmware_)
 							N.content.no_firmware.push_back(current_job->SerialNumber);
+                        else if (current_job->pending_)
+                            N.content.pending.push_back(current_job->SerialNumber);
 						upgraded_ += current_job->upgraded_;
 						skipped_ += current_job->skipped_;
 						no_firmware_ += current_job->no_firmware_;
 						not_connected_ += current_job->not_connected_;
+                        pending_ += current_job->pending_;
 						job_it = JobList.erase(job_it);
 						delete current_job;
 					} else {
@@ -163,8 +174,8 @@ namespace OpenWifi {
 				}
 
 				N.content.details = fmt::format(
-					"Job {} Completed: {} upgraded, {} not connected, {} skipped, {} no firmware.",
-					JobId(), upgraded_, not_connected_, skipped_, no_firmware_);
+					"Job {} Completed: {} upgraded, {} not connected, {} skipped, {} no firmware, {} pending.",
+					JobId(), upgraded_, not_connected_, skipped_, no_firmware_, pending_);
 			} else {
 				N.content.details = fmt::format("Venue {} no longer exists.", VenueUUID_);
 				Logger().warning(N.content.details);
