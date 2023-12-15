@@ -98,6 +98,10 @@ namespace OpenWifi {
                 std::vector<std::string> DeviceList;
                 StorageService()->InventoryDB().GetDevicesUUIDForVenue(Venue.info.id, DeviceList);
 
+                for(const auto &i:DeviceList) {
+                    Logger().debug("Upgrade device list: {}", i);
+                }
+
 				for (const auto &uuid : DeviceList) {
 					auto NewTask =
 						new VenueDeviceUpgrade(uuid, Venue.info.name, Revision_, Rules, Logger());
