@@ -44,18 +44,13 @@ namespace OpenWifi::SDK::FMS {
 			auto StatusCode = API.Do(CallResponse);
 			if (StatusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 				Poco::JSON::Array::Ptr FirmwareArr = CallResponse->getArray("firmwares");
-				for (uint64_t i = 0; i < FirmwareArr->size(); i++) {
+                for(const auto &firmware:*FirmwareArr) {
+                    auto Object = firmware.extract<Poco::JSON::Object::Ptr>();
 					FMSObjects::Firmware F;
-					F.from_json(FirmwareArr->getObject(i));
+					F.from_json(Object);
+                    std::cout << "Adding firmware: " << F.revision << std::endl;
 					FirmWares.emplace_back(F);
 				}
-                int done=0;
-                if(!done) {
-                    for (const auto &Firmware: FirmWares) {
-                        std::cout << "Firmware: " << Firmware.revision << std::endl;
-                    }
-                    done=1;
-                }
 				return true;
 			}
 			return false;
