@@ -32,7 +32,7 @@ namespace OpenWifi::ProvWebSocketNotifications {
 
 	struct FWUpgradeList {
 		std::string title, details, jobId;
-		std::vector<std::string> success, skipped, no_firmware, not_connected;
+		std::vector<std::string> success, skipped, no_firmware, not_connected, pending;
 		uint64_t timeStamp = OpenWifi::Utils::Now();
 
 		void to_json(Poco::JSON::Object &Obj) const;

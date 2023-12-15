@@ -79,7 +79,7 @@ namespace OpenWifi::SDK::GW {
 		}
 
 		bool Upgrade(RESTAPIHandler *client, const std::string &SerialNumber, uint64_t When,
-					 const std::string &ImageName) {
+					 const std::string &ImageName, std::string &status) {
 			Poco::JSON::Object Body;
 
 			Body.set(RESTAPI::Protocol::SERIALNUMBER, SerialNumber);
@@ -92,6 +92,7 @@ namespace OpenWifi::SDK::GW {
 			auto ResponseStatus =
 				API.Do(CallResponse, client ? client->UserInfo_.webtoken.access_token_ : "");
 			if (ResponseStatus == Poco::Net::HTTPResponse::HTTP_OK) {
+                status = CallResponse->get("status").toString();
 				return true;
 			}
 			return false;
