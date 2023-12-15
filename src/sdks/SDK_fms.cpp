@@ -48,7 +48,6 @@ namespace OpenWifi::SDK::FMS {
                     auto Object = firmware.extract<Poco::JSON::Object::Ptr>();
 					FMSObjects::Firmware F;
 					F.from_json(Object);
-                    std::cout << "Adding firmware: (" << F.revision.size() << ")  " << F.revision << std::endl;
 					FirmWares.emplace_back(F);
 				}
 				return true;
@@ -62,12 +61,10 @@ namespace OpenWifi::SDK::FMS {
 			if (GetDeviceTypeFirmwares(device_type, Firmwares)) {
 				for (const auto &firmware : Firmwares) {
 					if (firmware.revision == revision) {
-                        std::cout << "Found match..." << std::endl;
 						Firmware = firmware;
 						return true;
 					}
 				}
-                std::cout << "No match(" << revision.size() << ")  '" << revision << "'" << std::endl;
 			}
 			return false;
 		}

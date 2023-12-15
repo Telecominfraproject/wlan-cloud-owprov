@@ -53,7 +53,6 @@ namespace OpenWifi {
 				}
 			}
 			done_ = true;
-			// std::cout << "Done push for " << Device.serialNumber << std::endl;
 		}
 
 		std::uint64_t upgraded_ = 0, not_connected_ = 0, skipped_ = 0, no_firmware_ = 0;
