@@ -236,7 +236,7 @@ namespace OpenWifi {
     bool InventoryDB::GetDevicesForVenue(const std::string &venue_uuid, std::vector<std::string> &devices) {
         try {
             std::vector<ProvObjects::InventoryTag> device_list;
-            if(GetRecords(1, 1000, device_list, fmt::format(" venue='{}' ", venue_uuid))) {
+            if(GetRecords(0, 1000, device_list, fmt::format(" venue='{}' ", venue_uuid))) {
                 for(auto &i:device_list) {
                     devices.push_back(i.serialNumber);
                 }
@@ -258,7 +258,7 @@ namespace OpenWifi {
     bool InventoryDB::GetDevicesUUIDForVenue(const std::string &venue_uuid, std::vector<std::string> &devices) {
         try {
             std::vector<ProvObjects::InventoryTag> device_list;
-            if(GetRecords(1, 1000, device_list, fmt::format(" venue='{}' ", venue_uuid))) {
+            if(GetRecords(0, 1000, device_list, fmt::format(" venue='{}' ", venue_uuid))) {
                 for(auto &i:device_list) {
                     devices.push_back(i.info.id);
                 }
@@ -279,7 +279,7 @@ namespace OpenWifi {
 
     bool InventoryDB::GetDevicesForVenue(const std::string &venue_uuid, std::vector<ProvObjects::InventoryTag> &devices) {
         try {
-            return GetRecords(1, 1000, devices, fmt::format(" venue='{}' ", venue_uuid));
+            return GetRecords(0, 1000, devices, fmt::format(" venue='{}' ", venue_uuid));
         } catch(const Poco::Exception &E) {
             Logger().log(E);
             return false;
