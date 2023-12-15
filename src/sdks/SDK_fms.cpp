@@ -48,7 +48,7 @@ namespace OpenWifi::SDK::FMS {
                     auto Object = firmware.extract<Poco::JSON::Object::Ptr>();
 					FMSObjects::Firmware F;
 					F.from_json(Object);
-                    std::cout << "Adding firmware: " << F.revision << std::endl;
+                    std::cout << "Adding firmware: (" << F.revision.size() << ")  " << F.revision << std::endl;
 					FirmWares.emplace_back(F);
 				}
 				return true;
