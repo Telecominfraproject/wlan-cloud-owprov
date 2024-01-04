@@ -131,7 +131,9 @@ namespace OpenWifi {
 		} else {
 			ProvObjects::InventoryTagVec Tags;
 			DB_.GetRecords(QB_.Offset, QB_.Limit, Tags, "", OrderBy);
-			return MakeJSONObjectArray("taglist", Tags, *this);
+            return SendList(Tags, SerialOnly);
+
+//			return MakeJSONObjectArray("taglist", Tags, *this);
 		}
 	}
 } // namespace OpenWifi
