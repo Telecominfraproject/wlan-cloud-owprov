@@ -32,7 +32,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_entity_handler::DoDelete() {
-		if (!UserInfo_.userinfo.userPermissions["entities"]["delete"]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_ENTITIES][SecurityObjects::PT_DELETE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 
@@ -60,7 +60,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_entity_handler::DoPost() {
-		if (!UserInfo_.userinfo.userPermissions["entities"]["create"]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_ENTITIES][SecurityObjects::PT_CREATE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 

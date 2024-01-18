@@ -79,7 +79,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoDelete() {
-		if (!UserInfo_.userinfo.userPermissions["venues"]["delete"]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES][SecurityObjects::PT_DELETE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 
@@ -121,7 +121,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoPost() {
-		if (!UserInfo_.userinfo.userPermissions["venues"]["create"]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES][SecurityObjects::PT_CREATE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 
