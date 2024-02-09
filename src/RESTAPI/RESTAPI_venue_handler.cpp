@@ -284,21 +284,19 @@ namespace OpenWifi {
 		auto testUpdateOnly = GetBoolParameter("testUpdateOnly");
 		if (testUpdateOnly) {
 			ProvObjects::SerialNumberList SNL;
-
+            StorageService()->InventoryDB().GetDevicesForVenue(UUID, SNL.serialNumbers);
 			Poco::JSON::Object Answer;
-			SNL.serialNumbers = Existing.devices;
 			SNL.to_json(Answer);
 			return ReturnObject(Answer);
 		}
 
 		if (GetBoolParameter("updateAllDevices")) {
 			ProvObjects::SerialNumberList SNL;
+            StorageService()->InventoryDB().GetDevicesForVenue(UUID, SNL.serialNumbers);
 
 			Poco::JSON::Object Answer;
-			SNL.serialNumbers = Existing.devices;
 			auto JobId = MicroServiceCreateUUID();
 			Types::StringVec Parameters{UUID};
-			;
 			auto NewJob = new VenueConfigUpdater(JobId, "VenueConfigurationUpdater", Parameters, 0,
 												 UserInfo_.userinfo, Logger());
 			JobController()->AddJob(dynamic_cast<Job *>(NewJob));
@@ -310,11 +308,10 @@ namespace OpenWifi {
 		if (GetBoolParameter("upgradeAllDevices")) {
 			if (GetBoolParameter("revisionsAvailable")) {
 				std::set<std::string> DeviceTypes;
-				for (const auto &serialNumber : Existing.devices) {
-					ProvObjects::InventoryTag Device;
-					if (StorageService()->InventoryDB().GetRecord("id", serialNumber, Device)) {
-						DeviceTypes.insert(Device.deviceType);
-					}
+                std::vector<ProvObjects::InventoryTag> ExistingDevices;
+                StorageService()->InventoryDB().GetDevicesForVenue(UUID, ExistingDevices);
+				for (const auto &device : ExistingDevices) {
+                    DeviceTypes.insert(device.deviceType);
 				}
 
 				//  Get all the revisions for all the device types
@@ -382,18 +379,17 @@ namespace OpenWifi {
 				return ReturnObject(Answer);
 			}
 
-			ProvObjects::SerialNumberList SNL;
-
 			auto Revision = GetParameter("revision", "");
 			if (Revision.empty()) {
 				return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
 			}
 
+            ProvObjects::SerialNumberList SNL;
+            StorageService()->InventoryDB().GetDevicesForVenue(UUID, SNL.serialNumbers);
+
 			Poco::JSON::Object Answer;
-			SNL.serialNumbers = Existing.devices;
 			auto JobId = MicroServiceCreateUUID();
 			Types::StringVec Parameters{UUID, Revision};
-			;
 			auto NewJob = new VenueUpgrade(JobId, "VenueFirmwareUpgrade", Parameters, 0,
 										   UserInfo_.userinfo, Logger());
 			JobController()->AddJob(dynamic_cast<Job *>(NewJob));
@@ -404,9 +400,9 @@ namespace OpenWifi {
 
 		if (GetBoolParameter("rebootAllDevices")) {
 			ProvObjects::SerialNumberList SNL;
+            StorageService()->InventoryDB().GetDevicesForVenue(UUID, SNL.serialNumbers);
 
 			Poco::JSON::Object Answer;
-			SNL.serialNumbers = Existing.devices;
 			auto JobId = MicroServiceCreateUUID();
 			Types::StringVec Parameters{UUID};
 			;

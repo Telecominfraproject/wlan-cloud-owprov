@@ -68,8 +68,10 @@ namespace OpenWifi {
 
 				Poco::ThreadPool Pool_;
 				std::list<VenueDeviceRebooter *> JobList;
+                std::vector<std::string> DeviceList;
+                StorageService()->InventoryDB().GetDevicesUUIDForVenue(Venue.info.id, DeviceList);
 
-				for (const auto &uuid : Venue.devices) {
+				for (const auto &uuid : DeviceList) {
 					auto NewTask = new VenueDeviceRebooter(uuid, Venue.info.name, Logger());
 					bool TaskAdded = false;
 					while (!TaskAdded) {
