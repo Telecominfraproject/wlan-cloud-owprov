@@ -73,7 +73,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_managementRole_handler::DoPost() {
-		std::string UUID = GetBinding(RESTAPI::Protocol::ID, "");
+		std::string UUID = GetBinding(RESTAPI::Protocol::UUID, "");
 		if (UUID.empty()) {
 			return BadRequest(RESTAPI::Errors::MissingUUID);
 		}

@@ -79,7 +79,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoDelete() {
-		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES][SecurityObjects::PT_DELETE]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES_PROV][SecurityObjects::PT_DELETE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 
@@ -121,7 +121,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_venue_handler::DoPost() {
-		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES][SecurityObjects::PT_CREATE]) {
+		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_VENUES_PROV][SecurityObjects::PT_CREATE]) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 		}
 
@@ -435,6 +435,9 @@ namespace OpenWifi {
 		if (RawObject->has("deviceRules"))
 			Existing.deviceRules = NewObject.deviceRules;
 
+		if (RawObject->has("managementRoles"))
+			Existing.managementRoles = NewObject.managementRoles;
+
 		if (RawObject->has("sourceIP")) {
 			if (!NewObject.sourceIP.empty() && !CIDR::ValidateIpRanges(NewObject.sourceIP)) {
 				return BadRequest(RESTAPI::Errors::InvalidIPRanges);
@@ -464,7 +467,7 @@ namespace OpenWifi {
 		if (AssignIfPresent(RawObject, "location", MoveToLocation)) {
 			if (MoveToLocation.empty() ||
 				!StorageService()->LocationDB().Exists("id", MoveToLocation)) {
-				return BadRequest(RESTAPI::Errors::LocationMustExist);
+				//return BadRequest(RESTAPI::Errors::LocationMustExist);
 			}
 			MoveFromLocation = Existing.location;
 			Existing.location = MoveToLocation;
@@ -506,6 +509,7 @@ namespace OpenWifi {
 		std::string ErrorText;
 		NewObject.parent = Existing.parent;
 		NewObject.entity = Existing.entity;
+		NewObject.managementRoles = Existing.managementRoles;
 
 		std::vector<std::string> Errors;
 		auto ObjectsCreated = CreateObjects(NewObject, *this, Errors);
