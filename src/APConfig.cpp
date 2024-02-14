@@ -121,6 +121,41 @@ namespace OpenWifi {
                         }
                     }
                 }
+				else if (Original.isObject(i)) {
+					std::cout << "It's an object!!!" << std::endl;
+					const auto uuid = Original.get(i);
+					ProvObjects::VariableBlock VB;
+					if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+                            for (const auto &var: VB.variables) {
+                                Poco::JSON::Parser P;
+                                auto VariableBlockInfo =
+                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+                                auto VarNames = VariableBlockInfo->getNames();
+                                for (const auto &j: VarNames) {
+//                                    std::cout << "Name: " << j << std::endl;
+                                    if(VariableBlockInfo->isArray(j)) {
+                                        auto Elements = VariableBlockInfo->getArray(j);
+                                        if(Elements->size()>0) {
+                                            Poco::JSON::Array InnerArray;
+                                            ReplaceVariablesInArray(*Elements, InnerArray);
+                                            Result.set(j, InnerArray);
+//                                            std::cout << "Array!!!" << std::endl;
+                                        } else {
+//                                            std::cout << "Empty Array!!!" << std::endl;
+                                        }
+                                    } else if(VariableBlockInfo->isObject(j)) {
+                                        Poco::JSON::Object  InnerEval;
+//                                        std::cout << "Visiting object " << j << std::endl;
+                                        auto O = VariableBlockInfo->getObject(j);
+                                        ReplaceVariablesInObject(*O,InnerEval);
+                                        Result.set(j, InnerEval);
+                                    } else {
+                                        Result.set(j, VariableBlockInfo->get(j));
+                                    }
+                                }
+                            }
+                        }
+				}
             } else if (i == "__radiusEndpoint") {
                 auto EndPointId = Original.get(i).toString();
                 ProvObjects::RADIUSEndPoint RE;
