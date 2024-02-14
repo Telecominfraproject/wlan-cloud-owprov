@@ -37,10 +37,13 @@ namespace OpenWifi {
 		inline void onTimer([[maybe_unused]] Poco::Timer &timer) { UpdateDeviceTypes(); }
 
 		inline bool IsAcceptableDeviceType(const std::string &D) const {
-			return (DeviceTypes_.find(D) != DeviceTypes_.end());
+			return true;
+			//return (DeviceTypes_.find(D) != DeviceTypes_.end());
 		};
 		inline bool AreAcceptableDeviceTypes(const Types::StringVec &S,
 											 bool WildCardAllowed = true) const {
+			return true;
+			/*
 			for (const auto &i : S) {
 				if (WildCardAllowed && i == "*") {
 					//   We allow wildcards
@@ -48,6 +51,7 @@ namespace OpenWifi {
 					return false;
 			}
 			return true;
+			*/
 		}
 
 	  private:
