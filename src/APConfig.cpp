@@ -133,39 +133,9 @@ namespace OpenWifi {
 					]
 					*/
                     auto UUIDs = Original.getArray(i);
-                    for (const auto &uuid: *UUIDs) {
-                        ProvObjects::VariableBlock VB;
-                        if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-                            for (const auto &var: VB.variables) {
-                                Poco::JSON::Parser P;
-                                auto VariableBlockInfo =
-                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-                                auto VarNames = VariableBlockInfo->getNames();
-                                for (const auto &j: VarNames) {
-//                                    std::cout << "Name: " << j << std::endl;
-                                    if(VariableBlockInfo->isArray(j)) {
-                                        auto Elements = VariableBlockInfo->getArray(j);
-                                        if(Elements->size()>0) {
-                                            Poco::JSON::Array InnerArray;
-                                            ReplaceVariablesInArray(*Elements, InnerArray);
-                                            Result.set(j, InnerArray);
-//                                            std::cout << "Array!!!" << std::endl;
-                                        } else {
-//                                            std::cout << "Empty Array!!!" << std::endl;
-                                        }
-                                    } else if(VariableBlockInfo->isObject(j)) {
-                                        Poco::JSON::Object  InnerEval;
-//                                        std::cout << "Visiting object " << j << std::endl;
-                                        auto O = VariableBlockInfo->getObject(j);
-                                        ReplaceVariablesInObject(*O,InnerEval);
-                                        Result.set(j, InnerEval);
-                                    } else {
-                                        Result.set(j, VariableBlockInfo->get(j));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    for (const std::string &uuid: *UUIDs) {
+                        ReplaceNestedVariables(uuid, Result);
+					}
                 }
 				else {
 					/*
