@@ -80,6 +80,11 @@ namespace OpenWifi {
     }
 
 	void APConfig::ReplaceNestedVariables(const std::string uuid, Poco::JSON::Object &Result) {
+		/*
+		Helper method containg code previously in ReplaceVariablesinObject.
+		Once the top-level variable is resolved, this will be called to resolve any
+		variables nested within the top-level variable.
+		*/
 		ProvObjects::VariableBlock VB;
 		if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
 			for (const auto &var: VB.variables) {
@@ -117,12 +122,28 @@ namespace OpenWifi {
 		for (const auto &i : Names) {
             if (i == "__variableBlock") {
                 if (Original.isArray(i)) {
+					/*
+					E.g. of what the variable block would look like in an array:
+					"ssids": [
+						{
+							"__variableBlock": [
+								"79c083d2-d496-4de0-8600-76a63556851b"
+							]
+						}
+					]
+					*/
                     auto UUIDs = Original.getArray(i);
                     for (const std::string &uuid: *UUIDs) {
                         ReplaceNestedVariables(uuid, Result);
 					}
                 }
 				else {
+					/*
+					E.g. of what the variable block would look like replacing an entire json blob:
+					"services" : {
+						"__variableBlock": "ef8db4c0-f0ef-40d2-b676-c9c02ef39430"
+					}
+					*/
 					const std::string uuid = Original.get(i);
 					ReplaceNestedVariables(uuid, Result);
 				}
