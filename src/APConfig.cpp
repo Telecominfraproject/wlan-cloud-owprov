@@ -79,6 +79,37 @@ namespace OpenWifi {
         return false;
     }
 
+	void APConfig::ReplaceNestedVariables(const std::string uuid, Poco::JSON::Object &Result) {
+		ProvObjects::VariableBlock VB;
+		if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+			for (const auto &var: VB.variables) {
+				Poco::JSON::Parser P;
+				auto VariableBlockInfo =
+					P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+				auto VarNames = VariableBlockInfo->getNames();
+				for (const auto &j: VarNames) {
+					if(VariableBlockInfo->isArray(j)) {
+						auto Elements = VariableBlockInfo->getArray(j);
+						if(Elements->size()>0) {
+							Poco::JSON::Array InnerArray;
+							ReplaceVariablesInArray(*Elements, InnerArray);
+							Result.set(j, InnerArray);
+						} else {
+//                      	std::cout << "Empty Array!!!" << std::endl;
+						}
+					} else if(VariableBlockInfo->isObject(j)) {
+						Poco::JSON::Object  InnerEval;
+						auto O = VariableBlockInfo->getObject(j);
+						ReplaceVariablesInObject(*O,InnerEval);
+						Result.set(j, InnerEval);
+					} else {
+						Result.set(j, VariableBlockInfo->get(j));
+					}
+				}
+			}
+		}
+	}
+
     bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object &Original,
 											Poco::JSON::Object &Result) {
 		// get all the names and expand
@@ -87,74 +118,13 @@ namespace OpenWifi {
             if (i == "__variableBlock") {
                 if (Original.isArray(i)) {
                     auto UUIDs = Original.getArray(i);
-                    for (const auto &uuid: *UUIDs) {
-                        ProvObjects::VariableBlock VB;
-                        if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-                            for (const auto &var: VB.variables) {
-                                Poco::JSON::Parser P;
-                                auto VariableBlockInfo =
-                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-                                auto VarNames = VariableBlockInfo->getNames();
-                                for (const auto &j: VarNames) {
-//                                    std::cout << "Name: " << j << std::endl;
-                                    if(VariableBlockInfo->isArray(j)) {
-                                        auto Elements = VariableBlockInfo->getArray(j);
-                                        if(Elements->size()>0) {
-                                            Poco::JSON::Array InnerArray;
-                                            ReplaceVariablesInArray(*Elements, InnerArray);
-                                            Result.set(j, InnerArray);
-//                                            std::cout << "Array!!!" << std::endl;
-                                        } else {
-//                                            std::cout << "Empty Array!!!" << std::endl;
-                                        }
-                                    } else if(VariableBlockInfo->isObject(j)) {
-                                        Poco::JSON::Object  InnerEval;
-//                                        std::cout << "Visiting object " << j << std::endl;
-                                        auto O = VariableBlockInfo->getObject(j);
-                                        ReplaceVariablesInObject(*O,InnerEval);
-                                        Result.set(j, InnerEval);
-                                    } else {
-                                        Result.set(j, VariableBlockInfo->get(j));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    for (const std::string &uuid: *UUIDs) {
+                        ReplaceNestedVariables(uuid, Result);
+					}
                 }
-				else if (Original.isObject(i)) {
-					std::cout << "It's an object!!!" << std::endl;
-					const auto uuid = Original.get(i);
-					ProvObjects::VariableBlock VB;
-					if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-                            for (const auto &var: VB.variables) {
-                                Poco::JSON::Parser P;
-                                auto VariableBlockInfo =
-                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-                                auto VarNames = VariableBlockInfo->getNames();
-                                for (const auto &j: VarNames) {
-//                                    std::cout << "Name: " << j << std::endl;
-                                    if(VariableBlockInfo->isArray(j)) {
-                                        auto Elements = VariableBlockInfo->getArray(j);
-                                        if(Elements->size()>0) {
-                                            Poco::JSON::Array InnerArray;
-                                            ReplaceVariablesInArray(*Elements, InnerArray);
-                                            Result.set(j, InnerArray);
-//                                            std::cout << "Array!!!" << std::endl;
-                                        } else {
-//                                            std::cout << "Empty Array!!!" << std::endl;
-                                        }
-                                    } else if(VariableBlockInfo->isObject(j)) {
-                                        Poco::JSON::Object  InnerEval;
-//                                        std::cout << "Visiting object " << j << std::endl;
-                                        auto O = VariableBlockInfo->getObject(j);
-                                        ReplaceVariablesInObject(*O,InnerEval);
-                                        Result.set(j, InnerEval);
-                                    } else {
-                                        Result.set(j, VariableBlockInfo->get(j));
-                                    }
-                                }
-                            }
-                        }
+				else {
+					const std::string uuid = Original.get(i);
+					ReplaceNestedVariables(uuid, Result);
 				}
             } else if (i == "__radiusEndpoint") {
                 auto EndPointId = Original.get(i).toString();

@@ -47,6 +47,7 @@ namespace OpenWifi {
 
 		bool ReplaceVariablesInArray(const Poco::JSON::Array &O,
 									 Poco::JSON::Array &Result);
+		void ReplaceNestedVariables(const std::string uuid, Poco::JSON::Object &Result);
 		bool ReplaceVariablesInObject(const Poco::JSON::Object &Original,
 									  Poco::JSON::Object &Result);
 
