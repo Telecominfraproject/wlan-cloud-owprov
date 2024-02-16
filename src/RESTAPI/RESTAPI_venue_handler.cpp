@@ -187,7 +187,7 @@ namespace OpenWifi {
 			}
 		}
 
-		if (!NewObject.sourceIP.empty() && CIDR::ValidateIpRanges(NewObject.sourceIP)) {
+		if (!NewObject.sourceIP.empty() && !CIDR::ValidateIpRanges(NewObject.sourceIP)) {
 			return BadRequest(RESTAPI::Errors::InvalidIPRanges);
 		}
 
