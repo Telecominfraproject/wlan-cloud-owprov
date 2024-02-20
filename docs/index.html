@@ -1580,6 +1580,18 @@ ul.nav-tabs {
       "maxLength" : 2,
       "minLength" : 2,
       "type" : "string"
+    },
+    "imported" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "connected" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "platform" : {
+      "type" : "string",
+      "enum" : [ "AP", "SWITCH" ]
     }
   }
 };
@@ -4760,7 +4772,7 @@ $(document).ready(function() {
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Content-Type: application/json" \
- "https://localhost:16005/api/v1/configuration/{uuid}?validateOnly=true" \
+ "https://localhost:16005/api/v1/configuration/{uuid}?validateOnly=true&deviceType=deviceType_example" \
  -d '{
   &quot;subscriberOnly&quot; : false,
   &quot;allOf&quot; : {
@@ -4833,10 +4845,11 @@ public class ConfigurationsApiExample {
         ConfigurationsApi apiInstance = new ConfigurationsApi();
         UUID uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
         Boolean validateOnly = true; // Boolean | 
+        String deviceType = deviceType_example; // String | 
         DeviceConfiguration deviceConfiguration = ; // DeviceConfiguration | 
 
         try {
-            apiInstance.createConfiguration(uuid, validateOnly, deviceConfiguration);
+            apiInstance.createConfiguration(uuid, validateOnly, deviceType, deviceConfiguration);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConfigurationsApi#createConfiguration");
             e.printStackTrace();
@@ -4854,10 +4867,11 @@ public class ConfigurationsApiExample {
         ConfigurationsApi apiInstance = new ConfigurationsApi();
         UUID uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
         Boolean validateOnly = true; // Boolean | 
+        String deviceType = deviceType_example; // String | 
         DeviceConfiguration deviceConfiguration = ; // DeviceConfiguration | 
 
         try {
-            apiInstance.createConfiguration(uuid, validateOnly, deviceConfiguration);
+            apiInstance.createConfiguration(uuid, validateOnly, deviceType, deviceConfiguration);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConfigurationsApi#createConfiguration");
             e.printStackTrace();
@@ -4884,11 +4898,13 @@ public class ConfigurationsApiExample {
 ConfigurationsApi *apiInstance = [[ConfigurationsApi alloc] init];
 UUID *uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; //  (default to null)
 Boolean *validateOnly = true; //  (optional) (default to null)
+String *deviceType = deviceType_example; //  (optional) (default to null)
 DeviceConfiguration *deviceConfiguration = ; //  (optional)
 
 // Create a specific configuration.
 [apiInstance createConfigurationWith:uuid
     validateOnly:validateOnly
+    deviceType:deviceType
     deviceConfiguration:deviceConfiguration
               completionHandler: ^(NSError* error) {
     if (error) {
@@ -4917,6 +4933,7 @@ var api = new OpenWiFiProvisioningModel.ConfigurationsApi()
 var uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // {UUID} 
 var opts = {
   'validateOnly': true, // {Boolean} 
+  'deviceType': deviceType_example, // {String} 
   'deviceConfiguration':  // {DeviceConfiguration} 
 };
 
@@ -4958,11 +4975,12 @@ namespace Example
             var apiInstance = new ConfigurationsApi();
             var uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d;  // UUID |  (default to null)
             var validateOnly = true;  // Boolean |  (optional)  (default to null)
+            var deviceType = deviceType_example;  // String |  (optional)  (default to null)
             var deviceConfiguration = new DeviceConfiguration(); // DeviceConfiguration |  (optional) 
 
             try {
                 // Create a specific configuration.
-                apiInstance.createConfiguration(uuid, validateOnly, deviceConfiguration);
+                apiInstance.createConfiguration(uuid, validateOnly, deviceType, deviceConfiguration);
             } catch (Exception e) {
                 Debug.Print("Exception when calling ConfigurationsApi.createConfiguration: " + e.Message );
             }
@@ -4988,10 +5006,11 @@ OpenAPITools\Client\Configuration::getDefaultConfiguration()->setAccessToken('',
 $api_instance = new OpenAPITools\Client\Api\ConfigurationsApi();
 $uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
 $validateOnly = true; // Boolean | 
+$deviceType = deviceType_example; // String | 
 $deviceConfiguration = ; // DeviceConfiguration | 
 
 try {
-    $api_instance->createConfiguration($uuid, $validateOnly, $deviceConfiguration);
+    $api_instance->createConfiguration($uuid, $validateOnly, $deviceType, $deviceConfiguration);
 } catch (Exception $e) {
     echo 'Exception when calling ConfigurationsApi->createConfiguration: ', $e->getMessage(), PHP_EOL;
 }
@@ -5015,10 +5034,11 @@ $WWW::OPenAPIClient::Configuration::access_token = 'YOUR_ACCESS_TOKEN';
 my $api_instance = WWW::OPenAPIClient::ConfigurationsApi->new();
 my $uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; # UUID | 
 my $validateOnly = true; # Boolean | 
+my $deviceType = deviceType_example; # String | 
 my $deviceConfiguration = WWW::OPenAPIClient::Object::DeviceConfiguration->new(); # DeviceConfiguration | 
 
 eval {
-    $api_instance->createConfiguration(uuid => $uuid, validateOnly => $validateOnly, deviceConfiguration => $deviceConfiguration);
+    $api_instance->createConfiguration(uuid => $uuid, validateOnly => $validateOnly, deviceType => $deviceType, deviceConfiguration => $deviceConfiguration);
 };
 if ($@) {
     warn "Exception when calling ConfigurationsApi->createConfiguration: $@\n";
@@ -5044,11 +5064,12 @@ openapi_client.configuration.access_token = 'YOUR_ACCESS_TOKEN'
 api_instance = openapi_client.ConfigurationsApi()
 uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d # UUID |  (default to null)
 validateOnly = true # Boolean |  (optional) (default to null)
+deviceType = deviceType_example # String |  (optional) (default to null)
 deviceConfiguration =  # DeviceConfiguration |  (optional)
 
 try:
     # Create a specific configuration.
-    api_instance.create_configuration(uuid, validateOnly=validateOnly, deviceConfiguration=deviceConfiguration)
+    api_instance.create_configuration(uuid, validateOnly=validateOnly, deviceType=deviceType, deviceConfiguration=deviceConfiguration)
 except ApiException as e:
     print("Exception when calling ConfigurationsApi->createConfiguration: %s\n" % e)</code></pre>
                             </div>
@@ -5059,10 +5080,11 @@ except ApiException as e:
 pub fn main() {
     let uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID
     let validateOnly = true; // Boolean
+    let deviceType = deviceType_example; // String
     let deviceConfiguration = ; // DeviceConfiguration
 
     let mut context = ConfigurationsApi::Context::default();
-    let result = client.createConfiguration(uuid, validateOnly, deviceConfiguration, &context).wait();
+    let result = client.createConfiguration(uuid, validateOnly, deviceType, deviceConfiguration, &context).wait();
 
     println!("{:?}", result);
 }
@@ -5172,6 +5194,23 @@ $(document).ready(function() {
             <div class="primitive">
                 <span class="type">
                     Boolean
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">deviceType</td>
+<td>
+
+
+    <div id="d2e199_createConfiguration_deviceType">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
                 </span>
 
             </div>
@@ -6871,7 +6910,7 @@ return the number of devices
 -H "X-API-KEY: [[apiKey]]" \
  -H "Authorization: Bearer [[accessToken]]" \
  -H "Content-Type: application/json" \
- "https://localhost:16005/api/v1/configuration/{uuid}" \
+ "https://localhost:16005/api/v1/configuration/{uuid}?deviceType=deviceType_example" \
  -d '{
   &quot;subscriberOnly&quot; : false,
   &quot;allOf&quot; : {
@@ -6943,10 +6982,11 @@ public class ConfigurationsApiExample {
         // Create an instance of the API class
         ConfigurationsApi apiInstance = new ConfigurationsApi();
         UUID uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+        String deviceType = deviceType_example; // String | 
         DeviceConfiguration deviceConfiguration = ; // DeviceConfiguration | 
 
         try {
-            apiInstance.modifyConfiguration(uuid, deviceConfiguration);
+            apiInstance.modifyConfiguration(uuid, deviceType, deviceConfiguration);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConfigurationsApi#modifyConfiguration");
             e.printStackTrace();
@@ -6963,10 +7003,11 @@ public class ConfigurationsApiExample {
     public static void main(String[] args) {
         ConfigurationsApi apiInstance = new ConfigurationsApi();
         UUID uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+        String deviceType = deviceType_example; // String | 
         DeviceConfiguration deviceConfiguration = ; // DeviceConfiguration | 
 
         try {
-            apiInstance.modifyConfiguration(uuid, deviceConfiguration);
+            apiInstance.modifyConfiguration(uuid, deviceType, deviceConfiguration);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConfigurationsApi#modifyConfiguration");
             e.printStackTrace();
@@ -6992,10 +7033,12 @@ public class ConfigurationsApiExample {
 // Create an instance of the API class
 ConfigurationsApi *apiInstance = [[ConfigurationsApi alloc] init];
 UUID *uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; //  (default to null)
+String *deviceType = deviceType_example; //  (optional) (default to null)
 DeviceConfiguration *deviceConfiguration = ; //  (optional)
 
 // Modify a specific configuration.
 [apiInstance modifyConfigurationWith:uuid
+    deviceType:deviceType
     deviceConfiguration:deviceConfiguration
               completionHandler: ^(NSError* error) {
     if (error) {
@@ -7023,6 +7066,7 @@ bearerAuth.accessToken = "YOUR ACCESS TOKEN";
 var api = new OpenWiFiProvisioningModel.ConfigurationsApi()
 var uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // {UUID} 
 var opts = {
+  'deviceType': deviceType_example, // {String} 
   'deviceConfiguration':  // {DeviceConfiguration} 
 };
 
@@ -7063,11 +7107,12 @@ namespace Example
             // Create an instance of the API class
             var apiInstance = new ConfigurationsApi();
             var uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d;  // UUID |  (default to null)
+            var deviceType = deviceType_example;  // String |  (optional)  (default to null)
             var deviceConfiguration = new DeviceConfiguration(); // DeviceConfiguration |  (optional) 
 
             try {
                 // Modify a specific configuration.
-                apiInstance.modifyConfiguration(uuid, deviceConfiguration);
+                apiInstance.modifyConfiguration(uuid, deviceType, deviceConfiguration);
             } catch (Exception e) {
                 Debug.Print("Exception when calling ConfigurationsApi.modifyConfiguration: " + e.Message );
             }
@@ -7092,10 +7137,11 @@ OpenAPITools\Client\Configuration::getDefaultConfiguration()->setAccessToken('',
 // Create an instance of the API class
 $api_instance = new OpenAPITools\Client\Api\ConfigurationsApi();
 $uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID | 
+$deviceType = deviceType_example; // String | 
 $deviceConfiguration = ; // DeviceConfiguration | 
 
 try {
-    $api_instance->modifyConfiguration($uuid, $deviceConfiguration);
+    $api_instance->modifyConfiguration($uuid, $deviceType, $deviceConfiguration);
 } catch (Exception $e) {
     echo 'Exception when calling ConfigurationsApi->modifyConfiguration: ', $e->getMessage(), PHP_EOL;
 }
@@ -7118,10 +7164,11 @@ $WWW::OPenAPIClient::Configuration::access_token = 'YOUR_ACCESS_TOKEN';
 # Create an instance of the API class
 my $api_instance = WWW::OPenAPIClient::ConfigurationsApi->new();
 my $uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; # UUID | 
+my $deviceType = deviceType_example; # String | 
 my $deviceConfiguration = WWW::OPenAPIClient::Object::DeviceConfiguration->new(); # DeviceConfiguration | 
 
 eval {
-    $api_instance->modifyConfiguration(uuid => $uuid, deviceConfiguration => $deviceConfiguration);
+    $api_instance->modifyConfiguration(uuid => $uuid, deviceType => $deviceType, deviceConfiguration => $deviceConfiguration);
 };
 if ($@) {
     warn "Exception when calling ConfigurationsApi->modifyConfiguration: $@\n";
@@ -7146,11 +7193,12 @@ openapi_client.configuration.access_token = 'YOUR_ACCESS_TOKEN'
 # Create an instance of the API class
 api_instance = openapi_client.ConfigurationsApi()
 uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d # UUID |  (default to null)
+deviceType = deviceType_example # String |  (optional) (default to null)
 deviceConfiguration =  # DeviceConfiguration |  (optional)
 
 try:
     # Modify a specific configuration.
-    api_instance.modify_configuration(uuid, deviceConfiguration=deviceConfiguration)
+    api_instance.modify_configuration(uuid, deviceType=deviceType, deviceConfiguration=deviceConfiguration)
 except ApiException as e:
     print("Exception when calling ConfigurationsApi->modifyConfiguration: %s\n" % e)</code></pre>
                             </div>
@@ -7160,10 +7208,11 @@ except ApiException as e:
 
 pub fn main() {
     let uuid = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // UUID
+    let deviceType = deviceType_example; // String
     let deviceConfiguration = ; // DeviceConfiguration
 
     let mut context = ConfigurationsApi::Context::default();
-    let result = client.modifyConfiguration(uuid, deviceConfiguration, &context).wait();
+    let result = client.modifyConfiguration(uuid, deviceType, deviceConfiguration, &context).wait();
 
     println!("{:?}", result);
 }
@@ -7258,6 +7307,30 @@ $(document).ready(function() {
                             </table>
 
 
+                            <div class="methodsubtabletitle">Query parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">deviceType</td>
+<td>
+
+
+    <div id="d2e199_modifyConfiguration_deviceType">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
 
                           <h2>Responses</h2>
                             <h3 id="examples-Configurations-modifyConfiguration-title-200"></h3>
@@ -12853,6 +12926,8 @@ $(document).ready(function() {
   &quot;deviceConfiguration&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
   &quot;devClass&quot; : &quot;any&quot;,
   &quot;locale&quot; : &quot;locale&quot;,
+  &quot;platform&quot; : &quot;AP&quot;,
+  &quot;connected&quot; : 6,
   &quot;allOf&quot; : {
     &quot;notes&quot; : [ {
       &quot;note&quot; : &quot;note&quot;,
@@ -12877,6 +12952,7 @@ $(document).ready(function() {
   },
   &quot;qrCode&quot; : &quot;qrCode&quot;,
   &quot;contact&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
+  &quot;imported&quot; : 0,
   &quot;location&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
   &quot;state&quot; : &quot;state&quot;,
   &quot;entity&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;
@@ -15307,6 +15383,8 @@ return the resolved configuration for a specific device
   &quot;deviceConfiguration&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
   &quot;devClass&quot; : &quot;any&quot;,
   &quot;locale&quot; : &quot;locale&quot;,
+  &quot;platform&quot; : &quot;AP&quot;,
+  &quot;connected&quot; : 6,
   &quot;allOf&quot; : {
     &quot;notes&quot; : [ {
       &quot;note&quot; : &quot;note&quot;,
@@ -15331,6 +15409,7 @@ return the resolved configuration for a specific device
   },
   &quot;qrCode&quot; : &quot;qrCode&quot;,
   &quot;contact&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
+  &quot;imported&quot; : 0,
   &quot;location&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;,
   &quot;state&quot; : &quot;state&quot;,
   &quot;entity&quot; : &quot;046b6c7f-0b8a-43b9-b35d-6489e6daee91&quot;
