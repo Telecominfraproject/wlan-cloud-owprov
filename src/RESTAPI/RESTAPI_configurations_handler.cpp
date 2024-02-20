@@ -91,9 +91,10 @@ namespace OpenWifi {
 			}
 			auto Config = RawObject->get("configuration").toString();
 			Poco::JSON::Object Answer;
-			std::vector<std::string> Error;
+            auto deviceType = GetParameter("deviceType", "AP");
+            std::vector<std::string> Error;
 			auto Res =
-				ValidateUCentralConfiguration(Config, Error, GetBoolParameter("strict", true));
+				ValidateUCentralConfiguration(ConfigurationValidator::GetType(deviceType),Config, Error, GetBoolParameter("strict", true));
 			Answer.set("valid", Res);
 			Answer.set("error", Error);
 			return ReturnObject(Answer);
@@ -134,9 +135,10 @@ namespace OpenWifi {
 		}
 
 		std::vector<std::string> Errors;
-		if (!ValidateConfigBlock(NewObject, Errors)) {
-			return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
-		}
+        auto deviceType = GetParameter("deviceType", "AP");
+        if (!ValidateConfigBlock(ConfigurationValidator::GetType(deviceType), NewObject, Errors)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+        }
 
 		if (DB_.CreateRecord(NewObject)) {
 			MoveUsage(StorageService()->PolicyDB(), DB_, "", NewObject.managementPolicy,
@@ -185,9 +187,10 @@ namespace OpenWifi {
 			Existing.deviceTypes = NewObject.deviceTypes;
 
 		std::vector<std::string> Errors;
-		if (!ValidateConfigBlock(NewObject, Errors)) {
-			return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
-		}
+        auto deviceType = GetParameter("deviceType", "AP");
+        if (!ValidateConfigBlock(ConfigurationValidator::GetType(deviceType), NewObject, Errors)) {
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+        }
 
 		if (RawObject->has("configuration")) {
 			Existing.configuration = NewObject.configuration;
