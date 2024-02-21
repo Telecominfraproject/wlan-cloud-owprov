@@ -460,9 +460,11 @@ namespace OpenWifi {
             }
 
             try {
-                if (ValidateUCentralConfiguration(Type,i.configuration, Errors, true)) {
+                std::string Error;
+                if (ValidateUCentralConfiguration(Type,i.configuration, Error, true)) {
                     // std::cout << "Block: " << i.name << " is valid" << std::endl;
                 } else {
+                    Errors.push_back(Error);
                     return false;
                 }
             } catch (...) {

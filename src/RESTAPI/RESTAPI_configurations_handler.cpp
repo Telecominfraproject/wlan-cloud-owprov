@@ -92,7 +92,7 @@ namespace OpenWifi {
 			auto Config = RawObject->get("configuration").toString();
 			Poco::JSON::Object Answer;
             auto deviceType = GetParameter("deviceType", "AP");
-            std::vector<std::string> Error;
+            std::string Error;
 			auto Res =
 				ValidateUCentralConfiguration(ConfigurationValidator::GetType(deviceType),Config, Error, GetBoolParameter("strict", true));
 			Answer.set("valid", Res);
