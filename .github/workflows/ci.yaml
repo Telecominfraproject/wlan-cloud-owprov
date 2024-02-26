@@ -62,14 +62,14 @@ jobs:
           cd docker-image-build
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          if [[ "$GITHUB_REF" == "refs/heads/main" ]] ; then
+          if [[ "$GITHUB_REF" == "refs/heads/kinara" ]] ; then
             docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           fi
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Notify via Teams
-        #if: failure() && github.ref == 'refs/heads/main'
+        #if: failure() && github.ref == 'refs/heads/kinara'
         if: always()
         uses: skitionek/notify-microsoft-teams@master
         with:
@@ -81,7 +81,7 @@ jobs:
 
 #  trigger-deploy-to-dev:
 #    runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/kinara'
 #    needs:
 #      - docker
 #    steps:
