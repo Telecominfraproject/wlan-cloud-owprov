@@ -154,6 +154,19 @@ namespace OpenWifi {
 			ToVariables = NewObject.variables;
 		}
 
+		Types::UUIDvec_t ToVariables;
+		if (RawObject->has("variables")) {
+			for (const auto &i : NewObject.variables) {
+				if (!i.empty() && !StorageService()->VariablesDB().Exists("id", i)) {
+					return BadRequest(RESTAPI::Errors::VariableMustExist);
+				}
+			}
+			for (const auto &i : NewObject.variables)
+				ToVariables.emplace_back(i);
+			
+			ToVariables = NewObject.variables;
+		}
+
 		if (DB_.CreateRecord(NewObject)) {
 			AddMembership(StorageService()->VariablesDB(),
 							 &ProvObjects::VariableBlock::configurations, ToVariables, NewObject.info.id);
