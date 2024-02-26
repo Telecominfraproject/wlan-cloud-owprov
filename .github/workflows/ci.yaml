@@ -68,16 +68,17 @@ jobs:
           fi
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Notify on failure via Teams
-        if: failure() && github.ref == 'refs/heads/main'
+      - name: Notify via Teams
+        #if: failure() && github.ref == 'refs/heads/main'
+        if: always()
         uses: skitionek/notify-microsoft-teams@master
         with:
-          #webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK }}
-          webhook_url: TODO
+          webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK }}
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
-          dry_run: True
+          dry_run: False
+
 #  trigger-deploy-to-dev:
 #    runs-on: ubuntu-latest
 #    if: github.ref == 'refs/heads/main'
