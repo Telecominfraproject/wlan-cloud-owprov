@@ -192,17 +192,6 @@ namespace OpenWifi {
 		auto T = Poco::toLower(Type);
 		Types::MicroServiceMetaVec Res;
 
-        // adding hook to hijack FMS requests to different service
-        std::cerr << DAEMON_APP_NAME << ": services list for " << Type;
-        if (Type == "owfms") {
-            std::cerr << DAEMON_APP_NAME << ": adding conduit endpoint for " << Type;
-            OpenWifi::Types::MicroServiceMeta Rec;
-            Rec.Type = Type;
-            Rec.PrivateEndPoint = "http://conduit-conduit:6444";
-            Rec.AccessKey = "Z2F9AC460Hujq8JX5Gk1madSbPfvo7tTKQ";
-            Res.push_back(Rec);
-        }
-
 		for (const auto &[_, ServiceRec] : Services_) {
 			if (ServiceRec.Type == T)
 				Res.push_back(ServiceRec);
