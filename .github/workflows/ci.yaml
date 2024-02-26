@@ -5,13 +5,13 @@ on:
     paths-ignore:
       - '**.md'
     branches:
-      - main
+      - kinara
       - 'release/*'
     tags:
       - 'v*'
   pull_request:
     branches:
-      - main
+      - kinara
       - 'release/*'
 
 defaults:
