@@ -138,7 +138,22 @@ namespace OpenWifi {
 			return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
 		}
 
+		Types::UUIDvec_t ToVariables;
+		if (RawObject->has("variables")) {
+			for (const auto &i : NewObject.variables) {
+				if (!i.empty() && !StorageService()->VariablesDB().Exists("id", i)) {
+					return BadRequest(RESTAPI::Errors::VariableMustExist);
+				}
+			}
+			for (const auto &i : NewObject.variables)
+				ToVariables.emplace_back(i);
+			
+			ToVariables = NewObject.variables;
+		}
+
 		if (DB_.CreateRecord(NewObject)) {
+			AddMembership(StorageService()->VariablesDB(),
+							 &ProvObjects::VariableBlock::configurations, ToVariables, NewObject.info.id);
 			MoveUsage(StorageService()->PolicyDB(), DB_, "", NewObject.managementPolicy,
 					  NewObject.info.id);
 			AddMembership(StorageService()->VenueDB(), &ProvObjects::Venue::configurations,

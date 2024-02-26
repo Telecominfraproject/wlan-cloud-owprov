@@ -390,6 +390,13 @@ namespace OpenWifi {
 	}
 
 	template <typename db_type, typename Member>
+	void AddMembership(db_type &DB, Member T, const Types::UUIDvec_t &Obj, const std::string &Id) {
+		for (const auto &i : Obj) {
+			AddMembership(DB, T, i, Id);
+		}
+	}
+
+	template <typename db_type, typename Member>
 	void ManageMembership(db_type &DB, Member T, const std::string &From, const std::string &To,
 						  const std::string &Id) {
 		RemoveMembership(DB, T, From, Id);
