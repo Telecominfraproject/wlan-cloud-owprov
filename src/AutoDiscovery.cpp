@@ -54,6 +54,8 @@ namespace OpenWifi {
             FW = P->get(uCentralProtocol::FIRMWARE).toString();
         if (P->has(uCentralProtocol::SERIALNUMBER))
             SN = P->get(uCentralProtocol::SERIALNUMBER).toString();
+        else if (P->has(uCentralProtocol::SERIAL))
+            SN = P->get(uCentralProtocol::SERIAL).toString();
         if (P->has("locale")) {
             locale = P->get("locale").toString();
         }
@@ -83,6 +85,7 @@ namespace OpenWifi {
 					Poco::JSON::Parser Parser;
 					auto Object = Parser.parse(Msg->Payload()).extract<Poco::JSON::Object::Ptr>();
                     bool    Connected=true;
+                    bool isConnection=false;
 
 					if (Object->has(uCentralProtocol::PAYLOAD)) {
                         auto PayloadObj = Object->getObject(uCentralProtocol::PAYLOAD);
@@ -91,6 +94,7 @@ namespace OpenWifi {
                             auto PingObj = PayloadObj->getObject("ping");
                             ProcessPing(PingObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
                         } else if(PayloadObj->has("capabilities")) {
+                            isConnection=true;
                             ProcessConnect(PayloadObj, Firmware, SerialNumber, Compatible, ConnectedIP, Locale);
                         } else if(PayloadObj->has("disconnection")) {
                             //  we ignore disconnection in provisioning
@@ -102,7 +106,7 @@ namespace OpenWifi {
 
                         if (!SerialNumber.empty() && Connected) {
                             StorageService()->InventoryDB().CreateFromConnection(
-                                    SerialNumber, ConnectedIP, Compatible, Locale);
+                                    SerialNumber, ConnectedIP, Compatible, Locale, isConnection);
                         }
                     }
 				} catch (const Poco::Exception &E) {

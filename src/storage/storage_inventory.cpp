@@ -80,7 +80,8 @@ namespace OpenWifi {
 	bool InventoryDB::CreateFromConnection(const std::string &SerialNumberRaw,
 										   const std::string &ConnectionInfo,
 										   const std::string &DeviceType,
-										   const std::string &Locale) {
+										   const std::string &Locale,
+										   const bool isConnection) {
 
 		ProvObjects::InventoryTag ExistingDevice;
 		auto SerialNumber = Poco::toLower(SerialNumberRaw);
@@ -179,6 +180,28 @@ namespace OpenWifi {
 				StorageService()->InventoryDB().UpdateRecord("id", ExistingDevice.info.id,
 															 ExistingDevice);
 			}
+
+			// Push entity and venue down to GW but only on connect (not ping)
+			if (isConnection && !ExistingDevice.venue.empty()) {
+				if (SDK::GW::Device::SetVenue(nullptr, ExistingDevice.serialNumber, ExistingDevice.venue)) {
+						Logger().information(Poco::format("%s: GW set venue property.",
+														  ExistingDevice.serialNumber));
+				} else {
+					Logger().information(Poco::format(
+						"%s: could not set GW venue property.", ExistingDevice.serialNumber));
+				}
+			}
+
+			if (isConnection && !ExistingDevice.entity.empty()) {
+				if (SDK::GW::Device::SetEntity(nullptr, ExistingDevice.serialNumber, ExistingDevice.entity)) {
+						Logger().information(Poco::format("%s: GW set entity property.",
+														  ExistingDevice.serialNumber));
+				} else {
+					Logger().information(Poco::format(
+						"%s: could not set GW entity property.", ExistingDevice.serialNumber));
+				}
+			}
+
 		}
 		return false;
 	}
