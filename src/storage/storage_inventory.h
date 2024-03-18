@@ -16,7 +16,7 @@ namespace OpenWifi {
 						std::string, std::string, std::string, std::string, std::string,
 						std::string, std::string, std::string, std::string, std::string,
 						std::string, std::string, std::string, std::string, std::string,
-						std::string, std::string, bool>
+						std::string, std::string, bool, uint64_t, uint64_t, std::string>
 		InventoryDBRecordType;
 
 	class InventoryDB : public ORM::DB<InventoryDBRecordType, ProvObjects::InventoryTag> {

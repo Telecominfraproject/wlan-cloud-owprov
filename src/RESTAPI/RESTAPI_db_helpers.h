@@ -438,47 +438,49 @@ namespace OpenWifi {
 		return EntityDB::RootUUID();
 	}
 
-	inline bool ValidateConfigBlock(const ProvObjects::DeviceConfiguration &Config,
-									std::vector<std::string> &Errors) {
-		static const std::vector<std::string> SectionNames{
-			"globals",	   "interfaces", "metrics", "radios",	  "services",	"unit",
-			"definitions", "ethernet",	 "switch",	"config-raw", "third-party"};
+    inline bool ValidateConfigBlock(ConfigurationValidator::ConfigurationType Type, const ProvObjects::DeviceConfiguration &Config,
+                                    std::vector<std::string> &Errors) {
+        static const std::vector<std::string> SectionNames{
+                "globals",	   "interfaces", "metrics", "radios",	  "services",	"unit",
+                "definitions", "ethernet",	 "switch",	"config-raw", "third-party"};
 
-		for (const auto &i : Config.configuration) {
-			Poco::JSON::Parser P;
-			if (i.name.empty()) {
-				Errors.push_back("Name is empty");
-				return false;
-			}
+        for (const auto &i : Config.configuration) {
+            Poco::JSON::Parser P;
+            if (i.name.empty()) {
+                Errors.push_back("Name is empty");
+                return false;
+            }
 
-			try {
-				auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
-				auto N = Blocks->getNames();
-				for (const auto &j : N) {
-					if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) ==
-						SectionNames.cend()) {
-						Errors.push_back("Unknown block name");
-						return false;
-					}
-				}
-			} catch (const Poco::JSON::JSONException &E) {
-				Errors.push_back("Invalid JSON document");
-				return false;
-			}
+            try {
+                auto Blocks = P.parse(i.configuration).extract<Poco::JSON::Object::Ptr>();
+                auto N = Blocks->getNames();
+                for (const auto &j : N) {
+                    if (std::find(SectionNames.cbegin(), SectionNames.cend(), j) ==
+                        SectionNames.cend()) {
+                        Errors.push_back("Unknown block name");
+                        return false;
+                    }
+                }
+            } catch (const Poco::JSON::JSONException &E) {
+                Errors.push_back("Invalid JSON document");
+                return false;
+            }
 
-			try {
-				if (ValidateUCentralConfiguration(i.configuration, Errors, true)) {
-					// std::cout << "Block: " << i.name << " is valid" << std::endl;
-				} else {
-					return false;
-				}
-			} catch (...) {
-				Errors.push_back("Invalid configuration caused an exception");
-				return false;
-			}
-		}
-		return true;
-	}
+            try {
+                std::string Error;
+                if (ValidateUCentralConfiguration(Type,i.configuration, Error, true)) {
+                    // std::cout << "Block: " << i.name << " is valid" << std::endl;
+                } else {
+                    Errors.push_back(Error);
+                    return false;
+                }
+            } catch (...) {
+                Errors.push_back("Invalid configuration caused an exception");
+                return false;
+            }
+        }
+        return true;
+    }
 
 	template <typename Type>
 	std::map<std::string, std::string> CreateObjects(Type &NewObject, RESTAPIHandler &R,
@@ -542,7 +544,7 @@ namespace OpenWifi {
 						ProvObjects::DeviceConfiguration DC;
 						if (DC.from_json(ConfigurationDetails)) {
 							if constexpr (std::is_same_v<Type, ProvObjects::InventoryTag>) {
-								if (!ValidateConfigBlock(DC, Errors)) {
+								if (!ValidateConfigBlock(ConfigurationValidator::ConfigurationType::AP,DC, Errors)) {
 									break;
 								}
 								ProvObjects::CreateObjectInfo(R.UserInfo_.userinfo, DC.info);

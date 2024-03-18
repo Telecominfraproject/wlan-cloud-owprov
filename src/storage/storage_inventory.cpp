@@ -44,7 +44,10 @@ namespace OpenWifi {
 		ORM::Field{"devClass", ORM::FieldType::FT_TEXT},
 		ORM::Field{"locale", ORM::FieldType::FT_TEXT},
 		ORM::Field{"realMacAddress", ORM::FieldType::FT_TEXT},
-		ORM::Field{"doNotAllowOverrides", ORM::FieldType::FT_BOOLEAN}};
+		ORM::Field{"doNotAllowOverrides", ORM::FieldType::FT_BOOLEAN},
+        ORM::Field{"imported", ORM::FieldType::FT_BIGINT},
+        ORM::Field{"connected", ORM::FieldType::FT_BIGINT},
+        ORM::Field{"platform", ORM::FieldType::FT_TEXT}};
 
 	static ORM::IndexVec InventoryDB_Indexes{
 		{std::string("inventory_name_index"),
@@ -60,6 +63,9 @@ namespace OpenWifi {
 			"alter table " + TableName_ + " add column realMacAddress text",
 			"alter table " + TableName_ + " add column devClass text",
 			"alter table " + TableName_ + " add column deviceRules text",
+            "alter table " + TableName_ + " add column platform text default 'AP'",
+            "alter table " + TableName_ + " add column imported bigint",
+            "alter table " + TableName_ + " add column connected bigint",
 			"alter table " + TableName_ + " add column doNotAllowOverrides boolean"};
 
 		for (const auto &i : Script) {
@@ -107,6 +113,8 @@ namespace OpenWifi {
 			StateDoc["date"] = Utils::Now();
 			NewDevice.state = to_string(StateDoc);
 			NewDevice.devClass = "any";
+            NewDevice.connected = Now;
+            NewDevice.imported = 0;
 			if (!IP.empty()) {
 				StorageService()->VenueDB().GetByIP(IP, NewDevice.venue);
 				if (NewDevice.venue.empty()) {
@@ -177,6 +185,7 @@ namespace OpenWifi {
 
 			if (modified) {
 				ExistingDevice.info.modified = Utils::Now();
+                ExistingDevice.connected = Utils::Now();
 				StorageService()->InventoryDB().UpdateRecord("id", ExistingDevice.info.id,
 															 ExistingDevice);
 			}
@@ -349,6 +358,9 @@ void ORM::DB<OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTa
 	Out.locale = In.get<21>();
 	Out.realMacAddress = In.get<22>();
 	Out.doNotAllowOverrides = In.get<23>();
+    Out.imported = In.get<24>();
+    Out.connected = In.get<25>();
+    Out.platform = In.get<26>();
 }
 
 template <>
@@ -378,4 +390,7 @@ void ORM::DB<OpenWifi::InventoryDBRecordType, OpenWifi::ProvObjects::InventoryTa
 	Out.set<21>(In.locale);
 	Out.set<22>(In.realMacAddress);
 	Out.set<23>(In.doNotAllowOverrides);
+    Out.set<24>(In.imported);
+    Out.set<25>(In.connected);
+    Out.set<26>(In.platform);
 }
