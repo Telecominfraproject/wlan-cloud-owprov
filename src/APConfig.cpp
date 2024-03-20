@@ -79,6 +79,42 @@ namespace OpenWifi {
         return false;
     }
 
+	void APConfig::ReplaceNestedVariables(const std::string uuid, Poco::JSON::Object &Result) {
+		/*
+		Helper method contains code previously in ReplaceVariablesinObject.
+		Once the top-level variable is resolved, this will be called to resolve any
+		variables nested within the top-level variable.
+		*/
+		ProvObjects::VariableBlock VB;
+		if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
+			for (const auto &var: VB.variables) {
+				Poco::JSON::Parser P;
+				auto VariableBlockInfo =
+					P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
+				auto VarNames = VariableBlockInfo->getNames();
+				for (const auto &j: VarNames) {
+					if(VariableBlockInfo->isArray(j)) {
+						auto Elements = VariableBlockInfo->getArray(j);
+						if(Elements->size()>0) {
+							Poco::JSON::Array InnerArray;
+							ReplaceVariablesInArray(*Elements, InnerArray);
+							Result.set(j, InnerArray);
+						} else {
+//                      	std::cout << "Empty Array!!!" << std::endl;
+						}
+					} else if(VariableBlockInfo->isObject(j)) {
+						Poco::JSON::Object  InnerEval;
+						auto O = VariableBlockInfo->getObject(j);
+						ReplaceVariablesInObject(*O,InnerEval);
+						Result.set(j, InnerEval);
+					} else {
+						Result.set(j, VariableBlockInfo->get(j));
+					}
+				}
+			}
+		}
+	}
+
     bool APConfig::ReplaceVariablesInObject(const Poco::JSON::Object &Original,
 											Poco::JSON::Object &Result) {
 		// get all the names and expand
@@ -86,41 +122,31 @@ namespace OpenWifi {
 		for (const auto &i : Names) {
             if (i == "__variableBlock") {
                 if (Original.isArray(i)) {
+					/*
+					E.g. of what the variable block would look like in an array:
+					"ssids": [
+						{
+							"__variableBlock": [
+								"79c083d2-d496-4de0-8600-76a63556851b"
+							]
+						}
+					]
+					*/
                     auto UUIDs = Original.getArray(i);
-                    for (const auto &uuid: *UUIDs) {
-                        ProvObjects::VariableBlock VB;
-                        if (StorageService()->VariablesDB().GetRecord("id", uuid, VB)) {
-                            for (const auto &var: VB.variables) {
-                                Poco::JSON::Parser P;
-                                auto VariableBlockInfo =
-                                        P.parse(var.value).extract<Poco::JSON::Object::Ptr>();
-                                auto VarNames = VariableBlockInfo->getNames();
-                                for (const auto &j: VarNames) {
-//                                    std::cout << "Name: " << j << std::endl;
-                                    if(VariableBlockInfo->isArray(j)) {
-                                        auto Elements = VariableBlockInfo->getArray(j);
-                                        if(Elements->size()>0) {
-                                            Poco::JSON::Array InnerArray;
-                                            ReplaceVariablesInArray(*Elements, InnerArray);
-                                            Result.set(j, InnerArray);
-//                                            std::cout << "Array!!!" << std::endl;
-                                        } else {
-//                                            std::cout << "Empty Array!!!" << std::endl;
-                                        }
-                                    } else if(VariableBlockInfo->isObject(j)) {
-                                        Poco::JSON::Object  InnerEval;
-//                                        std::cout << "Visiting object " << j << std::endl;
-                                        auto O = VariableBlockInfo->getObject(j);
-                                        ReplaceVariablesInObject(*O,InnerEval);
-                                        Result.set(j, InnerEval);
-                                    } else {
-                                        Result.set(j, VariableBlockInfo->get(j));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    for (const std::string &uuid: *UUIDs) {
+                        ReplaceNestedVariables(uuid, Result);
+					}
                 }
+				else {
+					/*
+					E.g. of what the variable block would look like replacing an entire json blob:
+					"services" : {
+						"__variableBlock": "ef8db4c0-f0ef-40d2-b676-c9c02ef39430"
+					}
+					*/
+					const std::string uuid = Original.get(i);
+					ReplaceNestedVariables(uuid, Result);
+				}
             } else if (i == "__radiusEndpoint") {
                 auto EndPointId = Original.get(i).toString();
                 ProvObjects::RADIUSEndPoint RE;
