@@ -25,7 +25,8 @@ namespace OpenWifi {
 		virtual ~InventoryDB(){};
 		bool CreateFromConnection(const std::string &SerialNumber,
 								  const std::string &ConnectionInfo, const std::string &DeviceType,
-								  const std::string &Locale);
+								  const std::string &Locale,
+								  const bool isConnection);
 
 		void InitializeSerialCache();
 		bool GetRRMDeviceList(Types::UUIDvec_t &DeviceList);
