@@ -81,7 +81,7 @@ namespace OpenWifi {
 
 	void APConfig::ReplaceNestedVariables(const std::string uuid, Poco::JSON::Object &Result) {
 		/*
-		Helper method containg code previously in ReplaceVariablesinObject.
+		Helper method contains code previously in ReplaceVariablesinObject.
 		Once the top-level variable is resolved, this will be called to resolve any
 		variables nested within the top-level variable.
 		*/
