@@ -815,6 +815,17 @@ components:
           type: string
           minLength: 2
           maxLength: 2
+        imported:
+          type: integer
+          format: int64
+        connected:
+          type: integer
+          format: int64
+        platform:
+          type: string
+          enum:
+            - AP
+            - SWITCH
 
     VenueDeviceList:
       type: object
@@ -3240,6 +3251,15 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: deviceType
+          schema:
+            type: string
+            enum:
+              - AP
+              - SWITCH
+          required: false
+          default: AP
       requestBody:
         description: Information used to create the new entity
         content:
@@ -3268,6 +3288,15 @@ paths:
             format: uuid
             example: When modifying the root entity, the uuid 0000-0000-0000 must be entered.
           required: true
+        - in: query
+          name: deviceType
+          schema:
+            type: string
+            enum:
+              - AP
+              - SWITCH
+          required: false
+          default: AP
       requestBody:
         description: Information used to modify the new entity
         content:
