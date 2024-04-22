@@ -927,6 +927,7 @@ namespace OpenWifi::ProvObjects {
 		field_to_json(Obj, "inventory", inventory);
 		field_to_json(Obj, "configurations", configurations);
 		field_to_json(Obj, "managementPolicy", managementPolicy);
+		field_to_json(Obj, "templateTag", templateTag);
 	}
 
 	bool VariableBlock::from_json(const Poco::JSON::Object::Ptr &Obj) {
@@ -939,6 +940,7 @@ namespace OpenWifi::ProvObjects {
 			field_from_json(Obj, "inventory", inventory);
 			field_from_json(Obj, "configurations", configurations);
 			field_from_json(Obj, "managementPolicy", managementPolicy);
+			field_from_json(Obj, "templateTag", templateTag);
 			return true;
 		} catch (...) {
 		}

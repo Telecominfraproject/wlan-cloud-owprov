@@ -666,6 +666,7 @@ namespace OpenWifi::ProvObjects {
         std::string inventory;
         Types::UUIDvec_t configurations;
         Types::UUID_t managementPolicy;
+        std::string templateTag;
 
         void to_json(Poco::JSON::Object &Obj) const;
 
