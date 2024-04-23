@@ -24,7 +24,8 @@ namespace OpenWifi {
 		ORM::Field{"subscriber", ORM::FieldType::FT_TEXT},
 		ORM::Field{"inventory", ORM::FieldType::FT_TEXT},
 		ORM::Field{"configurations", ORM::FieldType::FT_TEXT},
-		ORM::Field{"managementPolicy", ORM::FieldType::FT_TEXT}};
+		ORM::Field{"managementPolicy", ORM::FieldType::FT_TEXT},
+		ORM::Field{"templateTag", ORM::FieldType::FT_TEXT}};
 
 	const static ORM::IndexVec VariablesDB_Indexes{
 		{std::string("variables_venue_index"),
@@ -38,6 +39,7 @@ namespace OpenWifi {
 
 	bool VariablesDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
 		std::vector<std::string> Statements{
+			            "alter table " + TableName_ + " add column templateTag TEXT;"
 			//            "alter table " + TableName_ + " add column configurations TEXT;" ,
 			//            "alter table " + TableName_ + " add column managementPolicy TEXT;"
 		};
@@ -66,6 +68,7 @@ void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::VariableBlo
 	Out.inventory = In.get<10>();
 	Out.configurations = OpenWifi::RESTAPI_utils::to_object_array(In.get<11>());
 	Out.managementPolicy = In.get<12>();
+	Out.templateTag = In.get<13>();
 }
 
 template <>
@@ -84,4 +87,5 @@ void ORM::DB<OpenWifi::VariablesDBRecordType, OpenWifi::ProvObjects::VariableBlo
 	Out.set<10>(In.inventory);
 	Out.set<11>(OpenWifi::RESTAPI_utils::to_string(In.configurations));
 	Out.set<12>(In.managementPolicy);
+	Out.set<13>(In.templateTag);
 }

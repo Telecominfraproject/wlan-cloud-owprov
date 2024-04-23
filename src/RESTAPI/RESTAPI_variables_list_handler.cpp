@@ -8,7 +8,19 @@
 namespace OpenWifi {
 
 	void RESTAPI_variables_list_handler::DoGet() {
-		return ListHandler<VariablesDB>("variableBlocks", DB_, *this);
+		auto templateTag = GetParameter("templateTag","");
+        if(templateTag.empty()) {		
+			return ListHandler<VariablesDB>("variableBlocks", DB_, *this);
+		}
+        VariablesDB::RecordVec Variables;
+        auto Where = fmt::format(" templateTag = '{}' ", templateTag);
+
+		//poco_debug(
+		//	Logger(),
+		//	fmt::format("RESTAPI_variables_list_handler Where clause {}", Where));
+
+        DB_.GetRecords(QB_.Offset, QB_.Limit, Variables, Where, " ORDER BY name ");
+        return ReturnObject("variableBlocks",Variables);		
 	}
 
 } // namespace OpenWifi
