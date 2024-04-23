@@ -3591,6 +3591,12 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          description: return list which matches templateTag
+          name: templateTag
+          schema:
+            type: string
+          required: false
       responses:
         200:
           $ref: '#/components/schemas/VariableBlockList'
