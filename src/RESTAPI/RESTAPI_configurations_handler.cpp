@@ -137,7 +137,8 @@ namespace OpenWifi {
 		std::vector<std::string> Errors;
         auto deviceType = GetParameter("deviceType", "AP");
         if (!ValidateConfigBlock(ConfigurationValidator::GetType(deviceType), NewObject, Errors)) {
-            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+			std::string allErrors = ConfigurationValidator::EncodeAllErrors(Errors);
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid, allErrors);
         }
 
 		Types::UUIDvec_t ToVariables;
@@ -204,7 +205,8 @@ namespace OpenWifi {
 		std::vector<std::string> Errors;
         auto deviceType = GetParameter("deviceType", "AP");
         if (!ValidateConfigBlock(ConfigurationValidator::GetType(deviceType), NewObject, Errors)) {
-            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+			std::string allErrors = ConfigurationValidator::EncodeAllErrors(Errors);
+            return BadRequest(RESTAPI::Errors::ConfigBlockInvalid, allErrors);
         }
 
 		if (RawObject->has("configuration")) {
