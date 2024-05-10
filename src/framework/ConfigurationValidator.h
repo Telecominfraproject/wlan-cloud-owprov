@@ -43,12 +43,13 @@ namespace OpenWifi {
 		// Encode errors supplied in the array into single string with delimiters
 		//
 		inline static std::string EncodeAllErrors(std::vector<std::string> Errors) {
-			const char* const delim = ", ";
-			std::ostringstream allErrors;
 			if (!Errors.empty()) {
+				const char* const delim = ", ";
+				std::ostringstream allErrors;
 				std::copy(Errors.begin(), Errors.end(), std::ostream_iterator<std::string>(allErrors, delim));
+				return std::string(allErrors.str());
 			}
-			return std::string(allErrors.str());
+			return std::string("unknown");
 		}
 
 	  private:
