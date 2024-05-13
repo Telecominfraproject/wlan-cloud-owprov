@@ -510,7 +510,8 @@ namespace OpenWifi {
 		std::vector<std::string> Errors;
 		auto ObjectsCreated = CreateObjects(NewObject, *this, Errors);
 		if (!Errors.empty()) {
-			return BadRequest(RESTAPI::Errors::ConfigBlockInvalid);
+			std::string allErrors = ConfigurationValidator::EncodeAllErrors(Errors);
+			return BadRequest(RESTAPI::Errors::ConfigBlockInvalid, allErrors);
 		}
 
 		if (!ObjectsCreated.empty()) {

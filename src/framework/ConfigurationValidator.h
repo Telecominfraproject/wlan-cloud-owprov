@@ -39,6 +39,19 @@ namespace OpenWifi {
 			return ConfigurationType::AP;
 		}
 
+		//
+		// Encode errors supplied in the array into single string with delimiters
+		//
+		inline static std::string EncodeAllErrors(std::vector<std::string> Errors) {
+			if (!Errors.empty()) {
+				const char* const delim = ", ";
+				std::ostringstream allErrors;
+				std::copy(Errors.begin(), Errors.end(), std::ostream_iterator<std::string>(allErrors, delim));
+				return std::string(allErrors.str());
+			}
+			return std::string("unknown");
+		}
+
 	  private:
 		bool Initialized_ = false;
 		bool Working_ = false;
