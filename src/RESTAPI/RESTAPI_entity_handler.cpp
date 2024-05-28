@@ -32,9 +32,6 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_entity_handler::DoDelete() {
-		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_ENTITIES_PROV][SecurityObjects::PT_DELETE]) {
-			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
-		}
 
 		std::string UUID = GetBinding("uuid", "");
 		ProvObjects::Entity Existing;
@@ -60,9 +57,6 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_entity_handler::DoPost() {
-		if (!UserInfo_.userinfo.userPermissions[SecurityObjects::PM_ENTITIES_PROV][SecurityObjects::PT_CREATE]) {
-			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
-		}
 
 		std::string UUID = GetBinding("uuid", "");
 		if (UUID.empty()) {

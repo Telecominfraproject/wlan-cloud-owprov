@@ -11,16 +11,21 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/LOBStream.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/Net/HTTPRequest.h"
 #include "framework/OpenWifiTypes.h"
 #include "framework/utils.h"
 #include <string>
 #include <type_traits>
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <set>
 
 namespace OpenWifi {
 	uint64_t Now();
 	namespace SecurityObjects {
+
+
 
 		typedef std::string USER_ID_TYPE;
 
@@ -55,6 +60,13 @@ namespace OpenWifi {
 
 			void to_json(Poco::JSON::Object &Obj) const;
 			bool from_json(const Poco::JSON::Object::Ptr &Obj);
+		};
+
+		const std::map<std::string, std::set<std::string>> API_WHITELIST = {
+			{"/api/v1/venue", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
+			{"/api/v1/inventory", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
+			{"/api/v1/variable", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
+			{"/api/v1/configuration", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}}
 		};
 
 		enum USER_ROLE {
