@@ -62,11 +62,8 @@ namespace OpenWifi {
 			bool from_json(const Poco::JSON::Object::Ptr &Obj);
 		};
 
+		// example entry: {"/api/v1/venue", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}}
 		const std::map<std::string, std::set<std::string>> API_WHITELIST = {
-			{"/api/v1/venue", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
-			{"/api/v1/inventory", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
-			{"/api/v1/variable", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}},
-			{"/api/v1/configuration", {Poco::Net::HTTPRequest::HTTP_POST, Poco::Net::HTTPRequest::HTTP_PUT, Poco::Net::HTTPRequest::HTTP_DELETE}}
 		};
 
 		enum USER_ROLE {
