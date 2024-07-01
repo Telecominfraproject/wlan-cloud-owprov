@@ -14,27 +14,12 @@
 #include "RESTAPI/RESTAPI_db_helpers.h"
 #include "SerialNumberCache.h"
 #include "StorageService.h"
+#include "Tasks/VenueConfigUpdater.h"
 #include "framework/utils.h"
 #include "sdks/SDK_gw.h"
 #include "sdks/SDK_sec.h"
 
 namespace OpenWifi {
-
-	void GetRejectedLines(const Poco::JSON::Object::Ptr &Response, Types::StringVec &Warnings) {
-		try {
-			if (Response->has("results")) {
-				auto Results = Response->get("results").extract<Poco::JSON::Object::Ptr>();
-				auto Status = Results->get("status").extract<Poco::JSON::Object::Ptr>();
-				auto Rejected = Status->getArray("rejected");
-				std::transform(
-					Rejected->begin(), Rejected->end(), std::back_inserter(Warnings),
-					[](auto i) -> auto { return i.toString(); });
-				//                for(const auto &i:*Rejected)
-				//                  Warnings.push_back(i.toString());
-			}
-		} catch (...) {
-		}
-	}
 
 	void RESTAPI_inventory_handler::DoGet() {
 
@@ -314,6 +299,8 @@ namespace OpenWifi {
 			return NotFound();
 		}
 
+		std::string previous_venue = Existing.venue;
+
 		auto RemoveSubscriber = GetParameter("removeSubscriber");
 		if (!RemoveSubscriber.empty()) {
 			if (Existing.subscriber == RemoveSubscriber) {
@@ -470,6 +457,13 @@ namespace OpenWifi {
 
 			SDK::GW::Device::SetOwnerShip(this, SerialNumber, Existing.entity, Existing.venue,
 										  Existing.subscriber);
+
+			// Attempt an automatic config push when the venue is set and different than what is
+			// in DB.
+			poco_information(Logger(), fmt::format("New Venue {} Old Venue {}", NewObject.venue, previous_venue));
+			if (!NewObject.venue.empty() && NewObject.venue != previous_venue) {
+				ComputeAndPushConfig(SerialNumber, NewObject.deviceType, Logger());
+			}
 
 			ProvObjects::InventoryTag NewObjectCreated;
 			DB_.GetRecord("id", Existing.info.id, NewObjectCreated);
