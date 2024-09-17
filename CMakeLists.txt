@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-<<<<<<< HEAD
 project(owprov VERSION 3.0.3)
-=======
-project(owprov VERSION 3.1.0)
->>>>>>> 1327b29 (https://telecominfraproject.atlassian.net/browse/WIFI-13808)
 
 set(CMAKE_CXX_STANDARD 17)
 
