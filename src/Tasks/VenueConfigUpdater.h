@@ -28,6 +28,42 @@ namespace OpenWifi {
 		}
 	}
 
+	[[maybe_unused]] static void ComputeAndPushConfig(const std::string &SerialNumber, const std::string &DeviceType, Poco::Logger &Logger) {
+		/*
+		Generic Helper to compute a device's config and push it down to the device.
+		*/
+		poco_information(Logger, fmt::format("Attempting to push venue config for device {}", SerialNumber));
+		auto DeviceConfig = std::make_shared<APConfig>(SerialNumber,
+														DeviceType, Logger, false);
+		auto Configuration = Poco::makeShared<Poco::JSON::Object>();
+		try {
+			if (DeviceConfig->Get(Configuration)) {
+				std::ostringstream OS;
+				Configuration->stringify(OS);
+				auto Response = Poco::makeShared<Poco::JSON::Object>();
+				poco_debug(Logger,
+							fmt::format("{}: Pushing configuration.", SerialNumber));
+				if (SDK::GW::Device::Configure(nullptr, SerialNumber, Configuration,
+												Response)) {
+					Logger.debug(
+						fmt::format("{}: Configuration pushed.", SerialNumber));
+					poco_information(Logger,
+										fmt::format("{}: Updated.", SerialNumber));
+				} else {
+					poco_information(Logger,
+										fmt::format("{}: Not updated.", SerialNumber));
+				}
+			} else {
+				poco_debug(Logger,
+							fmt::format("{}: Configuration is bad.", SerialNumber));
+			}
+		} catch (...) {
+			poco_debug(Logger,
+						fmt::format("{}: Configuration is bad (caused an exception).",
+									SerialNumber));
+		}
+	}
+
 	class VenueDeviceConfigUpdater : public Poco::Runnable {
 	  public:
 		VenueDeviceConfigUpdater(const std::string &UUID, const std::string &venue, Poco::Logger &L)
